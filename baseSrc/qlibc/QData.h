@@ -19,6 +19,7 @@ private:
 public:
     QData();
     explicit QData(const std::string& source);
+    explicit QData(const char* str, int size);
     explicit QData(const Json::Value& val);
     QData(const QData& data);
 
@@ -30,6 +31,9 @@ public:
     void clear();
     void removeMember(const std::string& key);
     Json::Value::Members getMemberNames();
+
+    QData& setInitData(const QData& data);
+    QData& setInitValue(const Json::Value& value);
 
     void toJsonString(std::string& str, bool expand = false);
     std::string toJsonString(bool expand = false);
@@ -48,11 +52,11 @@ public:
     std::string getString(const std::string& key) const;
     QData& setString(const std::string& key, const std::string& value);
 
-    bool getData(const std::string& key, QData& data);
+    void getData(const std::string& key, QData& data) const;
     QData getData(const std::string& key) const;
-    bool putData(const std::string& key, const QData& data);
+    void putData(const std::string& key, const QData& data);
 
-    bool getValue(const std::string& key, Json::Value& value) const;
+    void getValue(const std::string& key, Json::Value& value) const;
     Json::Value getValue(const std::string& key) const;
     void setValue(const std::string& key, const Json::Value& value);
 
@@ -68,6 +72,13 @@ public:
      * 成功返回true; 失败返回false,且destValue为Json::Value(Json::nullValue)
      */
     static bool parseJson(const std::string& srcStr, Json::Value& destValue);
+
+    /**
+     * 将字符串转换为Json::Value对象
+     * 成功返回true; 失败返回false,且destValue为Json::Value(Json::nullValue)
+     */
+    static bool parseJson(const char* srcStr, int srcSize, Json::Value& destValue);
+
 
     /**
      * 将字符串转换为Json::Value对象,

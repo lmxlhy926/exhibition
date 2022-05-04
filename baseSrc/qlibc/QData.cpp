@@ -15,6 +15,11 @@ QData::QData(const string &source) {
     parseJson(source, *_value);
 }
 
+QData::QData(const char* str, int size){
+    _value.reset(new Json::Value(Json::nullValue));
+    parseJson(str, size, *_value);
+}
+
 QData::QData(const Json::Value &val) {
     _value.reset(new Json::Value(val));
 }
@@ -35,6 +40,19 @@ bool QData::parseJson(const string &srcStr, Json::Value &destValue) {
     const char* str = srcStr.c_str();
     JSONCPP_STRING errs;
     bool ok = reader->parse(str, str + srcStr.size(), &destValue, &errs);
+    if (!ok){
+        destValue = Json::nullValue;
+        return false;
+    }
+    return true;
+}
+
+bool QData::parseJson(const char* srcStr, int srcSize, Json::Value& destValue){
+    Json::CharReaderBuilder b;
+    std::unique_ptr<Json::CharReader> reader(b.newCharReader());
+    const char* str = srcStr;
+    JSONCPP_STRING errs;
+    bool ok = reader->parse(str, str + srcSize, &destValue, &errs);
     if (!ok){
         destValue = Json::nullValue;
         return false;
@@ -126,6 +144,17 @@ Json::Value::Members QData::getMemberNames() {
     return Json::Value::Members();
 }
 
+QData& QData::setInitData(const QData& data){
+    Json::Value v = *data.asValue();
+    setInitValue(v);
+    return *this;
+}
+
+QData& QData::setInitValue(const Json::Value& value){
+    *_value = value;
+    return *this;
+}
+
 void QData::toJsonString(string &str, bool expand) {
     if(expand)
         str = _value->toStyledString();
@@ -148,9 +177,96 @@ void QData::saveToFile(const string &filePathName) {
 }
 
 bool QData::getBool(const string &key, bool defValue) const {
-    return false;
+    if(!_value->isObject() || key.empty()) return defValue;
+    Json::Value v = _value->get(key, Json::Value());
+    if(v.isBool())  return v.asBool();
+    return defValue;
 }
 
+bool QData::getBool(const std::string& key) const{
+    return getBool(key, false);
+}
 
+QData &QData::setBool(const string &key, bool value) {
+   if(!_value->isObject() || key.empty())   return *this;
+    (*_value)[key] = value;
+    return *this;
+}
+
+int QData::getInt(const string &key, int defValue) const {
+    if(!_value->isObject() || key.empty())  return defValue;
+    Json::Value v = (*_value).get(key, Json::Value());
+    if(v.isInt())   return v.asInt();
+    return defValue;
+}
+
+int QData::getInt(const string &key) const {
+    return getInt(key, -1);
+}
+
+QData &QData::setInt(const string &key, int val) {
+    if((!_value->isNull() && !_value->isObject()) || key.empty())
+        return *this;
+    (*_value)[key] = val;
+    return *this;
+}
+
+std::string QData::getString(const string &key, const string &defValue) const {
+    if(!_value->isObject() || key.empty())  return defValue;
+    Json::Value v = _value->get(key, Json::Value());
+    if(v.isString())    return v.asString();
+    return defValue;
+}
+
+std::string QData::getString(const string &key) const {
+   return getString(key, "");
+}
+
+QData &QData::setString(const string &key, const string &value) {
+    if((!_value->isNull() && !_value->isObject()) || value.empty())
+        return *this;
+    (*_value)[key] = value;
+    return *this;
+}
+
+void QData::getData(const string &key, QData &data) const{
+    if(!_value->isObject() || key.empty()){
+        data.setInitValue(Json::Value());
+        return;
+    }
+    Json::Value v = _value->get(key, Json::Value());
+    data.setInitValue(v);
+}
+
+QData QData::getData(const string &key) const {
+    QData data;
+    getData(key, data);
+    return data;
+}
+
+void QData::putData(const string &key, const QData &data) {
+    if((!_value->isNull() && !_value->isObject()) || key.empty())
+        return;
+    (*_value)[key] = *data.asValue();
+}
+
+void QData::getValue(const string &key, Json::Value &value) const {
+    if(!_value->isObject() || key.empty()){
+        value = Json::Value();
+        return;
+    }
+    value = _value->get(key, Json::Value());
+}
+
+Json::Value QData::getValue(const string &key) const {
+    Json::Value v;
+    getValue(key, v);
+    return v;
+}
+
+void QData::setValue(const string &key, const Json::Value &value) {
+    if(!_value->isObject() || key.empty())  return;
+    (*_value)[key] = value;
+}
 
 
