@@ -46,6 +46,8 @@ public:
     //启动client连接server
     bool start(const string& ip, int port);
 
+    void shutdownAndClose();
+
     //是否和server依然处于连接状态
     bool isConnectionAlive();
 
@@ -57,7 +59,9 @@ public:
 
     void readLine();
 
-    bool connectAndReconnect();
+    bool connectAtOnce();
+
+    void connectAtFixedTime();
 
     void setDefaultHandler(const JsonSocketHandler& defaultHandler);
 

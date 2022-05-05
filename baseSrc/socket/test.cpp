@@ -12,7 +12,7 @@
 using namespace sockCommon;
 using namespace std;
 
-
+#if 0
 int test1(){
     string ip = "127.0.0.1";
     int port = 60000;
@@ -66,6 +66,7 @@ int test1(){
 
 }
 
+#endif
 
 
 

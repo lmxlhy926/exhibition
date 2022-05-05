@@ -7,15 +7,22 @@
 bool socketClient::start(const string &ip, int port) {
     host_ = ip;
     port_ = port;
-    connectAndReconnect();
+    connectAtOnce();
+    threadPool_.enqueue([&](){
+        connectAtFixedTime();
+    });
+}
+
+void socketClient::shutdownAndClose(){
+    sockCommon::shutdown_socket(sock_);
+    sockCommon::close_socket(sock_);
+    std::cout << "sock:" << sock_ << " shutdownAndClosed---" << std::endl;
 }
 
 void socketClient::readLine() {
     while(true){
         if(!streamLineReader->getline()){
-            sockCommon::shutdown_socket(sock_);
-            sockCommon::close_socket(sock_);
-            std::cout << "---shutdown and closed first----" << std::endl;
+            shutdownAndClose();
             break;
         }
 
@@ -32,7 +39,7 @@ void socketClient::readLine() {
 }
 
 
-bool socketClient::connectAndReconnect(){
+bool socketClient::connectAtOnce(){
     sock_ = sockCommon::create_socket(host_.c_str(), port_,
                                       [](socket_t sock2, struct addrinfo &ai)->bool{
                                           return sockCommon::connect(sock2, ai);
@@ -46,13 +53,23 @@ bool socketClient::connectAndReconnect(){
     streamLineReader.reset(new sockCommon::stream_line_reader(*socketStream));
 
     threadPool_.enqueue([&](){
+        std::cout << "===>thread " << std::this_thread::get_id() << " start---" << std::endl;
         readLine();
-//        std::cout << "---lost and execute offlineHandler---" << std::endl;
-//        std::this_thread::sleep_for(std::chrono::seconds(2));
-//        connectAndReconnect();
+        connectAtOnce();
+        std::cout << "===>thread " << std::this_thread::get_id() << " end---" << std::endl;
     });
 
     return true;
+}
+
+void socketClient::connectAtFixedTime(){
+    while(true){
+        if(sock_ == INVALID_SOCKET){
+            std::cout << "----reconnect at fixed time----" << std::endl;
+            connectAtOnce();
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(15));
+    }
 }
 
 bool socketClient::isConnectionAlive() {
