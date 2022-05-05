@@ -103,8 +103,7 @@ namespace sockCommon{
 
     class stream_line_reader {
     public:
-        stream_line_reader(Stream &strm, char *fixed_buffer,
-                           size_t fixed_buffer_size);
+        explicit stream_line_reader(Stream &strm) : strm_(strm){};
         const char *ptr() const;        //返回读取内容
         size_t size() const;            //读取的内容字节数
         bool end_with_crlf() const;     //是否以特定字符结尾
@@ -114,8 +113,8 @@ namespace sockCommon{
         void append(char c);
 
         Stream &strm_;
-        char *fixed_buffer_;
-        const size_t fixed_buffer_size_;
+        char fixed_buffer_[1024]{};
+        const size_t fixed_buffer_size_ = 1024;
         size_t fixed_buffer_used_size_ = 0;
         std::string glowable_buffer_;
     };

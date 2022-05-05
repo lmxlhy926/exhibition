@@ -12,19 +12,25 @@
 
 using namespace std;
 
+/*
+ * 封装Json::Value的操作，增加判断条件，避免操作抛出异常从而终止程序
+ */
 class QData {
 private:
     std::shared_ptr<Json::Value> _value;
     std::recursive_mutex _mutex;
 public:
+    //构造函数，失败则_value被赋值为Json::Value(Json::nullValue)
     QData();
     explicit QData(const std::string& source);
     explicit QData(const char* str, int size);
     explicit QData(const Json::Value& val);
+    //拷贝构造、赋值函数
     QData(const QData& data);
+    QData& operator= (const QData& data);
 
 public:
-    std::shared_ptr<Json::Value> asValue() const;
+    Json::Value& asValue() const;
     Json::ArrayIndex size() const;
     Json::ValueType type() const;
     bool empty() const;
@@ -32,6 +38,7 @@ public:
     void removeMember(const std::string& key);
     Json::Value::Members getMemberNames();
 
+    //将_value赋值为新值
     QData& setInitData(const QData& data);
     QData& setInitValue(const Json::Value& value);
 
@@ -40,25 +47,25 @@ public:
     void loadFromFile(const std::string& filePathName);
     void saveToFile(const std::string& filePathName);
 
-    bool getBool(const std::string& key, bool defValue) const;
-    bool getBool(const std::string& key) const;
+    bool getBool(const std::string& key, bool defValue);
+    bool getBool(const std::string& key);
     QData& setBool(const std::string& key, bool value);
 
-    int getInt(const std::string& key, int defValue) const;
-    int getInt(const std::string& key) const;
+    int getInt(const std::string& key, int defValue);
+    int getInt(const std::string& key);
     QData& setInt(const std::string& key, int val);
 
-    std::string getString(const std::string& key, const std::string& defValue) const;
-    std::string getString(const std::string& key) const;
+    std::string getString(const std::string& key, const std::string& defValue);
+    std::string getString(const std::string& key);
     QData& setString(const std::string& key, const std::string& value);
 
-    void getData(const std::string& key, QData& data) const;
-    QData getData(const std::string& key) const;
-    void putData(const std::string& key, const QData& data);
+    void getData(const std::string& key, QData& data);
+    QData getData(const std::string& key);
+    QData& putData(const std::string& key, const QData& data);
 
-    void getValue(const std::string& key, Json::Value& value) const;
-    Json::Value getValue(const std::string& key) const;
-    void setValue(const std::string& key, const Json::Value& value);
+    void getValue(const std::string& key, Json::Value& value);
+    Json::Value getValue(const std::string& key);
+    QData& setValue(const std::string& key, const Json::Value& value);
 
 public:
     /**

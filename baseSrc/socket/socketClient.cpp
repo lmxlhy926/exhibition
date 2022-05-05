@@ -12,28 +12,23 @@ bool socketClient::start(const string &ip, int port) {
 
 void socketClient::readLine() {
     while(true){
-        if(!slr->getline()){
+        if(!streamLineReader->getline()){
             sockCommon::shutdown_socket(sock_);
             sockCommon::close_socket(sock_);
             std::cout << "---shutdown and closed first----" << std::endl;
             break;
         }
 
-        if(slr->end_with_crlf()){
-            std::cout << "readline==>" << slr->ptr();
-            QData data(slr->ptr(), slr->size() -1);
-            if(data.type() != Json::nullValue){
-                string uri = data.getString("uri");
-                jsonDataHandler.disPatchMessage(uri, data);
-            }
-        }else{
-            std::cout  << "notaline===>" << slr->ptr() << std::endl;
+        std::cout << "received Line==>" << streamLineReader->ptr();
+        QData data(streamLineReader->ptr(), streamLineReader->size() -1);
+        if(data.type() != Json::nullValue){
+            string uri = data.getString("uri");
+            receivedJsonHandler.disPatchMessage(uri, data);
         }
 
-        string str = "helloworld\n";
-        sockCommon::write_data(*sockst, str.c_str(), str.size());
+        string str = "messageBack\n";
+        sockCommon::write_data(*socketStream, str.c_str(), str.size());
     }
-
 }
 
 
@@ -47,26 +42,26 @@ bool socketClient::connectAndReconnect(){
         return false;
     }
 
-    sockst.reset(new sockCommon::SocketStream(sock_));
-    slr.reset(new sockCommon::stream_line_reader(*sockst, buffer, bufferSize));
+    socketStream.reset(new sockCommon::SocketStream(sock_));
+    streamLineReader.reset(new sockCommon::stream_line_reader(*socketStream));
 
     threadPool_.enqueue([&](){
         readLine();
-        std::cout << "---lost and execute offlineHandler---" << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        connectAndReconnect();
+//        std::cout << "---lost and execute offlineHandler---" << std::endl;
+//        std::this_thread::sleep_for(std::chrono::seconds(2));
+//        connectAndReconnect();
     });
 
     return true;
 }
 
-bool socketClient::isActive() {
+bool socketClient::isConnectionAlive() {
     return sockCommon::is_socket_alive(sock_);
 }
 
 bool socketClient::sendMessage(const char *buff, int len) {
-    if(isActive()){
-        return sockCommon::write_data(*sockst, buff, len);
+    if(isConnectionAlive()){
+        return sockCommon::write_data(*socketStream, buff, len);
     }
     return false;
 }
@@ -76,9 +71,9 @@ bool socketClient::sendMessage(const string &str) {
 }
 
 void socketClient::setDefaultHandler(const JsonSocketHandler &defaultHandler) {
-    jsonDataHandler.setDefaultHandler(defaultHandler);
+    receivedJsonHandler.setDefaultHandler(defaultHandler);
 }
 
 void socketClient::setUriHandler(const string &uri, const JsonSocketHandler &jsHandler) {
-    jsonDataHandler.setUriHandler(uri, jsHandler);
+    receivedJsonHandler.setUriHandler(uri, jsHandler);
 }

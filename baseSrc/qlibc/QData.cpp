@@ -25,9 +25,12 @@ QData::QData(const Json::Value &val) {
 }
 
 QData::QData(const QData& data) {
-    _value.reset(new Json::Value(*data.asValue()));
+    _value.reset(new Json::Value(data.asValue()));
 }
 
+QData& QData::operator= (const QData& data){
+    _value.reset(new Json::Value(data.asValue()));
+}
 
 bool QData::contains(const string &src, const string &dest) {
     if(src.find(dest) != std::string::npos) return true;
@@ -102,15 +105,15 @@ bool QData::writeToFile(const string &filePathName, const Json::Value &value) {
     if(valueToJsonString(value, content)){
         std::ofstream out(filePathName, std::ios::out);
         if(out.is_open()){
-            out << content << std::endl;
+            out << content;
             return true;
         }
     }
     return false;
 }
 
-std::shared_ptr<Json::Value> QData::asValue() const{
-    return _value;
+Json::Value& QData::asValue() const{
+    return *_value;
 }
 
 Json::ArrayIndex QData::size() const {
@@ -126,18 +129,21 @@ bool QData::empty() const {
 }
 
 void QData::clear() {
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if(_value->isNull() || _value->isObject() || _value->isArray()){
         _value->clear();
     }
 }
 
 void QData::removeMember(const string &key) {
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if(_value->isNull() || _value->isObject()){
         _value->removeMember(key.c_str());
     }
 }
 
 Json::Value::Members QData::getMemberNames() {
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if(_value->isNull() || _value->isObject()){
         return _value->getMemberNames();
     }
@@ -145,91 +151,108 @@ Json::Value::Members QData::getMemberNames() {
 }
 
 QData& QData::setInitData(const QData& data){
-    Json::Value v = *data.asValue();
-    setInitValue(v);
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
+    setInitValue(data.asValue());
     return *this;
 }
 
 QData& QData::setInitValue(const Json::Value& value){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     *_value = value;
     return *this;
 }
 
-void QData::toJsonString(string &str, bool expand) {
+void QData::toJsonString(string &str, bool expand){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if(expand)
         str = _value->toStyledString();
     else
         valueToJsonString(*_value, str);
 }
 
-std::string QData::toJsonString(bool expand) {
+std::string QData::toJsonString(bool expand){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     string str;
     toJsonString(str, expand);
     return str;
 }
 
 void QData::loadFromFile(const string &filePathName) {
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
    _value.reset(new Json::Value(parseFromFile(filePathName)));
 }
 
 void QData::saveToFile(const string &filePathName) {
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     writeToFile(filePathName, *_value);
 }
 
-bool QData::getBool(const string &key, bool defValue) const {
+bool QData::getBool(const string &key, bool defValue){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if(!_value->isObject() || key.empty()) return defValue;
     Json::Value v = _value->get(key, Json::Value());
     if(v.isBool())  return v.asBool();
     return defValue;
 }
 
-bool QData::getBool(const std::string& key) const{
+bool QData::getBool(const std::string& key){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     return getBool(key, false);
 }
 
 QData &QData::setBool(const string &key, bool value) {
-   if(!_value->isObject() || key.empty())   return *this;
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
+    if((!_value->isNull() && !_value->isObject()) || key.empty())   return *this;
     (*_value)[key] = value;
     return *this;
 }
 
-int QData::getInt(const string &key, int defValue) const {
+int QData::getInt(const string &key, int defValue){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if(!_value->isObject() || key.empty())  return defValue;
     Json::Value v = (*_value).get(key, Json::Value());
     if(v.isInt())   return v.asInt();
     return defValue;
 }
 
-int QData::getInt(const string &key) const {
+int QData::getInt(const string &key){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     return getInt(key, -1);
 }
 
 QData &QData::setInt(const string &key, int val) {
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if((!_value->isNull() && !_value->isObject()) || key.empty())
         return *this;
     (*_value)[key] = val;
     return *this;
 }
 
-std::string QData::getString(const string &key, const string &defValue) const {
+std::string QData::getString(const string &key, const string &defValue){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if(!_value->isObject() || key.empty())  return defValue;
     Json::Value v = _value->get(key, Json::Value());
-    if(v.isString())    return v.asString();
-    return defValue;
+    if(v.type() == Json::objectValue || v.type() == Json::arrayValue){
+        return defValue;
+    }
+    return v.asString();
 }
 
-std::string QData::getString(const string &key) const {
-   return getString(key, "");
+std::string QData::getString(const string &key){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
+    return getString(key, "");
 }
 
 QData &QData::setString(const string &key, const string &value) {
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if((!_value->isNull() && !_value->isObject()) || value.empty())
         return *this;
     (*_value)[key] = value;
     return *this;
 }
 
-void QData::getData(const string &key, QData &data) const{
+void QData::getData(const string &key, QData &data){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if(!_value->isObject() || key.empty()){
         data.setInitValue(Json::Value());
         return;
@@ -238,19 +261,23 @@ void QData::getData(const string &key, QData &data) const{
     data.setInitValue(v);
 }
 
-QData QData::getData(const string &key) const {
+QData QData::getData(const string &key){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     QData data;
     getData(key, data);
     return data;
 }
 
-void QData::putData(const string &key, const QData &data) {
+QData& QData::putData(const string &key, const QData &data) {
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if((!_value->isNull() && !_value->isObject()) || key.empty())
-        return;
-    (*_value)[key] = *data.asValue();
+        return *this;
+    (*_value)[key] = data.asValue();
+    return *this;
 }
 
-void QData::getValue(const string &key, Json::Value &value) const {
+void QData::getValue(const string &key, Json::Value &value){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     if(!_value->isObject() || key.empty()){
         value = Json::Value();
         return;
@@ -258,15 +285,18 @@ void QData::getValue(const string &key, Json::Value &value) const {
     value = _value->get(key, Json::Value());
 }
 
-Json::Value QData::getValue(const string &key) const {
+Json::Value QData::getValue(const string &key){
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
     Json::Value v;
     getValue(key, v);
     return v;
 }
 
-void QData::setValue(const string &key, const Json::Value &value) {
-    if(!_value->isObject() || key.empty())  return;
+QData& QData::setValue(const string &key, const Json::Value &value) {
+    std::lock_guard<std::recursive_mutex> lg(_mutex);
+    if(!_value->isObject() || key.empty())  return *this;
     (*_value)[key] = value;
+    return *this;
 }
 
 

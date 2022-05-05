@@ -6,7 +6,7 @@
 
 messageHandler::messageHandler() {
     defaultHandler_ = [](QData& message) -> bool{
-        std::cout << "received message: " << message.toJsonString();
+        std::cout << "-->received default unhandled msg>>:" << message.toJsonString() << endl;
     };
 }
 
@@ -17,6 +17,8 @@ void messageHandler::setDefaultHandler(const JsonSocketHandler &defaultHandler) 
 
 void messageHandler::setUriHandler(const string &uri, const JsonSocketHandler &jsHandler) {
     std::lock_guard<std::mutex> lg(mutex_);
+    if(uriHandlers_.find(uri) != uriHandlers_.end())
+        uriHandlers_.erase(uri);
     uriHandlers_.insert(std::make_pair(uri, jsHandler));
 }
 

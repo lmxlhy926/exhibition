@@ -348,11 +348,6 @@ namespace sockCommon{
     }
 
 
-    stream_line_reader::stream_line_reader(Stream &strm, char *fixed_buffer,
-                                           size_t fixed_buffer_size)
-                                           : strm_(strm), fixed_buffer_(fixed_buffer),
-                                             fixed_buffer_size_(fixed_buffer_size) {}
-
     const char *stream_line_reader::ptr() const {
         if (glowable_buffer_.empty()) {
             return fixed_buffer_;
