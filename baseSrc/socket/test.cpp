@@ -74,7 +74,7 @@ int test1(){
 
 int main(int agrc, char* argv[]){
     socketClient sc;
-    sc.start("127.0.0.1", 60000);
+    sc.start("127.0.0.1", 60000, string("loginMessage"));
     sc.setUriHandler("hello", [](QData& message)->bool{
         std::cout << "--uriHandler-hello--:" << message.toJsonString(true) << std::endl;
     });

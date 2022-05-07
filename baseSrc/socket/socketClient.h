@@ -24,29 +24,30 @@
 using namespace std;
 class socketClient {
 public:
-    using sockReadDataHandler = std::function<bool(const char* buff, int len)>;
-    using sockOfflineHandler = std::function<void(string& host, int port)>;
+    using afterConnectHandler = std::function<bool(const char* buff, int len)>;
 private:
     socket_t sock_ = -1;
     std::string host_;
     int port_ = -1;
+    string content;
 
-    time_t timeoutSec = 300;
-    bool active = false;
+    bool sockValid = false;
+    bool quit = false;
 
     httplib::ThreadPool threadPool_;
     messageHandler receivedJsonHandler;
     std::shared_ptr<sockCommon::SocketStream> socketStream;
     std::shared_ptr<sockCommon::stream_line_reader> streamLineReader;
+    afterConnectHandler func;
 
 public:
     explicit socketClient(): threadPool_(10){}
     ~socketClient()= default;
 
     //启动client连接server
-    bool start(const string& ip, int port);
+    bool start(const string& ip, int port, string loginMessage);
 
-    void shutdownAndClose();
+    bool stop();
 
     //是否和server依然处于连接状态
     bool isConnectionAlive();
@@ -57,16 +58,20 @@ public:
     //向server发送消息
     bool sendMessage(const string& str);
 
-    void readLine();
-
-    bool connectAtOnce();
-
-    void connectAtFixedTime();
-
     void setDefaultHandler(const JsonSocketHandler& defaultHandler);
 
     void setUriHandler(const string& uri, const JsonSocketHandler& jsHandler);
 
+private:
+    bool socketFdValid();
+
+    bool establishConnection();
+
+    void readLineAndHandle();
+
+    void connectAndHandle();
+
+    void shutdownAndCloseSocket();
 };
 
 
