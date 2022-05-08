@@ -1,0 +1,6 @@
+{
+  "server": "mqtt.chiq-cloud.com",
+  "port": 1883,
+  "username": "DCH201951420209546F00006",
+  "password": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0YW8xLmppYW5nIiwidXNlciI6ImlwcGNsb3VkIn0.LZCgZCs4eoL_EWytWnep_gP7hVRHcx9UKn1AWvqVo3A"
+}
