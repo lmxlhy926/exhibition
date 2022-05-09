@@ -5,10 +5,9 @@
 #include <chrono>
 #include <iostream>
 
-int main(int argc, char* argv[]){
+int main(int argc, char* argv[]) {
 
     std::cout << "----" << std::endl;
-
 
 
     QData configData;
@@ -19,12 +18,18 @@ int main(int argc, char* argv[]){
     std::string password = configData.getString("password");
 
     mqttClient mc;
-    mc.paramConfig(server, port, username, password, "sssshess");
-//    if(mc.connect()){
+    mc.paramConfig(server, port, username, password, "subscribe");
+    if(mc.connect()){
+        std::cout << "----connect successfully---" << std::endl;
+    }
 
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
+    mc.subscribe("abc");
 
-
+    while(true)
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+}
 
 
 

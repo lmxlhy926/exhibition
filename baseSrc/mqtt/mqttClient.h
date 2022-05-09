@@ -38,22 +38,22 @@ public:
                      const string& userName, const string& passWd,
                      const string& clientID);
 
-//    bool connect();
-//
-//    bool publish(const string& topic, const string& msg, int Qos = 2);
-//
-//    bool subscribe(const string& topic, int QOs = 2);
-//
-//    void setDefaultHandler(const MqttMsgHandler& defaultHandler);
-//
-//    void setTopicHandler(const string& topic, const MqttMsgHandler & handler);
-//
-//    bool addDataHooker(MqttDataHooker& dataHooker);
-//
-//private:
-//    static int onMsgArrvd(void *context, char *topicName, int topicLen, MQTTAsync_message *message);
-//
-//    void onMessageArrvd(char *topicName, int topicLen, void *payload, int payloadLen);
+    bool connect();
+
+    bool publish(const string& topic, const string& msg, int Qos = 2);
+
+    bool subscribe(const string& topic, int QOs = 2);
+
+    void setDefaultHandler(const MqttMsgHandler& defaultHandler);
+
+    void setTopicHandler(const string& topic, const MqttMsgHandler & handler);
+
+    bool addDataHooker(MqttDataHooker& dataHooker);
+
+private:
+    static int onMsgArrvd(void *context, char *topicName, int topicLen, MQTTAsync_message *message);
+
+    void onMessageArrvd(char *topicName, int topicLen, void *payload, int payloadLen);
 
 };
 

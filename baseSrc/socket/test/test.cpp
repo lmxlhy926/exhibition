@@ -5,6 +5,7 @@
 #include <chrono>
 #include <string>
 #include "socket/socketClient.h"
+#include "socket/socketServer.h"
 
 
 
@@ -27,14 +28,16 @@ void clientTest(){
 void serverTest(){
     string ip = "127.0.0.1";
     int port = 60001;
-//    socketServer server;
-//    server.start(ip, 60001);
-//    server.listen();
+    socketServer server;
+    if(server.start(ip, 60001)){
+        std::cout << "---bind error---" << std::endl;
+    }
+    server.listen();
 }
 
 
 int main(int argc, char* argv[]){
-    clientTest();
+    serverTest();
 
     std::cout << "-----main here-----" << std::endl;
 
