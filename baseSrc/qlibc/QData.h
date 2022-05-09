@@ -18,7 +18,7 @@ using namespace std;
 class QData {
 private:
     std::shared_ptr<Json::Value> _value;
-    std::recursive_mutex _mutex;
+    std::shared_ptr<std::recursive_mutex> _mutex;
 public:
     //构造函数，失败则_value被赋值为Json::Value(Json::nullValue)
     QData();
@@ -36,27 +36,27 @@ public:
     bool empty() const;
     void clear();
     void removeMember(const std::string& key);
-    Json::Value::Members getMemberNames();
+    Json::Value::Members getMemberNames() const;
 
     //将_value赋值为新值
     QData& setInitData(const QData& data);
     QData& setInitValue(const Json::Value& value);
 
-    void toJsonString(std::string& str, bool expand = false);
-    std::string toJsonString(bool expand = false);
+    void toJsonString(std::string& str, bool expand = false) const;
+    std::string toJsonString(bool expand = false) const;
     void loadFromFile(const std::string& filePathName);
     void saveToFile(const std::string& filePathName);
 
-    bool getBool(const std::string& key, bool defValue);
-    bool getBool(const std::string& key);
+    bool getBool(const std::string& key, bool defValue) const;
+    bool getBool(const std::string& key) const;
     QData& setBool(const std::string& key, bool value);
 
-    int getInt(const std::string& key, int defValue);
-    int getInt(const std::string& key);
+    int getInt(const std::string& key, int defValue) const;
+    int getInt(const std::string& key) const;
     QData& setInt(const std::string& key, int val);
 
-    std::string getString(const std::string& key, const std::string& defValue);
-    std::string getString(const std::string& key);
+    std::string getString(const std::string& key, const std::string& defValue) const;
+    std::string getString(const std::string& key) const;
     QData& setString(const std::string& key, const std::string& value);
 
     void getData(const std::string& key, QData& data);

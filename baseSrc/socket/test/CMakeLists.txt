@@ -1,1 +1,1 @@
-add_executable(socktest test.cpp)
+add_executable(socktest test.cpp ../objecPtrtHolder.cpp)
