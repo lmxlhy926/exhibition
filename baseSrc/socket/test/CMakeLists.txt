@@ -1,1 +1,2 @@
-add_executable(socktest test.cpp ../objecPtrtHolder.cpp)
+add_executable(socketTest test.cpp)
+target_link_libraries(socketTest PRIVATE socket)
