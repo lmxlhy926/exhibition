@@ -17,7 +17,7 @@ class acceptNode{
 private:
     string ip_; //对端的ip
     int port_;  //对端的port
-    const socket_t connectedSock = INVALID_SOCKET;  //用于和客户端通信的socket
+    socket_t connectedSock = INVALID_SOCKET;  //用于和客户端通信的socket
     bool quit = false;
     std::shared_ptr<sockCommon::SocketStream> socketStream;
     std::shared_ptr<sockCommon::stream_line_reader> streamLineReader;
@@ -25,7 +25,7 @@ private:
 public:
     explicit acceptNode(const string& ip, int port, socket_t sock);
 
-    ~acceptNode() = default;
+    ~acceptNode();
 
     bool isAlive() const;
 
@@ -77,6 +77,7 @@ private:
     string serverIp;
     int serverPort;
     socket_t serverSock_ = INVALID_SOCKET;
+    bool bindAndListen = false;
     httplib::ThreadPool threadPool_;
     objectPtrHolder clients_;
 

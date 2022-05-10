@@ -30,9 +30,14 @@ void serverTest(){
     int port = 60001;
     socketServer server;
     if(server.start(ip, 60001)){
-        std::cout << "---bind error---" << std::endl;
+        std::cout << "---bind successfully---" << std::endl;
+        server.listen();
     }
-    server.listen();
+    while(true){
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        server.postMessage("hello");
+    }
+
 }
 
 

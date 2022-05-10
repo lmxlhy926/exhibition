@@ -11,15 +11,21 @@ acceptNode::acceptNode(const string &ip,
     streamLineReader.reset(new sockCommon::stream_line_reader(*socketStream));
 }
 
+acceptNode::~acceptNode(){
+    close();
+}
+
 bool acceptNode::isAlive() const{
     return !quit && connectedSock != INVALID_SOCKET;
 }
 
 void acceptNode::close(){
-    if(connectedSock != INVALID_SOCKET){
+    if(connectedSock != INVALID_SOCKET && quit){
         sockCommon::shutdown_socket(connectedSock);
         sockCommon::close_socket(connectedSock);
     }
+    quit = false;
+    connectedSock = INVALID_SOCKET;
 }
 
 ssize_t acceptNode::write(const char *buff, size_t size) {
@@ -42,6 +48,7 @@ bool acceptNode::readLine(string& str){
         str.assign(streamLineReader->ptr(), streamLineReader->size() -1);
         return true;
     }
+    quit = true;
     return false;
 }
 
@@ -110,15 +117,18 @@ bool socketServer::start(string& ip, int port, int socket_flags) {
     serverIp = ip;
     serverPort = port;
     serverSock_ = createServerSocket(serverIp, serverPort, socket_flags);
-    return serverSock_ == INVALID_SOCKET;
+    if(serverSock_ != INVALID_SOCKET){
+        bindAndListen = true;
+        return true;
+    }
+    return false;
 }
 
 void socketServer::listen(){
-    listen_internal();
-
-//    threadPool_.enqueue([&](){
-//        listen_internal();
-//    });
+    threadPool_.enqueue([&](){
+        if(bindAndListen)
+            listen_internal();
+    });
 }
 
 bool socketServer::postMessage(const string& message) {
@@ -131,7 +141,7 @@ bool socketServer::postMessage(const string& message) {
 socket_t socketServer::createServerSocket(string& ip, int port, int socket_flags) {
     return sockCommon::create_socket(ip.c_str(), port,
                             [&](socket_t sock, struct addrinfo &ai)->bool{
-                                                if(!bind(sock, ai.ai_addr, ai.ai_addrlen))
+                                                if(bind(sock, ai.ai_addr, ai.ai_addrlen) != 0)
                                                     return false;
                                                 else
                                                     return ::listen(sock, 10) == 0;
@@ -159,6 +169,7 @@ bool socketServer::listen_internal() {
                 sockCommon::shutdown_socket(serverSock_);
                 sockCommon::close_socket(serverSock_);
                 serverSock_ = INVALID_SOCKET;
+                bindAndListen = false;
                 return false;
             }else{
                 ;
@@ -197,6 +208,8 @@ void socketServer::process_socket(socket_t sock) {
             }
         }
     }
+
+    //关闭和客户端建立的连接
     sockCommon::shutdown_socket(sock);
     sockCommon::close_socket(sock);
 }
