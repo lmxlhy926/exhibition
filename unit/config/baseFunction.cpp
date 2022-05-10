@@ -53,40 +53,42 @@ bool ecb_httppost(httplib::Client *client, const std::string& uri,
 }
 
 
-bool joinTvWhite(const string& cacheDir){
+bool joinTvWhite(const string& cacheDir, string& url, int port){
 
     qlibc::QData baseinfo;
-    lhytemp::fileRW::loadFromFile(baseinfo, FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+    baseinfo.loadFromFile(FileUtils::contactFileName(cacheDir, "baseinfo.json"));
     qlibc::QData record;
-    lhytemp::fileRW::loadFromFile(record, FileUtils::contactFileName(cacheDir, "record.json"));
+    record.loadFromFile(FileUtils::contactFileName(cacheDir, "record.json"));
     bool tvWhite = record.getBool("tvWhite");
 
     if(!tvWhite){   //如果没加入大白名单
-        qlibc::QData requestBody;
+//        qlibc::QData requestData;
+//        requestData.setString("device_id", "tv_gateway_local");
+//        postServiceRequest("coss", "/system/getTVInfo", requestData, TvInfo);
+//
+//        int tvInfoCode = TvInfo.getInt("code");
+//        while(tvInfoCode != 200){
+//            postServiceRequest("coss", "/system/getTVInfo", requestData, TvInfo);
+//            tvInfoCode = TvInfo.getInt("code");
+//        }
+
+        //todo 获取tv信息
         qlibc::QData TvInfo;
-        qlibc::QData requestData;
-        requestData.setString("device_id", "tv_gateway_local");
-        postServiceRequest("coss", "/system/getTVInfo", requestData, TvInfo);
 
-        int tvInfoCode = TvInfo.getInt("code");
-        while(tvInfoCode != 200){
-            postServiceRequest("coss", "/system/getTVInfo", requestData, TvInfo);
-            tvInfoCode = TvInfo.getInt("code");
-        }
-
+        qlibc::QData requestBody;
         requestBody.setString("productVender", "changhong");
         requestBody.setString("productType", "电视");
         requestBody.setString("productName", TvInfo.getData("payload").getString("tv_name"));
         requestBody.setString("productModel",TvInfo.getData("payload").getString("tv_model"));
         requestBody.setString("deviceSn",    TvInfo.getData("payload").getString("tv_mac"));
 
-        httplib::Client client__(url, port);
+        httplib::Client client(url, port);
 
         string sn = requestBody.getString("deviceSn");
         string mac = requestBody.getString("deviceMac");
         baseinfo.setString("deviceSn", sn);
         baseinfo.setString("deviceMac", mac);
-        lhytemp::fileRW::saveToFile(baseinfo, FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+        baseinfo.loadFromFile(FileUtils::contactFileName(cacheDir, "baseinfo.json"));
 
         string secretMsg = lhytemp::myutil::getSecretMsg(cacheDir, FileUtils::contactFileName(cacheDir, "baseinfo.json"));
         requestBody.setString("secretMsg", secretMsg);
@@ -98,19 +100,19 @@ bool joinTvWhite(const string& cacheDir){
 
         qlibc::QData returnMessage;
         while(true) {
-            ecb_httppost(&client__, "/logic-device/edge/tvWhite", message2Handle, returnMessage);
+            ecb_httppost(&client, "/logic-device/edge/tvWhite", message2Handle, returnMessage);
             if(returnMessage.getString("code") == "200")
                 break;
             std::this_thread::sleep_for(std::chrono::seconds(2));
-            QLog("===>join tvWhite failed, retry again-----\n");
+//            QLog("===>join tvWhite failed, retry again-----\n");
         }
 
         string tvDid = returnMessage.getData("data").getString("deviceDid");
         baseinfo.setString("tvDid", tvDid);
-        lhytemp::fileRW::saveToFile(baseinfo, FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+        baseinfo.loadFromFile(FileUtils::contactFileName(cacheDir, "baseinfo.json"));
 
         record.setBool("tvWhite", true);
-        lhytemp::fileRW::saveToFile(record, FileUtils::contactFileName(cacheDir, "record.json"));
+        record.loadFromFile(FileUtils::contactFileName(cacheDir, "record.json"));
     }
 
     //成功，或者已经注册后都会通知电视注册程序
@@ -121,10 +123,75 @@ bool joinTvWhite(const string& cacheDir){
     lhytemp::concurrency::registerConVar.notify_all();
 
     return true;
-
 }
 
+bool tvRegister(const string& cacheDir, qlibc::QData& message, const string& url, int port){
 
+    qlibc::QData record;
+    record.loadFromFile(FileUtils::contactFileName(cacheDir, "record.json"));
+
+    bool tvWhite = record.getBool("tvWhite");
+
+    if(!tvWhite){   //如果电视未加入大白名单
+        std::unique_lock<std::mutex> ul(lhytemp::concurrency::registerMutex);
+        lhytemp::concurrency::registerConVar.wait(ul, []{return lhytemp::concurrency::registerFlag;});
+        lhytemp::concurrency::registerFlag = false;
+    }
+
+    string engineID = message.getData("param").getString("engineID");
+    string domainSign = message.getData("param").getString("domainSign");
+    string domainID = message.getData("param").getString("domainID");
+
+    qlibc::QData baseinfo;
+    baseinfo.loadFromFile(FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+    baseinfo.setString("engineID", engineID);
+    baseinfo.setString("domainSign", domainSign);
+    baseinfo.setString("domainID", domainID);
+    baseinfo.saveToFile(FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+
+    //边缘电视注册
+    httplib::Client client(url, port);
+
+    time_t seconds;
+    seconds = time(nullptr);
+    string tvDid = baseinfo.getString("tvDid");
+    string tvSign = lhytemp::myutil::getTvSign(tvDid, std::to_string(seconds), cacheDir);
+
+    Json::Value paramData;
+    paramData["engineID"] = engineID;
+    paramData["domainID"] = domainID;
+    paramData["domainSign"] = domainSign;
+    paramData["tvDid"] = baseinfo.getString("tvDid");
+    paramData["tvTimeStamp"] = std::to_string(seconds);
+    paramData["tvSign"] = tvSign;
+
+    qlibc::QData message2Handle;
+    qlibc::QData returnMessage;
+    message2Handle.setString("User-Agent", "curl");
+    message2Handle.setValue("param", paramData);
+
+    ecb_httppost(&client, "/logic-device/edge/tvRegister", message2Handle, returnMessage);
+    if(returnMessage.getInt("code") != 200){    //如果注册不成功
+        return true;
+    }
+
+    record.setBool("tvRegister", true);
+    record.saveToFile(FileUtils::contactFileName(cacheDir, "record.json"));
+
+    //订阅相关主题
+    if(!domainID.empty()){
+        std::vector<string> topicVec;
+        string topic = "edge/" + domainID + "/device/domainWhite";
+        topicVec.emplace_back(topic);
+        for(auto &elem : topicVec){
+            //todo mqtt订阅相关主题
+//            mMqttClient.subscribe(elem);
+            lhytemp::myutil::storeTopic(elem);
+        }
+    }
+
+    return true;
+}
 
 
 

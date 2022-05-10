@@ -14,9 +14,11 @@
 bool ecb_httppost(httplib::Client *client, const std::string& uri,
                   const qlibc::QData &request, qlibc::QData &response);
 
+//电视加入大白名单
+bool joinTvWhite(const string& cacheDir, string& url, int port);
 
-
-bool joinTvWhite(const string& cacheDir);
+//电视注册
+bool tvRegister(const string& cacheDir, qlibc::QData& message, const string& url, int port);
 
 
 
