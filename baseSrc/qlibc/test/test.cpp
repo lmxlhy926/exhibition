@@ -1,12 +1,14 @@
 
 
 #include "qlibc/QData.h"
+#include "qlibc/FileUtils.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
 #include <string>
 
 using namespace std;
+using namespace qlibc;
 
 /**
  * 打印QData的类型，类中_value的地址，内容，大小，是否为空等信息
@@ -128,8 +130,12 @@ void test3(){
 }
 
 int main(int argc, char* argv[]){
+    string dir = "/ab/";
+    string fileName = "hello";
 
-    test3();
+    string out = FileUtils::contactFileName(dir, fileName);
+    std::cout << "out: " << out << std::endl;
+    std::cout << "dir: " << dir << std::endl;
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(10));

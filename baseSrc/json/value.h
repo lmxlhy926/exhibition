@@ -170,7 +170,7 @@ private:
  *
  * \note #Value string-length fit in size_t, but keys must be < 2^30.
  * (The reason is an implementation detail.) A #CharReader will raise an
- * exception if a bound is exceeded to avoid security holes in your app,
+ * exception if a bound is exceeded to avoid security holes in your config,
  * but the Value API does *not* check bounds. That is the responsibility
  * of the caller.
  */
