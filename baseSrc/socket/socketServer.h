@@ -11,6 +11,7 @@
 #include "qlibc/QData.h"
 
 using namespace std;
+using namespace qlibc;
 
 //存储和客户端建立连接的端点
 class acceptNode{

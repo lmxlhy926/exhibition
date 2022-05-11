@@ -27,7 +27,7 @@ const string TEST_SERVICE_ID_2 = "test_service_id_2";
 int service_request_handler_1(const Request& request, Response& response);
 int service_request_handler_2(const Request& request, Response& response);
 
-const string TEST_MESSAGE_ID_1 = "test_message_id_1";
+const string TEST_MESSAGE_ID_1 = "xxx";
 const string TEST_MESSAGE_ID_2 = "test_message_id_2";
 
 void message_handler_1(const Request& request);
@@ -88,7 +88,7 @@ void message_handler_1(const Request& request) {
 
 void publish_message(void){
     json message_json = {
-            {"message_id", "test_message_id_1"},
+            {"message_id", "xxx"},
             {"content", {
                                    "some_data", 123
                            }}
@@ -129,15 +129,15 @@ int main(int argc, char* argv[]) {
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
 
     // 注册 Service 请求处理 handler， 有两个 Service
-    serviceSiteManager->registerServiceRequestHandler(TEST_SERVICE_ID_1, service_request_handler_1);
-    serviceSiteManager->registerServiceRequestHandler(TEST_SERVICE_ID_2, service_request_handler_2);
-
-    // 注册支持的消息ID， 有两个消息
-    serviceSiteManager->registerMessageId(TEST_MESSAGE_ID_1);
-    serviceSiteManager->registerMessageId(TEST_MESSAGE_ID_2);
-
-    // 注册 Message 请求处理 handler
-    serviceSiteManager->registerMessageHandler(TEST_MESSAGE_ID_1, message_handler_1);
+//    serviceSiteManager->registerServiceRequestHandler(TEST_SERVICE_ID_1, service_request_handler_1);
+//    serviceSiteManager->registerServiceRequestHandler(TEST_SERVICE_ID_2, service_request_handler_2);
+//
+//    // 注册支持的消息ID， 有两个消息
+//    serviceSiteManager->registerMessageId(TEST_MESSAGE_ID_1);
+//    serviceSiteManager->registerMessageId(TEST_MESSAGE_ID_2);
+//
+//    // 注册 Message 请求处理 handler
+//    serviceSiteManager->registerMessageHandler(TEST_MESSAGE_ID_1, message_handler_1);
 
     // 创建线程, 启动服务器
     std::thread http_server_thread(http_server_thread_func);

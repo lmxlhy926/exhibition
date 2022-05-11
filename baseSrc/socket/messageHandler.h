@@ -13,6 +13,7 @@
 
 
 using namespace std;
+using namespace qlibc;
 
 using JsonSocketHandler = std::function<bool(QData& message)>;
 using UriHandlers = std::unordered_map<string, JsonSocketHandler>;

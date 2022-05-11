@@ -5,6 +5,8 @@
 #include <chrono>
 #include <iostream>
 
+using namespace qlibc;
+
 int main(int argc, char* argv[]) {
 
     QData configData;

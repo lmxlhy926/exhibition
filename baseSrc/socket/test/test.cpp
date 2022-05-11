@@ -27,7 +27,7 @@ void clientTest(){
 
 void serverTest(){
     string ip = "127.0.0.1";
-    int port = 60001;
+    int port = 60003;
     socketServer server;
     if(server.start(ip, 60001)){
         std::cout << "---bind successfully---" << std::endl;

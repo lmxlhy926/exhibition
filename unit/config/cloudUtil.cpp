@@ -1,64 +1,24 @@
 //
-// Created by 78472 on 2022/5/10.
+// Created by 78472 on 2022/5/11.
 //
 
-#include "baseFunction.h"
+#include "cloudUtil.h"
+#include <utility>
+#include "qlibc/QData.h"
+#include "qlibc/FileUtils.h"
+#include "socket/httplib.h"
 #include "myutil.h"
 
-bool ecb_httppost(httplib::Client *client, const std::string& uri,
-                  const qlibc::QData &request, qlibc::QData &response){
-
-    if (client == nullptr) return false;
-
-    httplib::Headers header;
-    Json::Value &root = request.asValue();
-    for (string h : root.getMemberNames()) {
-        if (h.empty() || h == "param" || h == "uri" || h[0] == '@') continue;
-        //读入header参数，可能是@c的Object对象
-        auto v = request.getValue(h);
-        if (v.isObject() || v.isNull() || v.isArray()) continue;
-        string str;
-        qlibc::QData::valueToJsonString(v, str);
-        if (str.empty()) continue;
-        header.insert(std::pair<string, string>(h, str));
-    }
-
-//    MGLogReq("Http ==> : %s --- %s", uri.c_str(), request.toJSONString().c_str());
-
-    string body = request.getData("param").toJsonString();
-    const char *key = "123456asdfgh1234";
-    string out;
-    lhytemp::myutil::ecb_encrypt_withPadding(body, out, reinterpret_cast<const uint8_t *>(key));
-
-//    QLog("==>encrypt body: %s\n", out.c_str());
-
-    auto http_res = client->Post(uri.c_str(), header, out, "application/json");
-//    QLog("====>post successfully==\n");
-
-    if(http_res == nullptr){
-//        QLog("========http_res in nullptr========>\n");
-    }
-
-    if (http_res != nullptr) {
-        string decryptOut;
-        lhytemp::myutil::ecb_decrypt_withPadding(http_res->body.c_str(), decryptOut,
-                                                 reinterpret_cast<const uint8_t *>(key));
-        response = qlibc::QData(decryptOut);
-//        MGLogRsp("Http <== : %s --- %s", uri.c_str(), response.toJSONString().c_str());
-//        QLog("Http <== : %s --- %s\n", uri.c_str(), response.toJSONString().c_str());
-
-        return true;
-    }
-    return false;
-}
+cloudUtil::cloudUtil(string  ip, int port,
+                       string  dataDirectoryPath) :
+                       serverIp(std::move(ip)), serverPort(port), dataDirPath(std::move(dataDirectoryPath)){}
 
 
-bool joinTvWhite(const string& cacheDir, string& url, int port){
-
+bool cloudUtil::joinTvWhite() {
     qlibc::QData baseinfo;
-    baseinfo.loadFromFile(FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+    baseinfo.loadFromFile(FileUtils::contactFileName(dataDirPath, "baseinfo.json"));
     qlibc::QData record;
-    record.loadFromFile(FileUtils::contactFileName(cacheDir, "record.json"));
+    record.loadFromFile(FileUtils::contactFileName(dataDirPath, "record.json"));
     bool tvWhite = record.getBool("tvWhite");
 
     if(!tvWhite){   //如果没加入大白名单
@@ -82,15 +42,15 @@ bool joinTvWhite(const string& cacheDir, string& url, int port){
         requestBody.setString("productModel",TvInfo.getData("payload").getString("tv_model"));
         requestBody.setString("deviceSn",    TvInfo.getData("payload").getString("tv_mac"));
 
-        httplib::Client client(url, port);
+        httplib::Client client(serverIp, serverPort);
 
         string sn = requestBody.getString("deviceSn");
         string mac = requestBody.getString("deviceMac");
         baseinfo.setString("deviceSn", sn);
         baseinfo.setString("deviceMac", mac);
-        baseinfo.loadFromFile(FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+        baseinfo.saveToFile(FileUtils::contactFileName(dataDirPath, "baseinfo.json"));
 
-        string secretMsg = lhytemp::myutil::getSecretMsg(cacheDir, FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+        string secretMsg = lhytemp::myutil::getSecretMsg(dataDirPath, FileUtils::contactFileName(dataDirPath, "baseinfo.json"));
         requestBody.setString("secretMsg", secretMsg);
 
         qlibc::QData message2Handle;
@@ -100,7 +60,7 @@ bool joinTvWhite(const string& cacheDir, string& url, int port){
 
         qlibc::QData returnMessage;
         while(true) {
-            ecb_httppost(&client, "/logic-device/edge/tvWhite", message2Handle, returnMessage);
+            ecb_httppost(client, "/logic-device/edge/tvWhite", message2Handle, returnMessage);
             if(returnMessage.getString("code") == "200")
                 break;
             std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -109,10 +69,10 @@ bool joinTvWhite(const string& cacheDir, string& url, int port){
 
         string tvDid = returnMessage.getData("data").getString("deviceDid");
         baseinfo.setString("tvDid", tvDid);
-        baseinfo.loadFromFile(FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+        baseinfo.saveToFile(FileUtils::contactFileName(dataDirPath, "baseinfo.json"));
 
         record.setBool("tvWhite", true);
-        record.loadFromFile(FileUtils::contactFileName(cacheDir, "record.json"));
+        record.saveToFile(FileUtils::contactFileName(dataDirPath, "record.json"));
     }
 
     //成功，或者已经注册后都会通知电视注册程序
@@ -125,10 +85,9 @@ bool joinTvWhite(const string& cacheDir, string& url, int port){
     return true;
 }
 
-bool tvRegister(const string& cacheDir, qlibc::QData& message, const string& url, int port){
-
+bool cloudUtil::tvRegister(qlibc::QData& engineerInfo) {
     qlibc::QData record;
-    record.loadFromFile(FileUtils::contactFileName(cacheDir, "record.json"));
+    record.loadFromFile(FileUtils::contactFileName(dataDirPath, "record.json"));
 
     bool tvWhite = record.getBool("tvWhite");
 
@@ -138,24 +97,24 @@ bool tvRegister(const string& cacheDir, qlibc::QData& message, const string& url
         lhytemp::concurrency::registerFlag = false;
     }
 
-    string engineID = message.getData("param").getString("engineID");
-    string domainSign = message.getData("param").getString("domainSign");
-    string domainID = message.getData("param").getString("domainID");
+    string engineID = engineerInfo.getData("param").getString("engineID");
+    string domainSign = engineerInfo.getData("param").getString("domainSign");
+    string domainID = engineerInfo.getData("param").getString("domainID");
 
     qlibc::QData baseinfo;
-    baseinfo.loadFromFile(FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+    baseinfo.loadFromFile(FileUtils::contactFileName(dataDirPath, "baseinfo.json"));
     baseinfo.setString("engineID", engineID);
     baseinfo.setString("domainSign", domainSign);
     baseinfo.setString("domainID", domainID);
-    baseinfo.saveToFile(FileUtils::contactFileName(cacheDir, "baseinfo.json"));
+    baseinfo.saveToFile(FileUtils::contactFileName(dataDirPath, "baseinfo.json"));
 
     //边缘电视注册
-    httplib::Client client(url, port);
+    httplib::Client client(serverIp, serverPort);
 
     time_t seconds;
     seconds = time(nullptr);
     string tvDid = baseinfo.getString("tvDid");
-    string tvSign = lhytemp::myutil::getTvSign(tvDid, std::to_string(seconds), cacheDir);
+    string tvSign = lhytemp::myutil::getTvSign(tvDid, std::to_string(seconds), dataDirPath);
 
     Json::Value paramData;
     paramData["engineID"] = engineID;
@@ -170,13 +129,13 @@ bool tvRegister(const string& cacheDir, qlibc::QData& message, const string& url
     message2Handle.setString("User-Agent", "curl");
     message2Handle.setValue("param", paramData);
 
-    ecb_httppost(&client, "/logic-device/edge/tvRegister", message2Handle, returnMessage);
+    ecb_httppost(client, "/logic-device/edge/tvRegister", message2Handle, returnMessage);
     if(returnMessage.getInt("code") != 200){    //如果注册不成功
         return true;
     }
 
     record.setBool("tvRegister", true);
-    record.saveToFile(FileUtils::contactFileName(cacheDir, "record.json"));
+    record.saveToFile(FileUtils::contactFileName(dataDirPath, "record.json"));
 
     //订阅相关主题
     if(!domainID.empty()){
@@ -191,40 +150,37 @@ bool tvRegister(const string& cacheDir, qlibc::QData& message, const string& url
     }
 
     return true;
+
 }
 
+bool cloudUtil::ecb_httppost(httplib::Client &client, const string &uri, const qlibc::QData &request,
+                             qlibc::QData &response) {
+    httplib::Headers header;
+    Json::Value &root = request.asValue();
+    for (string h : root.getMemberNames()) {
+        if (h.empty() || h == "param" || h == "uri" || h[0] == '@') continue;
+        //读入header参数，可能是@c的Object对象
+        auto v = request.getValue(h);
+        if (v.isObject() || v.isNull() || v.isArray()) continue;
+        string str;
+        qlibc::QData::valueToJsonString(v, str);
+        if (str.empty()) continue;
+        header.insert(std::pair<string, string>(h, str));
+    }
 
+    string body = request.getData("param").toJsonString();
+    const char *key = "123456asdfgh1234";
+    string out;
+    lhytemp::myutil::ecb_encrypt_withPadding(body, out, reinterpret_cast<const uint8_t *>(key));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    auto http_res = client.Post(uri.c_str(), header, out, "application/json");
+    if (http_res != nullptr) {
+        string decryptOut;
+        lhytemp::myutil::ecb_decrypt_withPadding(http_res->body.c_str(), decryptOut,
+                                                 reinterpret_cast<const uint8_t *>(key));
+        response = qlibc::QData(decryptOut);
+        std::cout << "===>httpResponse: " << response.toJsonString() << std::endl;
+        return true;
+    }
+    return false;
+}

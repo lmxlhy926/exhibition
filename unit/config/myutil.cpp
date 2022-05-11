@@ -269,8 +269,8 @@ namespace lhytemp{
         secretInfo.loadFromFile(generateFilePath);
         string filename = secretInfo.getString("filename");
 
-        uint8_t file_name[64]{};  //生成秘钥文件名
-        uint32_t file_name_len = 32;    //生成秘钥长度
+        uint8_t file_name[64]{};        //生成的秘钥文件的名字
+        uint32_t file_name_len = 32;    //生成的秘钥文件的长度
         unsigned char sign_buf[66]{};
         memcpy(file_name, filename.c_str(), filename.size());
 
@@ -352,12 +352,12 @@ namespace lhytemp{
     mutex concurrency::connectMutex2;
     bool  concurrency::connectFlag2 = false;
 
-     mutex concurrency::registerMutex;
-     condition_variable concurrency::registerConVar;
-     bool concurrency::registerFlag = false;
+    mutex concurrency::registerMutex;
+    condition_variable concurrency::registerConVar;
+    bool concurrency::registerFlag = false;
 
-     std::mutex concurrency::areaMutex;
-     std::string concurrency::area = "1";
+    std::mutex concurrency::areaMutex;
+    std::string concurrency::area = "1";
 
 
 }
