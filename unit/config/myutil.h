@@ -137,17 +137,7 @@ namespace lhytemp{
 
     class concurrency{
     public:
-        static mutex connectMutex;
-        static bool connectFlag;
 
-        static mutex connectMutex2;
-        static bool connectFlag2;
-
-        static mutex registerMutex;
-        static condition_variable registerConVar;
-        static bool registerFlag;
-
-        static std::mutex areaMutex;
         static std::string area;
     };
 

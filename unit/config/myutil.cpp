@@ -346,17 +346,6 @@ namespace lhytemp{
     }
 
 
-    mutex concurrency::connectMutex;
-    bool  concurrency::connectFlag = false;
-
-    mutex concurrency::connectMutex2;
-    bool  concurrency::connectFlag2 = false;
-
-    mutex concurrency::registerMutex;
-    condition_variable concurrency::registerConVar;
-    bool concurrency::registerFlag = false;
-
-    std::mutex concurrency::areaMutex;
     std::string concurrency::area = "1";
 
 

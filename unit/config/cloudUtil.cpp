@@ -75,15 +75,9 @@ bool cloudUtil::joinTvWhite() {
         record.saveToFile(FileUtils::contactFileName(dataDirPath, "record.json"));
     }
 
-    //成功，或者已经注册后都会通知电视注册程序
-    {
-        std::unique_lock<std::mutex> ul(lhytemp::concurrency::registerMutex);
-        lhytemp::concurrency::registerFlag = true;
-    }
-    lhytemp::concurrency::registerConVar.notify_all();
-
     return true;
 }
+
 
 bool cloudUtil::tvRegister(qlibc::QData& engineerInfo) {
     qlibc::QData record;
@@ -92,9 +86,7 @@ bool cloudUtil::tvRegister(qlibc::QData& engineerInfo) {
     bool tvWhite = record.getBool("tvWhite");
 
     if(!tvWhite){   //如果电视未加入大白名单
-        std::unique_lock<std::mutex> ul(lhytemp::concurrency::registerMutex);
-        lhytemp::concurrency::registerConVar.wait(ul, []{return lhytemp::concurrency::registerFlag;});
-        lhytemp::concurrency::registerFlag = false;
+       return false;
     }
 
     string engineID = engineerInfo.getData("param").getString("engineID");

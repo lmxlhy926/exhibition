@@ -12,6 +12,8 @@
 #include "serviceRequestHandler.h"
 #include "subscribeMessageHandler.h"
 #include "socket/socketServer.h"
+#include "cloudUtil.h"
+#include "configParamUtil.h"
 
 using namespace std;
 using namespace servicesite;
@@ -46,6 +48,19 @@ int main(int argc, char* argv[]) {
 
     httplib::ThreadPool threadPool_(100);
     std::atomic<bool> http_server_thread_end(false);
+
+    configParamUtil* configPathPtr = configParamUtil::getInstance();
+    configPathPtr->setConfigPath(string(argv[1]));
+
+    //开启线程，电视加入大白名单
+    string cloudServerIp;
+    int serverPort;
+    string directoryPath;
+    cloudUtil cloud(cloudServerIp, serverPort, configPathPtr->getconfigPath());
+
+    threadPool_.enqueue([&](){
+        cloud.joinTvWhite();
+    });
 
     //开启socketServer
     string ip = "127.0.0.1";
