@@ -15,8 +15,7 @@
 #include "aes/aes.hpp"
 #include "qlibc/QData.h"
 #include "qlibc/FileUtils.h"
-
-
+#include "configParamUtil.h"
 
 typedef unsigned int b64_size_t;
 typedef unsigned char b64_data_t;
@@ -27,9 +26,7 @@ namespace lhytemp{
     class myutil {
     public:
         static std::mutex rwLock;
-        static string cacheDir;
         static std::vector<string> topicVector;
-        static bool tvReady2Register;
 
     public:
         /**
@@ -69,12 +66,12 @@ namespace lhytemp{
         /**
          * 1. 如果秘钥文件不存在，则生成秘钥文件
          * 2. 从秘钥文件中提取出pub_key
-         * 3. 用事先提供的固定秘钥，加密从秘钥文件中提取出的pub_key.
+         * 3. 用事先提供的固定秘钥，加密从秘钥文件中提取出的pub_key
          * @param dirPath
          * @param baseInfoFile
          * @return
          */
-        static string getSecretMsg(const string& dirPath, const string& baseInfoFile);
+        static string getSecretMsg(const string& dirPath);
 
         /**
          * 用生成的秘钥文件加密<tvDid+second>
@@ -85,15 +82,6 @@ namespace lhytemp{
          */
         static string getTvSign(string& tvDid, const string& second, const string& dir);
 
-        static void setCacheDir(string& dataDir){
-            std::lock_guard<std::mutex> lg(rwLock);
-            cacheDir = dataDir;
-        }
-
-        static string getCacheDir(){
-            std::lock_guard<std::mutex> lg(rwLock);
-            return cacheDir;
-        }
 
         static void storeTopic(const string& topic){    //如果该主题没有被存储，则存储
             std::lock_guard<std::mutex> lg(rwLock);
@@ -107,26 +95,6 @@ namespace lhytemp{
         static vector<string> getTopic(){
             std::lock_guard<std::mutex> lg(rwLock);
             return topicVector;
-        }
-
-        static void setTvRegisterFlag(){
-            std::lock_guard<std::mutex> lg(rwLock);
-            qlibc::QData info;
-            const string dir = cacheDir;
-            info.loadFromFile(FileUtils::contactFileName(dir, "tvRegister.json"));
-            info.setString("registerFlag", "true");
-            info.saveToFile(FileUtils::contactFileName(dir, "tvRegister.json"));
-        }
-
-        static bool getTvReadyFlag(){
-            std::lock_guard<std::mutex> lg(rwLock);
-            qlibc::QData info;
-            const string dir = cacheDir;
-            info.loadFromFile(FileUtils::contactFileName(dir, "tvRegister.json"));
-            if(info.getString("registerFlag") == "true"){
-                return true;
-            } else
-                return false;
         }
 
         static bool ecb_encrypt_withPadding(const string &in , string &out, const uint8_t *key);

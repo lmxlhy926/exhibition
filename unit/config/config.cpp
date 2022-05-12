@@ -14,6 +14,7 @@
 #include "socket/socketServer.h"
 #include "cloudUtil.h"
 #include "configParamUtil.h"
+#include "qlibc/FileUtils.h"
 
 using namespace std;
 using namespace servicesite;
@@ -49,17 +50,21 @@ int main(int argc, char* argv[]) {
     httplib::ThreadPool threadPool_(100);
     std::atomic<bool> http_server_thread_end(false);
 
+    //设置配置文件加载路径
     configParamUtil* configPathPtr = configParamUtil::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
-    //开启线程，电视加入大白名单
-    string cloudServerIp;
-    int serverPort;
-    string directoryPath;
-    cloudUtil cloud(cloudServerIp, serverPort, configPathPtr->getconfigPath());
+    //加载http服务器配置信息，初始化云端对接类
+    const string dataDirPath = configPathPtr->getconfigPath();
+    qlibc::QData httpconfigData;
+    httpconfigData.loadFromFile(FileUtils::contactFileName(dataDirPath, "httpconfig.json"));
+    string httpServerIp = httpconfigData.getString("ip");
+    int serverPort = httpconfigData.getInt("port");
+    cloudUtil::getInstance()->init(httpServerIp, serverPort, dataDirPath);
 
-    threadPool_.enqueue([&](){
-        cloud.joinTvWhite();
+    //开启线程，电视加入大白名单
+    threadPool_.enqueue([](){
+        cloudUtil::getInstance()->joinTvWhite();
     });
 
     //开启socketServer

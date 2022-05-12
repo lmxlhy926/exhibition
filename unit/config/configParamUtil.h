@@ -6,12 +6,17 @@
 #define EXHIBITION_CONFIGPARAMUTIL_H
 
 #include <string>
+#include "qlibc/QData.h"
 
 using namespace std;
+using namespace qlibc;
 
 class configParamUtil {
 private:
     string dataDirPath;
+    QData baseInfoData;
+    QData recordData;
+    QData secretFileNameData;
     static configParamUtil* instance;
 
 private:
@@ -24,6 +29,17 @@ public:
 
     string getconfigPath();
 
+    QData getBaseInfo();
+
+    void saveBaseInfo(QData& data);
+
+    QData getRecordData();
+
+    void saveRecordData(QData& data);
+
+    QData getSecretFileNameData();
+
+    void saveSecretFileNameData(QData& data);
 };
 
 

@@ -1,3 +1,5 @@
+add_subdirectory(jsoncpp)
+
 add_library(qlibc STATIC QData.cpp StringUtils.cpp FileUtils.cpp)
 target_link_libraries(qlibc PUBLIC jsoncpp)
 

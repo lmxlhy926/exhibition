@@ -3,6 +3,7 @@
 //
 
 #include "myutil.h"
+#include <iostream>
 
 extern "C" {
 #include "encrypt_sign.c"
@@ -11,10 +12,7 @@ extern "C" {
 namespace lhytemp{
 
     std::mutex myutil::rwLock;
-    std::string myutil::cacheDir;
     std::vector<string> myutil::topicVector;
-     bool myutil::tvReady2Register = false;
-
 
     b64_size_t myutil::Base64_encode( char *out, b64_size_t out_len, const b64_data_t *in, b64_size_t in_len )
     {
@@ -182,43 +180,34 @@ namespace lhytemp{
         return str;
     }
 
-     string myutil::getSecretMsg(const string& dirPath, const string& baseInfoFilePath){
-
-        qlibc::QData info;
-        info.loadFromFile(baseInfoFilePath);
-
-        //  生成秘钥的时机：generateFile.json文件不存在 || 文件存储的加密文件名为空 || 加密文件名不存在
-        string secret_file_name_fullPath;
-        string secret_file_name;
-        bool secretReadyFlag = false;
+     string myutil::getSecretMsg(const string& dirPath){
         const string secretDir = FileUtils::contactFileName(dirPath, "secret");
-        string generateFilePath = FileUtils::contactFileName(secretDir, "generateFile.json");
-        bool generateFileIsExist = FileUtils::fileExists(generateFilePath);
+        bool secretReadyFlag = false;
 
-        if(generateFileIsExist){    //generateFile.json存在
-            qlibc::QData generateFileInfo;
-            generateFileInfo.loadFromFile(generateFilePath);
-            secret_file_name = generateFileInfo.getString("filename");
-
-            if(!secret_file_name.empty()){  //generateFile.json里存储的文件名不为空
-                secret_file_name_fullPath = FileUtils::contactFileName(secretDir, secret_file_name);
-                if(FileUtils::fileExists(secret_file_name_fullPath)){   //文件名对应的加密文件存在
-                    secretReadyFlag = true;
-//                    QLog("==>secret file already exists....\n");
-                }
+        /*
+         * 判断秘钥文件是否存在，如果存在则置位标志
+         * 生成秘钥的时机：generateFile.json文件不存在 || 文件存储的加密文件名为空 || 加密文件名不存在
+         */
+        QData secretFileNameData = configParamUtil::getInstance()->getSecretFileNameData();
+        string secret_file_name = secretFileNameData.getString("filename");
+        if(!secret_file_name.empty()){
+            string secret_file_name_fullPath = FileUtils::contactFileName(secretDir, secret_file_name);
+            if(FileUtils::fileExists(secret_file_name_fullPath)){
+                secretReadyFlag = true;
+                std::cout << "==>secret file already exists...." << std::endl;
             }
         }
 
+        //秘钥文件不存在，在指定的文件夹下生成秘钥文件
         if(!secretReadyFlag){
             uint8_t file_name[256];
             uint32_t file_name_len = 256;
             generate_save_secp256k1_key(const_cast<char *>(secretDir.c_str()), file_name, &file_name_len);
             secret_file_name = string(reinterpret_cast<const char *>(file_name), 0, file_name_len);
-//            QLog("===> generate secret file: %s\n", secret_file_name.c_str());
+            std::cout << "===> generate secret file: " << secret_file_name.c_str() << std::endl;
 
-            qlibc::QData qd;
-            qd.setString("filename", secret_file_name);
-            qd.saveToFile(generateFilePath);
+            secretFileNameData.setString("filename", secret_file_name);
+            configParamUtil::getInstance()->saveSecretFileNameData(secretFileNameData);
         }
 
         //获取生成的签名私钥
@@ -226,66 +215,53 @@ namespace lhytemp{
         uint32_t file_name_len_publickey = 32;
         unsigned char pub_key[66]{};
         memcpy(file_name_publickey, secret_file_name.c_str(), 32);
-
         get_secp256k1_pub_key_from_file(const_cast<char *>(secretDir.c_str()), file_name_publickey, file_name_len_publickey, pub_key);
         string publickey_hexString = lhytemp::myutil::byte2HexString(pub_key, 65);
 
         //构造待加密的加密体
-        Json::Value secretMessage;
-        secretMessage["deviceSn"] = info.getString("deviceSn");
-        secretMessage["deviceMac"] = info.getString("deviceMac");
-        secretMessage["pubKey"] = publickey_hexString;
-        Json::StreamWriterBuilder swbuilder;
-        std::string jsString = Json::writeString(swbuilder, secretMessage);
+        qlibc::QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
+        qlibc::QData secretMessage;
+        secretMessage.setString("deviceSn", baseInfoData.getString("deviceSn"));
+        secretMessage.setString("deviceMac", baseInfoData.getString("deviceMac"));
+        secretMessage.setString("pubKey", publickey_hexString);
 
         //用固定秘钥对加密体进行加密
-        char* message = const_cast<char*>(jsString.c_str());
-//        QLog("====>origin message to upload--size: %d---message: %s\n", jsString.size(), message);
         uint8_t file_name[256] = "620EE4666F39AAA0CCA8AE95F20FBA0D";    //固定秘钥文件名
         uint32_t file_name_len = 32;    //固定秘钥长度
-
         uint8_t encrypt_buf[256]{};   //加密后报文
-        uint32_t encrypt_len = 256; //加密报文长度
-        rsa_encrypt(const_cast<char *>(secretDir.c_str()), file_name, file_name_len, message, encrypt_buf, &encrypt_len);
+        uint32_t encrypt_len = 256;   //加密报文长度
+        rsa_encrypt(const_cast<char *>(secretDir.c_str()), file_name, file_name_len,
+                    const_cast<char*>(secretMessage.toJsonString().c_str()), encrypt_buf, &encrypt_len);
 
         //base64编码
         char out[1024]{};
         b64_size_t out_len = 1024;
         lhytemp::myutil::Base64_encode(out, out_len, encrypt_buf, encrypt_len);
         string outstr(out, 0, strlen(out));
-//        QLog("======secretMsg: %s\n", outstr.c_str());
+        std::cout << "======secretMsg: " << outstr << std::endl;
 
         return outstr;
     }
 
-    string myutil::getTvSign(string& tvDid, const string& second, const string& dir) {
 
+    string myutil::getTvSign(string& tvDid, const string& second, const string& dir) {
         string tvSignMessage = tvDid + second;
         const string secretDir = FileUtils::contactFileName(dir, "secret");
-        const string generateFilePath = FileUtils::contactFileName(secretDir, "generateFile.json");
-//        QLog("=====>generateFilePath: %s\n", generateFilePath.c_str());
-
-        qlibc::QData secretInfo;
-        secretInfo.loadFromFile(generateFilePath);
-        string filename = secretInfo.getString("filename");
+        string filename = configParamUtil::getInstance()->getSecretFileNameData().getString("filename");
 
         uint8_t file_name[64]{};        //生成的秘钥文件的名字
         uint32_t file_name_len = 32;    //生成的秘钥文件的长度
         unsigned char sign_buf[66]{};
         memcpy(file_name, filename.c_str(), filename.size());
 
-//        QLog("===>secretDir: %s\n", secretDir.c_str());
-//        QLog("====>file_name: %s\n", reinterpret_cast<char*>(file_name));
-//        QLog("====>tvSignMessage: %s\n", tvSignMessage.c_str());
-
         string secretDir1 = secretDir + "/";
         sign_secp256K1_recoverable(const_cast<char*>(secretDir1.c_str()), file_name, file_name_len, const_cast<char*>(tvSignMessage.c_str()), sign_buf);
-//        QLog("===============>getTvSign3---\n");
 
         print_hex("sign_buf", sign_buf, 65);
         string str = lhytemp::myutil::byte2HexString(sign_buf, 65);
         return str;
     }
+
 
     bool myutil::ecb_encrypt_withPadding(const string &in, string &out, const uint8_t *key) {
 
@@ -347,7 +323,6 @@ namespace lhytemp{
 
 
     std::string concurrency::area = "1";
-
 
 }
 
