@@ -8,11 +8,12 @@
 #include <string>
 #include "socket/httplib.h"
 #include "socket/socketServer.h"
-
+#include "siteService/service_site_manager.h"
 
 
 using namespace std;
 using namespace httplib;
+using namespace servicesite;
 
 //消息ID
 static const string DEVICESTATUS_MESSAGE_ID = "xxx";

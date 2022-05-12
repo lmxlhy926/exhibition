@@ -10,6 +10,8 @@ void deviceStatus_message_handler(socketServer& server, const Request& request) 
 }
 
 void radar_message_handler(socketServer& server, const Request& request) {
+    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
+    serviceSiteManager->publishMessage("", string());
 
 }
 

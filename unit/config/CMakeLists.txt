@@ -16,8 +16,4 @@ target_link_libraries(config PRIVATE socket)
 target_link_libraries(config PRIVATE aes)
 
 
-#add_executable(logicTest logic.cpp myutil.cpp cloudUtil.cpp)
-#target_link_libraries(logicTest PRIVATE encrypt)
-#target_link_libraries(logicTest PRIVATE qlibc)
-#
-#add_subdirectory(test)
+add_subdirectory(test)

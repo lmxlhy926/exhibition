@@ -60,3 +60,9 @@ void configParamUtil::saveSecretFileNameData(QData& data) {
     secretFileNameData.saveToFile(FileUtils::contactFileName(dir, "generateFile.json"));
 }
 
+QData configParamUtil::getMqttConfigData() {
+    if(mqttConfigData.empty())
+        mqttConfigData.loadFromFile(FileUtils::contactFileName(dataDirPath, "mqttConfig.json"));
+    return mqttConfigData;
+}
+
