@@ -46,7 +46,7 @@ namespace qlibc{
         void toJsonString(std::string& str, bool expand = false) const;
         std::string toJsonString(bool expand = false) const;
         void loadFromFile(const std::string& filePathName);
-        void saveToFile(const std::string& filePathName);
+        void saveToFile(const std::string& filePathName, bool expand = false);
 
         bool getBool(const std::string& key, bool defValue) const;
         bool getBool(const std::string& key) const;
@@ -67,6 +67,16 @@ namespace qlibc{
         void getValue(const std::string& key, Json::Value& value) const;
         Json::Value getValue(const std::string& key) const;
         QData& setValue(const std::string& key, const Json::Value& value);
+
+        void getArrayElement(Json::ArrayIndex index, QData& element);
+
+        QData getArrayElement(Json::ArrayIndex index);
+
+        QData& arrayInsert(Json::ArrayIndex, QData& element);
+
+        QData& append(const QData& data);
+
+        QData& append(const Json::Value &value);
 
     public:
         /**
@@ -116,7 +126,7 @@ namespace qlibc{
          * 将value对象转换为字符串后写入到文件中（truncate方式）
          * 成功返回true;失败返回false;
          */
-        static bool writeToFile(const std::string& filePathName, const Json::Value& value);
+        static bool writeToFile(const std::string& filePathName, const Json::Value& value, bool expand = false);
 
     };
 

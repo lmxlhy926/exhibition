@@ -38,7 +38,7 @@ public:
                      const string& userName, const string& passWd,
                      const string& clientID);
 
-    bool connect();
+    void connect();
 
     bool publish(const string& topic, const string& msg, int Qos = 2);
 
@@ -51,10 +51,32 @@ public:
     bool addDataHooker(MqttDataHooker& dataHooker);
 
 private:
+    void init();
+
     static int onMsgArrvd(void *context, char *topicName, int topicLen, MQTTAsync_message *message);
 
-    void onMessageArrvd(char *topicName, int topicLen, void *payload, int payloadLen);
+    static void connlost(void *context, char *cause);
 
+    static void onConnect(void* context, MQTTAsync_successData* response);
+
+    static void onConnectFailure(void* context, MQTTAsync_failureData* response);
+
+    static void onSubscribe(void* context, MQTTAsync_successData* response);
+
+    static void onSubscribeFailure(void* context, MQTTAsync_failureData* response);
+
+private:
+    void onMsgArrvd_member(char *topicName, int topicLen, void *payload, int payloadLen);
+
+    void connlost_member(void *context, char *cause);
+
+    void onConnect_member(void* context, MQTTAsync_successData* response);
+
+    void onConnectFailure_member(void* context, MQTTAsync_failureData* response);
+
+    void onSubscribe_member(void* context, MQTTAsync_successData* response);
+
+    void onSubscribeFailure_member(void* context, MQTTAsync_failureData* response);
 };
 
 

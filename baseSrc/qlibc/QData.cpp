@@ -38,86 +38,6 @@ namespace qlibc{
         _value.reset(new Json::Value(data.asValue()));
     }
 
-    bool QData::contains(const string &src, const string &dest) {
-        if(src.find(dest) != std::string::npos) return true;
-        return false;
-    }
-
-    bool QData::parseJson(const string &srcStr, Json::Value &destValue) {
-        Json::CharReaderBuilder b;
-        std::unique_ptr<Json::CharReader> reader(b.newCharReader());
-        const char* str = srcStr.c_str();
-        JSONCPP_STRING errs;
-        bool ok = reader->parse(str, str + srcStr.size(), &destValue, &errs);
-        if (!ok){
-            destValue = Json::nullValue;
-            return false;
-        }
-        return true;
-    }
-
-    bool QData::parseJson(const char* srcStr, int srcSize, Json::Value& destValue){
-        Json::CharReaderBuilder b;
-        std::unique_ptr<Json::CharReader> reader(b.newCharReader());
-        const char* str = srcStr;
-        JSONCPP_STRING errs;
-        bool ok = reader->parse(str, str + srcSize, &destValue, &errs);
-        if (!ok){
-            destValue = Json::nullValue;
-            return false;
-        }
-        return true;
-    }
-
-    Json::Value QData::parseJson(const string &srcStr) {
-        Json::Value destValue(Json::nullValue);
-        parseJson(srcStr, destValue);
-        return destValue;
-    }
-
-    bool QData::valueToJsonString(const Json::Value &obj, string &ret) {
-        std::ostringstream os;
-        Json::StreamWriterBuilder builder;
-        builder.settings_["indentation"] = "";
-        std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
-        writer->write(obj, &os);
-        if(!os.good()){
-            ret = "";
-            return false;
-        }
-        ret = os.str();
-        return true;
-    }
-
-    bool QData::parseFromFile(const string &fileNamePath, Json::Value &value) {
-        ifstream infile(fileNamePath,std::ios::in);
-        Json::CharReaderBuilder b;
-        JSONCPP_STRING errs;
-        if (!parseFromStream(b, infile, &value, &errs)) {
-            value = Json::nullValue;
-            return false;
-        }
-        return true;
-    }
-
-    Json::Value QData::parseFromFile(const string &filePathName) {
-        Json::Value value;
-        parseFromFile(filePathName, value);
-        return value;
-    }
-
-    bool QData::writeToFile(const string &filePathName, const Json::Value &value) {
-        string content;
-        if(valueToJsonString(value, content)){
-            std::ofstream out(filePathName, std::ios::out);
-            if(out.is_open()){
-                out << content;
-                return true;
-            }
-        }
-        return false;
-    }
-
     Json::Value& QData::asValue() const{
         return *_value;
     }
@@ -188,9 +108,9 @@ namespace qlibc{
         _value.reset(new Json::Value(parseFromFile(filePathName)));
     }
 
-    void QData::saveToFile(const string &filePathName) {
+    void QData::saveToFile(const string &filePathName, bool expand) {
         std::lock_guard<std::recursive_mutex> lg(*_mutex);
-        writeToFile(filePathName, *_value);
+        writeToFile(filePathName, *_value, expand);
     }
 
     bool QData::getBool(const string &key, bool defValue) const{
@@ -304,6 +224,124 @@ namespace qlibc{
         (*_value)[key] = value;
         return *this;
     }
+
+    bool QData::contains(const string &src, const string &dest) {
+        if(src.find(dest) != std::string::npos) return true;
+        return false;
+    }
+
+    bool QData::parseJson(const string &srcStr, Json::Value &destValue) {
+        Json::CharReaderBuilder b;
+        std::unique_ptr<Json::CharReader> reader(b.newCharReader());
+        const char* str = srcStr.c_str();
+        JSONCPP_STRING errs;
+        bool ok = reader->parse(str, str + srcStr.size(), &destValue, &errs);
+        if (!ok){
+            destValue = Json::nullValue;
+            return false;
+        }
+        return true;
+    }
+
+    bool QData::parseJson(const char* srcStr, int srcSize, Json::Value& destValue){
+        Json::CharReaderBuilder b;
+        std::unique_ptr<Json::CharReader> reader(b.newCharReader());
+        const char* str = srcStr;
+        JSONCPP_STRING errs;
+        bool ok = reader->parse(str, str + srcSize, &destValue, &errs);
+        if (!ok){
+            destValue = Json::nullValue;
+            return false;
+        }
+        return true;
+    }
+
+    Json::Value QData::parseJson(const string &srcStr) {
+        Json::Value destValue(Json::nullValue);
+        parseJson(srcStr, destValue);
+        return destValue;
+    }
+
+    bool QData::valueToJsonString(const Json::Value &obj, string &ret) {
+        std::ostringstream os;
+        Json::StreamWriterBuilder builder;
+        builder.settings_["indentation"] = "";
+        std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+        writer->write(obj, &os);
+        if(!os.good()){
+            ret = "";
+            return false;
+        }
+        ret = os.str();
+        return true;
+    }
+
+    bool QData::parseFromFile(const string &fileNamePath, Json::Value &value) {
+        ifstream infile(fileNamePath,std::ios::in);
+        Json::CharReaderBuilder b;
+        JSONCPP_STRING errs;
+        if (!parseFromStream(b, infile, &value, &errs)) {
+            value = Json::nullValue;
+            return false;
+        }
+        return true;
+    }
+
+    Json::Value QData::parseFromFile(const string &filePathName) {
+        Json::Value value;
+        parseFromFile(filePathName, value);
+        return value;
+    }
+
+    bool QData::writeToFile(const string &filePathName, const Json::Value &value, bool expand) {
+        string content;
+        if(expand)
+            content = value.toStyledString();
+        else
+            valueToJsonString(value, content);
+
+        std::ofstream out(filePathName, std::ios::out);
+        if(out.is_open()){
+            out << content;
+            return true;
+        }
+
+        return false;
+    }
+
+    void QData::getArrayElement(Json::ArrayIndex index, QData &element) {
+        if(_value->isNull() || _value->isArray()){
+            Json::Value v = _value->get(index, Json::Value());
+            element.setInitValue(v);
+        }
+    }
+
+    QData QData::getArrayElement(Json::ArrayIndex index) {
+        QData data;
+        getArrayElement(index, data);
+        return data;
+    }
+
+    QData& QData::arrayInsert(Json::ArrayIndex index, QData &element) {
+        if(_value->isNull() || _value->isArray()){
+            (*_value)[index] = element.asValue();
+        }
+        return *this;
+    }
+
+    QData& QData::append(const QData &data) {
+        if(_value->isNull() || _value->isArray()){
+            _value->append(data.asValue());
+            return *this;
+        }
+    }
+
+    QData& QData::append(const Json::Value &value) {
+        append( QData(value));
+        return *this;
+    }
+
+
 }
 
 

@@ -129,13 +129,38 @@ void test3(){
     std::cout << "-----------------" << std::endl;
 }
 
-int main(int argc, char* argv[]){
+void contactFileTest(){
     string dir = "/ab/";
     string fileName = "hello";
 
     string out = FileUtils::contactFileName(dir, fileName);
     std::cout << "out: " << out << std::endl;
     std::cout << "dir: " << dir << std::endl;
+}
+
+
+int main(int argc, char* argv[]){
+
+
+    QData data;
+    data.loadFromFile(R"(D:\bywg\project\exhibition\test\a.json)");
+    Json::Value a;
+    a["hello"] = "world";
+    Json::Value b(Json::arrayValue);
+    b.append(2);
+
+    data.append(a).append(b);
+    printValue("data", data);
+
+    QData first;
+    first.setString("ss", "aa");
+    data.arrayInsert(0, first);
+    std::cout << endl;
+    printValue("data", data);
+
+
+
+
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(10));

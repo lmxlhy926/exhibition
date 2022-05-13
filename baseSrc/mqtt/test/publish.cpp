@@ -10,7 +10,7 @@ using namespace qlibc;
 int main(int argc, char* argv[]) {
 
     QData configData;
-    configData.loadFromFile(R"(D:\project\byjs\zhanting\exhibition\baseSrc\mqtt\test\mqttconfig.json)");
+    configData.loadFromFile(R"(D:\bywg\project\exhibition\baseSrc\mqtt\test\hongmeimqttconfig.json)");
     std::string server = configData.getString("server");
     int port = configData.getInt("port");
     std::string username = configData.getString("username");
@@ -18,13 +18,11 @@ int main(int argc, char* argv[]) {
 
     mqttClient mc;
     mc.paramConfig(server, port, username, password, "publish");
-    if(mc.connect()){
-        std::cout << "----publish connect successfully---" << std::endl;
-    }
+    mc.connect();
 
    while(true){
        std::this_thread::sleep_for(std::chrono::seconds(3));
-       mc.publish("abc", "hello");
+//       mc.publish("abc", "hello");
    }
 
 }

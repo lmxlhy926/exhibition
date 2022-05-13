@@ -4,6 +4,8 @@
 
 #include "mqttClient.h"
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 mqttClient::mqttClient(){}
 
@@ -15,26 +17,15 @@ void mqttClient::paramConfig(const string &server, int port,
     mUserName = userName;
     mPassWd = passWd;
     mClientId = clientID;
+    if(client_ == nullptr)
+        init();
 }
 
-bool mqttClient::connect() {
+void mqttClient::connect() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
-    if(mConnected)
-        return true;
-    if(client_ != nullptr)
-        MQTTAsync_destroy(&client_);
-
-    MQTTAsync_createOptions createOptions = MQTTAsync_createOptions_initializer;
-    createOptions.sendWhileDisconnected = 1;
-    createOptions.maxBufferedMessages = 32;
-
-    MQTTAsync_createWithOptions(&client_, mServerUrl.c_str(), mClientId.c_str(),
-                                MQTTCLIENT_PERSISTENCE_NONE, nullptr, &createOptions);
-
-    MQTTAsync_setCallbacks(client_, this, nullptr, onMsgArrvd, nullptr);
-
+    std::cout << "start to connect...." << std::endl;
     MQTTAsync_connectOptions connectOptions = MQTTAsync_connectOptions_initializer;
-    connectOptions.keepAliveInterval = 30;
+    connectOptions.keepAliveInterval = 10;
     connectOptions.cleansession = 1;
     connectOptions.username = mUserName.c_str();
     connectOptions.password = mPassWd.c_str();
@@ -42,16 +33,10 @@ bool mqttClient::connect() {
     connectOptions.minRetryInterval = 1;
     connectOptions.maxRetryInterval = 10;
     connectOptions.context = this;
+    connectOptions.onSuccess = onConnect;
+    connectOptions.onFailure = onConnectFailure;
 
-    int rc = MQTTAsync_connect(client_, &connectOptions);
-    if(rc != MQTTASYNC_SUCCESS){
-        std::cout << "failed to strart connect: " << MQTTAsync_strerror(rc) << std::endl;
-        MQTTAsync_destroy(&client_);
-        client_ = nullptr;
-        return false;
-    }
-    mConnected = true;
-    return true;
+    MQTTAsync_connect(client_, &connectOptions);
 }
 
 bool mqttClient::publish(const string &topic, const string &msg, int Qos) {
@@ -96,15 +81,26 @@ bool mqttClient::addDataHooker(MqttDataHooker& dataHooker){
     this->hooker = dataHooker;
 }
 
+void mqttClient::init() {
+    MQTTAsync_createOptions createOptions = MQTTAsync_createOptions_initializer;
+    //createOptions.sendWhileDisconnected = 1;
+    //createOptions.maxBufferedMessages = 32;
+
+    MQTTAsync_createWithOptions(&client_, mServerUrl.c_str(), mClientId.c_str(),
+                                MQTTCLIENT_PERSISTENCE_NONE, nullptr, &createOptions);
+
+    MQTTAsync_setCallbacks(client_, this, connlost, onMsgArrvd, nullptr);
+}
+
 int mqttClient::onMsgArrvd(void *context, char *topicName, int topicLen, MQTTAsync_message *message) {
     auto client = (mqttClient *)(context);
-    client->onMessageArrvd(topicName, topicLen, message->payload, message->payloadlen);
+    client->onMsgArrvd_member(topicName, topicLen, message->payload, message->payloadlen);
     MQTTAsync_freeMessage(&message);
     MQTTAsync_free(topicName);
     return 1;
 }
 
-void mqttClient::onMessageArrvd(char *topicName, int topicLen, void *payload, int payloadLen) {
+void mqttClient::onMsgArrvd_member(char *topicName, int topicLen, void *payload, int payloadLen) {
     string topic(topicName, topicLen);
     if(hooker != nullptr){
         char buffer[64 * 1024]{};
@@ -115,6 +111,55 @@ void mqttClient::onMessageArrvd(char *topicName, int topicLen, void *payload, in
         messageHandler.disPatchMessage(topic, reinterpret_cast<char *>(payload), payloadLen);
     }
 }
+
+void mqttClient::connlost(void *context, char *cause) {
+    auto client = (mqttClient *)(context);
+    client->connlost_member(context, cause);
+}
+
+void mqttClient::onConnect(void *context, MQTTAsync_successData *response) {
+    auto client = (mqttClient *)(context);
+    client->onConnect_member(context, response);
+}
+
+void mqttClient::onConnectFailure(void *context, MQTTAsync_failureData *response) {
+    auto client = (mqttClient *)(context);
+    client->onConnectFailure_member(context, response);
+}
+
+void mqttClient::onSubscribe(void *context, MQTTAsync_successData *response) {
+    auto client = (mqttClient *)(context);
+    client->onSubscribe_member(context, response);
+}
+
+void mqttClient::onSubscribeFailure(void *context, MQTTAsync_failureData *response) {
+    auto client = (mqttClient *)(context);
+    client->onSubscribeFailure_member(context, response);
+}
+
+void mqttClient::connlost_member(void *context, char *cause) {
+    std::cout << "-----connlost_member----" << std::endl;
+    connect();
+}
+
+void mqttClient::onConnect_member(void *context, MQTTAsync_successData *response) {
+    std::cout << "connect successfully....." << std::endl;
+}
+
+void mqttClient::onConnectFailure_member(void *context, MQTTAsync_failureData *response) {
+    std::cout << "onConnectFailure_member connect failed......." << std::endl;
+}
+
+void mqttClient::onSubscribe_member(void *context, MQTTAsync_successData *response) {
+
+}
+
+void mqttClient::onSubscribeFailure_member(void *context, MQTTAsync_failureData *response) {
+
+    response->
+}
+
+
 
 
 
