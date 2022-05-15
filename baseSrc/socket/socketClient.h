@@ -17,32 +17,41 @@
 #include <mutex>
 #include <string>
 #include <functional>
+#include <atomic>
 #include "sockUtils.h"
+#include "noncopyable.h"
 #include "messageHandler.h"
 
-
 using namespace std;
-class socketClient {
+
+/**
+ * socketclient
+ *      1. start启动，掉线后自动重连
+ *      2. stop关闭连接
+ */
+class socketClient : noncopyable{
 public:
     using afterConnectHandler = std::function<bool(const char* buff, int len)>;
 private:
-    socket_t sock_ = -1;
-    std::string host_;
-    int port_ = -1;
-    string content;
+    socket_t sock_ = INVALID_SOCKET;    //创建的客户端socket fd
+    std::string ip_;        //服务器ip地址
+    int port_ = -1;         //服务器端口号
+    string loginMessage_;   //连接成功后上报的loginMessage
+    std::atomic<bool> sockValid{false};     //端口号是否有效
+    std::atomic<bool> quit{false};          //是否退出
 
-    bool sockValid = false;
-    bool quit = false;
+    httplib::ThreadPool& threadPool_;      //线程池
+    messageHandler receivedJsonHandler;    //处理消息的handler表
+    std::unique_ptr<sockCommon::SocketStream> socketStream;
+    std::unique_ptr<sockCommon::stream_line_reader> streamLineReader;
+    std::recursive_mutex mutex_;
 
-    httplib::ThreadPool threadPool_;
-    messageHandler receivedJsonHandler;
-    std::shared_ptr<sockCommon::SocketStream> socketStream;
-    std::shared_ptr<sockCommon::stream_line_reader> streamLineReader;
     afterConnectHandler func;
 
 public:
-    explicit socketClient(): threadPool_(10){}
-    ~socketClient()= default;
+    explicit socketClient(httplib::ThreadPool& threadPool) : threadPool_(threadPool){}
+
+    ~socketClient();
 
     //启动client连接server
     bool start(const string& ip, int port, string loginMessage);
@@ -63,13 +72,20 @@ public:
     void setUriHandler(const string& uri, const JsonSocketHandler& jsHandler);
 
 private:
-    bool socketFdValid();
-
+    /**
+     * 和服务器建立连接，并发送登录信息
+     * @return false: 和服务器建立连接失败; true:和服务器建立连接成功;
+     */
     bool establishConnection();
 
+    //阻塞读取一行内容并处理，如果返回则代表连接断开
     void readLineAndHandle();
 
+    /**
+     * 和服务器连接失败后，自动重连
+     */
     void connectAndHandle();
+
 
     void shutdownAndCloseSocket();
 };

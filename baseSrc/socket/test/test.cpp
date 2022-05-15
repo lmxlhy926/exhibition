@@ -13,11 +13,24 @@ using namespace std;
 
 
 void clientTest(){
-    socketClient sc;
-    sc.start("127.0.0.1", 60000, string("loginMessage"));
+    httplib::ThreadPool threadPool(100);
+    socketClient sc(threadPool);
+    sc.start("127.0.0.1", 60000, "loginMessage");
     sc.setUriHandler("hello", [](QData& message)->bool{
         std::cout << "--uriHandler-hello--:" << message.toJsonString(true) << std::endl;
     });
+    threadPool.enqueue([&](){
+        while(true){
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            sc.sendMessage("hello");
+        }
+    });
+
+    std::this_thread::sleep_for(std::chrono::seconds(30));
+    sc.stop();
+    std::cout << "client stopped....." << std::endl;
+//    std::this_thread::sleep_for(std::chrono::seconds(10));
+//    sc.start("127.0.0.1", 60000, "loginMessage");
 
     while(true)
         std::this_thread::sleep_for(std::chrono::seconds(100));
@@ -42,14 +55,9 @@ void serverTest(){
 
 
 int main(int argc, char* argv[]){
-    serverTest();
-
-    std::cout << "-----main here-----" << std::endl;
+    clientTest();
 
 
-
-    while(true)
-        std::this_thread::sleep_for(std::chrono::seconds(100));
 
     return 0;
 }

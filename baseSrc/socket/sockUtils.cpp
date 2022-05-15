@@ -120,6 +120,7 @@ namespace sockCommon{
         return res;
     }
 
+    //指定时间读取
     ssize_t select_read(socket_t sock, time_t sec, time_t usec){
         fd_set fds;
         FD_ZERO(&fds);
@@ -134,6 +135,7 @@ namespace sockCommon{
         });
     }
 
+    //阻塞读取
     ssize_t select_read(socket_t sock){
         fd_set fds;
         FD_ZERO(&fds);
@@ -167,7 +169,7 @@ namespace sockCommon{
             return false;
         }
 
-        //可读，则读取一个数据测试通道
+        //如果可读，则预读取一个数据测试通道（并不会真正的读取）
         char buf[1];
         return read_socket(sock, &buf[0], sizeof(buf), MSG_PEEK) > 0;
     }
@@ -232,13 +234,13 @@ namespace sockCommon{
 
         if (!getpeername(sock, reinterpret_cast<struct sockaddr *>(&addr),
                          &addr_len)) {
-            return get_remote_ip_and_port(addr, addr_len, ip, port);
+            return get_ip_and_port(addr, addr_len, ip, port);
         }
         return false;
     }
 
 
-    bool get_remote_ip_and_port(const struct sockaddr_storage &addr,
+    bool get_ip_and_port(const struct sockaddr_storage &addr,
                                 socklen_t addr_len, std::string &ip,
                                 int &port){
         if (addr.ss_family == AF_INET) {
@@ -280,14 +282,14 @@ namespace sockCommon{
     }
 
     bool SocketStream::is_writable() const {
-        return select_write(sock_, write_timeout_sec_, write_timeout_usec_) > 0;
+        return select_write(sock_, 0, 0) > 0;
     }
 
     ssize_t SocketStream::read(char *ptr, size_t size) {
         if(!is_readable())  return -1;
 
         size = (std::min)(size, static_cast<size_t>((std::numeric_limits<ssize_t>::max)()));
-        //当前有数据可以被读取，最多可读取剩余的所有数据
+        //当前读取缓存中有数据可以被读取，最多可读取剩余的所有数据
         if (read_buff_off_ < read_buff_content_size_) {
             auto remaining_size = read_buff_content_size_ - read_buff_off_;
             if (size <= remaining_size) {
@@ -301,18 +303,20 @@ namespace sockCommon{
             }
         }
 
+        //当前读取缓存中，无数据可以读取
         read_buff_off_ = 0;
         read_buff_content_size_ = 0;
 
         if (size < read_buff_size_) {
             auto n = read_socket(sock_, read_buff_.data(), read_buff_size_,
                                  CPPHTTPLIB_RECV_FLAGS);
-            if (n <= 0) {
+
+            if (n <= 0) {   //读取错误
                 return n;
-            } else if (n <= static_cast<ssize_t>(size)) {
+            } else if (n <= static_cast<ssize_t>(size)) {   //读取的数据不够
                 memcpy(ptr, read_buff_.data(), static_cast<size_t>(n));
                 return n;
-            } else {    //读取的数据有剩余，存储剩余的数据
+            } else {    //读取的数据有剩余，返回需要的数据，存储剩余的数据
                 memcpy(ptr, read_buff_.data(), size);
                 read_buff_off_ = size;
                 read_buff_content_size_ = static_cast<size_t>(n);
@@ -329,7 +333,10 @@ namespace sockCommon{
     }
 
     void SocketStream::get_remote_ip_and_port(std::string &ip, int &port) const {
-         sockCommon::get_remote_ip_and_port(sock_, ip, port);
+        if(!sockCommon::get_remote_ip_and_port(sock_, ip, port)){
+            ip = "INVALID_IP";
+            port = INVALID_SOCKET;
+        }
     }
 
     socket_t SocketStream::socket() const {
@@ -377,16 +384,9 @@ namespace sockCommon{
             char byte;
             auto n = strm_.read(&byte, 1);
 
-            if (n < 0) {
+            if (n < 0) {    //通道关闭
                 return false;
-            } else if (n == 0) {
-                if (i == 0) {
-                    return false;
-                } else {
-                    break;
-                }
             }
-
             append(byte);
 
             if (byte == '\n') { break; }
