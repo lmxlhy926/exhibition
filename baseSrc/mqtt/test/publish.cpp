@@ -9,8 +9,10 @@ using namespace qlibc;
 
 int main(int argc, char* argv[]) {
 
+    string fileName = argv[1];
+    std::cout << "loadFileName: " << fileName << std::endl;
     QData configData;
-    configData.loadFromFile(R"(D:\bywg\project\exhibition\baseSrc\mqtt\test\hongmeimqttconfig.json)");
+    configData.loadFromFile(fileName);
     std::string server = configData.getString("server");
     int port = configData.getInt("port");
     std::string username = configData.getString("username");
@@ -22,7 +24,7 @@ int main(int argc, char* argv[]) {
 
    while(true){
        std::this_thread::sleep_for(std::chrono::seconds(3));
-//       mc.publish("abc", "hello");
+       mc.publish("abc", "hello");
    }
 
 }
