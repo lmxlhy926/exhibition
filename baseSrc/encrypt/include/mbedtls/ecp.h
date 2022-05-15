@@ -37,7 +37,7 @@
 #define MBEDTLS_ECP_H
 
 #if !defined(MBEDTLS_CONFIG_FILE)
-#include "config.h"
+#include "synergy.h"
 #else
 #include MBEDTLS_CONFIG_FILE
 #endif

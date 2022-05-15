@@ -26,7 +26,7 @@
  */
 
 #if !defined(MBEDTLS_CONFIG_FILE)
-#include "mbedtls/config.h"
+#include "mbedtls/synergy.h"
 #else
 #include MBEDTLS_CONFIG_FILE
 #endif
@@ -121,7 +121,7 @@ void mbedtls_hmac_drbg_update( mbedtls_hmac_drbg_context *ctx,
 #endif /* MBEDTLS_DEPRECATED_REMOVED */
 
 /*
- * Simplified HMAC_DRBG initialisation (for use with deterministic ECDSA) //¼òµ¥µÄ»ùÓÚÔÓ´Õº¯Êý¹¹ÔìµÄÈ·¶¨ÐÔËæ»ú±ÈÌØÉú³ÉÆ÷³õÊ¼»¯
+ * Simplified HMAC_DRBG initialisation (for use with deterministic ECDSA) //ï¿½òµ¥µÄ»ï¿½ï¿½ï¿½ï¿½Ó´Õºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½
  */
 int mbedtls_hmac_drbg_seed_buf( mbedtls_hmac_drbg_context *ctx,
                         const mbedtls_md_info_t * md_info,

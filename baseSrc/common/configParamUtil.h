@@ -18,6 +18,7 @@ private:
     QData recordData;
     QData secretFileNameData;
     QData mqttConfigData;
+    QData interactiveAppData;
     static configParamUtil* instance;
 
 private:
@@ -43,6 +44,8 @@ public:
     void saveSecretFileNameData(QData& data);
 
     QData getMqttConfigData();
+
+    QData getInterActiveAppData();
 
 };
 

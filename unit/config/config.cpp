@@ -13,9 +13,10 @@
 #include "subscribeMessageHandler.h"
 #include "socket/socketServer.h"
 #include "cloudUtil.h"
-#include "configParamUtil.h"
+#include "common/configParamUtil.h"
 #include "qlibc/FileUtils.h"
 #include "mqtt/mqttClient.h"
+#include "mqttPayloadHandle.h"
 
 using namespace std;
 using namespace servicesite;
@@ -79,19 +80,20 @@ int main(int argc, char* argv[]) {
         std::cout << "---bind failed---" << std::endl;
     }
 
-    //启动mqtt,订阅主题，发布
+    //加载mqtt服务器配置信息
     QData mqttConfigData = configParamUtil::getInstance()->getMqttConfigData();
     std::string mqttServer = mqttConfigData.getString("server");
     int mqttPort = mqttConfigData.getInt("port");
     std::string mqttUsername = mqttConfigData.getString("username");
     std::string mqttPassword = mqttConfigData.getString("password");
 
+    //连接mqtt服务器，订阅主题，设置接收处理函数
     mqttClient mc;
     mc.paramConfig(mqttServer, mqttPort, mqttUsername, mqttPassword, "subscribe");
-    if(mc.connect()){
-        std::cout << "----connect successfully---" << std::endl;
-    }
+    mc.connect();
     mc.subscribe("abc");
+    mc.setDefaultHandler(mqttPayloadHandle::handle);
+
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();

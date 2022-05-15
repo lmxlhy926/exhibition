@@ -10,7 +10,7 @@
 #include "siteService/nlohmann/json.hpp"
 #include "socket/socketServer.h"
 #include "cloudUtil.h"
-#include "configParamUtil.h"
+#include "common/configParamUtil.h"
 
 using namespace std;
 using namespace httplib;

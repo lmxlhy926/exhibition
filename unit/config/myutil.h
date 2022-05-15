@@ -15,7 +15,7 @@
 #include "aes/aes.hpp"
 #include "qlibc/QData.h"
 #include "qlibc/FileUtils.h"
-#include "configParamUtil.h"
+#include "common/configParamUtil.h"
 
 typedef unsigned int b64_size_t;
 typedef unsigned char b64_data_t;

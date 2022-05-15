@@ -25,7 +25,7 @@
 #define MBEDTLS_HMAC_DRBG_H
 
 #if !defined(MBEDTLS_CONFIG_FILE)
-#include "config.h"
+#include "synergy.h"
 #else
 #include MBEDTLS_CONFIG_FILE
 #endif
@@ -78,7 +78,7 @@ extern "C" {
 #endif
 
 /**
- * HMAC_DRBG context. »ùÓÚÔÓ´Õº¯Êý¹¹ÔìµÄÈ·¶¨ÐÔËæ»ú±ÈÌØÉú³ÉÆ÷
+ * HMAC_DRBG context. ï¿½ï¿½ï¿½ï¿½ï¿½Ó´Õºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 typedef struct mbedtls_hmac_drbg_context
 {

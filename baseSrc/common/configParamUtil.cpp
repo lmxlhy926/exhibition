@@ -66,3 +66,9 @@ QData configParamUtil::getMqttConfigData() {
     return mqttConfigData;
 }
 
+QData configParamUtil::getInterActiveAppData() {
+    if(interactiveAppData.empty())
+        interactiveAppData.loadFromFile(FileUtils::contactFileName(dataDirPath, "interactionApp.json"));
+    return interactiveAppData;
+}
+

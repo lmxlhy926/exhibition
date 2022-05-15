@@ -31,7 +31,7 @@
 #define MBEDTLS_ARIA_H
 
 #if !defined(MBEDTLS_CONFIG_FILE)
-#include "config.h"
+#include "synergy.h"
 #else
 #include MBEDTLS_CONFIG_FILE
 #endif

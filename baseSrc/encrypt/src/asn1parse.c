@@ -20,7 +20,7 @@
  */
 
 #if !defined(MBEDTLS_CONFIG_FILE)
-#include "mbedtls/config.h"
+#include "mbedtls/synergy.h"
 #else
 #include MBEDTLS_CONFIG_FILE
 #endif
