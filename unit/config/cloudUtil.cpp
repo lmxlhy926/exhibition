@@ -35,18 +35,24 @@ void cloudUtil::init(const string&  ip, int port, const string& dataDirectoryPat
 }
 
 bool cloudUtil::joinTvWhite() {
+    //加载记录信息
     qlibc::QData recordData = configParamUtil::getInstance()->getRecordData();
     bool tvWhite = recordData.getBool("tvWhite");
 
     if(!tvWhite){
-        //todo 获取tv信息
+        //todo 获取tv信息,暂时调试用. 在这里循环获取mac信息，直到获取到为止
         qlibc::QData TvInfo;
+        TvInfo.setString("tv_mac","1111111111");
+        TvInfo.setString("tv_name","changhogn");
+        TvInfo.setString("tv_model","changhogn");
 
+        //存储tv信息
         qlibc::QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
         baseInfoData.setString("deviceSn", TvInfo.getString("tv_mac"));
         baseInfoData.setString("deviceMac", TvInfo.getString("tv_mac"));
         configParamUtil::getInstance()->saveBaseInfo(baseInfoData);
 
+        //构造请求体，上传生成的秘钥
         qlibc::QData requestBody;
         requestBody.setString("productVender", "changhong");
         requestBody.setString("productType", "电视");
@@ -81,25 +87,25 @@ bool cloudUtil::joinTvWhite() {
 }
 
 
-bool cloudUtil::tvRegister(qlibc::QData& engineerInfo, qlibc::QData& responseData) {
+bool cloudUtil::tvRegister(mqttClient& mc, qlibc::QData& engineerInfo, qlibc::QData& responseData) {
+
+    //判断电视是否加入大白名单， 如果没有加入，则直接返回
     qlibc::QData recordData = configParamUtil::getInstance()->getRecordData();
     bool tvWhite = recordData.getBool("tvWhite");
-
     if(!tvWhite){   //如果电视未加入大白名单
-        responseData.setString("code", "201");
-        responseData.setString("msg", "joinTvWhite not finished.....");
+        responseData.setString("code", "1");
+        responseData.setString("error", "joinTvWhite not finished.....");
+        responseData.putData("response", qlibc::QData());
         return false;
     }
 
+    //将安装师傅信息存入文件
     qlibc::QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
-    baseInfoData.setString("engineID", engineerInfo.getString("engineID"));
-    baseInfoData.setString("domainSign", engineerInfo.getString("domainSign"));
-    baseInfoData.setString("domainID", engineerInfo.getString("domainID"));
-    configParamUtil::getInstance()->saveBaseInfo(baseInfoData);
 
     string tvDid = baseInfoData.getString("tvDid");
     time_t seconds = time(nullptr);
 
+    //构造电视注册请求体
     Json::Value paramData;
     paramData["engineID"] = engineerInfo.getString("engineID");
     paramData["domainID"] = engineerInfo.getString("domainSign");
@@ -119,21 +125,22 @@ bool cloudUtil::tvRegister(qlibc::QData& engineerInfo, qlibc::QData& responseDat
         return false;
     }
 
+    //注册成功则保存信息到
+    baseInfoData.setString("engineID", engineerInfo.getString("engineID"));
+    baseInfoData.setString("domainSign", engineerInfo.getString("domainSign"));
+    baseInfoData.setString("domainID", engineerInfo.getString("domainID"));
+    configParamUtil::getInstance()->saveBaseInfo(baseInfoData);
+
     recordData.setBool("tvRegister", true);
     configParamUtil::getInstance()->saveRecordData(recordData);
 
     responseData.setInitData(returnMessage);
 
-    //订阅相关主题
-    if(!engineerInfo.getString("domainID").empty()){
-        std::vector<string> topicVec;
-        string topic = "edge/" + engineerInfo.getString("domainID") + "/device/domainWhite";
-        topicVec.emplace_back(topic);
-        for(auto &elem : topicVec){
-            //todo mqtt订阅相关主题
-//            mMqttClient.subscribe(elem);
-            lhytemp::myutil::storeTopic(elem);
-        }
+   //订阅相关的主题
+    string domainID = engineerInfo.getString("domainID");
+    if(!domainID.empty()){
+        string topic = "edge/" + domainID + "/device/domainWhite";
+        mc.subscribe(topic, 0);
     }
 
     return true;

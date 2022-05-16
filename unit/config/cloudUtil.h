@@ -10,6 +10,7 @@
 #include "qlibc/QData.h"
 #include "socket/httplib.h"
 #include "common/configParamUtil.h"
+#include "mqtt/mqttClient.h"
 
 using namespace std;
 
@@ -42,7 +43,7 @@ public:
      * @param engineerInfo 安装师傅信息
      * @return
      */
-    bool tvRegister(qlibc::QData& engineerInfo, qlibc::QData& responseData);
+    bool tvRegister(mqttClient& mc, qlibc::QData& engineerInfo, qlibc::QData& responseData);
 
     //向云端发送http请求
     bool ecb_httppost(const std::string& uri, const qlibc::QData &request, qlibc::QData &response);

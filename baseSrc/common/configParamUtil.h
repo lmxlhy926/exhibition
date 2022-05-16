@@ -7,6 +7,7 @@
 
 #include <string>
 #include "qlibc/QData.h"
+#include <mutex>
 
 using namespace std;
 using namespace qlibc;
@@ -20,6 +21,7 @@ private:
     QData mqttConfigData;
     QData interactiveAppData;
     static configParamUtil *instance;
+    std::recursive_mutex mutex_;
 
 private:
     explicit configParamUtil();

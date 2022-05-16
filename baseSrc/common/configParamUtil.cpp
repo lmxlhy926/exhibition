@@ -18,6 +18,7 @@ configParamUtil *configParamUtil::getInstance() {
 }
 
 void configParamUtil::setConfigPath(const string& configPath) {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
     dataDirPath = configPath;
 }
 
@@ -26,28 +27,34 @@ string configParamUtil::getconfigPath() {
 }
 
 QData configParamUtil::getBaseInfo() {
-    if(baseInfoData.empty())
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    if(baseInfoData.empty()){
         baseInfoData.loadFromFile(FileUtils::contactFileName(dataDirPath, "baseInfo.json"));
+    }
     return baseInfoData;
 }
 
 void configParamUtil::saveBaseInfo(QData& data) {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
     baseInfoData.setInitData(data);
-    baseInfoData.saveToFile(FileUtils::contactFileName(dataDirPath, "baseInfo.json"));
+    baseInfoData.saveToFile(FileUtils::contactFileName(dataDirPath, "baseInfo.json"), true);
 }
 
 QData configParamUtil::getRecordData() {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(recordData.empty())
         recordData.loadFromFile(FileUtils::contactFileName(dataDirPath, "record.json"));
     return recordData;
 }
 
 void configParamUtil::saveRecordData(QData &data) {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
     recordData.setInitData(data);
-    recordData.saveToFile(FileUtils::contactFileName(dataDirPath, "record.json"));
+    recordData.saveToFile(FileUtils::contactFileName(dataDirPath, "record.json"), true);
 }
 
 QData configParamUtil::getSecretFileNameData() {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
     const string dir = FileUtils::contactFileName(dataDirPath, "secret");
     if(secretFileNameData.empty())
         secretFileNameData.loadFromFile(FileUtils::contactFileName(dir, "generateFile.json"));
@@ -55,18 +62,21 @@ QData configParamUtil::getSecretFileNameData() {
 }
 
 void configParamUtil::saveSecretFileNameData(QData& data) {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
     const string dir = FileUtils::contactFileName(dataDirPath, "secret");
     secretFileNameData.setInitData(data);
-    secretFileNameData.saveToFile(FileUtils::contactFileName(dir, "generateFile.json"));
+    secretFileNameData.saveToFile(FileUtils::contactFileName(dir, "generateFile.json"), true);
 }
 
 QData configParamUtil::getMqttConfigData() {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(mqttConfigData.empty())
         mqttConfigData.loadFromFile(FileUtils::contactFileName(dataDirPath, "mqttConfig.json"));
     return mqttConfigData;
 }
 
 QData configParamUtil::getInterActiveAppData() {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(interactiveAppData.empty())
         interactiveAppData.loadFromFile(FileUtils::contactFileName(dataDirPath, "interactionApp.json"));
     return interactiveAppData;

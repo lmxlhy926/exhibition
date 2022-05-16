@@ -10,13 +10,13 @@
 
 #include "socket/httplib.h"
 #include "serviceRequestHandler.h"
-#include "subscribeMessageHandler.h"
 #include "socket/socketServer.h"
 #include "cloudUtil.h"
 #include "common/configParamUtil.h"
 #include "qlibc/FileUtils.h"
 #include "mqtt/mqttClient.h"
 #include "mqttPayloadHandle.h"
+#include "myutil.h"
 
 using namespace std;
 using namespace servicesite;
@@ -62,6 +62,7 @@ int main(int argc, char* argv[]) {
     httpconfigData.loadFromFile(FileUtils::contactFileName(dataDirPath, "httpconfig.json"));
     string httpServerIp = httpconfigData.getString("ip");
     int serverPort = httpconfigData.getInt("port");
+    //初始化云端对接类
     cloudUtil::getInstance()->init(httpServerIp, serverPort, dataDirPath);
 
     //开启线程，电视加入大白名单
@@ -69,62 +70,55 @@ int main(int argc, char* argv[]) {
         cloudUtil::getInstance()->joinTvWhite();
     });
 
-    //开启socketServer
-    string ip = "127.0.0.1";
-    int port = 60003;
-    socketServer server;
-    if(server.start(ip, port)){
-        std::cout << "---bind successfully---" << std::endl;
-        server.listen();
-    }else{
-        std::cout << "---bind failed---" << std::endl;
-    }
 
-    //启动mqtt,订阅主题，发布
+    //加载mqtt配置信息
     QData mqttConfigData = configParamUtil::getInstance()->getMqttConfigData();
     std::string mqttServer = mqttConfigData.getString("server");
     int mqttPort = mqttConfigData.getInt("port");
     std::string mqttUsername = mqttConfigData.getString("username");
     std::string mqttPassword = mqttConfigData.getString("password");
 
+    //加载基础参数信息
+    QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
+    string domainID = baseInfoData.getString("domainID");
+    string clientID = domainID.empty() ?
+            "config" + std::to_string(time(nullptr)) : "config" + domainID + std::to_string(time(nullptr));
+
+    //配置mqtt客户端、设置处理回调、设置预处理回调、订阅主题
     mqttClient mc;
-    mc.paramConfig(mqttServer, mqttPort, mqttUsername, mqttPassword, "subscribe");
-    mc.connect();
-    mc.subscribe("abc");
+    mc.paramConfig(mqttServer, mqttPort, mqttUsername, mqttPassword, clientID);
+    if(!domainID.empty()){
+        mc.subscribe("edge/" + domainID + "/device/domainWhite");
+    }
     mc.setDefaultHandler(mqttPayloadHandle::handle);
+    mc.addDataHooker([](const std::string& topic, void *payload, int payloadLen, char* buffer, int* len)->bool{
+        const string in = string(reinterpret_cast<char *>(payload), 0, payloadLen);
+        string out;
+        const uint8_t key[] = "123456asdfgh1234";
+        lhytemp::myutil::ecb_decrypt_withPadding(in, out, key);
+
+        strcpy(buffer, out.data());
+        *len = static_cast<int>(out.size());
+
+        return true;
+    });
+    mc.connect();
+
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
 
-    // 注册 Service 请求处理 handler， 有两个 Service
+    //注册请求场景列表处理函数
     serviceSiteManager->registerServiceRequestHandler(SCENELIST_REQUEST_SERVICE_ID,sceneListRequest_service_request_handler);
+    //注册子设备注册处理函数
     serviceSiteManager->registerServiceRequestHandler(SUBDEVICE_REGISTER_SERVICE_ID, subDeviceRegister_service_request_handler);
+    //注册获取家庭域Id处理函数
     serviceSiteManager->registerServiceRequestHandler(DOMAINID_REQUEST_SERVICE_ID, domainIdRequest_service_request_handler);
-    serviceSiteManager->registerServiceRequestHandler(ENGINEER_REQUEST_SERVICE_ID, engineer_service_request_handler);
-    serviceSiteManager->registerServiceRequestHandler(GETDEVICELIST_REQUEST_SERVICE_ID, getDeviceList_service_request_handler);
-    serviceSiteManager->registerServiceRequestHandler(GETTVINFO_REQUEST_SERVICE_ID, getTvInfo_service_request_handler);
-    serviceSiteManager->registerServiceRequestHandler(CONTROLDEVICE_REQUEST_SERVICE_ID, controlDevice_service_request_handler);
-    serviceSiteManager->registerServiceRequestHandler(REDARREPORT_REQUEST_SERVICE_ID, radarReportEnable_service_request_handler);
-
-    // 注册支持的消息ID
-    serviceSiteManager->registerMessageId(DEVICESTATUS_MESSAGE_ID);
-    serviceSiteManager->registerMessageId(RADAR_MESSAGE_ID);
-    serviceSiteManager->registerMessageId(MICPANELMESSAGE_ID);
-
-    // 注册消息ID对应的handler
-    serviceSiteManager->registerMessageHandler(DEVICESTATUS_MESSAGE_ID,
-                                               [&](const Request& request){
-        deviceStatus_message_handler(server, request);
+    //注册安装师傅信息上传请求函数
+    serviceSiteManager->registerServiceRequestHandler(ENGINEER_REQUEST_SERVICE_ID,
+                                                      [&](const Request& request, Response& response) -> int{
+        return engineer_service_request_handler(mc, request, response);
     });
-    serviceSiteManager->registerMessageHandler(DEVICESTATUS_MESSAGE_ID,
-                                               [&](const Request& request){
-        radar_message_handler(server, request);
-    });
-    serviceSiteManager->registerMessageHandler(DEVICESTATUS_MESSAGE_ID,
-                                               [&](const Request& request){
-        micpanel_message_handler(server, request);
-    });
-
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
@@ -148,15 +142,6 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    // 订阅消息, 需要传入订阅站点的IP、端口号、消息ID列表
-    std::vector<string> messageIdList;
-    messageIdList.push_back(DEVICESTATUS_MESSAGE_ID);
-    messageIdList.push_back(RADAR_MESSAGE_ID);
-    messageIdList.push_back(MICPANELMESSAGE_ID);
-    int  code = serviceSiteManager->subscribeMessage("127.0.0.1", 60001, messageIdList);
-    if (code == ServiceSiteManager::RET_CODE_OK) {
-        printf("subscribeMessage ok.\n");
-    }
 
     while(true){
         if (http_server_thread_end){

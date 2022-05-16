@@ -17,7 +17,6 @@ public:
 
     static std::string contactFileName(const std::string &dest, const std::string &fn);
 
-    static std::string contactFileName(std::string &dest, const std::string &fn);
 };
 
 

@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include "socket/socketServer.h"
+#include "common/configParamUtil.h"
 
 
 
@@ -31,23 +32,13 @@ void test(socketServer& a, const Request& request, Response& response){
 
 int main(int argc, char* argv[])
 {
-    socketServer c;
-    Request request;
-    Response response;
-    int b;
-    push([&](const Request& request, Response& response){
-        test(c, request, response);
-    });
+    configParamUtil* configPtr = configParamUtil::getInstance();
+    configPtr->setConfigPath(string(argv[1]));
+    QData data = configPtr->getBaseInfo();
+    std::cout << data.toJsonString() << std::endl;
 
-
-//    bind(test, c, _1, _2)(request, response);
-
-
-//    socketServer s;
-//    Request request;
-//    Response response;
-//    bind(sceneListRequest_service_request_handler, s, _1, _2)(s, request, response);
-
+    data.setString("hello", "world");
+    configParamUtil::getInstance()->saveBaseInfo(data);
 
 
     while(true)

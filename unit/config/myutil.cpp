@@ -210,7 +210,7 @@ namespace lhytemp{
             configParamUtil::getInstance()->saveSecretFileNameData(secretFileNameData);
         }
 
-        //获取生成的签名私钥
+        //从生成的秘钥文件按中，获取签名私钥
         uint8_t file_name_publickey[64]{};
         uint32_t file_name_len_publickey = 32;
         unsigned char pub_key[66]{};

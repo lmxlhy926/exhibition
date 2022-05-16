@@ -4,7 +4,6 @@ set(src
     myutil.cpp
     cloudUtil.cpp
     serviceRequestHandler.cpp
-    subscribeMessageHandler.cpp
     mqttPayloadHandle.cpp)
 
 add_executable(config  ${src})
