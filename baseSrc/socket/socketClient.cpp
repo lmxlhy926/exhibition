@@ -4,6 +4,12 @@
 
 #include "socketClient.h"
 
+#include <utility>
+
+void socketClient::setAfterConnectHandler(afterConnectHandler handler){
+    func = std::move(handler);
+}
+
 socketClient::~socketClient(){
     shutdownAndCloseSocket();
 }
@@ -67,7 +73,10 @@ bool socketClient::establishConnection(){
     socketStream.reset(new sockCommon::SocketStream(sock_));
     streamLineReader.reset(new sockCommon::stream_line_reader(*socketStream));
 
-    sendMessage(loginMessage_);
+    if(!loginMessage_.empty())
+        sendMessage(loginMessage_);
+    if(func != nullptr)
+        func();
     return true;
 }
 

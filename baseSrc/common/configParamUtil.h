@@ -1,5 +1,5 @@
 //
-// Created by 78472 on 2022/5/11.
+// Created by 78472 on 2022/5/16.
 //
 
 #ifndef EXHIBITION_CONFIGPARAMUTIL_H
@@ -18,33 +18,34 @@ private:
     QData recordData;
     QData secretFileNameData;
     QData mqttConfigData;
-    static configParamUtil* instance;
+    QData interactiveAppData;
+    static configParamUtil *instance;
 
 private:
     explicit configParamUtil();
 
 public:
-    static configParamUtil* getInstance();
+    static configParamUtil *getInstance();
 
-    void setConfigPath(const string& configPath);
+    void setConfigPath(const string &configPath);
 
     string getconfigPath();
 
     QData getBaseInfo();
 
-    void saveBaseInfo(QData& data);
+    void saveBaseInfo(QData &data);
 
     QData getRecordData();
 
-    void saveRecordData(QData& data);
+    void saveRecordData(QData &data);
 
     QData getSecretFileNameData();
 
-    void saveSecretFileNameData(QData& data);
+    void saveSecretFileNameData(QData &data);
 
     QData getMqttConfigData();
 
+    QData getInterActiveAppData();
 };
-
 
 #endif //EXHIBITION_CONFIGPARAMUTIL_H

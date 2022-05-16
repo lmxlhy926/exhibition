@@ -9,7 +9,7 @@
 #include <mutex>
 #include "qlibc/QData.h"
 #include "socket/httplib.h"
-#include "configParamUtil.h"
+#include "common/configParamUtil.h"
 
 using namespace std;
 

@@ -29,9 +29,10 @@ using namespace std;
  *      1. start启动，掉线后自动重连
  *      2. stop关闭连接
  */
+
+using afterConnectHandler = std::function<void()>;
+
 class socketClient : noncopyable{
-public:
-    using afterConnectHandler = std::function<bool(const char* buff, int len)>;
 private:
     socket_t sock_ = INVALID_SOCKET;    //创建的客户端socket fd
     std::string ip_;        //服务器ip地址
@@ -50,6 +51,8 @@ private:
 
 public:
     explicit socketClient(httplib::ThreadPool& threadPool) : threadPool_(threadPool){}
+
+    void setAfterConnectHandler(afterConnectHandler handler);
 
     ~socketClient();
 

@@ -1,5 +1,5 @@
 //
-// Created by 78472 on 2022/5/11.
+// Created by 78472 on 2022/5/16.
 //
 
 #include "configParamUtil.h"
@@ -27,7 +27,7 @@ string configParamUtil::getconfigPath() {
 
 QData configParamUtil::getBaseInfo() {
     if(baseInfoData.empty())
-       baseInfoData.loadFromFile(FileUtils::contactFileName(dataDirPath, "baseInfo.json"));
+        baseInfoData.loadFromFile(FileUtils::contactFileName(dataDirPath, "baseInfo.json"));
     return baseInfoData;
 }
 
@@ -65,4 +65,12 @@ QData configParamUtil::getMqttConfigData() {
         mqttConfigData.loadFromFile(FileUtils::contactFileName(dataDirPath, "mqttConfig.json"));
     return mqttConfigData;
 }
+
+QData configParamUtil::getInterActiveAppData() {
+    if(interactiveAppData.empty())
+        interactiveAppData.loadFromFile(FileUtils::contactFileName(dataDirPath, "interactionApp.json"));
+    return interactiveAppData;
+}
+
+
 

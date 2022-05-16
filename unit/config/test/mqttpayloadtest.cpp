@@ -8,7 +8,7 @@
 #include <fstream>
 #include "qlibc/QData.h"
 #include "qlibc/FileUtils.h"
-#include "../configParamUtil.h"
+#include "common/configParamUtil.h"
 
 
 using namespace std;

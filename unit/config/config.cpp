@@ -13,9 +13,10 @@
 #include "subscribeMessageHandler.h"
 #include "socket/socketServer.h"
 #include "cloudUtil.h"
-#include "configParamUtil.h"
+#include "common/configParamUtil.h"
 #include "qlibc/FileUtils.h"
 #include "mqtt/mqttClient.h"
+#include "mqttPayloadHandle.h"
 
 using namespace std;
 using namespace servicesite;
@@ -88,10 +89,9 @@ int main(int argc, char* argv[]) {
 
     mqttClient mc;
     mc.paramConfig(mqttServer, mqttPort, mqttUsername, mqttPassword, "subscribe");
-    if(mc.connect()){
-        std::cout << "----connect successfully---" << std::endl;
-    }
+    mc.connect();
     mc.subscribe("abc");
+    mc.setDefaultHandler(mqttPayloadHandle::handle);
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
