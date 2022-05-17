@@ -8,6 +8,10 @@
 
 #include "qlibc/QData.h"
 
+
+static const string ADAPTER_IP = "127.0.0.1";
+static const int ADAPTER_PORT = 60003;
+
 struct controlData {
     const string deviceType;
     const string area;
