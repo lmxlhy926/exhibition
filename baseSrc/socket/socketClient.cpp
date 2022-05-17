@@ -44,9 +44,12 @@ bool socketClient::sendMessage(const char *buff, int len) {
     return false;
 }
 
-bool socketClient::sendMessage(const string &str) {
+bool socketClient::sendMessage(const string &str, bool withLF) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
-    return sendMessage(str.c_str(), str.size());
+    if(withLF)
+        return sendMessage(str.c_str(), static_cast<int>(str.size()));
+    else
+        return sendMessage((str + "\n").c_str(), static_cast<int>(str.size()) + 1);
 }
 
 void socketClient::setDefaultHandler(const JsonSocketHandler &defaultHandler) {
@@ -94,10 +97,6 @@ void socketClient::readLineAndHandle() {
             string uri = data.getString("uri");
             receivedJsonHandler.disPatchMessage(uri, data);
         }
-
-        //返回提示数据
-        string str = "receive commit\n";
-        sockCommon::write_data(*socketStream, str.c_str(), str.size());
     }
 }
 

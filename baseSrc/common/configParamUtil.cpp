@@ -82,5 +82,12 @@ QData configParamUtil::getInterActiveAppData() {
     return interactiveAppData;
 }
 
+QData configParamUtil::getDeviceControlData() {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    if(deviceControlData.empty())
+        deviceControlData.loadFromFile(FileUtils::contactFileName(dataDirPath, "deviceControl.json"));
+    return deviceControlData;
+}
+
 
 

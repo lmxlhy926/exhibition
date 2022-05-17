@@ -68,7 +68,7 @@ public:
     bool sendMessage(const char* buff, int len);
 
     //向server发送消息
-    bool sendMessage(const string& str);
+    bool sendMessage(const string& str, bool withLF = false);
 
     void setDefaultHandler(const JsonSocketHandler& defaultHandler);
 

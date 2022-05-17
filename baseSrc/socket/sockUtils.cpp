@@ -386,7 +386,14 @@ namespace sockCommon{
 
             if (n < 0) {    //通道关闭
                 return false;
+            }else if (n == 0) {
+                if (i == 0) {
+                    return false;
+                } else {
+                    break;
+                }
             }
+
             append(byte);
 
             if (byte == '\n') { break; }

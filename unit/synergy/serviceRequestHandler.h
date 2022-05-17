@@ -8,8 +8,7 @@
 #include <string>
 #include <socket/httplib.h>
 #include "socket/socketClient.h"
-
-
+#include "siteService/nlohmann/json.hpp"
 
 using namespace std;
 using namespace httplib;
@@ -17,11 +16,16 @@ using namespace httplib;
 //服务ID, 对内提供
 static const string TVUPLOAD_SERVICE_ID = "tveventUpload";
 static const string SENSOR_SERVICE_ID = "sensorEventUpload";
-
+static const string TV_SOUND_SERVICE_ID = "tvSound";
+static const string COMMON_EVENT_SERVICE_ID = "commonEvent";
 
 int tvupload_service_handler(socketClient& client, const Request& request, Response& response);
 
 int sensor_service_handler(socketClient& client, const Request& request, Response& response);
+
+int tvSound_service_handler(socketClient& client, const Request& request, Response& response);
+
+int commonEvent_service_handler(socketClient& client, const Request& request, Response& response);
 
 
 

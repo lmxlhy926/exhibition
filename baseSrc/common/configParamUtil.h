@@ -20,6 +20,7 @@ private:
     QData secretFileNameData;
     QData mqttConfigData;
     QData interactiveAppData;
+    QData deviceControlData;
     static configParamUtil *instance;
     std::recursive_mutex mutex_;
 
@@ -48,6 +49,8 @@ public:
     QData getMqttConfigData();
 
     QData getInterActiveAppData();
+
+    QData getDeviceControlData();
 };
 
 #endif //EXHIBITION_CONFIGPARAMUTIL_H
