@@ -33,13 +33,9 @@ int main(int argc, char* argv[]) {
     configPathPtr->setConfigPath(string(argv[1]));
 
     //加载http服务器配置信息，初始化云端对接类
+    QData httpConfigData = configPathPtr->getCloudServerData();
     const string dataDirPath = configPathPtr->getconfigPath();
-    qlibc::QData httpconfigData;
-    httpconfigData.loadFromFile(FileUtils::contactFileName(dataDirPath, "httpconfig.json"));
-    string httpServerIp = httpconfigData.getString("ip");
-    int serverPort = httpconfigData.getInt("port");
-    //初始化云端对接类
-    cloudUtil::getInstance()->init(httpServerIp, serverPort, dataDirPath);
+    cloudUtil::getInstance()->init(httpConfigData.getString("ip"), httpConfigData.getInt("port"), dataDirPath);
 
     //开启线程，阻塞进行电视加入大白名单
     threadPool_.enqueue([](){

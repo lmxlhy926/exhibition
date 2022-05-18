@@ -178,7 +178,7 @@ namespace lhytemp{
     }
 
      string secretUtil::getSecretMsg(const string& dirPath){
-        const string secretDir = FileUtils::contactFileName(dirPath, "secret");
+        const string secretDir = FileUtils::contactFileName(dirPath, "config/secret");
         bool secretReadyFlag = false;
 
         /*
@@ -243,7 +243,7 @@ namespace lhytemp{
 
     string secretUtil::getTvSign(string& tvDid, const string& second, const string& dir) {
         string tvSignMessage = tvDid + second;
-        const string secretDir = FileUtils::contactFileName(dir, "secret");
+        const string secretDir = FileUtils::contactFileName(dir, "config/secret");
         string filename = configParamUtil::getInstance()->getSecretFileNameData().getString("filename");
 
         uint8_t file_name[64]{};        //生成的秘钥文件的名字

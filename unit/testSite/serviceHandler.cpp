@@ -7,7 +7,7 @@
 
 int deviceList_service_request_handler(const Request& request, Response& response){
     qlibc::QData data;
-    data.loadFromFile(R"(D:\bywg\project\exhibition\unit\testSite\configData\devicelist.json)");
+    data.loadFromFile(R"(D:\bywg\project\exhibition\unit\paramData\testSite\devicelist.json)");
     response.set_content(data.toJsonString(), "text/json");
 
     return 0;
@@ -22,7 +22,7 @@ int controlDevice_service_request_handler(const Request& request, Response& resp
 
 int tvMac_service_request_handler(const Request& request, Response& response){
     qlibc::QData data;
-    data.loadFromFile(R"(D:\bywg\project\exhibition\unit\testSite\configData\tvMac.json)");
+    data.loadFromFile(R"(D:\bywg\project\exhibition\unit\paramData\testSite\tvMac.json)");
     response.set_content(data.toJsonString(), "text/json");
 
     return 0;
