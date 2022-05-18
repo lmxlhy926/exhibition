@@ -11,6 +11,7 @@
 #include "qlibc/FileUtils.h"
 #include "mqttPayloadHandle.h"
 #include "myutil.h"
+#include "paramconfig.h"
 
 using namespace std;
 using namespace servicesite;

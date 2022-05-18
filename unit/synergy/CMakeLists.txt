@@ -2,7 +2,8 @@
 set(src
     synergy.cpp
     serviceRequestHandler.cpp
-        sceneCommandHandler.cpp)
+    sceneCommandHandler.cpp
+    util.cpp)
 
 add_executable(synergy  ${src})
 target_include_directories(synergy PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)

@@ -8,6 +8,7 @@
 #include "common/httpUtil.h"
 #include <thread>
 #include <chrono>
+#include "paramconfig.h"
 
 
 cloudUtil* cloudUtil::instance = nullptr;
@@ -36,38 +37,69 @@ void cloudUtil::init(const string&  ip, int port, const string& dataDirectoryPat
               << ">---dataDirPath<" << dataDirPath << ">" << std::endl;
 }
 
+bool cloudUtil::getTvInfo(string& tvMac, string& tvName, string& tvModel){
+    qlibc::QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
+    tvMac = baseInfoData.getString("deviceMac");
+    tvName = baseInfoData.getString("tv_name");
+    tvModel = baseInfoData.getString("tv_model");
+
+    if(tvMac.empty() || tvName.empty() || tvModel.empty()){
+        qlibc::QData tvRequest, tvResponse;
+        tvRequest.setString("service_id", "get_tv_mac");
+        tvRequest.putData("request", qlibc::QData());
+
+        auto ret = httpUtil::sitePostRequest(ADAPTER_IP, ADAPTER_PORT, tvRequest, tvResponse);
+        if(ret){
+            if(tvResponse.getInt("code") == 0){
+                tvMac = tvResponse.getData("response").getString("tv_mac");
+                tvName = tvResponse.getData("response").getString("tv_name");
+                tvModel = tvResponse.getData("response").getString("tv_model");
+
+                baseInfoData.setString("deviceSn", tvMac);
+                baseInfoData.setString("deviceMac", tvMac);
+                baseInfoData.setString("tv_name", tvName);
+                baseInfoData.setString("tv_model", tvModel);
+                configParamUtil::getInstance()->saveBaseInfo(baseInfoData);
+                return true;
+            }
+        }
+        return false;
+    }
+    return true;
+}
+
+bool cloudUtil::getTvInfo(qlibc::QData& tvInfo){
+    string tvMac, tvName, tvModel;
+    bool ret = getTvInfo(tvMac, tvName, tvModel);
+    if(ret){
+        qlibc::QData params;
+        params.setString("tvMac", tvMac);
+
+        tvInfo.setString("funcName", "deviceDataReport");
+        tvInfo.setString("deviceType", "tvMac");
+        tvInfo.setString("area", "");
+        tvInfo.setString("deviceName", "");
+        tvInfo.setString("eventName", "tvMac");
+        tvInfo.setValue("params", params.asValue());
+
+        return true;
+    }
+    return false;
+}
+
 bool cloudUtil::joinTvWhite() {
     //加载记录信息,加载基本信息
     qlibc::QData recordData = configParamUtil::getInstance()->getRecordData();
-    qlibc::QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
     bool tvWhite = recordData.getBool("tvWhite");
 
     if(!tvWhite){
-        string tvMac = baseInfoData.getString("deviceMac");
-        string tvName = baseInfoData.getString("tv_name");
-        string tvModel = baseInfoData.getString("tv_model");
-
-        if(tvMac.empty() || tvName.empty() || tvModel.empty()){
-            qlibc::QData tvRequest, tvResponse;
-            tvRequest.setString("service_id", "get_tv_mac");
-            tvRequest.putData("request", qlibc::QData());
-
-            while(true){
-                auto ret = httpUtil::sitePostRequest("127.0.0.1", ADAPTER_PORT, tvRequest, tvResponse);
-                if(ret){
-                    if(tvResponse.getInt("code") == 0){
-                        tvMac = tvResponse.getData("response").getString("tv_mac");
-                        tvName = tvResponse.getData("response").getString("tv_name");
-                        tvModel = tvResponse.getData("response").getString("tv_model");
-
-                        baseInfoData.setString("deviceSn", tvMac);
-                        baseInfoData.setString("deviceMac", tvMac);
-                        baseInfoData.setString("tv_name", tvName);
-                        baseInfoData.setString("tv_model", tvModel);
-                        configParamUtil::getInstance()->saveBaseInfo(baseInfoData);
-                        break;
-                    }
-                }
+        //获取电视信息
+        string tvMac, tvName, tvModel;
+        while(true){
+            bool ret = getTvInfo(tvMac, tvName, tvModel);
+            if(ret)
+                break;
+            else{
                 std::cout << "---can no get tvInfo from adapter site, try again in 3 seconds......" << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(3));
             }
@@ -98,8 +130,10 @@ bool cloudUtil::joinTvWhite() {
 
         string tvDid = returnMessage.getData("data").getString("deviceDid");
 
+        qlibc::QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
         baseInfoData.setString("tvDid", tvDid);
         configParamUtil::getInstance()->saveBaseInfo(baseInfoData);
+
         recordData.setBool("tvWhite", true);
         configParamUtil::getInstance()->saveRecordData(recordData);
     }

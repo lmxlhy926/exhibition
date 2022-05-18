@@ -14,7 +14,6 @@
 
 using namespace std;
 
-static const int ADAPTER_PORT = 60003;
 
 class cloudUtil {
 private:
@@ -32,6 +31,10 @@ public:
     static void destroyInstance();
 
     void init(const string&  ip, int port, const string& dataDirectoryPath);
+
+    static bool getTvInfo(string& tvMac, string& tvName, string& tvModel);
+
+    static bool getTvInfo(qlibc::QData& tvInfo);
 
     //阻塞，直到成功为止
     bool joinTvWhite();

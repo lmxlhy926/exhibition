@@ -3,6 +3,7 @@
 //
 
 #include "serviceRequestHandler.h"
+#include "paramconfig.h"
 
 int test_service_request_handler(const Request& request, Response& response) {
     // HTTP库已判断字符串能否转成 JSON
@@ -28,8 +29,7 @@ int test_service_request_handler(const Request& request, Response& response) {
 
 
 int sceneListRequest_service_request_handler(const Request& request, Response& response) {
-    qlibc::QData sceneListRequest;
-    qlibc::QData sceneListResponse;
+    qlibc::QData sceneListRequest, sceneListResponse;
     qlibc::QData param;
     param.setString("familyCode", "XXXX");  //TODO 待定
     sceneListRequest.putData("param", param);
@@ -53,10 +53,10 @@ int sceneListRequest_service_request_handler(const Request& request, Response& r
 int subDeviceRegister_service_request_handler(const Request& request, Response& response) {
 
     qlibc::QData requestData(request.body);
+
+    qlibc::QData registerRequest, registerResponse;
     qlibc::QData param = requestData.getData("request");
     param.setString("domainID", configParamUtil::getInstance()->getBaseInfo().getString("domainID"));
-    qlibc::QData registerRequest;
-    qlibc::QData registerResponse;
     registerRequest.setString("User-Agent", "curl");
     registerRequest.putData("param", param);
 

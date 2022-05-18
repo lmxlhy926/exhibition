@@ -14,6 +14,8 @@
 #include "serviceRequestHandler.h"
 #include "socket/socketClient.h"
 #include "sceneCommandHandler.h"
+#include "util.h"
+#include "paramConfig.h"
 
 using namespace std;
 using namespace servicesite;
@@ -23,25 +25,6 @@ using json = nlohmann::json;
 
 static const string SYNERGY_SITE_ID = "collaborate";
 static const string SYNERGY_SITE_ID_NAME = "协同站点";
-
-
-void publish_message(void){
-//    json message_json = {
-//            {"message_id", "test_message_id_1"},
-//            {"content", {
-//                                   "some_data", 123
-//                           }}
-//    };
-//
-//    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-//
-//    // 把要发布的消息 json 字符串传入即可， 由库来向订阅过的站点发送消息
-//    serviceSiteManager->publishMessage(TEST_MESSAGE_ID_1, message_json.dump());
-//
-//    message_json["message_id"] = "test_message_id_2";
-//    serviceSiteManager->publishMessage(TEST_MESSAGE_ID_2, message_json.dump());
-}
-
 
 
 int main(int argc, char* argv[]) {
@@ -59,11 +42,20 @@ int main(int argc, char* argv[]) {
     int activeAppPort2 = interActiveAppData.getInt("port2");
 
     string loginMessage = "{\"identity\":\"ctl\",\"pwd\":\"ctl123456\"}\n";
+
     //启动socketClient1
     socketClient sockClient_1(threadPool_);
     sockClient_1.setAfterConnectHandler([&](){
-        //todo 获取tvMac
-        sockClient_1.sendMessage("tvmac from client1\n");
+        qlibc::QData tvInfo;
+        while(true){
+            bool ret = util::getTvInfo(tvInfo);
+            if(ret)
+                break;
+            else{
+                std::this_thread::sleep_for(std::chrono::seconds(3));
+            }
+        }
+        sockClient_1.sendMessage(tvInfo.toJsonString(), true);
     });
 
     sockClient_1.setUriHandler("/dev/deviceControl", [](QData& message)->bool{
@@ -72,21 +64,24 @@ int main(int argc, char* argv[]) {
 
     sockClient_1.start(activeAppServerIp, activeAppPort1, loginMessage);
 
+
     //启动socket_client_2
     socketClient sockClient_2(threadPool_);
     sockClient_2.setAfterConnectHandler([&](){
-        //todo 获取tvMac
-        sockClient_2.sendMessage("tvmac from client2\n");
+        qlibc::QData tvInfo;
+        while(true){
+            bool ret = util::getTvInfo(tvInfo);
+            if(ret)
+                break;
+            else{
+                std::this_thread::sleep_for(std::chrono::seconds(3));
+            }
+        }
+        sockClient_2.sendMessage(tvInfo.toJsonString(), true);
     });
 
     sockClient_2.start(activeAppServerIp, activeAppPort2, loginMessage);
 
-//    threadPool_.enqueue([&](){
-//        while(true){
-//            socket_client_1.sendMessage("hello");
-//            std::this_thread::sleep_for(std::chrono::seconds(3));
-//        }
-//    });
 
 
     // 创建 serviceSiteManager 对象, 单例
@@ -114,20 +109,6 @@ int main(int argc, char* argv[]) {
                                                       });
 
 
-
-
-#if 0
-    // 注册支持的消息ID
-    serviceSiteManager->registerMessageId(DEVICESTATUS_MESSAGE_ID);
-    // 注册消息ID对应的handler
-    serviceSiteManager->registerMessageHandler(DEVICESTATUS_MESSAGE_ID,
-                                               [&](const Request& request){
-        deviceStatus_message_handler(server, request);
-    });
-#endif
-
-
-
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         // 启动服务器，参数为端口， 可用于单独的开发调试
@@ -143,19 +124,14 @@ int main(int argc, char* argv[]) {
         http_server_thread_end.store(true);
     });
 
-    sleep(2);
-
-    if (http_server_thread_end.load()) {
-        printf("启动 http 服务器线程错误.\n");
-        return -1;
-    }
+    std::this_thread::sleep_for(std::chrono::seconds(3));
 
     while(true){
         if (http_server_thread_end){
             printf("http end abnormally....\n");
             break;
         }
-        std::this_thread::sleep_for(std::chrono::seconds(10));
+        std::this_thread::sleep_for(std::chrono::seconds(30));
     }
 
     return -1;

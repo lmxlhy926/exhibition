@@ -17,16 +17,6 @@ using namespace httplib;
 using json = nlohmann::json;
 
 
-static const string SCENELIST_URL = "/logic-device/scene/list";  //请求场景列表URL
-static const string SUBDEVICE_REGISTER_URL = "/logic-device/edge/deviceRegister";
-
-//服务ID, 对内提供
-static const string SCENELIST_REQUEST_SERVICE_ID = "sceneListRequest";
-static const string SUBDEVICE_REGISTER_SERVICE_ID = "subDeviceRegister";
-static const string DOMAINID_REQUEST_SERVICE_ID = "domainIdRequest";
-static const string ENGINEER_REQUEST_SERVICE_ID = "engineerAppInfo";
-
-
 //获取情景列表<内部>
 int sceneListRequest_service_request_handler(const Request& request, Response& response);
 

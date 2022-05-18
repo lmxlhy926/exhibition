@@ -13,11 +13,6 @@
 using namespace std;
 using namespace httplib;
 
-//服务ID, 对内提供
-static const string TVUPLOAD_SERVICE_ID = "tveventUpload";
-static const string SENSOR_SERVICE_ID = "sensorEventUpload";
-static const string TV_SOUND_SERVICE_ID = "tvSound";
-static const string COMMON_EVENT_SERVICE_ID = "commonEvent";
 
 int tvupload_service_handler(socketClient& client, const Request& request, Response& response);
 

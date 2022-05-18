@@ -5,6 +5,7 @@
 #include "sceneCommandHandler.h"
 #include <iostream>
 #include "socket/httplib.h"
+#include "paramConfig.h"
 
 bool sitePostRequest(const string& ip, int port, qlibc::QData& request, qlibc::QData& response){
     httplib::Client client(ip, port);
