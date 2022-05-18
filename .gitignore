@@ -1,3 +1,8 @@
 /cmake-build-debug
 /test
-/unit/config/configData
+/unit/config/configData/baseInfo.json
+/unit/config/configData/record.json
+/unit/config/configData/secret/*
+
+/unit/synergy/configData
+/unit/testSite/configData
