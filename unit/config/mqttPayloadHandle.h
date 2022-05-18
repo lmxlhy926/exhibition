@@ -9,7 +9,7 @@
 
 using namespace std;
 
-static const string WHITELIST_MESSAGE_ID = "";
+static const string WHITELIST_MESSAGE_ID = "whiteList";
 
 class mqttPayloadHandle {
 public:

@@ -6,7 +6,9 @@
 #include <iostream>
 #include "mqttPayloadHandle.h"
 #include "qlibc/QData.h"
+#include "qlibc/FileUtils.h"
 #include "siteService/service_site_manager.h"
+#include "common/configParamUtil.h"
 
 using namespace qlibc;
 using namespace servicesite;
@@ -93,8 +95,11 @@ bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int le
     string timeStr = std::to_string(time(nullptr));
     payload.setString("timeStamp", timeStr);
 
-    payload.saveToFile(R"(D:\bywg\project\exhibition\test\out.json)", true);
+    //存储
+    const string dataDir = configParamUtil::getInstance()->getconfigPath();
+    payload.saveToFile(FileUtils::contactFileName(dataDir, "whitelist.json"), true);
 
+    //发布
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->publishMessage(WHITELIST_MESSAGE_ID, payload.toJsonString());
 

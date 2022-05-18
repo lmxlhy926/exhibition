@@ -23,10 +23,7 @@ typedef unsigned char b64_data_t;
 using namespace std;
 namespace lhytemp{
 
-    class myutil {
-    public:
-        static std::mutex rwLock;
-        static std::vector<string> topicVector;
+    class secretUtil {
 
     public:
         /**
@@ -82,33 +79,11 @@ namespace lhytemp{
          */
         static string getTvSign(string& tvDid, const string& second, const string& dir);
 
-
-        static void storeTopic(const string& topic){    //如果该主题没有被存储，则存储
-            std::lock_guard<std::mutex> lg(rwLock);
-            for(auto& elem : topicVector){
-                if(topic == elem)
-                   return;
-            }
-            topicVector.emplace_back(topic);
-        }
-
-        static vector<string> getTopic(){
-            std::lock_guard<std::mutex> lg(rwLock);
-            return topicVector;
-        }
-
         static bool ecb_encrypt_withPadding(const string &in , string &out, const uint8_t *key);
 
         static bool ecb_decrypt_withPadding(const string& in, string& out, const uint8_t *key);
 
     };
-
-    class concurrency{
-    public:
-
-        static std::string area;
-    };
-
 
 }
 

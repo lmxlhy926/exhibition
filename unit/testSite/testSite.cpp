@@ -59,6 +59,8 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(DEVICE_LIST_REQUEST_SERVICE_ID,deviceList_service_request_handler);
     //注册子设备注册处理函数
     serviceSiteManager->registerServiceRequestHandler(CONTROL_DEVICE_REGISTER_SERVICE_ID,controlDevice_service_request_handler);
+    //注册获取tvMac处理函数
+    serviceSiteManager->registerServiceRequestHandler(TVMAC_SERVICE_ID,tvMac_service_request_handler);
 
 
     // 站点监听线程启动

@@ -11,10 +11,7 @@ extern "C" {
 
 namespace lhytemp{
 
-    std::mutex myutil::rwLock;
-    std::vector<string> myutil::topicVector;
-
-    b64_size_t myutil::Base64_encode( char *out, b64_size_t out_len, const b64_data_t *in, b64_size_t in_len )
+    b64_size_t secretUtil::Base64_encode( char *out, b64_size_t out_len, const b64_data_t *in, b64_size_t in_len )
     {
         static const char BASE64_ENCODE_TABLE[] =
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -72,7 +69,7 @@ namespace lhytemp{
         return ret;
     }
 
-    b64_size_t myutil::Base64_decode(b64_data_t *out, b64_size_t out_len, const char *in, b64_size_t in_len) {
+    b64_size_t secretUtil::Base64_decode(b64_data_t *out, b64_size_t out_len, const char *in, b64_size_t in_len) {
 
 #define NV 64
         static const unsigned char BASE64_DECODE_TABLE[] =
@@ -154,7 +151,7 @@ namespace lhytemp{
     }
 
 
-    string myutil::byte2HexString(unsigned char* in, int length){
+    string secretUtil::byte2HexString(unsigned char* in, int length){
 
         string str;
         for(int i = 0; i < length; i++){
@@ -180,7 +177,7 @@ namespace lhytemp{
         return str;
     }
 
-     string myutil::getSecretMsg(const string& dirPath){
+     string secretUtil::getSecretMsg(const string& dirPath){
         const string secretDir = FileUtils::contactFileName(dirPath, "secret");
         bool secretReadyFlag = false;
 
@@ -216,7 +213,7 @@ namespace lhytemp{
         unsigned char pub_key[66]{};
         memcpy(file_name_publickey, secret_file_name.c_str(), 32);
         get_secp256k1_pub_key_from_file(const_cast<char *>(secretDir.c_str()), file_name_publickey, file_name_len_publickey, pub_key);
-        string publickey_hexString = lhytemp::myutil::byte2HexString(pub_key, 65);
+        string publickey_hexString = lhytemp::secretUtil::byte2HexString(pub_key, 65);
 
         //构造待加密的加密体
         qlibc::QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
@@ -236,7 +233,7 @@ namespace lhytemp{
         //base64编码
         char out[1024]{};
         b64_size_t out_len = 1024;
-        lhytemp::myutil::Base64_encode(out, out_len, encrypt_buf, encrypt_len);
+        lhytemp::secretUtil::Base64_encode(out, out_len, encrypt_buf, encrypt_len);
         string outstr(out, 0, strlen(out));
         std::cout << "======secretMsg: " << outstr << std::endl;
 
@@ -244,7 +241,7 @@ namespace lhytemp{
     }
 
 
-    string myutil::getTvSign(string& tvDid, const string& second, const string& dir) {
+    string secretUtil::getTvSign(string& tvDid, const string& second, const string& dir) {
         string tvSignMessage = tvDid + second;
         const string secretDir = FileUtils::contactFileName(dir, "secret");
         string filename = configParamUtil::getInstance()->getSecretFileNameData().getString("filename");
@@ -258,12 +255,12 @@ namespace lhytemp{
         sign_secp256K1_recoverable(const_cast<char*>(secretDir1.c_str()), file_name, file_name_len, const_cast<char*>(tvSignMessage.c_str()), sign_buf);
 
         print_hex("sign_buf", sign_buf, 65);
-        string str = lhytemp::myutil::byte2HexString(sign_buf, 65);
+        string str = lhytemp::secretUtil::byte2HexString(sign_buf, 65);
         return str;
     }
 
 
-    bool myutil::ecb_encrypt_withPadding(const string &in, string &out, const uint8_t *key) {
+    bool secretUtil::ecb_encrypt_withPadding(const string &in, string &out, const uint8_t *key) {
 
         struct AES_ctx ctx{};
         AES_init_ctx(&ctx, key);
@@ -284,18 +281,18 @@ namespace lhytemp{
         //BASE64加密
         char encodeOut[10240*10]{};
         int encodeOutLength = 1024*10;
-        int base64EncodedLen = myutil::Base64_encode(encodeOut, encodeOutLength, dataWithPadding, encryptLength);
+        int base64EncodedLen = secretUtil::Base64_encode(encodeOut, encodeOutLength, dataWithPadding, encryptLength);
 
         out = string(encodeOut, 0, base64EncodedLen);
 
         return true;
     }
 
-    bool myutil::ecb_decrypt_withPadding(const string &in, string &out, const uint8_t *key) {
+    bool secretUtil::ecb_decrypt_withPadding(const string &in, string &out, const uint8_t *key) {
         //base64解密
         b64_data_t decodeOut[1024*64]{};
         b64_size_t decodeOutLength = 1024*64;
-        int base64DecodedLen = myutil::Base64_decode(decodeOut, decodeOutLength, reinterpret_cast<const char *>(in.c_str()), in.size());
+        int base64DecodedLen = secretUtil::Base64_decode(decodeOut, decodeOutLength, reinterpret_cast<const char *>(in.c_str()), in.size());
 
         //ECB解密
         struct AES_ctx ctx{};
@@ -321,8 +318,6 @@ namespace lhytemp{
         return true;
     }
 
-
-    std::string concurrency::area = "1";
 
 }
 

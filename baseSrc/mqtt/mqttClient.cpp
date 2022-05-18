@@ -141,7 +141,7 @@ void mqttClient::onMsgArrvd_member(char *topicName, int topicLen, void *payload,
 }
 
 void mqttClient::connlost_member(void *context, char *cause) {
-    std::cout << "-----connlost_member----" << std::endl;
+    std::cout << "-----connlost, start to connect aggain----" << std::endl;
     connect();
 }
 

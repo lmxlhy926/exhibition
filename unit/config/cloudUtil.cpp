@@ -3,11 +3,11 @@
 //
 
 #include "cloudUtil.h"
-#include <utility>
-#include "qlibc/QData.h"
 #include "qlibc/FileUtils.h"
-#include "socket/httplib.h"
 #include "myutil.h"
+#include "common/httpUtil.h"
+#include <thread>
+#include <chrono>
 
 
 cloudUtil* cloudUtil::instance = nullptr;
@@ -32,34 +32,55 @@ void cloudUtil::init(const string&  ip, int port, const string& dataDirectoryPat
     serverIp = ip;
     serverPort = port;
     dataDirPath = dataDirectoryPath;
+    std::cout << "cloudUtil init: serverIp<" << serverIp << ">---serverPort<" << serverPort
+              << ">---dataDirPath<" << dataDirPath << ">" << std::endl;
 }
 
 bool cloudUtil::joinTvWhite() {
-    //加载记录信息
+    //加载记录信息,加载基本信息
     qlibc::QData recordData = configParamUtil::getInstance()->getRecordData();
+    qlibc::QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
     bool tvWhite = recordData.getBool("tvWhite");
 
     if(!tvWhite){
-        //todo 获取tv信息,暂时调试用. 在这里循环获取mac信息，直到获取到为止
-        qlibc::QData TvInfo;
-        TvInfo.setString("tv_mac","1111111111");
-        TvInfo.setString("tv_name","changhogn");
-        TvInfo.setString("tv_model","changhogn");
+        string tvMac = baseInfoData.getString("deviceMac");
+        string tvName = baseInfoData.getString("tv_name");
+        string tvModel = baseInfoData.getString("tv_model");
 
-        //存储tv信息
-        qlibc::QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
-        baseInfoData.setString("deviceSn", TvInfo.getString("tv_mac"));
-        baseInfoData.setString("deviceMac", TvInfo.getString("tv_mac"));
-        configParamUtil::getInstance()->saveBaseInfo(baseInfoData);
+        if(tvMac.empty() || tvName.empty() || tvModel.empty()){
+            qlibc::QData tvRequest, tvResponse;
+            tvRequest.setString("service_id", "get_tv_mac");
+            tvRequest.putData("request", qlibc::QData());
+
+            while(true){
+                auto ret = httpUtil::sitePostRequest("127.0.0.1", ADAPTER_PORT, tvRequest, tvResponse);
+                if(ret){
+                    if(tvResponse.getInt("code") == 0){
+                        tvMac = tvResponse.getData("response").getString("tv_mac");
+                        tvName = tvResponse.getData("response").getString("tv_name");
+                        tvModel = tvResponse.getData("response").getString("tv_model");
+
+                        baseInfoData.setString("deviceSn", tvMac);
+                        baseInfoData.setString("deviceMac", tvMac);
+                        baseInfoData.setString("tv_name", tvName);
+                        baseInfoData.setString("tv_model", tvModel);
+                        configParamUtil::getInstance()->saveBaseInfo(baseInfoData);
+                        break;
+                    }
+                }
+                std::cout << "---can no get tvInfo from adapter site, try again in 3 seconds......" << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3));
+            }
+        }
 
         //构造请求体，上传生成的秘钥
         qlibc::QData requestBody;
         requestBody.setString("productVender", "changhong");
         requestBody.setString("productType", "电视");
-        requestBody.setString("productName", TvInfo.getString("tv_name"));
-        requestBody.setString("productModel",TvInfo.getString("tv_model"));
-        requestBody.setString("deviceSn",    TvInfo.getString("tv_mac"));
-        requestBody.setString("secretMsg", lhytemp::myutil::getSecretMsg(dataDirPath));
+        requestBody.setString("productName", tvName);
+        requestBody.setString("productModel", tvModel);
+        requestBody.setString("deviceSn", tvMac);
+        requestBody.setString("secretMsg", lhytemp::secretUtil::getSecretMsg(dataDirPath));
 
         qlibc::QData message2Handle;
         message2Handle.setString("User-Agent", "curl");
@@ -112,7 +133,7 @@ bool cloudUtil::tvRegister(mqttClient& mc, qlibc::QData& engineerInfo, qlibc::QD
     paramData["domainSign"] = engineerInfo.getString("domainID");
     paramData["tvDid"] = baseInfoData.getString("tvDid");
     paramData["tvTimeStamp"] = std::to_string(seconds);
-    paramData["tvSign"] = lhytemp::myutil::getTvSign(tvDid, std::to_string(seconds), dataDirPath);
+    paramData["tvSign"] = lhytemp::secretUtil::getTvSign(tvDid, std::to_string(seconds), dataDirPath);
 
     qlibc::QData message2Handle;
     qlibc::QData returnMessage;
@@ -165,12 +186,12 @@ bool cloudUtil::ecb_httppost(const string &uri, const qlibc::QData &request, qli
     string body = request.getData("param").toJsonString();
     const char *key = "123456asdfgh1234";
     string out;
-    lhytemp::myutil::ecb_encrypt_withPadding(body, out, reinterpret_cast<const uint8_t *>(key));
+    lhytemp::secretUtil::ecb_encrypt_withPadding(body, out, reinterpret_cast<const uint8_t *>(key));
 
     auto http_res = client.Post(uri.c_str(), header, out, "application/json");
     if (http_res != nullptr) {
         string decryptOut;
-        lhytemp::myutil::ecb_decrypt_withPadding(http_res->body.c_str(), decryptOut,
+        lhytemp::secretUtil::ecb_decrypt_withPadding(http_res->body.c_str(), decryptOut,
                                                  reinterpret_cast<const uint8_t *>(key));
         response = qlibc::QData(decryptOut);
         std::cout << "===>httpResponse: " << response.toJsonString() << std::endl;

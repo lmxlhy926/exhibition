@@ -16,11 +16,14 @@ using json = nlohmann::json;
 
 static const string DEVICE_LIST_REQUEST_SERVICE_ID = "get_device_list";
 static const string CONTROL_DEVICE_REGISTER_SERVICE_ID = "control_device";
-
+static const string TVMAC_SERVICE_ID = "get_tv_mac";
 
 int deviceList_service_request_handler(const Request& request, Response& response);
 
 int controlDevice_service_request_handler(const Request& request, Response& response);
+
+int tvMac_service_request_handler(const Request& request, Response& response);
+
 
 
 

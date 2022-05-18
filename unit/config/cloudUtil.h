@@ -14,14 +14,13 @@
 
 using namespace std;
 
+static const int ADAPTER_PORT = 60003;
+
 class cloudUtil {
 private:
     string serverIp;
     int serverPort;
     string dataDirPath;
-    mutex registerMutex;
-    condition_variable registerConVar;
-    bool registerFlag;
     static cloudUtil* instance;
 
 private:
