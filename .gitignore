@@ -2,3 +2,6 @@
 /test
 /unit/paramData
 /out
+/output
+/cmake-build-release-visual-studio
+.idea
