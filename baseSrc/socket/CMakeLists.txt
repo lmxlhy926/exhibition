@@ -9,4 +9,7 @@ set(src
 add_library(socket STATIC ${src})
 target_link_libraries(socket PUBLIC qlibc)
 
+add_library(socket_shared SHARED ${src})
+target_link_libraries(socket_shared PUBLIC qlibc)
+
 add_subdirectory(test)
