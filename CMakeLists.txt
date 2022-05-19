@@ -29,6 +29,9 @@ install(TARGETS config      DESTINATION bin)
 install(TARGETS synergy     DESTINATION bin)
 install(TARGETS testSite    DESTINATION bin)
 
+install(TARGETS config_shared      DESTINATION bin)
+
+
 
 
 

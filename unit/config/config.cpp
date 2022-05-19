@@ -10,7 +10,7 @@
 #include "serviceRequestHandler.h"
 #include "qlibc/FileUtils.h"
 #include "mqttPayloadHandle.h"
-#include "myutil.h"
+#include "secretUtils.h"
 #include "paramconfig.h"
 
 using namespace std;
