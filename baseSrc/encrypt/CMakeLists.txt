@@ -1,4 +1,5 @@
 FILE(GLOB src "src/*.c")
+
 add_library(encrypt STATIC ${src})
 target_include_directories(encrypt PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc/)
 target_include_directories(encrypt PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc/encrypt/include)
