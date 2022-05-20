@@ -10,8 +10,7 @@ elseif(ANDROID)
     set(outDir android)
 endif()
 
-#set(libType "STATIC")
-set(libType "SHARED")
+set(libType "STATIC")
 message("===>libType: ${libType}")
 
 add_subdirectory(baseSrc)
@@ -26,6 +25,7 @@ if("${libType}" STREQUAL "SHARED")
     install(TARGETS siteService  DESTINATION ${outDir})
     install(TARGETS socket       DESTINATION ${outDir})
     install(TARGETS config       DESTINATION ${outDir})
+    install(TARGETS synergy      DESTINATION ${outDir})
     if(CYGWIN)
         install(FILES baseSrc/mqtt/lib/cygwin/libpaho-mqtt3a.dll.a
                 DESTINATION ${outDir})
@@ -36,10 +36,9 @@ if("${libType}" STREQUAL "SHARED")
 
 elseif("${libType}" STREQUAL "STATIC")
     install(TARGETS config       DESTINATION bin)
+    install(TARGETS synergy      DESTINATION bin)
 endif()
 
-
-#install(TARGETS synergy     DESTINATION bin)
 #install(TARGETS testSite    DESTINATION bin)
 
 

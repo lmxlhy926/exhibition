@@ -141,7 +141,7 @@ bool socketServer::postMessage(const string& message) {
 socket_t socketServer::createServerSocket(string& ip, int port, int socket_flags) {
     return sockCommon::create_socket(ip.c_str(), port,
                             [&](socket_t sock, struct addrinfo &ai)->bool{
-                                                if(bind(sock, ai.ai_addr, ai.ai_addrlen) != 0)
+                                                if(::bind(sock, ai.ai_addr, ai.ai_addrlen) != 0)
                                                     return false;
                                                 else
                                                     return ::listen(sock, 10) == 0;

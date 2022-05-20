@@ -17,4 +17,4 @@ target_link_libraries(mqttclient PUBLIC qlibc)
 
 
 
-#add_subdirectory(test)
+add_subdirectory(test)

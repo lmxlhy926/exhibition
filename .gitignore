@@ -1,6 +1,6 @@
 .idea
 /cmake-build-debug
-/cmake-build-release-visual-studio
+/cmake-build-minsizerel-visual-studio
 /test
 /unit/paramData
 /out
