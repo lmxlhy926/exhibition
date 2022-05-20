@@ -22,11 +22,13 @@ bool socketClient::start(const string &ip, int port, string loginMessage) {
     threadPool_.enqueue([&](){
         connectAndHandle();
     });
+    return true;
 }
 
 bool socketClient::stop(){
     quit.store(true);
     shutdownAndCloseSocket();
+    return true;
 }
 
 bool socketClient::isConnectionAlive() {

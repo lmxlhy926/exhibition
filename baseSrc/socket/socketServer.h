@@ -12,6 +12,7 @@
 
 using namespace std;
 using namespace qlibc;
+using namespace httplib;
 
 //存储和客户端建立连接的端点
 class acceptNode{

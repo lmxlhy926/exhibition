@@ -7,6 +7,7 @@
 mqttMessageHandler::mqttMessageHandler() {
     defaultHandler_ = [](const string& topic, char* payload, int payloadLength) -> bool{
        std::cout << "default Handler-->topic: " << topic << "--->message: " << string(payload, payloadLength) << std::endl;
+       return true;
     };
 }
 

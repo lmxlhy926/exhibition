@@ -7,6 +7,7 @@
 messageHandler::messageHandler() {
     defaultHandler_ = [](QData& message) -> bool{
         std::cout << "-->received default unhandled msg>>:" << message.toJsonString() << endl;
+        return true;
     };
 }
 

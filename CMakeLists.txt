@@ -22,19 +22,19 @@ add_subdirectory(unit)
 #install(TARGETS siteService DESTINATION static_lib)
 #install(TARGETS socket      DESTINATION static_lib)
 
-install(TARGETS aes_shared          DESTINATION shared_lib)
-install(TARGETS common_shared       DESTINATION shared_lib)
-install(TARGETS encrypt_shared      DESTINATION shared_lib)
-install(TARGETS qlibc_shared        DESTINATION shared_lib)
-install(TARGETS mqttclient_shared   DESTINATION shared_lib)
-install(TARGETS siteService_shared  DESTINATION shared_lib)
-install(TARGETS socket_shared       DESTINATION shared_lib)
+#install(TARGETS aes_shared          DESTINATION shared_lib)
+#install(TARGETS common_shared       DESTINATION shared_lib)
+#install(TARGETS encrypt_shared      DESTINATION shared_lib)
+#install(TARGETS qlibc_shared        DESTINATION shared_lib)
+#install(TARGETS mqttclient_shared   DESTINATION shared_lib)
+#install(TARGETS siteService_shared  DESTINATION shared_lib)
+#install(TARGETS socket_shared       DESTINATION shared_lib)
 
-install(TARGETS config_shared      DESTINATION shared_lib)
+#install(TARGETS config_shared      DESTINATION shared_lib)
 
 
 
-#install(TARGETS config      DESTINATION bin)
+install(TARGETS config      DESTINATION bin)
 #install(TARGETS synergy     DESTINATION bin)
 #install(TARGETS testSite    DESTINATION bin)
 

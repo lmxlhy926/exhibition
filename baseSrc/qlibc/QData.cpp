@@ -36,6 +36,7 @@ namespace qlibc{
 
     QData& QData::operator= (const QData& data){
         _value.reset(new Json::Value(data.asValue()));
+        return *this;
     }
 
     Json::Value& QData::asValue() const{
@@ -334,6 +335,7 @@ namespace qlibc{
             _value->append(data.asValue());
             return *this;
         }
+        return *this;
     }
 
     QData& QData::append(const Json::Value &value) {

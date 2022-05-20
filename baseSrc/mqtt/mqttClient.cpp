@@ -101,6 +101,7 @@ void mqttClient::setTopicHandler(const string& topic, const MqttMsgHandler & han
 bool mqttClient::addDataHooker(MqttDataHooker dataHooker){
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     this->hooker = dataHooker;
+    return true;
 }
 
 int mqttClient::onMsgArrvd(void *context, char *topicName, int topicLen, MQTTAsync_message *message) {
