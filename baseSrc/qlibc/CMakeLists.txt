@@ -1,19 +1,9 @@
+FILE(GLOB jsoncppSrc "jsoncpp/*.cpp")
+FILE(GLOB qlibcSrc "*.cpp")
 
-set(src
-        jsoncpp/json_reader.cpp
-        jsoncpp/json_value.cpp
-        jsoncpp/json_writer.cpp
-        QData.cpp
-        StringUtils.cpp
-        FileUtils.cpp)
+set(src ${jsoncppSrc} ${qlibcSrc})
 
-add_library(qlibc STATIC ${src})
+add_library(qlibc ${libType} ${src})
 target_include_directories(qlibc PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)
 
-
-add_library(qlibc_shared SHARED ${src})
-target_include_directories(qlibc_shared PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)
-
-
-
-add_subdirectory(test)
+#add_subdirectory(test)
