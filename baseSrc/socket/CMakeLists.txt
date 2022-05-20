@@ -14,4 +14,4 @@ target_link_libraries(socket_shared PUBLIC qlibc_shared)
 target_include_directories(socket_shared PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)
 
 
-add_subdirectory(test)
+#add_subdirectory(test)

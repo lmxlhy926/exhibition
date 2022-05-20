@@ -3,6 +3,5 @@
 /cmake-build-release-visual-studio
 /test
 /unit/paramData
-/output
-/libs
+/out
 
