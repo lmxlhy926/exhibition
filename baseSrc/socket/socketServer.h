@@ -9,6 +9,7 @@
 #include "httplib.h"
 #include "sockUtils.h"
 #include "qlibc/QData.h"
+#include "noncopyable.h"
 
 using namespace std;
 using namespace qlibc;
@@ -17,12 +18,12 @@ using namespace httplib;
 //存储和客户端建立连接的端点
 class acceptNode{
 private:
-    string ip_; //对端的ip
-    int port_;  //对端的port
-    socket_t connectedSock = INVALID_SOCKET;  //用于和客户端通信的socket
-    bool quit = false;
-    std::shared_ptr<sockCommon::SocketStream> socketStream;
-    std::shared_ptr<sockCommon::stream_line_reader> streamLineReader;
+    string ip_; //通信对端的ip
+    int port_;  //通信对端的port
+    socket_t connectedSock = INVALID_SOCKET;  //用于和对端通信的socket
+    std::unique_ptr<std::recursive_mutex> mutex_;
+    std::unique_ptr<sockCommon::SocketStream> socketStream;
+    std::unique_ptr<sockCommon::stream_line_reader> streamLineReader;
 
 public:
     explicit acceptNode(const string& ip, int port, socket_t sock);
@@ -74,17 +75,17 @@ public:
     void invokeOnAllObject(objectFunction func);
 };
 
-class socketServer {
+class socketServer: noncopyable{
 private:
-    string serverIp;
-    int serverPort;
-    socket_t serverSock_ = INVALID_SOCKET;
+    string serverIp;    //服务器ip
+    int serverPort;     //服务器端口号
+    socket_t serverSock_ = INVALID_SOCKET;  //服务器监听端点
     bool bindAndListen = false;
-    httplib::ThreadPool threadPool_;
-    objectPtrHolder clients_;
+    httplib::ThreadPool& threadPool_;
+    objectPtrHolder clients_;  //连接到服务器的客户端
 
 public:
-    explicit socketServer(int threadNum = 5);
+    explicit socketServer(httplib::ThreadPool& threadPool);
 
     ~socketServer() = default;
 

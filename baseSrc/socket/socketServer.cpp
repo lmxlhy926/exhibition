@@ -4,11 +4,14 @@
 
 #include "socketServer.h"
 
-acceptNode::acceptNode(const string &ip,
-                                   int port, const socket_t sock) :
+#include <memory>
+
+acceptNode::acceptNode(const string &ip, int port, const socket_t sock) :
                                    ip_(ip), port_(port), connectedSock(sock){
-    socketStream.reset(new sockCommon::SocketStream(sock));
-    streamLineReader.reset(new sockCommon::stream_line_reader(*socketStream));
+    if(!isAlive())  return;
+    mutex_ = std::make_unique<std::recursive_mutex>();
+    socketStream = std::make_unique<sockCommon::SocketStream>(sock);
+    streamLineReader = std::make_unique<sockCommon::stream_line_reader>(*socketStream);
 }
 
 acceptNode::~acceptNode(){
@@ -16,39 +19,48 @@ acceptNode::~acceptNode(){
 }
 
 bool acceptNode::isAlive() const{
-    return !quit && connectedSock != INVALID_SOCKET;
+    std::lock_guard<std::recursive_mutex> lg(*mutex_);
+    return connectedSock != INVALID_SOCKET;
 }
 
 void acceptNode::close(){
-    if(connectedSock != INVALID_SOCKET && quit){
+    std::lock_guard<std::recursive_mutex> lg(*mutex_);
+    if(isAlive()){
         sockCommon::shutdown_socket(connectedSock);
         sockCommon::close_socket(connectedSock);
+        connectedSock = INVALID_SOCKET;
     }
-    quit = false;
-    connectedSock = INVALID_SOCKET;
 }
 
 ssize_t acceptNode::write(const char *buff, size_t size) {
+    std::lock_guard<std::recursive_mutex> lg(*mutex_);
+    if(!isAlive())  return -1;
     return socketStream->write(buff, size);
 }
 
 bool acceptNode::write(const string &message) {
+    std::lock_guard<std::recursive_mutex> lg(*mutex_);
+    if(!isAlive())  return false;
     size_t length = message.length();
     return  socketStream->write(message.c_str(), message.length()) == length;
 }
 
 bool acceptNode::write(QData &message) {
+    std::lock_guard<std::recursive_mutex> lg(*mutex_);
     string buff = message.toJsonString();
     buff += "\n";
     return write(buff);
 }
 
 bool acceptNode::readLine(string& str){
+    std::lock_guard<std::recursive_mutex> lg(*mutex_);
+    if(!isAlive())  return false;
+
     if(streamLineReader->getline()){
         str.assign(streamLineReader->ptr(), streamLineReader->size() -1);
         return true;
     }
-    quit = true;
+    close();
     return false;
 }
 
@@ -111,7 +123,7 @@ void objectPtrHolder::invokeOnAllObject(objectPtrHolder::objectFunction func) {
     }
 }
 
-socketServer::socketServer(int threadNum) : threadPool_(threadNum) {}
+socketServer::socketServer(httplib::ThreadPool& threadPool) : threadPool_(threadPool) {}
 
 bool socketServer::start(string& ip, int port, int socket_flags) {
     serverIp = ip;
@@ -177,6 +189,7 @@ bool socketServer::listen_internal() {
             break;
         }
 
+        //开启线程处理客户端连接
         threadPool_.enqueue([&](){
             process_socket(acceptSock);
         });
@@ -201,7 +214,6 @@ void socketServer::process_socket(socket_t sock) {
                 std::cout << "received: " << aReadedLine << std::endl;
                 continue;
             }else{  //和客户端断开连接
-                node->close();
                 clients_.eraseObject(key);
                 std::cout << "---client<ip: " << ip << ", port: " << port << "> disconnetced......" << std::endl;
                 break;

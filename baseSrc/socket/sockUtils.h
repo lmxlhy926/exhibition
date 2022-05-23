@@ -114,7 +114,7 @@ namespace sockCommon{
          */
         bool is_readable() const override;
 
-        //是否可写
+        //是否可写,立即返回
         bool is_writable() const override;
 
         /**
