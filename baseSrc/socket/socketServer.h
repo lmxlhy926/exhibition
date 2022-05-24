@@ -32,7 +32,9 @@ private:
     string ip_; //通信对端的ip
     int port_;  //通信对端的port
     socket_t connectedSock = INVALID_SOCKET;  //用于和对端通信的socket
-    std::unique_ptr<std::recursive_mutex> mutex_;
+    std::recursive_mutex readMutex_;
+    std::recursive_mutex writeMutex_;
+    std::recursive_mutex modifyMutex;
     std::unique_ptr<sockCommon::SocketStream> socketStream;
     std::unique_ptr<sockCommon::stream_line_reader> streamLineReader;
 
@@ -44,8 +46,7 @@ public:
     //和对端的连接是否处于有效状态
     bool isAlive();
 
-    //关闭connectedSock，结束和对端的连接
-    void close();
+
 
     ssize_t write(const char* buff, size_t size);
 
@@ -54,6 +55,11 @@ public:
     bool write(QData& message);
 
     bool readLine(string& str);
+
+private:
+    //关闭connectedSock，结束和对端的连接
+    void close();
+
 };
 
 
@@ -107,7 +113,6 @@ private:
     bool isRunning = false;
     httplib::ThreadPool threadPool_;
     objectPtrHolder clients_;  //连接到服务器的客户端
-    std::recursive_mutex mutex_;
 
 public:
     explicit socketServer(size_t n = 10);
@@ -123,7 +128,7 @@ public:
      */
     bool start(string& ip, int port, int socket_flags = AI_NUMERICHOST | AI_NUMERICSERV);
 
-    void stop();
+
 
     bool postMessage(const string& message);
 
@@ -135,6 +140,8 @@ private:
     bool listen_internal();
 
     void process_socket(socket_t sock);
+
+    void stop();
 };
 
 

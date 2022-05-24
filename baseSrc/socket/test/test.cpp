@@ -84,9 +84,9 @@ void serverTest(){
     socketServer server;
     if(server.start(ip, port)){
         std::cout << "---bind successfully---" << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(60));
-        server.stop();
-        std::cout << "server stop......" << std::endl;
+//        std::this_thread::sleep_for(std::chrono::seconds(10));
+//        server.stop();
+//        std::cout << "server stop......" << std::endl;
 
     }else{
         std::cout << "bind failed...." << std::endl;
@@ -95,14 +95,27 @@ void serverTest(){
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        server.postMessage("hello");
+        server.postMessage("hello\n");
+        std::cout << "---post---" << std::endl;
     }
 
 }
 
+void test(){
+
+    acceptNode an("", 1000, 4);
+
+    while(true){
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
+}
+
 
 int main(int argc, char* argv[]){
+
+
     serverTest();
+
 
     return 0;
 }

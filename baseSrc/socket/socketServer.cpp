@@ -9,9 +9,8 @@
 acceptNode::acceptNode(const string &ip, int port, const socket_t sock) :
                                    ip_(ip), port_(port), connectedSock(sock){
     if(!isAlive())  return;
-    mutex_.reset(new std::recursive_mutex);
-    socketStream.reset(new sockCommon::SocketStream(connectedSock))
-    streamLineReader.
+    socketStream.reset(new sockCommon::SocketStream(connectedSock));
+    streamLineReader.reset(new sockCommon::stream_line_reader(*socketStream));
 }
 
 acceptNode::~acceptNode(){
@@ -19,41 +18,32 @@ acceptNode::~acceptNode(){
 }
 
 bool acceptNode::isAlive(){
-    std::lock_guard<std::recursive_mutex> lg(*mutex_);
+    std::lock_guard<std::recursive_mutex> lg(modifyMutex);
     return connectedSock != INVALID_SOCKET;
 }
 
-void acceptNode::close(){
-    std::lock_guard<std::recursive_mutex> lg(*mutex_);
-    if(isAlive()){
-        sockCommon::shutdown_socket(connectedSock);
-        sockCommon::close_socket(connectedSock);
-        connectedSock = INVALID_SOCKET;
-    }
-}
-
 ssize_t acceptNode::write(const char *buff, size_t size) {
-    std::lock_guard<std::recursive_mutex> lg(*mutex_);
+    std::lock_guard<std::recursive_mutex> lg(writeMutex_);
     if(!isAlive())  return -1;
     return socketStream->write(buff, size);
 }
 
 bool acceptNode::write(const string &message) {
-    std::lock_guard<std::recursive_mutex> lg(*mutex_);
+    std::lock_guard<std::recursive_mutex> lg(writeMutex_);
     if(!isAlive())  return false;
     size_t length = message.length();
     return  socketStream->write(message.c_str(), message.length()) == length;
 }
 
 bool acceptNode::write(QData &message) {
-    std::lock_guard<std::recursive_mutex> lg(*mutex_);
+    std::lock_guard<std::recursive_mutex> lg(writeMutex_);
     string buff = message.toJsonString();
     buff += "\n";
     return write(buff);
 }
 
 bool acceptNode::readLine(string& str){
-    std::lock_guard<std::recursive_mutex> lg(*mutex_);
+    std::lock_guard<std::recursive_mutex> lg(readMutex_);
     if(!isAlive())  return false;
 
     if(streamLineReader->getline()){
@@ -62,6 +52,15 @@ bool acceptNode::readLine(string& str){
     }
     close();
     return false;
+}
+
+void acceptNode::close(){
+    std::lock_guard<std::recursive_mutex> lg(modifyMutex);
+    if(isAlive()){
+        sockCommon::shutdown_socket(connectedSock);
+        sockCommon::close_socket(connectedSock);
+        connectedSock = INVALID_SOCKET;
+    }
 }
 
 
@@ -134,7 +133,6 @@ void objectPtrHolder::invokeOnAllObject(objectPtrHolder::objectFunction func) {
 socketServer::socketServer(size_t n) : threadPool_(n) {}
 
 bool socketServer::start(string& ip, int port, int socket_flags) {
-    std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(isRunning)   return false;
 
     serverIp = ip;
@@ -148,16 +146,6 @@ bool socketServer::start(string& ip, int port, int socket_flags) {
         return true;
     }
     return false;
-}
-
-void socketServer::stop(){
-    std::lock_guard<std::recursive_mutex> lg(mutex_);
-    if(serverSock_ != INVALID_SOCKET){
-        sockCommon::shutdown_socket(serverSock_);
-        sockCommon::close_socket(serverSock_);
-        serverSock_ = INVALID_SOCKET;
-        isRunning = false;
-    }
 }
 
 bool socketServer::postMessage(const string& message) {
@@ -183,23 +171,13 @@ bool socketServer::listen_internal() {
     bool ret = true;
 
     while(true){
-        socket_t sock;
-        {
-            std::lock_guard<std::recursive_mutex> lg(mutex_);
-            if(serverSock_ == INVALID_SOCKET)    break;
-            sock = sockCommon::select_read(serverSock_, 0, 0);
-        }
+        socket_t sock = sockCommon::select_read(serverSock_, 0, 100000);
         if(sock == 0){   //timeout
-            std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }
 
-        socket_t acceptSock;
-        {
-            std::lock_guard<std::recursive_mutex> lg(mutex_);
-            if(serverSock_ == INVALID_SOCKET)    break;
-            acceptSock = accept(serverSock_, nullptr, nullptr);
-        }
+        socket_t acceptSock = accept(serverSock_, nullptr, nullptr);
+
         if(acceptSock == INVALID_SOCKET){
             if(errno == EMFILE){
                 // The per-process limit of open file descriptors has been reached.
@@ -251,6 +229,15 @@ void socketServer::process_socket(socket_t sock) {
                 break;
             }
         }
+    }
+}
+
+void socketServer::stop(){
+    if(serverSock_ != INVALID_SOCKET){
+        sockCommon::shutdown_socket(serverSock_);
+        sockCommon::close_socket(serverSock_);
+        serverSock_ = INVALID_SOCKET;
+        isRunning = false;
     }
 }
 
