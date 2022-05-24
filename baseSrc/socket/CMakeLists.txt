@@ -4,7 +4,7 @@ set(src
     sockUtils.cpp
     socketClient.cpp
     messageHandler.cpp
-    socketServer.cpp)
+#    socketServer.cpp)
 
 add_library(socket ${libType} ${src})
 target_include_directories(socket PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)

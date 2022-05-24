@@ -9,16 +9,16 @@
 acceptNode::acceptNode(const string &ip, int port, const socket_t sock) :
                                    ip_(ip), port_(port), connectedSock(sock){
     if(!isAlive())  return;
-    mutex_ = std::make_unique<std::recursive_mutex>();
-    socketStream = std::make_unique<sockCommon::SocketStream>(sock);
-    streamLineReader = std::make_unique<sockCommon::stream_line_reader>(*socketStream);
+    mutex_.reset(new std::recursive_mutex);
+    socketStream.reset(new sockCommon::SocketStream(connectedSock))
+    streamLineReader.
 }
 
 acceptNode::~acceptNode(){
     close();
 }
 
-bool acceptNode::isAlive() const{
+bool acceptNode::isAlive(){
     std::lock_guard<std::recursive_mutex> lg(*mutex_);
     return connectedSock != INVALID_SOCKET;
 }
@@ -116,6 +116,14 @@ void objectPtrHolder::eraseObject(const string &key) {
     }
 }
 
+void objectPtrHolder::clear(){
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    for(auto & elem : objectPtrMap){
+        delete elem.second;
+        objectPtrMap.erase(elem.first);
+    }
+}
+
 void objectPtrHolder::invokeOnAllObject(objectPtrHolder::objectFunction func) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     for(auto & elem : objectPtrMap){
@@ -123,24 +131,33 @@ void objectPtrHolder::invokeOnAllObject(objectPtrHolder::objectFunction func) {
     }
 }
 
-socketServer::socketServer(httplib::ThreadPool& threadPool) : threadPool_(threadPool) {}
+socketServer::socketServer(size_t n) : threadPool_(n) {}
 
 bool socketServer::start(string& ip, int port, int socket_flags) {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    if(isRunning)   return false;
+
     serverIp = ip;
     serverPort = port;
     serverSock_ = createServerSocket(serverIp, serverPort, socket_flags);
     if(serverSock_ != INVALID_SOCKET){
-        bindAndListen = true;
+        isRunning = true;
+        threadPool_.enqueue([&](){
+                listen_internal();
+        });
         return true;
     }
     return false;
 }
 
-void socketServer::listen(){
-    threadPool_.enqueue([&](){
-        if(bindAndListen)
-            listen_internal();
-    });
+void socketServer::stop(){
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    if(serverSock_ != INVALID_SOCKET){
+        sockCommon::shutdown_socket(serverSock_);
+        sockCommon::close_socket(serverSock_);
+        serverSock_ = INVALID_SOCKET;
+        isRunning = false;
+    }
 }
 
 bool socketServer::postMessage(const string& message) {
@@ -163,13 +180,26 @@ socket_t socketServer::createServerSocket(string& ip, int port, int socket_flags
 
 bool socketServer::listen_internal() {
     std::cout << "---server<ip: " << serverIp << ", port: " << serverPort << "> start to listen....." << std::endl;
+    bool ret = true;
+
     while(true){
-        auto ret = sockCommon::select_read(serverSock_, 0, 100000);
-        if(ret == 0){   //timeout
+        socket_t sock;
+        {
+            std::lock_guard<std::recursive_mutex> lg(mutex_);
+            if(serverSock_ == INVALID_SOCKET)    break;
+            sock = sockCommon::select_read(serverSock_, 0, 0);
+        }
+        if(sock == 0){   //timeout
+            std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }
 
-        socket_t acceptSock = accept(serverSock_, nullptr, nullptr);
+        socket_t acceptSock;
+        {
+            std::lock_guard<std::recursive_mutex> lg(mutex_);
+            if(serverSock_ == INVALID_SOCKET)    break;
+            acceptSock = accept(serverSock_, nullptr, nullptr);
+        }
         if(acceptSock == INVALID_SOCKET){
             if(errno == EMFILE){
                 // The per-process limit of open file descriptors has been reached.
@@ -178,13 +208,12 @@ bool socketServer::listen_internal() {
                 continue;
             }
             if(serverSock_ != INVALID_SOCKET){
-                sockCommon::shutdown_socket(serverSock_);
-                sockCommon::close_socket(serverSock_);
-                serverSock_ = INVALID_SOCKET;
-                bindAndListen = false;
-                return false;
+                //关闭服务器监听端点，关闭所有的连接端点
+                stop();
+                ret = false;
+                break;
             }else{
-                ;
+                ; // The server socket was closed by user.
             }
             break;
         }
@@ -194,7 +223,10 @@ bool socketServer::listen_internal() {
             process_socket(acceptSock);
         });
     }
-    return false;
+
+    //无任务线程退出，有任务线程执行完毕后退出
+    threadPool_.shutdown();
+    return ret;
 }
 
 //处理和客户端建立的连接
@@ -220,10 +252,6 @@ void socketServer::process_socket(socket_t sock) {
             }
         }
     }
-
-    //关闭和客户端建立的连接
-    sockCommon::shutdown_socket(sock);
-    sockCommon::close_socket(sock);
 }
 
 

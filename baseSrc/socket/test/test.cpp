@@ -80,12 +80,19 @@ void clientTest1(){
 
 void serverTest(){
     string ip = "127.0.0.1";
-    int port = 60003;
+    int port = 60001;
     socketServer server;
-    if(server.start(ip, 60001)){
+    if(server.start(ip, port)){
         std::cout << "---bind successfully---" << std::endl;
-        server.listen();
+        std::this_thread::sleep_for(std::chrono::seconds(60));
+        server.stop();
+        std::cout << "server stop......" << std::endl;
+
+    }else{
+        std::cout << "bind failed...." << std::endl;
     }
+
+
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(5));
         server.postMessage("hello");
@@ -95,7 +102,7 @@ void serverTest(){
 
 
 int main(int argc, char* argv[]){
-    clientTest1();
+    serverTest();
 
     return 0;
 }
