@@ -10,4 +10,6 @@ add_library(socket ${libType} ${src})
 target_include_directories(socket PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)
 target_link_libraries(socket PUBLIC qlibc)
 
-add_subdirectory(test)
+if(${TEST_ENABE})
+    add_subdirectory(test)
+endif()

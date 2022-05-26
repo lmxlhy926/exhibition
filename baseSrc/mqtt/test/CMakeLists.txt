@@ -1,5 +1,12 @@
-add_executable(subscribe subscribe.cpp)
-target_link_libraries(subscribe PRIVATE mqttclient)
 
-add_executable(publish publish.cpp)
-target_link_libraries(publish PRIVATE mqttclient)
+set(CONFIG_PATH ${CMAKE_SOURCE_DIR}/baseSrc/mqtt/test)
+configure_file(configPath.h.in ${CMAKE_SOURCE_DIR}/baseSrc/mqtt/test/configPath.h)
+
+add_executable(mqtt_subscribe_test subscribe.cpp)
+target_link_libraries(mqtt_subscribe_test PRIVATE mqttclient)
+target_link_libraries(mqtt_subscribe_test PRIVATE qlibc)
+
+add_executable(mqtt_publish_test publish.cpp)
+target_link_libraries(mqtt_publish_test PRIVATE mqttclient)
+target_link_libraries(mqtt_publish_test PRIVATE qlibc)
+

@@ -12,7 +12,7 @@
 #include <functional>
 #include <semaphore.h>
 #include <queue>
-#include "httplib.h"
+#include "socket/httplib.h"
  
 using namespace std;
 using namespace httplib;
@@ -111,20 +111,18 @@ public:
     /**
      * @brief 启动 ServiceSite 指定端口
      * 
-     * @param port http 服务器端口
      * @return int 错误码参照错误码定义
      */
-    int start(int port);
+    int start(void);
 
     /**
      * @brief 启动 ServiceSite 通过服务发布站点注册
      * 
      * @param pSiteId 站点 ID
      * @param pSummary 站点 简介
-     * @param port http 服务器端口
      * @return int 错误码参照错误码定义
      */
-    int startByRegister(string pSiteId, string pSummary, int port);
+    int startByRegister(string pSiteId, string pSummary);
 
     /**
      * @brief 注册服务请求处理函数
@@ -224,6 +222,14 @@ public:
      * @return int 错误码参照错误码定义   
      */
     int unsubscribeMessage(string ip, int port, std::vector<string> messageIdList);
+
+	int getServerPort() const {
+		return serverPort;
+	}
+
+	void setServerPort(int serverPort) {
+		this->serverPort = serverPort;
+	}
 };
 
 class SiteHandle {

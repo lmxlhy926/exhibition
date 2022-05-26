@@ -1,15 +1,17 @@
 
 #include "mqtt/mqttClient.h"
 #include "qlibc/QData.h"
+#include "qlibc/FileUtils.h"
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include "configPath.h"
 
 using namespace qlibc;
 
 int main(int argc, char* argv[]) {
 
-    string fileName = argv[1];
+    string fileName = FileUtils::contactFileName(configPath, "hongmeimqttconfig.json");
     std::cout << "loadFileName: " << fileName << std::endl;
     QData configData;
     configData.loadFromFile(fileName);

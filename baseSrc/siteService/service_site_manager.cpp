@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <mutex>
 #include <semaphore.h>
-#include "httplib.h"
+#include "socket/httplib.h"
 #include "nlohmann/json.hpp"
 #include"service_site_manager.h"
 
@@ -81,7 +81,7 @@ int ServiceSiteManager::serviceRequestHandlerGetServiceList(const Request& reque
         }}
 	};
 
-    for (const auto &item : serviceRequestHandlers) {
+    for (const auto& item : serviceRequestHandlers) {
         response_json["response"]["service_list"].push_back(item.first);
     }
 
@@ -99,7 +99,7 @@ int ServiceSiteManager::serviceRequestHandlerGetMessageList(const Request& reque
         }}
 	};
 
-    for (const auto &item : messageIds) {
+    for (const auto& item : messageIds) {
         response_json["response"]["message_list"].push_back(item);
     }
 
@@ -130,12 +130,12 @@ int ServiceSiteManager::serviceRequestHandlerSubscribeMessage(const Request& req
 
     int port = request_json["request"]["port"];
 
-    for (auto json_message_id : request_json["request"]["message_list"]) {
+    for (auto& json_message_id : request_json["request"]["message_list"]) {
         // 线程锁, 对象析构时解锁
         std::lock_guard<std::mutex> lockGuard(messageSubscriberList_mutex);
 
         MessageSubscriberSiteHandle* temp_messageSubscriberSiteHandle = NULL;
-        for (auto &item : messageSubscriberSiteHandlePList) {
+        for (auto& item : messageSubscriberSiteHandlePList) {
             if (item->getIp() == ip) {
                 if (item->getPort() == port) {
                     temp_messageSubscriberSiteHandle = item;
@@ -149,7 +149,7 @@ int ServiceSiteManager::serviceRequestHandlerSubscribeMessage(const Request& req
         }
         
         MessageSubscriber* temp_messageSubscriber = NULL;
-        for (auto &item : messageSubscriberList) {
+        for (auto& item : messageSubscriberList) {
             if (json_message_id == item.getMessageId()) {
                 temp_messageSubscriber = &item;
             }
@@ -191,12 +191,12 @@ int ServiceSiteManager::serviceRequestHandlerUnsubscribeMessage(const Request& r
 
     int port = request_json["request"]["port"];
 
-    for (auto json_message_id : request_json["request"]["message_list"]) {
+    for (auto& json_message_id : request_json["request"]["message_list"]) {
         // 线程锁, 对象析构时解锁
         std::lock_guard<std::mutex> lockGuard(messageSubscriberList_mutex);
 
         MessageSubscriberSiteHandle* temp_messageSubscriberSiteHandle = NULL;
-        for (auto &item : messageSubscriberSiteHandlePList) {
+        for (auto& item : messageSubscriberSiteHandlePList) {
             if (item->getIp() == ip) {
                 if (item->getPort() == port) {
                     temp_messageSubscriberSiteHandle = item;
@@ -211,7 +211,7 @@ int ServiceSiteManager::serviceRequestHandlerUnsubscribeMessage(const Request& r
         }
         
         MessageSubscriber* temp_messageSubscriber = NULL;
-        for (auto &item : messageSubscriberList) {
+        for (auto& item : messageSubscriberList) {
             if (json_message_id == item.getMessageId()) {
                 temp_messageSubscriber = &item;
             }
@@ -240,13 +240,13 @@ int ServiceSiteManager::serviceRequestHandlerDebug(const Request& request, Respo
         }}
 	};
 
-    for (auto &item : messageSubscriberList) {
+    for (auto& item : messageSubscriberList) {
         json item_json = {
             {"messageId", item.getMessageId()},
             {"site_handle_list", json::array()}
         };
 
-        for (const auto &sub_item : item.getSiteMessageSubscriberSiteHandlePlist()) {
+        for (const auto& sub_item : item.getSiteMessageSubscriberSiteHandlePlist()) {
             json sub_item_json = {
                 {"ip", sub_item->getIp()},
                 {"port", sub_item->getPort()},
@@ -260,7 +260,7 @@ int ServiceSiteManager::serviceRequestHandlerDebug(const Request& request, Respo
         response_json["response"]["message_subscriber_list"].push_back(item_json);
     }
 
-    for (const auto &item : messageSubscriberSiteHandlePList) {
+    for (const auto& item : messageSubscriberSiteHandlePList) {
         json item_json = {
             {"ip", item->getIp()},
             {"port", item->getPort()},
@@ -298,9 +298,9 @@ void ServiceSiteManager::rawHttpRequestHandler(const Request& request, Response&
     // Service
     if (!request_json["service_id"].is_null()) {
         string request_service_id = request_json["service_id"];
-        for (const auto &x : serviceRequestHandlers) {
-            const auto &serviceId = x.first;
-            const auto &handler = x.second;
+        for (const auto& x : serviceRequestHandlers) {
+            const auto& serviceId = x.first;
+            const auto& handler = x.second;
 
             if (serviceId == request_service_id) {
                 int code = handler(request, response);
@@ -346,9 +346,7 @@ void ServiceSiteManager::rawHttpRequestHandler(const Request& request, Response&
     response.set_content(ERROR_RESPONSE_NOT_SERVICE_OR_MESSAGE, "text/plain");
 }
 
-int ServiceSiteManager::start(int port) {
-    serverPort = port;
-
+int ServiceSiteManager::start(void) {
     server.Post("/", ServiceSiteManager::rawHttpRequestHandler);
 
     if (!server.listen("0.0.0.0", serverPort)) {
@@ -375,7 +373,7 @@ void  service_site_ping_thread(string siteId) {
     }
 }
 
-int ServiceSiteManager::startByRegister(string pSiteId, string pSummary, int port) {
+int ServiceSiteManager::startByRegister(string pSiteId, string pSummary) {
     siteId = pSiteId;
     summary = pSummary;
 
@@ -384,7 +382,7 @@ int ServiceSiteManager::startByRegister(string pSiteId, string pSummary, int por
 		{"request", {
 			{"site_id", siteId},
             {"summary", summary},
-            {"port", port}
+            {"port", serverPort}
 		}}
 	};
 
@@ -418,8 +416,6 @@ int ServiceSiteManager::startByRegister(string pSiteId, string pSummary, int por
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
-    serverPort = port;
-
     pingThreadP = new std::thread(service_site_ping_thread, siteId);
 
     printf("http listen port: %d\n", serverPort);
@@ -443,9 +439,9 @@ void ServiceSiteManager::publishMessage(string messageId, string message) {
     // 线程锁, 对象析构时解锁
     std::lock_guard<std::mutex> lockGuard(messageSubscriberList_mutex);
 
-    for (auto messageSubscriberItem : messageSubscriberList) {
+    for (auto& messageSubscriberItem : messageSubscriberList) {
         if (messageId == messageSubscriberItem.getMessageId()) {
-            for (auto siteHandlePItem : messageSubscriberItem.getSiteMessageSubscriberSiteHandlePlist()) {
+            for (auto& siteHandlePItem : messageSubscriberItem.getSiteMessageSubscriberSiteHandlePlist()) {
                 siteHandlePItem->sendMessage(message);
             }
             break;
@@ -462,7 +458,7 @@ int ServiceSiteManager::subscribeMessage(string ip, int port, std::vector<string
 		}}
 	};
 
-    for (auto item : messageIdList) {
+    for (auto& item : messageIdList) {
         request_json["request"]["message_list"].push_back(item);
     }
 
@@ -509,7 +505,7 @@ int ServiceSiteManager::unsubscribeMessage(string ip, int port, std::vector<stri
 		}}
 	};
 
-    for (auto item : messageIdList) {
+    for (auto& item : messageIdList) {
         request_json["request"]["message_list"].push_back(item);
     }
 
@@ -592,7 +588,7 @@ int ServiceSiteManager::getServiceList(string ip, int port, std::vector<string>&
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
-    for (auto item : response_json["response"]["service_list"]) {
+    for (auto& item : response_json["response"]["service_list"]) {
         serviceIdList.push_back(item);
     }
 
@@ -645,7 +641,7 @@ int ServiceSiteManager::getMessageList(string ip, int port, std::vector<string>&
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
-    for (auto item : response_json["response"]["message_list"]) {
+    for (auto& item : response_json["response"]["message_list"]) {
         messageIdList.push_back(item);
     }
 
@@ -700,7 +696,7 @@ int ServiceSiteManager::updateSiteHandleList(void) {
     }
 
     std::vector<SiteHandle> tempSiteHandleList;
-    for (auto json_item : response_json["response"]["site_list"]) {
+    for (auto& json_item : response_json["response"]["site_list"]) {
         if (json_item["site_id"].is_null()) {
             printf("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
@@ -786,7 +782,7 @@ int ServiceSiteManager::querySiteList(std::vector<SiteHandle>& pSiteHandleList) 
         return RET_CODE_ERROR_REQ_CODE;
     }
 
-    for (auto json_item : response_json["response"]["site_list"]) {
+    for (auto& json_item : response_json["response"]["site_list"]) {
         if (json_item["site_id"].is_null()) {
             printf("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
@@ -872,7 +868,7 @@ int ServiceSiteManager::querySiteListBySiteId(string pSiteId, std::vector<SiteHa
         return RET_CODE_ERROR_REQ_CODE;
     }
 
-    for (auto json_item : response_json["response"]["site_list"]) {
+    for (auto& json_item : response_json["response"]["site_list"]) {
         if (json_item["site_id"].is_null()) {
             printf("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
@@ -925,7 +921,7 @@ string MessageSubscriber::getMessageId(void) {
 
 void MessageSubscriber::addSiteMessageSubscriberSiteHandleP(MessageSubscriberSiteHandle* pMessageSubscriberSiteHandle) {
     MessageSubscriberSiteHandle* temp = NULL;
-    for (auto &item : siteMessageSubscriberSiteHandlePlist) {
+    for (auto& item : siteMessageSubscriberSiteHandlePlist) {
         if (item == pMessageSubscriberSiteHandle) {
             // 已存在
             temp = item;

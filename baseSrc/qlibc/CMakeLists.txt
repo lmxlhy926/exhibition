@@ -6,4 +6,6 @@ set(src ${jsoncppSrc} ${qlibcSrc})
 add_library(qlibc ${libType} ${src})
 target_include_directories(qlibc PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)
 
-add_subdirectory(test)
+if(${TEST_ENABE})
+    add_subdirectory(test)
+endif()

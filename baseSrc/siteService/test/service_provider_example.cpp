@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <atomic>
 #include <stdio.h>
-#include "httplib.h"
+#include "socket/httplib.h"
 #include "nlohmann/json.hpp"
 #include "service_site_manager.h"
 
@@ -112,7 +112,7 @@ void http_server_thread_func() {
 	ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
 
 	// 启动服务器，参数为端口， 可用于单独的开发调试
-	 code = serviceSiteManager->start(9001);
+	 code = serviceSiteManager->start();
 
 	// 通过注册的方式启动服务器， 需要提供site_id, site_name, port
 //	code = serviceSiteManager->startByRegister(TEST_SITE_ID_1, TEST_SITE_NAME_1, 9001);
@@ -127,6 +127,8 @@ void http_server_thread_func() {
 int main(int argc, char* argv[]) {
 	// 创建 serviceSiteManager 对象, 单例
 	ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
+
+	serviceSiteManager->setServerPort(9001);
 
 	// 注册 Service 请求处理 handler， 有两个 Service
 	serviceSiteManager->registerServiceRequestHandler(TEST_SERVICE_ID_1, service_request_handler_1);

@@ -1,5 +1,9 @@
 
-add_library(siteService ${libType} cJSON.c httplib.cpp service_site_manager.cpp)
+add_library(siteService ${libType} cJSON.c service_site_manager.cpp)
+target_include_directories(siteService PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)
 target_include_directories(siteService PUBLIC nlohmann)
+target_link_libraries(siteService PUBLIC socket)
 
-add_subdirectory(test)
+if(${TEST_ENABE})
+    add_subdirectory(test)
+endif()

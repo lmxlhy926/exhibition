@@ -16,5 +16,6 @@ endif()
 target_link_libraries(mqttclient PUBLIC qlibc)
 
 
-
-add_subdirectory(test)
+if(${TEST_ENABE})
+    add_subdirectory(test)
+endif()
