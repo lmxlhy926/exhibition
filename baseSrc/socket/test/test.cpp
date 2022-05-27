@@ -84,14 +84,16 @@ void serverTest(){
     socketServer server;
     if(server.start(ip, port)){
         std::cout << "---bind successfully---" << std::endl;
-//        std::this_thread::sleep_for(std::chrono::seconds(10));
-//        server.stop();
-//        std::cout << "server stop......" << std::endl;
-
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+        server.stop();
+        std::cout << "server stop......" << std::endl;
     }else{
         std::cout << "bind failed...." << std::endl;
     }
 
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+    server.start(ip, port);
+    std::cout << "---start agagin....." << std::endl;
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(5));

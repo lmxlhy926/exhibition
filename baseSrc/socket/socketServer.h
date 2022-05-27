@@ -46,8 +46,6 @@ public:
     //和对端的连接是否处于有效状态
     bool isAlive();
 
-
-
     ssize_t write(const char* buff, size_t size);
 
     bool write(const string& message);
@@ -56,10 +54,8 @@ public:
 
     bool readLine(string& str);
 
-private:
     //关闭connectedSock，结束和对端的连接
     void close();
-
 };
 
 
@@ -113,6 +109,7 @@ private:
     bool isRunning = false;
     httplib::ThreadPool threadPool_;
     objectPtrHolder clients_;  //连接到服务器的客户端
+    std::recursive_mutex mutex_;
 
 public:
     explicit socketServer(size_t n = 10);
@@ -128,8 +125,6 @@ public:
      */
     bool start(string& ip, int port, int socket_flags = AI_NUMERICHOST | AI_NUMERICSERV);
 
-
-
     bool postMessage(const string& message);
 
 private:
@@ -141,6 +136,7 @@ private:
 
     void process_socket(socket_t sock);
 
+public:
     void stop();
 };
 

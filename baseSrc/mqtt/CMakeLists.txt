@@ -16,6 +16,6 @@ endif()
 target_link_libraries(mqttclient PUBLIC qlibc)
 
 
-if(${TEST_ENABE})
+if(${TEST_ENABLE})
     add_subdirectory(test)
 endif()

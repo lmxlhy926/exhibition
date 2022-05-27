@@ -4,6 +4,6 @@ target_include_directories(siteService PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)
 target_include_directories(siteService PUBLIC nlohmann)
 target_link_libraries(siteService PUBLIC socket)
 
-if(${TEST_ENABE})
+if(${TEST_ENABLE})
     add_subdirectory(test)
 endif()

@@ -11,6 +11,7 @@ acceptNode::acceptNode(const string &ip, int port, const socket_t sock) :
     if(!isAlive())  return;
     socketStream.reset(new sockCommon::SocketStream(connectedSock));
     streamLineReader.reset(new sockCommon::stream_line_reader(*socketStream));
+    std::cout << "---client<ip: " << ip_ << ", port: " << port_ << "> connetc to the server......" << std::endl;
 }
 
 acceptNode::~acceptNode(){
@@ -60,6 +61,7 @@ void acceptNode::close(){
         sockCommon::shutdown_socket(connectedSock);
         sockCommon::close_socket(connectedSock);
         connectedSock = INVALID_SOCKET;
+        std::cout << "---client<ip: " << ip_ << ", port: " << port_ << "> disconnetced......" << std::endl;
     }
 }
 
@@ -171,7 +173,13 @@ bool socketServer::listen_internal() {
     bool ret = true;
 
     while(true){
-        socket_t sock = sockCommon::select_read(serverSock_, 0, 100000);
+        socket_t svrSock;
+        {
+            std::lock_guard<std::recursive_mutex> lg(mutex_);
+            if(serverSock_ == INVALID_SOCKET)   break;
+            svrSock = serverSock_;
+        }
+        socket_t sock = sockCommon::select_read(svrSock, 0, 100000);
         if(sock == 0){   //timeout
             continue;
         }
@@ -202,8 +210,8 @@ bool socketServer::listen_internal() {
         });
     }
 
-    //无任务线程退出，有任务线程执行完毕后退出
-    threadPool_.shutdown();
+    clients_.clear();
+
     return ret;
 }
 
@@ -215,7 +223,6 @@ void socketServer::process_socket(socket_t sock) {
         string key = ip + std::to_string(port) + std::to_string(sock);
         acceptNode* node = new acceptNode(ip, port, sock);
         clients_.appendNew(key, node);
-        std::cout << "---client<ip: " << ip << ", port: " << port << "> connetc to the server......" << std::endl;
 
         while(true){
             string aReadedLine;
@@ -225,7 +232,6 @@ void socketServer::process_socket(socket_t sock) {
                 continue;
             }else{  //和客户端断开连接
                 clients_.eraseObject(key);
-                std::cout << "---client<ip: " << ip << ", port: " << port << "> disconnetced......" << std::endl;
                 break;
             }
         }
@@ -233,6 +239,7 @@ void socketServer::process_socket(socket_t sock) {
 }
 
 void socketServer::stop(){
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(serverSock_ != INVALID_SOCKET){
         sockCommon::shutdown_socket(serverSock_);
         sockCommon::close_socket(serverSock_);

@@ -12,7 +12,7 @@ endif()
 
 set(libType "STATIC")
 message("===>libType: ${libType}")
-set(TEST_ENABLE false)
+set(TEST_ENABLE true)
 
 add_subdirectory(baseSrc)
 add_subdirectory(unit)
