@@ -16,7 +16,7 @@ bool util::getTvInfo(string& tvMac, string& tvName, string& tvModel){
         tvRequest.setString("service_id", "get_tv_mac");
         tvRequest.putData("request", qlibc::QData());
 
-        auto ret = httpUtil::sitePostRequest(ADAPTER_IP, ADAPTER_PORT, tvRequest, tvResponse);
+        auto ret = httpUtil::sitePostRequest(AdapterIp, AdapterPort, tvRequest, tvResponse);
         if(ret){
             if(tvResponse.getInt("code") == 0){
                 tvMac = tvResponse.getData("response").getString("tv_mac");

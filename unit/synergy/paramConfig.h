@@ -5,14 +5,13 @@
 #ifndef EXHIBITION_PARAMCONFIG_H
 #define EXHIBITION_PARAMCONFIG_H
 
-static const string ADAPTER_IP = "127.0.0.1";
-static const int ADAPTER_PORT = 60003;
 
-//服务ID, 对内提供
-static const string TVUPLOAD_SERVICE_ID = "tveventUpload";
-static const string SENSOR_SERVICE_ID = "sensorEventUpload";
-static const string TV_SOUND_SERVICE_ID = "tvSound";
-static const string COMMON_EVENT_SERVICE_ID = "commonEvent";
+const int SynergySitePort = 60002;
+const string AdapterIp = "127.0.0.1";
+const int AdapterPort = 60003;
+
+//服务ID
+const string Control_Device_Service_ID = "deviceControl";
 
 
 

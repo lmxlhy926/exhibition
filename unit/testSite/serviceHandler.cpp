@@ -4,11 +4,16 @@
 
 #include "serviceHandler.h"
 #include "qlibc/QData.h"
+#include "path.h"
+#include "qlibc/FileUtils.h"
 
 int deviceList_service_request_handler(const Request& request, Response& response){
     qlibc::QData data;
-    data.loadFromFile(R"(D:\bywg\project\exhibition\unit\paramData\testSite\devicelist.json)");
+    std::string path = FileUtils::contactFileName(ProjectPath, R"(unit\paramData\testSite\devicelist.json)");
+    data.loadFromFile(path);
+
     response.set_content(data.toJsonString(), "text/json");
+    std::cout << "request device list: " << data.toJsonString() << std::endl;
 
     return 0;
 }

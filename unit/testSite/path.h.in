@@ -1,0 +1,7 @@
+#include <string>
+
+static const string ProjectPath = "${CMAKE_SOURCE_DIR}";
+
+
+
+

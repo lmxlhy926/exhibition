@@ -2,7 +2,7 @@
 // Created by 78472 on 2022/5/17.
 //
 
-#include "sceneCommandHandler.h"
+#include "deviceControlHandler.h"
 #include <iostream>
 #include "socket/httplib.h"
 #include "paramConfig.h"
@@ -53,16 +53,15 @@ qlibc::QData construct_lightControlCommand(const struct controlData& controlComm
 }
 
 
-bool deviceControlHandler(const string& uri, qlibc::QData& message){
-    std::cout << "received: <" << uri << ">---" << message.toJsonString() << std::endl;
-
+bool deviceControlHandler(qlibc::QData& message){
+    std::cout << "received message: " << message.toJsonString() << std::endl;
     const struct controlData controlCommand(message);
+    controlCommand.show();
     qlibc::QData request, response;
     request.setString("service_id", "get_device_list");
     request.setValue("request", Json::nullValue);
 
-    bool ret = sitePostRequest(ADAPTER_IP, ADAPTER_PORT,
-                                             request, response);
+    bool ret = sitePostRequest(AdapterIp, AdapterPort,request, response);
 
     if(ret){
         if(response.getInt("code") == 0 && controlCommand.deviceType == "light"){
@@ -71,8 +70,9 @@ bool deviceControlHandler(const string& uri, qlibc::QData& message){
                 qlibc::QData ithData = deviceList.getArrayElement(i);
                 if(ithData.getString("nick_name") == controlCommand.deviceName){
                     qlibc::QData commandData = construct_lightControlCommand(controlCommand, ithData);
+                    std::cout << "===>commandData: " << commandData.toJsonString() << std::endl;
                     qlibc::QData controlRet;
-                    sitePostRequest(ADAPTER_IP, ADAPTER_PORT, commandData, controlRet);
+                    sitePostRequest(AdapterIp, AdapterPort, commandData, controlRet);
                     break;
                 }
             }

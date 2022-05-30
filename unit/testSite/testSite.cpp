@@ -24,8 +24,8 @@ using namespace httplib;
 using namespace std::placeholders;
 using json = nlohmann::json;
 
-static const string CONFIG_SITE_ID = "config";
-static const string CONFIG_SITE_ID_NAME = "整体配置站点";
+static const string CONFIG_SITE_ID = "测试站点";
+static const string CONFIG_SITE_ID_NAME = "测试站点";
 
 
 void publish_message(void){
@@ -49,13 +49,15 @@ void publish_message(void){
 
 int main(int argc, char* argv[]) {
 
-    httplib::ThreadPool threadPool_(100);
+    httplib::ThreadPool threadPool_(30);
     std::atomic<bool> http_server_thread_end(false);
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
+    serviceSiteManager->setServerPort(60003);
 
-    //注册请求场景列表处理函数
+
+    //注册获取设备列表函数
     serviceSiteManager->registerServiceRequestHandler(DEVICE_LIST_REQUEST_SERVICE_ID,deviceList_service_request_handler);
     //注册子设备注册处理函数
     serviceSiteManager->registerServiceRequestHandler(CONTROL_DEVICE_REGISTER_SERVICE_ID,controlDevice_service_request_handler);
@@ -66,7 +68,7 @@ int main(int argc, char* argv[]) {
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         // 启动服务器，参数为端口， 可用于单独的开发调试
-        int code = serviceSiteManager->start(60003);
+        int code = serviceSiteManager->start();
 
         // 通过注册的方式启动服务器， 需要提供site_id, site_name, port
 //    	code = serviceSiteManager->startByRegister(TEST_SITE_ID_1, TEST_SITE_NAME_1, 9001);

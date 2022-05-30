@@ -13,14 +13,7 @@
 using namespace std;
 using namespace httplib;
 
-
-int tvupload_service_handler(socketClient& client, const Request& request, Response& response);
-
-int sensor_service_handler(socketClient& client, const Request& request, Response& response);
-
-int tvSound_service_handler(socketClient& client, const Request& request, Response& response);
-
-int commonEvent_service_handler(socketClient& client, const Request& request, Response& response);
+int device_control_service_handler(const Request& request, Response& response);
 
 
 

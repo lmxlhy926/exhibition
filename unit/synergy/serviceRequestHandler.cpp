@@ -3,6 +3,7 @@
 //
 
 #include "serviceRequestHandler.h"
+#include "deviceControlHandler.h"
 
 static const nlohmann::json okResponse = {
         {"code", 0},
@@ -38,27 +39,16 @@ void publish2Client(socketClient& client, const Request& request, Response& resp
     }
 }
 
-int tvupload_service_handler(socketClient& client, const Request& request, Response& response){
-    publish2Client(client, request, response);
-    return 0;
-}
-
-int sensor_service_handler(socketClient& client, const Request& request, Response& response){
-    publish2Client(client, request, response);
-    return 0;
-}
 
 
-int tvSound_service_handler(socketClient& client, const Request& request, Response& response){
-    std::cout << "Received message to activeApp: " << request.body << std::endl;
-    client.sendMessage(tvSoundMessage.dump(), true);
-    response.set_content(okResponse.dump(), "text/json");
-    return 0;
-}
-
-
-int commonEvent_service_handler(socketClient& client, const Request& request, Response& response){
-    publish2Client(client, request, response);
+int device_control_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    if(requestBody.type() != Json::nullValue){
+        deviceControlHandler(requestBody);
+        response.set_content(okResponse.dump(), "text/json");
+    }else{
+        response.set_content(errResponse.dump(), "text/json");
+    }
     return 0;
 }
 

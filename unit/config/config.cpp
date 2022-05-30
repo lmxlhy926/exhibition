@@ -25,7 +25,7 @@ static const string CONFIG_SITE_ID_NAME = "整体配置站点";
 
 int main(int argc, char* argv[]) {
 
-    httplib::ThreadPool threadPool_(100);
+    httplib::ThreadPool threadPool_(30);
     std::atomic<bool> http_server_thread_end(false);
 
     //设置配置文件加载路径
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-    serviceSiteManager->setServerPort(60002);
+    serviceSiteManager->setServerPort(60001);
 
     //注册请求场景列表处理函数
     serviceSiteManager->registerServiceRequestHandler(SCENELIST_REQUEST_SERVICE_ID,sceneListRequest_service_request_handler);

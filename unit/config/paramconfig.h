@@ -6,8 +6,10 @@
 #define EXHIBITION_PARAMCONFIG_H
 
 
-static const string ADAPTER_IP = "127.0.0.1";
-static const int ADAPTER_PORT = 60003;
+static const string AdapterIp = "127.0.0.1";
+static const int AdapterPort = 60003;
+
+static const int ConfigSitePort = 60001;
 
 //请求url
 static const string SCENELIST_URL = "/logic-device/scene/list";  //请求场景列表URL
