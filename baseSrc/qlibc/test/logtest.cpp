@@ -33,40 +33,17 @@ void allTypeTest(){
 
     string str = "welcome to the world";
     LOG_HLIGHT << str;
-
-    while(true){
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-    }
 }
 
-void output(const char* msg, size_t len, Logger::LogLevel level){
-    switch(level){
-        case Logger::LogLevel::INFO:
-            fprintf(stdout, WHITE "%s" COLOR_NONE, msg);
-            fflush(stdout);
-            break;
-        case Logger::LogLevel::HLIGHT:
-            fprintf(stdout, DEEP_GREEN "%s" COLOR_NONE, msg);
-            fflush(stdout);
-            break;
-    }
-}
-
-int main(int argc, char* argv[]){
+void setOutputTest(){
     httplib::ThreadPool threadPool(10);
     FILE* fp = fopen(R"(D:\bywg\project\exhibition\unit\paramData\testSite\logout.txt)", "a+");
+    std::recursive_mutex mutex_;
 
     Logger::setOutput([&](const char* msg, size_t len, Logger::LogLevel level){
-        switch(level){
-            case Logger::LogLevel::INFO:
-                fprintf(fp, WHITE "%s" COLOR_NONE, msg);
-                fflush(fp);
-                break;
-            case Logger::LogLevel::HLIGHT:
-                fprintf(fp, DEEP_GREEN "%s" COLOR_NONE, msg);
-                fflush(fp);
-                break;
-        }
+        std::lock_guard<std::recursive_mutex> lg(mutex_);
+        fprintf(fp, "%s", msg);
+        fflush(fp);
     });
 
 
@@ -78,28 +55,24 @@ int main(int argc, char* argv[]){
     });
     threadPool.enqueue([](){
         for(int i = 0; i < 1000; i++){
-            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
             LOG_INFO << "***********************Q";
         }
     });
     threadPool.enqueue([](){
         for(int i = 0; i < 1000; i++){
-            std::this_thread::sleep_for(std::chrono::milliseconds(3));
-            LOG_INFO << "***********************Q";
-        }
-    });
-    threadPool.enqueue([](){
-        for(int i = 0; i < 1000; i++){
-            std::this_thread::sleep_for(std::chrono::milliseconds(4));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
             LOG_HLIGHT << "***********************Q";
         }
     });
-    threadPool.enqueue([](){
-        for(int i = 0; i < 1000; i++){
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            LOG_HLIGHT << "***********************Q";
-        }
-    });
+
+    threadPool.shutdown();
+}
+
+int main(int argc, char* argv[]){
+    setOutputTest();
+
+    std::cout << "-----------shutdown----------" << std::endl;
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(10));
