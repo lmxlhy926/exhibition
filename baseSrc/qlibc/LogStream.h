@@ -72,17 +72,17 @@ namespace qlibc{
         string toString() const{
             return string(data_, length());
         }
-
     };
 
 
-
+    //将所有的数据类型全部以字符串的形式写入到Buffer中
     class LogStream {
-    private:
+    public:
         typedef LogStream self;
         typedef FixedBuffer<SmallBufferSize> Buffer;
+    private:
         Buffer buffer_;
-        static const int KMaxNumericSize = 32;
+        static const int KMaxNumericSize = 32;  //数字转换后最多占用的字符数
     private:
         template<typename T>
         void formatInteger(T);

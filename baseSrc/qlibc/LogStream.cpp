@@ -78,64 +78,91 @@ namespace qlibc{
         return *this;
     }
 
-    LogStream& LogStream::operator<<(int) {
-
+    LogStream& LogStream::operator<<(int v) {
+        formatInteger(v);
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(unsigned int) {
-        return <#initializer#>;
+    LogStream& LogStream::operator<<(unsigned int v) {
+        formatInteger(v);
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(long) {
-        return <#initializer#>;
+    LogStream& LogStream::operator<<(long v) {
+        formatInteger(v);
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(unsigned long) {
-        return <#initializer#>;
+    LogStream& LogStream::operator<<(unsigned long v) {
+        formatInteger(v);
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(long long int) {
-        return <#initializer#>;
+    LogStream& LogStream::operator<<(long long int v) {
+        formatInteger(v);
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(unsigned long long int) {
-        return <#initializer#>;
+    LogStream& LogStream::operator<<(unsigned long long int v) {
+        formatInteger(v);
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(float) {
-        return <#initializer#>;
+    LogStream& LogStream::operator<<(float v) {
+        *this << static_cast<double>(v);
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(double) {
-        return <#initializer#>;
+    //最传统的做法就是用snprintf函数，将各种类型的数据转换为字符串
+    LogStream& LogStream::operator<<(double v) {
+        if(buffer_.avail() >= KMaxNumericSize){
+            int len = snprintf(buffer_.current(), KMaxNumericSize, "%.12g", v);
+            buffer_.add(len);
+        }
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(const void *) {
-        return <#initializer#>;
+    //打印地址
+    LogStream& LogStream::operator<<(const void * p) {
+        uintptr_t v = reinterpret_cast<uintptr_t>(p);
+        if(buffer_.avail() > KMaxNumericSize){
+            char* buf = buffer_.current();
+            buf[0] = '0';
+            buf[1] = 'x';
+            size_t len = convertHex(buf + 2, v);
+            buffer_.add(len + 2);
+        }
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(const char *) {
-        return <#initializer#>;
+    LogStream& LogStream::operator<<(const char* str) {
+        if(str)
+            buffer_.append(str, strlen(str));
+        else
+            buffer_.append("(null)", 6);
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(const unsigned char *) {
-        return <#initializer#>;
+    LogStream& LogStream::operator<<(const unsigned char* str) {
+        *this << reinterpret_cast<const char*>(str);
+        return *this;
     }
 
-    LogStream& LogStream::operator<<(const string &) {
-        return <#initializer#>;
+    LogStream& LogStream::operator<<(const string& v) {
+        buffer_.append(v.c_str(), v.size());
+        return *this;
     }
 
     void LogStream::append(const char *data, size_t len) {
-
+        buffer_.append(data, len);
     }
 
-    const LogStream::Buffer &LogStream::buffer() const {
-        return <#initializer#>;
+    const LogStream::Buffer& LogStream::buffer() const {
+        return buffer_;
     }
 
     void LogStream::resetBuffer() {
-
+        buffer_.reset();
     }
 
 
