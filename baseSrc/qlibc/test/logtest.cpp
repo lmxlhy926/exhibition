@@ -6,12 +6,15 @@
 #include <thread>
 #include <cstdio>
 #include "qlibc/Logging.h"
+#include "qlibc/LogFile.h"
 
 #include "socket/httplib.h"
 
 using namespace qlibc;
+using namespace httplib;
 
 void allTypeTest(){
+
     LOG_INFO << "true: "<< true;
     LOG_INFO << "false: " << false;
 
@@ -37,32 +40,29 @@ void allTypeTest(){
 
 void setOutputTest(){
     httplib::ThreadPool threadPool(10);
-    FILE* fp = fopen(R"(D:\bywg\project\exhibition\unit\paramData\testSite\logout.txt)", "a+");
-    std::recursive_mutex mutex_;
+    LogFile lf(R"(D:\bywg\project\exhibition\unit\paramData\testSite\logout)", 1000* 30);
 
-    Logger::setOutput([&](const char* msg, size_t len, Logger::LogLevel level){
-        std::lock_guard<std::recursive_mutex> lg(mutex_);
-        fprintf(fp, "%s", msg);
-        fflush(fp);
+    qlibc::Logger::setOutput([&](const char* msg, size_t len, Logger::LogLevel level){
+        lf.append(msg, len);
     });
 
 
     threadPool.enqueue([](){
         for(int i = 0; i < 1000; i++){
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            LOG_INFO << "***********************Q";
+            LOG_INFO << 123456789;
         }
     });
     threadPool.enqueue([](){
         for(int i = 0; i < 1000; i++){
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            LOG_INFO << "***********************Q";
+            LOG_INFO << 123456789;
         }
     });
     threadPool.enqueue([](){
         for(int i = 0; i < 1000; i++){
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            LOG_HLIGHT << "***********************Q";
+            LOG_HLIGHT << 123456789;
         }
     });
 

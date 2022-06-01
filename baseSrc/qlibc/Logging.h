@@ -96,8 +96,8 @@ namespace qlibc{
         Impl impl_;
     };
 
-    #define LOG_INFO qlibc::Logger(__FILE__, __LINE__, Logger::INFO).stream()
-    #define LOG_HLIGHT qlibc::Logger(__FILE__, __LINE__, Logger::HLIGHT).stream()
+    #define LOG_INFO qlibc::Logger(__FILE__, __LINE__, qlibc::Logger::INFO).stream()
+    #define LOG_HLIGHT qlibc::Logger(__FILE__, __LINE__, qlibc::Logger::HLIGHT).stream()
 
 }
 

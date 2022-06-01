@@ -27,7 +27,7 @@ const string TEST_SERVICE_ID_2 = "test_service_id_2";
 int service_request_handler_1(const Request& request, Response& response);
 int service_request_handler_2(const Request& request, Response& response);
 
-const string TEST_MESSAGE_ID_1 = "test_message_id_1";
+const string TEST_MESSAGE_ID_1 = "eventLeaveHome";
 
 // test_service_id_1 服务请求处理函数
 int service_request_handler_1(const Request& request, Response& response) {
@@ -75,8 +75,6 @@ int service_request_handler_2(const Request& request, Response& response) {
 
 // test_message_id_1 消息处理函数
 void message_handler_1(const Request& request) {
-    // HTTP库已判断字符串能否转成 JSON
-
     // 消息的json字符串位于request.body
     auto message_json = json::parse(request.body);
 
@@ -125,7 +123,7 @@ int main(int argc, char* argv[]) {
     int code;
     std::vector<string> messageIdList;
     messageIdList.push_back(TEST_MESSAGE_ID_1);
-    code = serviceSiteManager->subscribeMessage("127.0.0.1", 60001, messageIdList);
+    code = serviceSiteManager->subscribeMessage("127.0.0.1", 60003, messageIdList);
     if (code == ServiceSiteManager::RET_CODE_OK) {
         printf("subscribeMessage ok.\n");
     }else{

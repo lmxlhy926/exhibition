@@ -28,25 +28,6 @@ static const string CONFIG_SITE_ID = "测试站点";
 static const string CONFIG_SITE_ID_NAME = "测试站点";
 
 
-void publish_message(void){
-//    json message_json = {
-//            {"message_id", "test_message_id_1"},
-//            {"content", {
-//                                   "some_data", 123
-//                           }}
-//    };
-//
-//    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-//
-//    // 把要发布的消息 json 字符串传入即可， 由库来向订阅过的站点发送消息
-//    serviceSiteManager->publishMessage(TEST_MESSAGE_ID_1, message_json.dump());
-//
-//    message_json["message_id"] = "test_message_id_2";
-//    serviceSiteManager->publishMessage(TEST_MESSAGE_ID_2, message_json.dump());
-}
-
-
-
 int main(int argc, char* argv[]) {
 
     httplib::ThreadPool threadPool_(30);
