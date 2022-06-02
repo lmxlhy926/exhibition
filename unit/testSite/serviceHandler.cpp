@@ -20,7 +20,7 @@ int deviceList_service_request_handler(const Request& request, Response& respons
 
 
 int controlDevice_service_request_handler(const Request& request, Response& response){
-    std::cout << "controlDevice_service_request_handler: " << request.body << std::endl;
+    std::cout << "controlDevice_service_request_handler: " << qlibc::QData(request.body).toJsonString(true) << std::endl;
 
     return 0;
 }

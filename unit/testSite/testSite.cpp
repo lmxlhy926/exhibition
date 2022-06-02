@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-    serviceSiteManager->setServerPort(60003);
+    serviceSiteManager->setServerPort(60004);
 
 
     //注册获取设备列表函数

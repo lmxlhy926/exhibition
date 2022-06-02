@@ -8,6 +8,9 @@
 #include <string>
 #include <memory>
 #include <mutex>
+#include <cstdlib>
+#include <ctime>
+
 using namespace std;
 
 namespace qlibc{

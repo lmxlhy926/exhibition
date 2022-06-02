@@ -6,9 +6,9 @@
 #define EXHIBITION_PARAMCONFIG_H
 
 
-const int SynergySitePort = 60002;
+const int SynergySitePort = 60003;
 const string AdapterIp = "127.0.0.1";
-const int AdapterPort = 60003;
+const int AdapterPort = 60004;
 
 //服务ID
 const string Control_Device_Service_ID = "deviceControl";

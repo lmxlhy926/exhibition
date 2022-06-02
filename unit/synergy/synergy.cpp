@@ -8,13 +8,9 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 
-#include "socket/httplib.h"
 #include "common/configParamUtil.h"
 #include "qlibc/FileUtils.h"
 #include "serviceRequestHandler.h"
-#include "socket/socketClient.h"
-#include "deviceControlHandler.h"
-#include "util.h"
 #include "paramConfig.h"
 
 using namespace std;
