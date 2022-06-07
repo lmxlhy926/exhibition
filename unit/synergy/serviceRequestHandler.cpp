@@ -34,6 +34,7 @@ bool controlDeviceRightNow(qlibc::QData& message){
 
     if(ret){
         if(response.getInt("code") == 0){
+            std::cout << "===>get deviceList successfully" << std::endl;
             qlibc::QData deviceList = response.getData("response").getData("device_list");
 
             if(downCommand.deviceType == "light"){
@@ -42,7 +43,6 @@ bool controlDeviceRightNow(qlibc::QData& message){
             }
         }
     }
-
     return true;
 }
 

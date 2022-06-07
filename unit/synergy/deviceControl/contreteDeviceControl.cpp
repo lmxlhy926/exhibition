@@ -16,9 +16,13 @@ void CommonControl::operator()(const DownCommandData &downCommand, qlibc::QData 
             //发送控制请求
             qlibc::QData controlRet;
             ControlBase::sitePostRequest(AdapterIp, AdapterPort, controlCommand, controlRet);
+            std::cout << "===>controlCommand to Adapter: " << controlCommand.toJsonString(true) << std::endl;
 
             break;
         }
+
+        if(i == deviceList.size() - 1)
+            std::cout << "===>no matched deviceItem" << std::endl;
     }
 }
 
