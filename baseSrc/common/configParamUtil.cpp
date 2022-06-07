@@ -87,6 +87,19 @@ QData configParamUtil::getInterActiveAppData() {
     return interactiveAppData;
 }
 
+QData configParamUtil::getWhiteList() {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    if(whiteListData.empty())
+        whiteListData.loadFromFile(FileUtils::contactFileName(dataDirPath, "config/whiteList.json"));
+    return whiteListData;
+}
+
+void configParamUtil::saveWhiteListData(QData &data) {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    whiteListData.setInitData(data);
+    whiteListData.saveToFile(FileUtils::contactFileName(dataDirPath, "config/whiteList.json"), true);
+}
+
 
 
 

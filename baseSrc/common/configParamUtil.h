@@ -22,6 +22,7 @@ private:
     QData interactiveAppData;
     QData deviceControlData;
     QData cloudServerData;
+    QData whiteListData;
     static configParamUtil *instance;
     std::recursive_mutex mutex_;
 
@@ -52,6 +53,11 @@ public:
     QData getCloudServerData();
 
     QData getInterActiveAppData();
+
+    QData getWhiteList();
+
+    void saveWhiteListData(QData &data);
+
 
 };
 

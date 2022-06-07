@@ -92,6 +92,12 @@ int main(int argc, char* argv[]) {
                                                       [&](const Request& request, Response& response) -> int{
         return engineer_service_request_handler(mc, request, response);
     });
+    //获取白名单列表
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID,
+                                                      [&](const Request& request, Response& response) -> int{
+        return whiteList_service_request_handler(request, response);
+    });
+
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){

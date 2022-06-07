@@ -29,5 +29,9 @@ int domainIdRequest_service_request_handler(const Request& request, Response& re
 //安装app发送请求，传递安装师傅信息<安装app>
 int engineer_service_request_handler(mqttClient& mc, const Request& request, Response& response);
 
+int whiteList_service_request_handler(const Request& request, Response& response);
+
+
+
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

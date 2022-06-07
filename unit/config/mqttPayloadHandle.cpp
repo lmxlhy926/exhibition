@@ -96,8 +96,7 @@ bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int le
     payload.setString("timeStamp", timeStr);
 
     //存储
-    const string dataDir = configParamUtil::getInstance()->getconfigPath();
-    payload.saveToFile(FileUtils::contactFileName(dataDir, "whitelist.json"), true);
+    configParamUtil::getInstance()->saveWhiteListData(payload);
 
     //发布
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();

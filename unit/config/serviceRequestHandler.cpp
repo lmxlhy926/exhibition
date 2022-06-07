@@ -115,4 +115,12 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 }
 
 
+int whiteList_service_request_handler(const Request& request, Response& response){
+    qlibc::QData whiteListData = configParamUtil::getInstance()->getWhiteList();
+    response.set_content(whiteListData.toJsonString(), "text/json");
+
+    return 0;
+}
+
+
 
