@@ -5,7 +5,7 @@
 #include "socket/httplib.h"
 
 bool ControlBase::match(const DownCommandData &downCommand, qlibc::QData &deviceItem){
-    return downCommand.deviceName == deviceItem.getString("device_name") &&
+    return downCommand.deviceName == deviceItem.getString("nick_name") &&
            downCommand.area == deviceItem.getData("location").getString("room_no");
 }
 
