@@ -1,6 +1,6 @@
 {
   "commonBase": {
-    "ORDER" : ["CONTROL_INDEX", "NET_KEY_INDEX", "APP_KEY_INDEX", "RETRY_CNT", "RSP_MAX", "ADDRESS_DEST", "OPERATION"],
+    "paramOrder" : ["CONTROL_INDEX", "NET_KEY_INDEX", "APP_KEY_INDEX", "RETRY_CNT", "RSP_MAX", "ADDRESS_DEST", "OPERATION"],
     "param" : {
       "CONTROL_INDEX" : "E8FF",
       "NET_KEY_INDEX" : "0000",
@@ -17,6 +17,7 @@
       "cmdParam": {
         "turnOn": {
           "opCode": "8202",
+          "paramOrder" : ["OnOff", "TID", "TransitionTime", "Delay"],
           "param": {
             "OnOff": "01",
             "TID": "00",
@@ -26,6 +27,7 @@
         },
         "turnOff": {
           "opCode": "8202",
+          "paramOrder" : ["OnOff", "TID", "TransitionTime", "Delay"],
           "param": {
             "OnOff": "00",
             "TID": "00",
@@ -40,6 +42,7 @@
       "cmdParam": {
         "setBrightness": {
           "opCode": "824C",
+          "paramOrder" : ["Lightness", "TID", "TransitionTime", "Delay"],
           "param": {
             "Lightness": "",
             "TID": "00",
@@ -54,6 +57,7 @@
       "cmdParam": {
         "setColorTemperature": {
           "opCode": "8264",
+          "paramOrder" : ["CTLTemperature", "CTLDeltaUV", "TID", "TransitionTime", "Delay"],
           "param": {
             "CTLTemperature": "",
             "CTLDeltaUV": "",
@@ -69,6 +73,7 @@
       "cmdParam": {
         "setLightColorTemperature": {
           "opCode": "825E",
+          "paramOrder" : ["Lightness", "CTLTemperature", "CTLDeltaUV", "TID", "TransitionTime", "Delay"],
           "param": {
             "Lightness": "",
             "CTLTemperature": "",
@@ -85,6 +90,7 @@
       "cmdParam": {
         "setPowerUpState": {
           "opCode": "8213",
+          "paramOrder" : ["powerUpState"],
           "param": {
             "powerUpState": ""
           }
@@ -96,6 +102,7 @@
       "cmdParam": {
         "setColorMode": {
           "opCode": "8276",
+          "paramOrder" : ["HSLLightness", "HSLHue", "HSLSaturation", "TID", "TransitionTime", "Delay"],
           "param": {
             "HSLLightness": "",
             "HSLHue": "",

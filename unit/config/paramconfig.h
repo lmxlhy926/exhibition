@@ -9,7 +9,7 @@
 static const string AdapterIp = "127.0.0.1";
 static const int AdapterPort = 60004;
 
-static const int ConfigSitePort = 60003;
+static const int ConfigSitePort = 9006;
 
 //请求url
 static const string SCENELIST_URL = "/logic-device/scene/list";  //请求场景列表URL

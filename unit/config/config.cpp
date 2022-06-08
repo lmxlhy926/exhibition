@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-    serviceSiteManager->setServerPort(60001);
+    serviceSiteManager->setServerPort(ConfigSitePort);
 
     //注册请求场景列表处理函数
     serviceSiteManager->registerServiceRequestHandler(SCENELIST_REQUEST_SERVICE_ID,sceneListRequest_service_request_handler);

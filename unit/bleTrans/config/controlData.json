@@ -1,0 +1,101 @@
+
+// 控制开关
+{
+  "service_id": "control_light",
+  "request": {
+    "command": "turnOn",
+    "device_id": "001",
+    "status_value": "on"
+  }
+}
+// 控制亮度
+{
+  "service_id": "control_light",
+  "request": {
+    "command": "setBrightness",
+    "device_id": "001",
+    "status_value": "10000"
+  }
+}
+// 控制色温
+{
+  "service_id": "control_light",
+  "request": {
+    "command": "setColorTemperature",
+    "device_id": "001",
+    "status_value": "6500"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

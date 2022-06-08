@@ -29,7 +29,7 @@ int test_service_request_handler(const Request& request, Response& response) {
 
 
 int sceneListRequest_service_request_handler(const Request& request, Response& response) {
-    std::cout << "===>sceneListRequest_service_request_handler: " << std::endl;
+    std::cout << "===>sceneListRequest_service_request_handler: " << request.body <<  std::endl;
     qlibc::QData sceneListRequest, sceneListResponse;
     qlibc::QData param;
     param.setString("familyCode", "XXXX");  //TODO 待定
@@ -52,7 +52,7 @@ int sceneListRequest_service_request_handler(const Request& request, Response& r
 }
 
 int subDeviceRegister_service_request_handler(const Request& request, Response& response) {
-
+    std::cout << "===>subDeviceRegister_service_request_handler: " << request.body <<  std::endl;
     qlibc::QData requestData(request.body);
 
     qlibc::QData registerRequest, registerResponse;
@@ -77,6 +77,7 @@ int subDeviceRegister_service_request_handler(const Request& request, Response& 
 }
 
 int domainIdRequest_service_request_handler(const Request& request, Response& response) {
+    std::cout << "===>domainIdRequest_service_request_handler: " << request.body <<  std::endl;
 
     string domainId = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
     qlibc::QData res;
@@ -97,6 +98,8 @@ int domainIdRequest_service_request_handler(const Request& request, Response& re
 }
 
 int engineer_service_request_handler(mqttClient& mc, const Request& request, Response& response) {
+    std::cout << "===>engineer_service_request_handler: " << request.body <<  std::endl;
+
     qlibc::QData requestData = qlibc::QData(request.body).getData("request");
     qlibc::QData registerRes;
     cloudUtil::getInstance()->tvRegister(mc, requestData, registerRes);
@@ -117,7 +120,7 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 
 
 int whiteList_service_request_handler(const Request& request, Response& response){
-
+    std::cout << "===>whiteList_service_request_handler: " << request.body <<  std::endl;
 
     qlibc::QData whiteListData = configParamUtil::getInstance()->getWhiteList();
     response.set_content(whiteListData.toJsonString(), "text/json");
