@@ -1,0 +1,111 @@
+{
+  "commonBase": {
+    "ORDER" : ["CONTROL_INDEX", "NET_KEY_INDEX", "APP_KEY_INDEX", "RETRY_CNT", "RSP_MAX", "ADDRESS_DEST", "OPERATION"],
+    "param" : {
+      "CONTROL_INDEX" : "E8FF",
+      "NET_KEY_INDEX" : "0000",
+      "APP_KEY_INDEX" : "0000",
+      "RETRY_CNT"     : "02",
+      "RSP_MAX"       : "03",
+      "ADDRESS_DEST"  : "",
+      "OPERATION"     : ""
+    }
+  },
+  "OPERATION": {
+    "lightOnOff": {
+      "cmd": ["turnOn", "turnOff"],
+      "cmdParam": {
+        "turnOn": {
+          "opCode": "8202",
+          "param": {
+            "OnOff": "01",
+            "TID": "00",
+            "TransitionTime": "",
+            "Delay": ""
+          }
+        },
+        "turnOff": {
+          "opCode": "8202",
+          "param": {
+            "OnOff": "00",
+            "TID": "00",
+            "TransitionTime": "",
+            "Delay": ""
+          }
+        }
+      }
+    },
+    "lightBrightness": {
+      "cmd": ["setBrightness"],
+      "cmdParam": {
+        "setBrightness": {
+          "opCode": "824C",
+          "param": {
+            "Lightness": "",
+            "TID": "00",
+            "TransitionTime": "",
+            "Delay": ""
+          }
+        }
+      }
+    },
+    "lightColorTemperature": {
+      "cmd": ["setColorTemperature"],
+      "cmdParam": {
+        "setColorTemperature": {
+          "opCode": "8264",
+          "param": {
+            "CTLTemperature": "",
+            "CTLDeltaUV": "",
+            "TID": "",
+            "TransitionTime": "",
+            "Delay": ""
+          }
+        }
+      }
+    },
+    "lightBrightnessColorTemperature": {
+      "cmd": ["setLightColorTemperature"],
+      "cmdParam": {
+        "setLightColorTemperature": {
+          "opCode": "825E",
+          "param": {
+            "Lightness": "",
+            "CTLTemperature": "",
+            "CTLDeltaUV": "",
+            "TID": "",
+            "TransitionTime": "",
+            "Delay": ""
+          }
+        }
+      }
+    },
+    "lightOnPowerUpState": {
+      "cmd": ["setPowerUpState"],
+      "cmdParam": {
+        "setPowerUpState": {
+          "opCode": "8213",
+          "param": {
+            "powerUpState": ""
+          }
+        }
+      }
+    },
+    "lightColorMode": {
+      "cmd": ["setColorMode"],
+      "cmdParam": {
+        "setColorMode": {
+          "opCode": "8276",
+          "param": {
+            "HSLLightness": "",
+            "HSLHue": "",
+            "HSLSaturation": "",
+            "TID": "",
+            "TransitionTime": "",
+            "Delay": ""
+          }
+        }
+      }
+    }
+  }
+}

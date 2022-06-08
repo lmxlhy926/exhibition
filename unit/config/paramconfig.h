@@ -7,13 +7,14 @@
 
 
 static const string AdapterIp = "127.0.0.1";
-static const int AdapterPort = 60003;
+static const int AdapterPort = 60004;
 
-static const int ConfigSitePort = 60001;
+static const int ConfigSitePort = 60003;
 
 //请求url
 static const string SCENELIST_URL = "/logic-device/scene/list";  //请求场景列表URL
 static const string SUBDEVICE_REGISTER_URL = "/logic-device/edge/deviceRegister";
+static const string WHITELIST_REQUEST_URL =  "/logic-device/edge/deviceRegister";
 
 //服务ID, 对内提供
 static const string SCENELIST_REQUEST_SERVICE_ID = "sceneListRequest";

@@ -29,6 +29,7 @@ int test_service_request_handler(const Request& request, Response& response) {
 
 
 int sceneListRequest_service_request_handler(const Request& request, Response& response) {
+    std::cout << "===>sceneListRequest_service_request_handler: " << std::endl;
     qlibc::QData sceneListRequest, sceneListResponse;
     qlibc::QData param;
     param.setString("familyCode", "XXXX");  //TODO 待定
@@ -116,6 +117,8 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 
 
 int whiteList_service_request_handler(const Request& request, Response& response){
+
+
     qlibc::QData whiteListData = configParamUtil::getInstance()->getWhiteList();
     response.set_content(whiteListData.toJsonString(), "text/json");
 
@@ -123,4 +126,10 @@ int whiteList_service_request_handler(const Request& request, Response& response
 }
 
 
+int whiteList_service_request_handler_bak(const Request& request, Response& response){
+
+
+
+    return 0;
+}
 
