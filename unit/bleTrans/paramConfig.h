@@ -12,7 +12,11 @@ using namespace std;
 const int BleSitePort = 60009;
 
 //服务ID
-const string Ble_Device_Service_ID = "BleDeviceControl";
+const string Ble_Device_Control_Service_ID = "BleDeviceControl";
+
+const string Ble_Device_Command_Service_ID = "BleDeviceCommand";
+
+
 
 
 

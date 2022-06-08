@@ -6,8 +6,8 @@
 #define EXHIBITION_PARAMCONFIG_H
 
 
-const int SynergySitePort = 60003;
-const string AdapterIp = "192.168.1.100";
+const int SynergySitePort = 9007;
+const string AdapterIp = "127.0.0.1";
 const int AdapterPort = 9002;
 
 //服务ID

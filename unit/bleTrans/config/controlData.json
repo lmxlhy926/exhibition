@@ -1,7 +1,7 @@
 
 // 控制开关
 {
-  "service_id": "control_light",
+  "service_id": "BleDeviceCommand",
   "request": {
     "command": "turnOn",
     "device_id": "001",
@@ -10,7 +10,7 @@
 }
 // 控制亮度
 {
-  "service_id": "control_light",
+  "service_id": "BleDeviceCommand",
   "request": {
     "command": "setBrightness",
     "device_id": "001",
@@ -19,7 +19,7 @@
 }
 // 控制色温
 {
-  "service_id": "control_light",
+  "service_id": "BleDeviceCommand",
   "request": {
     "command": "setColorTemperature",
     "device_id": "001",
@@ -28,8 +28,36 @@
 }
 
 
+//扫描
+{
+  "service_id": "BleDeviceControl",
+  "request": {
+    "command" : "scan"
+  }
+}
 
 
+
+//添加
+{
+  "service_id": "BleDeviceControl",
+  "request": {
+    "command": "addDevice",
+    "device_id": "001",
+    "status_value": "6500"
+  }
+}
+
+
+//删除
+{
+  "service_id": "BleDeviceControl",
+  "request": {
+    "command": "deleteDevice",
+    "device_id": "001",
+    "status_value": "6500"
+  }
+}
 
 
 

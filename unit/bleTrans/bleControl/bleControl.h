@@ -7,7 +7,11 @@
 
 #include "qlibc/QData.h"
 
-void control(qlibc::QData& data);
+void bleControl(qlibc::QData& data);
+
+void bleCommand(qlibc::QData& data);
+
+
 
 
 #endif //EXHIBITION_BLECONTROL_H

@@ -9,7 +9,12 @@
 #include <socket/httplib.h>
 using namespace httplib;
 
+
 int BleDevice_control_service_handler(const Request& request, Response& response);
+
+int BleDevice_command_service_handler(const Request& request, Response& response);
+
+
 
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

@@ -20,17 +20,28 @@ static const nlohmann::json errResponse = {
 };
 
 
-
 int BleDevice_control_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
-        control(requestBody);
+        bleControl(requestBody);
         response.set_content(okResponse.dump(), "text/json");
     }else{
         response.set_content(errResponse.dump(), "text/json");
     }
     return 0;
 }
+
+int BleDevice_command_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    if(requestBody.type() != Json::nullValue){
+        bleCommand(requestBody);
+        response.set_content(okResponse.dump(), "text/json");
+    }else{
+        response.set_content(errResponse.dump(), "text/json");
+    }
+    return 0;
+}
+
 
 
 

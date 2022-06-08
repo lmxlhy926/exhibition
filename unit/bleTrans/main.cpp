@@ -36,10 +36,16 @@ int main(int argc, char* argv[]) {
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->setServerPort(BleSitePort);
 
-    // 注册 Service 请求处理 handler
-    serviceSiteManager->registerServiceRequestHandler(Ble_Device_Service_ID,
+    //注册蓝牙控制handler
+    serviceSiteManager->registerServiceRequestHandler(Ble_Device_Control_Service_ID,
                                                       [&](const Request& request, Response& response) -> int{
         return BleDevice_control_service_handler(request, response);
+    });
+
+    //注册蓝牙命令handler
+    serviceSiteManager->registerServiceRequestHandler(Ble_Device_Command_Service_ID,
+                                                      [&](const Request& request, Response& response) -> int{
+        return BleDevice_command_service_handler(request, response);
     });
 
 
