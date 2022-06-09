@@ -5,7 +5,7 @@
 #include "contreteDeviceControl.h"
 #include "../paramConfig.h"
 
-void CommonControl::operator()(const DownCommandData &downCommand, qlibc::QData &deviceList) {
+void CommonControl::operator()(const DownCommandData &downCommand, qlibc::QData &deviceList, int sitePort) {
     for(int i = 0 ; i < deviceList.size(); i++){
         qlibc::QData ithData = deviceList.getArrayElement(i);
 
@@ -15,7 +15,7 @@ void CommonControl::operator()(const DownCommandData &downCommand, qlibc::QData 
 
             //发送控制请求
             qlibc::QData controlRet;
-            ControlBase::sitePostRequest(AdapterIp, AdapterPort, controlCommand, controlRet);
+            ControlBase::sitePostRequest(RequestIp, sitePort,controlCommand, controlRet);
             std::cout << "===>controlCommand to Adapter: " << controlCommand.toJsonString(true) << std::endl;
 
             break;

@@ -26,20 +26,23 @@ bool controlDeviceRightNow(qlibc::QData& message){
     const DownCommandData downCommand(message);
 
     //构造请求体，获取设备列表
-    qlibc::QData request, response;
+    qlibc::QData request, responseTvAdapter, responseZigbee;
     request.setString("service_id", "get_device_list");
     request.setValue("request", Json::nullValue);
 
-    bool ret = ControlBase::sitePostRequest(AdapterIp, AdapterPort,request, response);
+    bool retTvAdapter = ControlBase::sitePostRequest(RequestIp, TvAdapterSitePort,request, responseTvAdapter);
+    bool retZigbee = ControlBase::sitePostRequest(RequestIp, ZigbeeSitePort,request, responseZigbee);
 
-    if(ret){
-        if(response.getInt("code") == 0){
+    if(retTvAdapter || retZigbee){
+        if(responseTvAdapter.getInt("code") == 0 || responseZigbee.getInt("code") == 0){
             std::cout << "===>get deviceList successfully" << std::endl;
-            qlibc::QData deviceList = response.getData("response").getData("device_list");
+            qlibc::QData deviceListTvAdapter = responseTvAdapter.getData("response").getData("device_list");
+            qlibc::QData deviceListZigbee = responseZigbee.getData("response").getData("device_list");
 
             if(downCommand.deviceType == "light"){
                 CommonControl comCtr;
-                comCtr(downCommand, deviceList);
+                comCtr(downCommand, deviceListTvAdapter, TvAdapterSitePort);
+                comCtr(downCommand, deviceListZigbee, ZigbeeSitePort);
             }
         }
     }

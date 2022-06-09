@@ -13,7 +13,7 @@ using namespace std;
 
 class CommonControl : public ControlBase{
 public:
-    void operator()(const DownCommandData& downCommand, qlibc::QData& deviceList);
+    void operator()(const DownCommandData& downCommand, qlibc::QData& deviceList, int sitePort);
 
 private:
     bool match(const DownCommandData &downCommand, qlibc::QData &deviceItem) override;
