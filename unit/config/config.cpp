@@ -12,6 +12,7 @@
 #include "mqttPayloadHandle.h"
 #include "secretUtils.h"
 #include "paramconfig.h"
+#include "messageSubscribeHandler.h"
 
 using namespace std;
 using namespace servicesite;
@@ -37,6 +38,7 @@ int main(int argc, char* argv[]) {
     const string dataDirPath = configPathPtr->getconfigPath();
     cloudUtil::getInstance()->init(httpConfigData.getString("ip"), httpConfigData.getInt("port"), dataDirPath);
 
+    //开启线程前，所有的单例已经创建完毕
     //开启线程，阻塞进行电视加入大白名单
     threadPool_.enqueue([](){
         cloudUtil::getInstance()->joinTvWhite();
@@ -97,7 +99,48 @@ int main(int argc, char* argv[]) {
                                                       [&](const Request& request, Response& response) -> int{
         return whiteList_service_request_handler(request, response);
     });
+    //获取所有的设备列表
+    serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID,
+                                                      [&](const Request& request, Response& response) -> int{
+        return getAllDeviceList_service_request_handler(request, response);
+    });
+    //让电视发声
+    serviceSiteManager->registerServiceRequestHandler(TVSOUND_REQUEST_SERVICE_ID,
+                                                      [&](const Request& request, Response& response) -> int{
+        return tvSound_service_request_handler(request, response);
+    });
 
+
+
+#if 0
+    //注册订阅消息messageID;
+    serviceSiteManager->registerMessageId(TVADAPTER_DEVICE_STATUS_MESSAGE_ID);
+    serviceSiteManager->registerMessageId(RADAR_DEVICE_STATUS_MESSAGE_ID);
+
+    //注册messageID对应的handler;
+    serviceSiteManager->registerMessageHandler(TVADAPTER_DEVICE_STATUS_MESSAGE_ID, deviceStatus);
+    serviceSiteManager->registerMessageHandler(RADAR_DEVICE_STATUS_MESSAGE_ID, deviceStatus);
+
+    threadPool_.enqueue([&](){
+        while(true){
+            int code1, code2;
+            std::vector<string> messageIdList1, messageIdList2;
+            messageIdList1.push_back(TVADAPTER_DEVICE_STATUS_MESSAGE_ID);
+            messageIdList2.push_back(RADAR_DEVICE_STATUS_MESSAGE_ID);
+
+            code1 = serviceSiteManager->subscribeMessage(RequestIp, AdapterPort, messageIdList1);
+            code2 = serviceSiteManager->subscribeMessage(RequestIp, 60003, messageIdList2);
+
+            if (code1 == ServiceSiteManager::RET_CODE_OK && code2 == ServiceSiteManager::RET_CODE_OK) {
+                printf("subscribeMessage ok.\n");
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            printf("subscribed failed....., start to subscribe in 3 seconds\n");
+        }
+    });
+#endif
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){

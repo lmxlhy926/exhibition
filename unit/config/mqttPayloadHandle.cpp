@@ -96,11 +96,18 @@ bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int le
     payload.setString("timeStamp", timeStr);
 
     //存储
-    configParamUtil::getInstance()->saveWhiteListData(payload);
+    qlibc::QData requestData;
+    requestData.setInt("code", 0);
+    requestData.setString("error", "ok");
+    requestData.putData("response", payload);
+    configParamUtil::getInstance()->saveWhiteListData(requestData);
 
     //发布
+    qlibc::QData publishData;
+    publishData.setString("message_id", "whiteList");
+    publishData.putData("content", payload);
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-    serviceSiteManager->publishMessage(WHITELIST_MESSAGE_ID, payload.toJsonString());
+    serviceSiteManager->publishMessage(WHITELIST_MESSAGE_ID, publishData.toJsonString());
 
     return true;
 }

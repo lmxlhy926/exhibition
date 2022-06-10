@@ -80,13 +80,6 @@ QData configParamUtil::getCloudServerData(){
     return cloudServerData;
 }
 
-QData configParamUtil::getInterActiveAppData() {
-    std::lock_guard<std::recursive_mutex> lg(mutex_);
-    if(interactiveAppData.empty())
-        interactiveAppData.loadFromFile(FileUtils::contactFileName(dataDirPath, "synergy/interactionApp.json"));
-    return interactiveAppData;
-}
-
 QData configParamUtil::getWhiteList() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(whiteListData.empty())

@@ -29,10 +29,14 @@ int domainIdRequest_service_request_handler(const Request& request, Response& re
 //安装app发送请求，传递安装师傅信息<安装app>
 int engineer_service_request_handler(mqttClient& mc, const Request& request, Response& response);
 
+//获取白名单列表
 int whiteList_service_request_handler(const Request& request, Response& response);
 
-int whiteList_service_request_handler_bak(const Request& request, Response& response);
+//获取所有设备列表
+int getAllDeviceList_service_request_handler(const Request& request, Response& response);
 
+//电视发声
+int tvSound_service_request_handler(const Request& request, Response& response);
 
 
 

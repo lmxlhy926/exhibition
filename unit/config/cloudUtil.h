@@ -17,9 +17,9 @@ using namespace std;
 
 class cloudUtil {
 private:
-    string serverIp;
-    int serverPort;
-    string dataDirPath;
+    string serverIp;        //http服务器Ip
+    int serverPort;         //http服务器端口号
+    string dataDirPath;     //配置文件路径
     static cloudUtil* instance;
 
 private:
@@ -30,11 +30,10 @@ public:
 
     static void destroyInstance();
 
+    //初始化http服务器配置参数
     void init(const string&  ip, int port, const string& dataDirectoryPath);
 
     static bool getTvInfo(string& tvMac, string& tvName, string& tvModel);
-
-    static bool getTvInfo(qlibc::QData& tvInfo);
 
     //阻塞，直到成功为止
     bool joinTvWhite();

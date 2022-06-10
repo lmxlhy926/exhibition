@@ -48,7 +48,7 @@ bool cloudUtil::getTvInfo(string& tvMac, string& tvName, string& tvModel){
         tvRequest.setString("service_id", "get_tv_mac");
         tvRequest.putData("request", qlibc::QData());
 
-        auto ret = httpUtil::sitePostRequest(AdapterIp, AdapterPort, tvRequest, tvResponse);
+        auto ret = httpUtil::sitePostRequest(RequestIp, AdapterPort, tvRequest, tvResponse);
         if(ret){
             if(tvResponse.getInt("code") == 0){
                 tvMac = tvResponse.getData("response").getString("tv_mac");
@@ -62,30 +62,13 @@ bool cloudUtil::getTvInfo(string& tvMac, string& tvName, string& tvModel){
                 configParamUtil::getInstance()->saveBaseInfo(baseInfoData);
                 return true;
             }
+            return false;
         }
         return false;
     }
     return true;
 }
 
-bool cloudUtil::getTvInfo(qlibc::QData& tvInfo){
-    string tvMac, tvName, tvModel;
-    bool ret = getTvInfo(tvMac, tvName, tvModel);
-    if(ret){
-        qlibc::QData params;
-        params.setString("tvMac", tvMac);
-
-        tvInfo.setString("funcName", "deviceDataReport");
-        tvInfo.setString("deviceType", "tvMac");
-        tvInfo.setString("area", "");
-        tvInfo.setString("deviceName", "");
-        tvInfo.setString("eventName", "tvMac");
-        tvInfo.setValue("params", params.asValue());
-
-        return true;
-    }
-    return false;
-}
 
 bool cloudUtil::joinTvWhite() {
     //加载记录信息,加载基本信息
@@ -148,9 +131,8 @@ bool cloudUtil::tvRegister(mqttClient& mc, qlibc::QData& engineerInfo, qlibc::QD
     qlibc::QData recordData = configParamUtil::getInstance()->getRecordData();
     bool tvWhite = recordData.getBool("tvWhite");
     if(!tvWhite){   //如果电视未加入大白名单
-        responseData.setString("code", "1");
-        responseData.setString("error", "joinTvWhite not finished.....");
-        responseData.putData("response", qlibc::QData());
+        responseData.setString("code", "201");
+        responseData.setString("msg", "joinTvWhite not finished.....");
         return false;
     }
 
@@ -163,8 +145,8 @@ bool cloudUtil::tvRegister(mqttClient& mc, qlibc::QData& engineerInfo, qlibc::QD
     //构造电视注册请求体
     Json::Value paramData;
     paramData["engineID"] = engineerInfo.getString("engineID");
-    paramData["domainID"] = engineerInfo.getString("domainSign");
-    paramData["domainSign"] = engineerInfo.getString("domainID");
+    paramData["domainID"] = engineerInfo.getString("domainID");
+    paramData["domainSign"] = engineerInfo.getString("domainSign");
     paramData["tvDid"] = baseInfoData.getString("tvDid");
     paramData["tvTimeStamp"] = std::to_string(seconds);
     paramData["tvSign"] = lhytemp::secretUtil::getTvSign(tvDid, std::to_string(seconds), dataDirPath);
