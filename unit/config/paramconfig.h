@@ -6,7 +6,7 @@
 #define EXHIBITION_PARAMCONFIG_H
 
 
-static const string RequestIp = "192.168.50.138";
+static const string RequestIp = "127.0.0.1";
 static const int AdapterPort = 9008;
 static const int SouthPort = 9010;
 static const int ConfigSitePort = 9006;

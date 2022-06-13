@@ -76,13 +76,21 @@ class ServiceSiteManager {
 
     static int serviceRequestHandlerDebug(const Request& request, Response& response);
 
-    string siteId;
-    string summary;
+    static string siteId;
+    static string summary;
 
-    Server server;
-    int serverPort;
+    static Server server;
+    static int serverPort;
 
-    std::thread* pingThreadP;
+    static const string MESSAGE_SUBSCRIBER_CONFIG_FILE;
+    static string messageSubscriberConfigPath;
+
+    static std::thread* pingThreadP;
+
+    static void saveMessageSubscriber(void);
+    static void loadMessageSubscriber(void);
+
+    static bool subscribeMessage(string message_id, string ip, int port);
 
     ServiceSiteManager();
     static ServiceSiteManager instance;
@@ -122,7 +130,7 @@ public:
      * @param pSummary 站点 简介
      * @return int 错误码参照错误码定义
      */
-    int startByRegister(string pSiteId, string pSummary);
+    static int startByRegister(void);
 
     /**
      * @brief 注册服务请求处理函数
@@ -230,6 +238,17 @@ public:
 	void setServerPort(int serverPort) {
 		this->serverPort = serverPort;
 	}
+
+    static int createDir(string sPathName);
+
+	static void setMessageSubscriberConfigPath(string pMessageSubscriberConfigPath) {
+		messageSubscriberConfigPath = pMessageSubscriberConfigPath;
+	}
+
+	static void setSiteIdSummary(string pSiteId, string pSummary) {
+		siteId = pSiteId;
+		summary = pSummary;
+	}
 };
 
 class SiteHandle {
@@ -292,8 +311,11 @@ class MessageSubscriberSiteHandle {
     string ip;
     int port;
 
+    Client* cli = nullptr;
+
     sem_t sem;
     std::queue<string> queue;
+    std::mutex queue_mutex; // 保护 队列
     std::thread* sendMessageThreadP;
 
     int sendRetryCount;

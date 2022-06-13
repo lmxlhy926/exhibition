@@ -55,12 +55,27 @@ const int ServiceSiteManager::RET_CODE_ERROR_REQ_CODE = -5;
 
 const string ServiceSiteManager::RET_OK = "ok";
 
+const string ServiceSiteManager::MESSAGE_SUBSCRIBER_CONFIG_FILE = "_message_subscriber.json";
+string ServiceSiteManager::messageSubscriberConfigPath = "/data/changhong/edge_midware/";
+
+std::mutex init_mutex; // 保护 初始化
 std::mutex http_request_mutex; // 保护 http_request handler
 std::mutex messageSubscriberList_mutex; // 保护 MessageSubscriberList
+
+string ServiceSiteManager::siteId;
+int ServiceSiteManager::serverPort;
+Server ServiceSiteManager::server;
+
+string ServiceSiteManager::summary;
+
+std::thread* ServiceSiteManager::pingThreadP;
 
 ServiceSiteManager ServiceSiteManager::instance;
 
 int ServiceSiteManager::registerServiceRequestHandler(string serviceId, ServiceRequestHandler handler) {
+    // 线程锁, 对象析构时解锁
+    std::lock_guard<std::mutex> lockGuard(init_mutex);
+    
     serviceRequestHandlers.push_back(std::make_pair(serviceId, handler));
 
     return RET_CODE_OK;
@@ -113,6 +128,8 @@ int ServiceSiteManager::serviceRequestHandlerSubscribeMessage(const Request& req
 
     json request_json = json::parse(request.body);
 
+    bool need_save = false;
+
     if (request_json["request"].is_null()) {
         response.set_content(ERROR_RESPONSE_REQUEST_ILLEGAL, "text/plain");
         return RET_CODE_OK;
@@ -130,42 +147,16 @@ int ServiceSiteManager::serviceRequestHandlerSubscribeMessage(const Request& req
 
     int port = request_json["request"]["port"];
 
-    for (auto& json_message_id : request_json["request"]["message_list"]) {
-        // 线程锁, 对象析构时解锁
-        std::lock_guard<std::mutex> lockGuard(messageSubscriberList_mutex);
-
-        MessageSubscriberSiteHandle* temp_messageSubscriberSiteHandle = NULL;
-        for (auto& item : messageSubscriberSiteHandlePList) {
-            if (item->getIp() == ip) {
-                if (item->getPort() == port) {
-                    temp_messageSubscriberSiteHandle = item;
-                    break;
-                }
-            }
-        }
-        if (temp_messageSubscriberSiteHandle == NULL) {
-            temp_messageSubscriberSiteHandle = new MessageSubscriberSiteHandle(ip, port);
-            messageSubscriberSiteHandlePList.push_back(temp_messageSubscriberSiteHandle);
-        }
-        
-        MessageSubscriber* temp_messageSubscriber = NULL;
-        for (auto& item : messageSubscriberList) {
-            if (json_message_id == item.getMessageId()) {
-                temp_messageSubscriber = &item;
-            }
-        }
-        if (temp_messageSubscriber == NULL) {
-            temp_messageSubscriber = new MessageSubscriber(json_message_id);
-            temp_messageSubscriber->addSiteMessageSubscriberSiteHandleP(temp_messageSubscriberSiteHandle);
-
-            messageSubscriberList.push_back(*temp_messageSubscriber);
-        }
-        else {
-            temp_messageSubscriber->addSiteMessageSubscriberSiteHandleP(temp_messageSubscriberSiteHandle);
-        }
+    for (auto& message_id : request_json["request"]["message_list"]) {
+        need_save = subscribeMessage(message_id, ip, port);
     }
 
     response.set_content(OK_RESPONSE_JSON, "text/plain");
+
+    if (need_save) {
+        saveMessageSubscriber();
+    }
+    
     return RET_CODE_OK;
 }
 
@@ -174,6 +165,8 @@ int ServiceSiteManager::serviceRequestHandlerUnsubscribeMessage(const Request& r
 
     json request_json = json::parse(request.body);
 
+    bool need_save = false;
+    
     if (request_json["request"].is_null()) {
         response.set_content(ERROR_RESPONSE_REQUEST_ILLEGAL, "text/plain");
         return RET_CODE_OK;
@@ -223,10 +216,17 @@ int ServiceSiteManager::serviceRequestHandlerUnsubscribeMessage(const Request& r
         }
         else {
             temp_messageSubscriber->delSiteMessageSubscriberSiteHandleP(temp_messageSubscriberSiteHandle);
+
+            need_save = true;
         }
     }
 
     response.set_content(OK_RESPONSE_JSON, "text/plain");
+
+    if (need_save) {
+        saveMessageSubscriber();
+    }
+
     return RET_CODE_OK;
 }
 
@@ -287,6 +287,8 @@ ServiceSiteManager::ServiceSiteManager() {
 void ServiceSiteManager::rawHttpRequestHandler(const Request& request, Response& response) {
     // 线程锁, 对象析构时解锁
     std::lock_guard<std::mutex> lockGuard(http_request_mutex);
+
+    // printf("%s\n", request.body.c_str());
 
     if (!json::accept(request.body)) {
         response.set_content(ERROR_RESPONSE_JSON_FORMAT, "text/plain");
@@ -349,6 +351,11 @@ void ServiceSiteManager::rawHttpRequestHandler(const Request& request, Response&
 int ServiceSiteManager::start(void) {
     server.Post("/", ServiceSiteManager::rawHttpRequestHandler);
 
+    loadMessageSubscriber();
+
+    // server.set_read_timeout(0, 500000);
+    // server.set_write_timeout(0, 500000);
+
     if (!server.listen("0.0.0.0", serverPort)) {
         return RET_CODE_ERROR_START_SERVER;
     }
@@ -373,10 +380,7 @@ void  service_site_ping_thread(string siteId) {
     }
 }
 
-int ServiceSiteManager::startByRegister(string pSiteId, string pSummary) {
-    siteId = pSiteId;
-    summary = pSummary;
-
+int ServiceSiteManager::startByRegister(void) {
     json request_json = {
 		{"service_id", "site_register"},
 		{"request", {
@@ -411,16 +415,18 @@ int ServiceSiteManager::startByRegister(string pSiteId, string pSummary) {
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
-    if (response_json["response"].is_null()) {
-        printf("response_json format error.\n");
-        return RET_CODE_ERROR_REQ_JSON_FORMAT;
-    }
+    // if (response_json["response"].is_null()) {
+    //     printf("response_json format error.\n");
+    //     return RET_CODE_ERROR_REQ_JSON_FORMAT;
+    // }
 
     pingThreadP = new std::thread(service_site_ping_thread, siteId);
 
     printf("http listen port: %d\n", serverPort);
 
     server.Post("/", ServiceSiteManager::rawHttpRequestHandler);
+
+    loadMessageSubscriber();
 
     if (!server.listen("0.0.0.0", serverPort)) {
         return RET_CODE_ERROR_START_SERVER;
@@ -444,7 +450,6 @@ void ServiceSiteManager::publishMessage(string messageId, string message) {
             for (auto& siteHandlePItem : messageSubscriberItem.getSiteMessageSubscriberSiteHandlePlist()) {
                 siteHandlePItem->sendMessage(message);
             }
-            break;
         }
     }
 }
@@ -463,6 +468,7 @@ int ServiceSiteManager::subscribeMessage(string ip, int port, std::vector<string
     }
 
     Client cli(ip, port);
+    cli.set_connection_timeout(1, 0);
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
@@ -542,6 +548,26 @@ int ServiceSiteManager::unsubscribeMessage(string ip, int port, std::vector<stri
     return RET_CODE_OK;
 }
 
+int ServiceSiteManager::createDir(string sPathName) {
+    char DirName[sPathName.length() + 1];
+    strcpy(DirName, sPathName.c_str());
+    int i, len = strlen(DirName);
+    
+    for (i = 1; i < len; i++) {
+        if (DirName[i] == '/') {
+            DirName[i] = 0;
+            if (access(DirName, F_OK) != 0) {
+                if (mkdir(DirName, 0755) == -1) {
+                    printf("mkdir error\n");
+                    return -1;
+                }
+            }
+            DirName[i] = '/';
+        }
+    }
+
+    return 0;
+}
 
 int ServiceSiteManager::getServiceList(string ip, int port, std::vector<string>& serviceIdList) {
     json request_json = {
@@ -602,6 +628,7 @@ int ServiceSiteManager::getMessageList(string ip, int port, std::vector<string>&
 	};
 
     Client cli(ip, port);
+    cli.set_connection_timeout(1, 0);
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
@@ -975,15 +1002,44 @@ int MessageSubscriberSiteHandle::getPort(void) {
 }
 
 void MessageSubscriberSiteHandle::sendFromThread(void) {
+    string message = "";
+
     sem_wait(&sem); 
 
-    string message = queue.front();
-    queue.pop();
+    queue_mutex.lock();
 
-    Client cli(ip, port);
-    auto res = cli.Post("/", message, "text/plain");
+    if (!queue.empty()) {
+        message = queue.front();
+        queue.pop();
+    }
+
+    queue_mutex.unlock();
+
+    if (message == "") {
+        return;
+    }
+
+    if (cli == nullptr) {
+        cli = new Client(ip, port);
+        cli->set_keep_alive(true);
+        cli->set_connection_timeout(1, 0);
+    }
+
+    // Client cli(ip, port);
+
+    if (!cli->is_socket_open()) {
+        cli->stop();
+        delete cli;
+        cli = nullptr;
+
+        cli = new Client(ip, port);
+        cli->set_keep_alive(true);
+        cli->set_connection_timeout(1, 0);
+    }
+
+    auto res = cli->Post("/", message, "text/plain");
     if (!res) {
-        printf("client connect error.\n");
+        printf("client connect error. %s %d\n", ip.c_str(), port);
 
         ++sendRetryCount;
     }
@@ -997,8 +1053,9 @@ void MessageSubscriberSiteHandle::sendFromThread(void) {
 
     if (sendRetryCount >= MAX_SEND_RETRY) {
         printf("sendRetryCount = %d, error.\n", sendRetryCount);
+        sendRetryCount = 0;
 
-        isStop = true;
+        // isStop = true;
     }
 }
 
@@ -1007,14 +1064,19 @@ void MessageSubscriberSiteHandle::sendMessage(string message) {
         return;
     }
     
+    queue_mutex.lock();
+
     if (queue.size() > MAX_QUEUE_SIZE) {
+        printf("queue is full.\n");
+
         // 队列满， 清空
         while(!queue.empty()) {
             queue.pop();
         }
     }
-
     queue.push(message);
+
+    queue_mutex.unlock();
 
     sem_post(&sem); 
 }
@@ -1030,4 +1092,160 @@ int MessageSubscriberSiteHandle::getSendRetryCount(void) {
 
 bool MessageSubscriberSiteHandle::getIsStop(void) {
     return isStop;
+}
+
+void servicesite::ServiceSiteManager::saveMessageSubscriber(void) {
+    json message_subscriber_list = json::array();
+
+    for (auto& item : messageSubscriberList) {
+        json item_json = {
+            {"messageId", item.getMessageId()},
+            {"site_handle_list", json::array()}
+        };
+
+        for (const auto& sub_item : item.getSiteMessageSubscriberSiteHandlePlist()) {
+            json sub_item_json = {
+                {"ip", sub_item->getIp()},
+                {"port", sub_item->getPort()},
+                {"sendRetryCount", sub_item->getSendRetryCount()},
+                {"isStop", sub_item->getIsStop()},
+            };
+
+            item_json["site_handle_list"].push_back(sub_item_json);
+        }
+
+        message_subscriber_list.push_back(item_json);
+    }
+
+    string config_filename = messageSubscriberConfigPath + siteId + MESSAGE_SUBSCRIBER_CONFIG_FILE;
+
+    // printf("----%s\n", config_filename.c_str());
+    // printf("----%s\n", message_subscriber_list.dump(4).c_str());
+
+    if (0 != createDir(ServiceSiteManager::messageSubscriberConfigPath)) {
+        printf("createDir error: %s\n", messageSubscriberConfigPath.c_str());
+        return;
+    }
+
+    int fd = open(config_filename.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0777);
+    if(fd == -1)
+    { 
+        printf("open error: %s\n", config_filename.c_str());
+        return;
+    } 
+
+    string json_data = message_subscriber_list.dump(4);
+    write(fd, json_data.c_str(), json_data.size());
+
+    close(fd);
+
+    printf("saveMessageSubscriber ok.\n");
+}
+
+void servicesite::ServiceSiteManager::loadMessageSubscriber(void) {
+    const int buf_size = 10 * 1024;
+    char buf[buf_size];
+    
+    string config_filename = messageSubscriberConfigPath + siteId + MESSAGE_SUBSCRIBER_CONFIG_FILE;
+
+    // printf("----%s\n", config_filename.c_str());
+
+	int fd = open(config_filename.c_str(), O_RDONLY);
+	if(fd == -1)
+	{
+		printf("open error: %s\n", config_filename.c_str());
+		return;
+	}
+
+	int read_len = read(fd, buf, buf_size);
+	close(fd);
+
+    if (read_len == buf_size) {
+        printf("read_len error: %d\n", read_len);
+        return;
+    }
+
+    buf[read_len] = 0;
+
+    if (!json::accept(string(buf))) {
+        printf("json::accept error: %s\n", buf);
+        return;
+    }
+
+    json message_subscriber_list = json::parse(buf);
+
+    // printf("----%s\n", message_subscriber_list.dump(4).c_str());
+    for (json& item : message_subscriber_list) {
+        if (!item["messageId"].is_string()) {
+            printf("json::parse messageId error: %s\n", item.dump().c_str());
+            return;
+        }
+
+        string message_id = item["messageId"];
+
+        if (!item["site_handle_list"].is_array()) {
+            printf("json::parse site_handle_list error: %s\n", item.dump().c_str());
+            return;
+        }
+
+        for (json& sub_item : item["site_handle_list"]) {
+            if (!sub_item["ip"].is_string()) {
+                printf("json::parse ip error: %s\n", sub_item.dump().c_str());
+                return;
+            }
+            
+            string ip = sub_item["ip"];
+
+            if (!sub_item["port"].is_number_integer()) {
+                printf("json::parse ip port: %s\n", sub_item.dump().c_str());
+                return;
+            }
+
+            int port = sub_item["port"];
+
+            // printf("%s %s %d\n", messageId.c_str(), ip.c_str(), port);
+
+            subscribeMessage(message_id, ip, port);
+        }
+    }
+}
+
+bool servicesite::ServiceSiteManager::subscribeMessage(string message_id, string ip, int port) {
+    bool need_save = false;
+
+    // 线程锁, 对象析构时解锁
+    std::lock_guard<std::mutex> lockGuard(messageSubscriberList_mutex);
+
+    MessageSubscriberSiteHandle* temp_messageSubscriberSiteHandle = NULL;
+    for (auto& item : messageSubscriberSiteHandlePList) {
+        if (item->getIp() == ip) {
+            if (item->getPort() == port) {
+                temp_messageSubscriberSiteHandle = item;
+                break;
+            }
+        }
+    }
+    if (temp_messageSubscriberSiteHandle == NULL) {
+        temp_messageSubscriberSiteHandle = new MessageSubscriberSiteHandle(ip, port);
+        messageSubscriberSiteHandlePList.push_back(temp_messageSubscriberSiteHandle);
+    }
+    
+    MessageSubscriber* temp_messageSubscriber = NULL;
+    for (auto& item : messageSubscriberList) {
+        if (message_id == item.getMessageId()) {
+            temp_messageSubscriber = &item;
+        }
+    }
+    if (temp_messageSubscriber == NULL) {
+        temp_messageSubscriber = new MessageSubscriber(message_id);
+        temp_messageSubscriber->addSiteMessageSubscriberSiteHandleP(temp_messageSubscriberSiteHandle);
+
+        messageSubscriberList.push_back(*temp_messageSubscriber);
+        need_save = true;
+    }
+    else {
+        temp_messageSubscriber->addSiteMessageSubscriberSiteHandleP(temp_messageSubscriberSiteHandle);
+    }
+
+    return need_save;
 }

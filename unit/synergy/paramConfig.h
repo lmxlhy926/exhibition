@@ -5,7 +5,7 @@
 #ifndef EXHIBITION_PARAMCONFIG_H
 #define EXHIBITION_PARAMCONFIG_H
 
-const string RequestIp = "192.168.50.138";
+const string RequestIp = "127.0.0.1";
 
 const int ZigbeeSitePort = 9002;
 const int TvAdapterSitePort = 9008;

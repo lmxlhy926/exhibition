@@ -21,7 +21,7 @@ using namespace std::placeholders;
 using json = nlohmann::json;
 
 static const string CONFIG_SITE_ID = "config";
-static const string CONFIG_SITE_ID_NAME = "整体配置站点";
+static const string CONFIG_SITE_ID_NAME = "整体配置";
 
 
 int main(int argc, char* argv[]) {
@@ -82,6 +82,7 @@ int main(int argc, char* argv[]) {
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->setServerPort(ConfigSitePort);
+    serviceSiteManager->setSiteIdSummary(CONFIG_SITE_ID, CONFIG_SITE_ID_NAME);
 
     //注册请求场景列表处理函数
     serviceSiteManager->registerServiceRequestHandler(SCENELIST_REQUEST_SERVICE_ID,sceneListRequest_service_request_handler);
@@ -145,10 +146,10 @@ int main(int argc, char* argv[]) {
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         // 启动服务器，参数为端口， 可用于单独的开发调试
-        int code = serviceSiteManager->start();
+//        int code = serviceSiteManager->start();
 
         // 通过注册的方式启动服务器， 需要提供site_id, site_name, port
-    	//code = serviceSiteManager->startByRegister(TEST_SITE_ID_1, TEST_SITE_NAME_1, 9001);
+    	int code = serviceSiteManager->startByRegister();
 
         if (code != 0) {
             printf("start error. code = %d\n", code);

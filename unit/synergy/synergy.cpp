@@ -20,7 +20,7 @@ using namespace std::placeholders;
 using json = nlohmann::json;
 
 static const string SYNERGY_SITE_ID = "collaborate";
-static const string SYNERGY_SITE_ID_NAME = "协同站点";
+static const string SYNERGY_SITE_ID_NAME = "协同服务";
 
 
 int main(int argc, char* argv[]) {
@@ -35,6 +35,7 @@ int main(int argc, char* argv[]) {
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->setServerPort(SynergySitePort);
+    serviceSiteManager->setSiteIdSummary(SYNERGY_SITE_ID, SYNERGY_SITE_ID_NAME);
 
     // 注册 Service 请求处理 handler
     serviceSiteManager->registerServiceRequestHandler(Control_Device_Service_ID,
@@ -46,10 +47,10 @@ int main(int argc, char* argv[]) {
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         // 启动服务器，参数为端口， 可用于单独的开发调试
-        int code = serviceSiteManager->start();
+//        int code = serviceSiteManager->start();
 
         // 通过注册的方式启动服务器， 需要提供site_id, site_name, port
-    	//code = serviceSiteManager->startByRegister(TEST_SITE_ID_1, TEST_SITE_NAME_1, 9001);
+    	int code = serviceSiteManager->startByRegister();
 
         if (code != 0) {
             printf("start error. code = %d\n", code);
