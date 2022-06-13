@@ -7,7 +7,6 @@
 #include <cstdio>
 #include "qlibc/Logging.h"
 #include "qlibc/LogFile.h"
-
 #include "socket/httplib.h"
 
 using namespace qlibc;
@@ -42,7 +41,7 @@ void setOutputTest(){
     httplib::ThreadPool threadPool(10);
     LogFile lf(R"(D:\bywg\project\exhibition\unit\paramData\testSite\logout)", 1000* 30);
 
-    qlibc::Logger::setOutput([&](const char* msg, size_t len, Logger::LogLevel level){
+    qlibc::Logger::setOutput([&](const char* msg, size_t len, qlibc::Logger::LogLevel level){
         lf.append(msg, len);
     });
 

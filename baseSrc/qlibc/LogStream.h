@@ -63,11 +63,6 @@ namespace qlibc{
             cur_ = data_;
         }
 
-        //复位buffer内容
-        void bzero(){
-            memset(data_, 0, sizeof data_);
-        }
-
         //以字符串格式返回data_内容
         string toString() const{
             return string(data_, length());

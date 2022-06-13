@@ -8,3 +8,5 @@ target_link_libraries(bleTrans PRIVATE qlibc)
 target_link_libraries(bleTrans PRIVATE siteService)
 target_link_libraries(bleTrans PRIVATE socket)
 target_link_libraries(bleTrans PRIVATE common)
+
+add_subdirectory(test)

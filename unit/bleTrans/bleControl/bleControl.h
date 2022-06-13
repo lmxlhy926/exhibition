@@ -12,6 +12,4 @@ void bleControl(qlibc::QData& data);
 void bleCommand(qlibc::QData& data);
 
 
-
-
 #endif //EXHIBITION_BLECONTROL_H
