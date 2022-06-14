@@ -4,8 +4,8 @@
 
 #include "serviceRequestHandler.h"
 #include "siteService/nlohmann/json.hpp"
-#include "bleControl/bleControl.h"
 #include "qlibc/QData.h"
+#include "kernal/requestHandler.h"
 
 static const nlohmann::json okResponse = {
         {"code", 0},
@@ -23,7 +23,7 @@ static const nlohmann::json errResponse = {
 int BleDevice_control_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
-        bleControl(requestBody);
+        downControlHandler(requestBody);
         response.set_content(okResponse.dump(), "text/json");
     }else{
         response.set_content(errResponse.dump(), "text/json");
@@ -34,7 +34,7 @@ int BleDevice_control_service_handler(const Request& request, Response& response
 int BleDevice_command_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
-        bleCommand(requestBody);
+        downCmdHandler(requestBody);
         response.set_content(okResponse.dump(), "text/json");
     }else{
         response.set_content(errResponse.dump(), "text/json");

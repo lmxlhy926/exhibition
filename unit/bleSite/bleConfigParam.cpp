@@ -25,7 +25,7 @@ string bleConfigParam::getconfigPath() {
 QData bleConfigParam::getBleParamData() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(bleParamData.empty()){
-        bleParamData.loadFromFile(FileUtils::contactFileName(dataDirPath, "config/bleCommand.json"));
+        bleParamData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/bleCommand.json"));
     }
     return bleParamData;
 }
