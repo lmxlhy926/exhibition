@@ -11,17 +11,9 @@
 #include "bleConfigParam.h"
 
 class JsonCmd2Binary{
-private:
-    string pseudoCommand;
-    string address;
-    string device_id;
 public:
-    explicit JsonCmd2Binary(qlibc::QData& request){
-       init(request);
-    }
-
     //获取二进制格式蓝牙命令
-    size_t getBinary(unsigned char* buf, size_t bufSize);
+    virtual size_t getBinary(unsigned char* buf, size_t bufSize) = 0;
 
     //获取构造的字符串形式的二进制数据
     static string getBinaryString(qlibc::QData& bleConfigData);
@@ -53,10 +45,6 @@ private:
 
         size_t size() const{ return count_; }
     };
-
-    void init(qlibc::QData& request);
-
-    void set_light_turnOnOff(qlibc::QData& lightData);
 };
 
 

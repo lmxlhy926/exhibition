@@ -4,36 +4,6 @@
 
 #include "jsonCmd2Binary.h"
 
-size_t JsonCmd2Binary::getBinary(unsigned char *buf, size_t bufSize) {
-    qlibc::QData thisBleConfigData = bleConfigParam::getInstance()->getBleParamData();
-    string binaryString;
-    bool flag = false;
-
-    if(pseudoCommand == "scan"){
-        binaryString = "E9FF00";
-        flag = true;
-
-    }else if(pseudoCommand == "addDevice"){
-        binaryString = "E9FF08";
-        binaryString += "device_id";
-        flag = true;
-
-    }else if(pseudoCommand == "deleteDevice"){
-
-
-    }else if(pseudoCommand == "turnOn" || pseudoCommand == "turnOff"){
-        set_light_turnOnOff(thisBleConfigData);
-        binaryString = getBinaryString(thisBleConfigData);
-        flag = true;
-    }
-
-    std::cout << "==>binaryString: " << binaryString << std::endl;
-    if(flag){
-        return binaryString2binary(binaryString, buf, bufSize);
-    }
-    return 0;
-}
-
 string JsonCmd2Binary::getBinaryString(QData &bleConfigData) {
     std::vector<string> commonBaseParamOrderVec;
     qlibc::QData commonBaseParamOrder = bleConfigData.getData("commonBase").getData("paramOrder");
@@ -82,17 +52,6 @@ size_t JsonCmd2Binary::binaryString2binary(string &binaryString, unsigned char *
         binaryBuf.append(charString);
     }
     return binaryBuf.size();
-}
-
-void JsonCmd2Binary::init(QData &request) {
-    pseudoCommand  = request.getData("request").getString("command");
-    address = request.getData("request").getString("device_id");
-    device_id = request.getData("request").getString("device_id");
-}
-
-void JsonCmd2Binary::set_light_turnOnOff(QData &lightData) {
-    lightData.asValue()["commonBase"]["param"]["ADDRESS_DEST"] = address;
-    lightData.asValue()["commonBase"]["param"]["OPERATION"] = pseudoCommand;
 }
 
 
