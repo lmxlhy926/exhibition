@@ -9,6 +9,5 @@
 
 void downCmdHandler(qlibc::QData& cmdData);
 
-void downControlHandler(qlibc::QData& controlData);
 
 #endif //EXHIBITION_REQUESTHANDLER_H

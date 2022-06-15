@@ -6,14 +6,29 @@
 
 size_t JsonCmd2Binary::getBinary(unsigned char *buf, size_t bufSize) {
     qlibc::QData thisBleConfigData = bleConfigParam::getInstance()->getBleParamData();
+    string binaryString;
     bool flag = false;
-    if(pseudoCommand == "turnOn" || pseudoCommand == "turnOff"){
+
+    if(pseudoCommand == "scan"){
+        binaryString = "E9FF00";
+        flag = true;
+
+    }else if(pseudoCommand == "addDevice"){
+        binaryString = "E9FF08";
+        binaryString += "device_id";
+        flag = true;
+
+    }else if(pseudoCommand == "deleteDevice"){
+
+
+    }else if(pseudoCommand == "turnOn" || pseudoCommand == "turnOff"){
         set_light_turnOnOff(thisBleConfigData);
+        binaryString = getBinaryString(thisBleConfigData);
         flag = true;
     }
 
+    std::cout << "==>binaryString: " << binaryString << std::endl;
     if(flag){
-        string binaryString = getBinaryString(thisBleConfigData);
         return binaryString2binary(binaryString, buf, bufSize);
     }
     return 0;
@@ -57,8 +72,6 @@ string JsonCmd2Binary::getBinaryString(QData &bleConfigData) {
             }
         }
     }
-
-    std::cout << "==>binaryCommandString: " << binaryCommandString << std::endl;
     return binaryCommandString;
 }
 
@@ -66,7 +79,6 @@ size_t JsonCmd2Binary::binaryString2binary(string &binaryString, unsigned char *
     BinaryBuf binaryBuf(buf, size);
     for(int i = 0; i < binaryString.size() / 2; i++){
         string charString = binaryString.substr(i * 2, 2);
-        std::cout << "charString: " << charString << std::endl;
         binaryBuf.append(charString);
     }
     return binaryBuf.size();
@@ -75,6 +87,7 @@ size_t JsonCmd2Binary::binaryString2binary(string &binaryString, unsigned char *
 void JsonCmd2Binary::init(QData &request) {
     pseudoCommand  = request.getData("request").getString("command");
     address = request.getData("request").getString("device_id");
+    device_id = request.getData("request").getString("device_id");
 }
 
 void JsonCmd2Binary::set_light_turnOnOff(QData &lightData) {

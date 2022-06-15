@@ -2,36 +2,36 @@
 // Created by 78472 on 2022/6/13.
 //
 
-#ifndef EXHIBITION_BINARYSTATUS2JSON_H
-#define EXHIBITION_BINARYSTATUS2JSON_H
+#ifndef EXHIBITION_BINARY2JSONEVENT_H
+#define EXHIBITION_BINARY2JSONEVENT_H
 
 #include <string>
 using namespace std;
 
-class CharArray2String{
+class CharArray2BinaryString{
 public:
     static string getBinaryString(const unsigned char* binaryStream, size_t size);
 };
 
-class ReadString{
+class ReadBinaryString{
 private:
     string binaryString_;
     size_t readIndex = 0;
 public:
-    explicit ReadString(string binaryString)
+    explicit ReadBinaryString(string binaryString)
         : binaryString_(std::move(binaryString)){}
 
-    ReadString& readByte(string& dest);
-    ReadString& readByte();
-    ReadString& read2Byte(string& dest);
-    ReadString& read2Byte();
-    ReadString& readBytes(string& dest, int readBytesNum);
-    ReadString& readBytes(int readBytesNum);
+    ReadBinaryString& readByte(string& dest);
+    ReadBinaryString& readByte();
+    ReadBinaryString& read2Byte(string& dest);
+    ReadBinaryString& read2Byte();
+    ReadBinaryString& readBytes(string& dest, int readBytesNum);
+    ReadBinaryString& readBytes(int readBytesNum);
 
     void reset() {readIndex = 0; }
     void rollBack(size_t n) {
-        if(readIndex - n >= 0)
-            readIndex -= n;
+        if(readIndex - n * 2 >= 0)
+            readIndex -= n * 2;
     }
     string remainingString(){ return binaryString_.substr(readIndex); }
 };
@@ -73,14 +73,14 @@ private:
 };
 
 
-class BinaryStringCmdUp{
+class BinaryString2JsonEvent{
 private:
     string binaryString_;
 public:
-    explicit BinaryStringCmdUp(string binaryString) : binaryString_(std::move(binaryString)){}
+    explicit BinaryString2JsonEvent(string binaryString) : binaryString_(std::move(binaryString)){}
 
-    string getResStatusString();
+    string getJsonStringEvent();
 };
 
 
-#endif //EXHIBITION_BINARYSTATUS2JSON_H
+#endif //EXHIBITION_BINARY2JSONEVENT_H

@@ -7,10 +7,8 @@
 
 #include "qlibc/QData.h"
 
-size_t getBleControlBinary(qlibc::QData& data, unsigned char* buf, size_t bufSize);
+size_t bleJsonCmd2Binaray(qlibc::QData& data, unsigned char* buf, size_t bufSize);
 
-size_t getBleCommandBinaray(qlibc::QData& data, unsigned char* buf, size_t bufSize);
-
-string binaryCommand2JsonString(unsigned char* buf, size_t bufSize);
+string binaryCommand2JsonStringEvent(unsigned char* buf, size_t bufSize);
 
 #endif //EXHIBITION_CONVERT_H

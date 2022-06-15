@@ -8,12 +8,13 @@
 
 #include <iostream>
 #include "qlibc/QData.h"
-#include "../bleConfigParam.h"
+#include "bleConfigParam.h"
 
 class JsonCmd2Binary{
 private:
     string pseudoCommand;
     string address;
+    string device_id;
 public:
     explicit JsonCmd2Binary(qlibc::QData& request){
        init(request);
@@ -38,7 +39,7 @@ private:
                 : binaryBuf_(buffer), size_(size){}
 
         void append(string& charString){
-            int charInt = 0;
+            int charInt;
             try{
                 charInt =  std::stoi(charString, nullptr, 16);
             }catch(std::exception& e){

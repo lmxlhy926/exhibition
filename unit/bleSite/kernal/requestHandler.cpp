@@ -7,15 +7,7 @@
 
 void downCmdHandler(qlibc::QData& cmdData){
     unsigned char buf[100]{};
-    size_t size = getBleCommandBinaray(cmdData, buf, 100);
-    for(int i = 0; i < size; i++){
-        printf("==>%2x\n", buf[i]);
-    }
-}
-
-void downControlHandler(qlibc::QData& controlData){
-    unsigned char buf[100]{};
-    size_t size = getBleControlBinary(controlData, buf, 100);
+    size_t size = bleJsonCmd2Binaray(cmdData, buf, 100);
     for(int i = 0; i < size; i++){
         printf("==>%2x\n", buf[i]);
     }

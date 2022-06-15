@@ -4,42 +4,17 @@
 
 #include "convert.h"
 #include "jsonCmd2Binary.h"
-#include "binaryStatus2Json.h"
-
-size_t getBleControlBinary(qlibc::QData& data, unsigned char* buf, size_t bufSize){
-    string pseudoCommand  = data.getData("request").getString("command");
-
-    string binaryControlString;
-    if(pseudoCommand == "scan"){
-        binaryControlString = "E9FF00";
-
-    }else if(pseudoCommand == "addDevice"){
-        binaryControlString = "E9FF08";
-        binaryControlString += data.getData("request").getString("device_id");
-
-    }else if(pseudoCommand == "deleteDevice"){
-
-    }
-    std::cout << "==>binaryControlString: " << binaryControlString << std::endl;
-
-    size_t size = JsonCmd2Binary::binaryString2binary(binaryControlString, buf, bufSize);
-
-    for(int i = 0; i < bufSize; i++){
-        printf("==>%2x\n", buf[i]);
-    }
-    return size;
-}
+#include "binary2JsonEvent.h"
 
 
-size_t getBleCommandBinaray(qlibc::QData& data, unsigned char* buf, size_t bufSize){
+size_t bleJsonCmd2Binaray(qlibc::QData& data, unsigned char* buf, size_t bufSize){
     std::cout << "===>getBleCommandBinaray: " << data.toJsonString() << std::endl;
     JsonCmd2Binary cmd(data);
     return cmd.getBinary(buf, bufSize);
 }
 
-
-string binaryCommand2JsonString(unsigned char* buf, size_t bufSize){
-    string binaryString = CharArray2String::getBinaryString(buf, bufSize);
-    BinaryStringCmdUp bscp(binaryString);
-    return bscp.getResStatusString();
+string binaryCommand2JsonStringEvent(unsigned char* buf, size_t bufSize){
+    string binaryString = CharArray2BinaryString::getBinaryString(buf, bufSize);
+    BinaryString2JsonEvent bs2je(binaryString);
+    return bs2je.getJsonStringEvent();
 }

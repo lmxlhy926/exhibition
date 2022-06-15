@@ -60,6 +60,50 @@
 }
 
 
+//控制设备
+{
+  "service_id": "control_device",
+  "request": {
+    "device_list": [
+      {
+        "device_id": "000D6F000DBE3EC4_01",
+        "command_list": [
+          {
+            "command_id": "power",
+            "command_para": "toggle"
+          }
+        ]
+      },
+      {
+        "device_id": "000D6F000DBE3EC4_02",
+        "command_list": [
+          {
+            "command_id": "power",
+            "command_para": "toggle"
+          }
+        ]
+      },
+      {
+        "device_id": "000D6F000DBE3EC4_03",
+        "command_list": [
+          {
+            "command_id": "power",
+            "command_para": "toggle"
+          }
+        ]
+      },
+      {
+        "device_id": "000D6F000DBE3EC4_04",
+        "command_list": [
+          {
+            "command_id": "power",
+            "command_para": "toggle"
+          }
+        ]
+      }
+    ]
+  }
+}
 
 
 
