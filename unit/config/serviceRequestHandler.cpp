@@ -140,11 +140,12 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
     qlibc::QData adapterResponse, zigBeeResponse, southResponse;
     deviceListRequest.setString("service_id", "get_device_list");
     deviceListRequest.putData("request", qlibc::QData());
+
     httpUtil::sitePostRequest(RequestIp, AdapterPort, deviceListRequest, adapterResponse);
     httpUtil::sitePostRequest(RequestIp, ZigBeeSitePort, deviceListRequest, zigBeeResponse);
     httpUtil::sitePostRequest(RequestIp, SouthPort, deviceListRequest, southResponse);
 
-    //初始返回了列表为空
+    //初始列表为空
     qlibc::QData data, initRes;
     initRes.setValue("device_list", Json::Value(Json::arrayValue));
     data.setInt("code", 0);

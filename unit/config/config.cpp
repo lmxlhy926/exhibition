@@ -26,26 +26,31 @@ static const string CONFIG_SITE_ID_NAME = "整体配置";
 
 int main(int argc, char* argv[]) {
 
+    //. 设置线程池
     httplib::ThreadPool threadPool_(30);
     std::atomic<bool> http_server_thread_end(false);
 
-    //设置配置文件加载路径
+    //. 配置本站点启动信息
+    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
+    serviceSiteManager->setServerPort(ConfigSitePort);
+    serviceSiteManager->setSiteIdSummary(CONFIG_SITE_ID, CONFIG_SITE_ID_NAME);
+
+    //. 设置配置文件加载路径
     configParamUtil* configPathPtr = configParamUtil::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
-    //加载http服务器配置信息，初始化云端对接类
+    //. 初始化cloudUtil, 加载http服务器配置信息
     QData httpConfigData = configPathPtr->getCloudServerData();
     const string dataDirPath = configPathPtr->getconfigPath();
     cloudUtil::getInstance()->init(httpConfigData.getString("ip"), httpConfigData.getInt("port"), dataDirPath);
 
-    //开启线程前，所有的单例已经创建完毕
-    //开启线程，阻塞进行电视加入大白名单
+    //. 开启线程，阻塞进行电视加入大白名单
     threadPool_.enqueue([](){
         cloudUtil::getInstance()->joinTvWhite();
     });
 
 
-    //加载mqtt配置信息
+    //. 获取mqtt配置参数
     QData mqttConfigData = configParamUtil::getInstance()->getMqttConfigData();
     std::string mqttServer = mqttConfigData.getString("server");
     int mqttPort = mqttConfigData.getInt("port");
@@ -79,10 +84,6 @@ int main(int argc, char* argv[]) {
     });
     mc.connect();
 
-    // 创建 serviceSiteManager 对象, 单例
-    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-    serviceSiteManager->setServerPort(ConfigSitePort);
-    serviceSiteManager->setSiteIdSummary(CONFIG_SITE_ID, CONFIG_SITE_ID_NAME);
 
     //注册请求场景列表处理函数
     serviceSiteManager->registerServiceRequestHandler(SCENELIST_REQUEST_SERVICE_ID,sceneListRequest_service_request_handler);
@@ -100,7 +101,7 @@ int main(int argc, char* argv[]) {
                                                       [&](const Request& request, Response& response) -> int{
         return whiteList_service_request_handler(request, response);
     });
-    //获取所有的设备列表
+    //获取灯控设备列表
     serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID,
                                                       [&](const Request& request, Response& response) -> int{
         return getAllDeviceList_service_request_handler(request, response);

@@ -7,12 +7,10 @@
 
 
 static const string RequestIp = "127.0.0.1";
+static const int ZigBeeSitePort = 9002;
+static const int ConfigSitePort = 9006;
 static const int AdapterPort = 9008;
 static const int SouthPort = 9010;
-static const int ConfigSitePort = 9006;
-static const int ZigBeeSitePort = 9002;
-
-
 
 //设备消息订阅ID
 static const string TVADAPTER_DEVICE_STATUS_MESSAGE_ID = "";        //tvAdapter设备消息订阅ID

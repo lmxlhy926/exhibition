@@ -5,13 +5,10 @@
         mqttConfig.json:    存储云端mqtt服务器的Ip和端口号
         record.json:        记录加入大白名单操作和电视注册操作
 
-    运行逻辑：
+    config.cpp运行逻辑：
         1. 设置配置文件加载路径
-        2. 加载http服务器地址，开启线程执行电视加入大白名单操作
+        2. 初始化cloudUtil: 加载http服务器地址，开启线程执行电视加入大白名单操作
         3. 加载mqtt服务器地址，设置回调函数和预处理函数，订阅相关主题，连接服务器。
-        4. 设置服务回调函数：
-                *请求场景列表  :  向云端请求
-                *子设备注册    :  向云端请求
-                *获取家庭域Id  :  安装师傅app上传后，存储下来的
-                *安装师傅信息上传请求函数： 安装app上传
-                *电视发声： 收到消息后发布出去
+        4. 设置服务回调函数
+
+/data/changhong/edge_midware/config /data/changhong/chiotedge/paramData &

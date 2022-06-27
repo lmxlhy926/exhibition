@@ -15,10 +15,15 @@
 using namespace std;
 
 
+/**
+ * 1. 获取tv信息
+ * 2. 加入大白名单
+ * 3. 电视注册
+ */
 class cloudUtil {
 private:
-    string serverIp;        //http服务器Ip
-    int serverPort;         //http服务器端口号
+    string serverIp;        //云端http服务器Ip
+    int serverPort;         //云端http服务器端口号
     string dataDirPath;     //配置文件路径
     static cloudUtil* instance;
 
@@ -33,6 +38,7 @@ public:
     //初始化http服务器配置参数
     void init(const string&  ip, int port, const string& dataDirectoryPath);
 
+    //从Adapter站点获取tvMac
     static bool getTvInfo(string& tvMac, string& tvName, string& tvModel);
 
     //阻塞，直到成功为止

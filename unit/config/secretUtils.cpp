@@ -279,7 +279,7 @@ namespace lhytemp{
         }
 
         //BASE64加密
-        char encodeOut[10240*10]{};
+        char encodeOut[1024*10]{};
         int encodeOutLength = 1024*10;
         int base64EncodedLen = secretUtil::Base64_encode(encodeOut, encodeOutLength, dataWithPadding, encryptLength);
 

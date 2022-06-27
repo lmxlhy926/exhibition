@@ -32,7 +32,7 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 //获取白名单列表
 int whiteList_service_request_handler(const Request& request, Response& response);
 
-//获取所有设备列表
+//获取灯控设备设备列表
 int getAllDeviceList_service_request_handler(const Request& request, Response& response);
 
 //电视发声

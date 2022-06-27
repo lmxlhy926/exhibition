@@ -13,7 +13,9 @@
 using namespace qlibc;
 using namespace servicesite;
 
-
+/*
+ * 接收转换白名单，存储，发布
+ */
 bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int len) {
     qlibc::QData payload(payloadReceive, len);
     if(payload.type() == Json::nullValue){
@@ -26,7 +28,6 @@ bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int le
     Json::ArrayIndex devicesItemCount = devices.size();
 
     qlibc::QData deviceDataList;
-
 
     for (int i = 0; i < devicesItemCount; i++) {
         qlibc::QData ithData;
@@ -70,7 +71,6 @@ bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int le
         string categoryCode = ithData.getString("categoryCode");
         if(categoryCode == "light"){
             dataObject.setString("device_type", ithData.getString("productUsed"));
-            //lighDataList.append(dataObject);
         }
 
 
@@ -90,7 +90,6 @@ bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int le
         deviceDataList.append(dataObject);
     }
 
-    //传递白名单给ipvdal
     payload.asValue()["info"]["devices"] = deviceDataList.asValue();
     string timeStr = std::to_string(time(nullptr));
     payload.setString("timeStamp", timeStr);

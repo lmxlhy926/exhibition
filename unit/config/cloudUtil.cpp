@@ -138,7 +138,6 @@ bool cloudUtil::tvRegister(mqttClient& mc, qlibc::QData& engineerInfo, qlibc::QD
 
     //将安装师傅信息存入文件
     qlibc::QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
-
     string tvDid = baseInfoData.getString("tvDid");
     time_t seconds = time(nullptr);
 
@@ -157,8 +156,8 @@ bool cloudUtil::tvRegister(mqttClient& mc, qlibc::QData& engineerInfo, qlibc::QD
     message2Handle.setValue("param", paramData);
 
     ecb_httppost("/logic-device/edge/tvRegister", message2Handle, returnMessage);
+    responseData.setInitData(returnMessage);
     if(returnMessage.getInt("code") != 200){    //如果注册不成功
-        responseData.setInitData(returnMessage);
         return false;
     }
 
@@ -170,8 +169,6 @@ bool cloudUtil::tvRegister(mqttClient& mc, qlibc::QData& engineerInfo, qlibc::QD
 
     recordData.setBool("tvRegister", true);
     configParamUtil::getInstance()->saveRecordData(recordData);
-
-    responseData.setInitData(returnMessage);
 
    //订阅相关的主题
     string domainID = engineerInfo.getString("domainID");

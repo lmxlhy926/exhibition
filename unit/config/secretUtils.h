@@ -64,18 +64,11 @@ namespace lhytemp{
          * 1. 如果秘钥文件不存在，则生成秘钥文件
          * 2. 从秘钥文件中提取出pub_key
          * 3. 用事先提供的固定秘钥，加密从秘钥文件中提取出的pub_key
-         * @param dirPath
-         * @param baseInfoFile
-         * @return
          */
         static string getSecretMsg(const string& dirPath);
 
         /**
          * 用生成的秘钥文件加密<tvDid+second>
-         * @param tvDid
-         * @param second
-         * @param dir
-         * @return
          */
         static string getTvSign(string& tvDid, const string& second, const string& dir);
 
