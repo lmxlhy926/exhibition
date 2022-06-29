@@ -6,12 +6,17 @@
 #define EXHIBITION_BLECONFIGPARAM_H
 
 #include "qlibc/QData.h"
+#include "serial/BLETelinkDongle.h"
+#include <memory>
+
 using namespace qlibc;
 
 class bleConfigParam {
 private:
-    string dataDirPath;                 //配置文件路径
-    QData bleParamData;                 //蓝牙命令配置数据
+    string dataDirPath;                         //配置文件路径
+    QData bleParamData;                         //蓝牙命令配置数据
+    QData serialData;                           //串口配置数据
+    std::shared_ptr<BLETelinkDongle> serial;    //串口
     static bleConfigParam* instance;
     std::recursive_mutex mutex_;
 
@@ -27,6 +32,9 @@ public:
 
     QData getBleParamData();
 
+    QData getSerialData();
+
+    shared_ptr<BLETelinkDongle> getSerial();
 };
 
 

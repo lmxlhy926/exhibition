@@ -4,6 +4,7 @@
 
 #include "bleConfigParam.h"
 #include "qlibc/FileUtils.h"
+#include <iostream>
 
 bleConfigParam* bleConfigParam::instance = nullptr;
 
@@ -29,5 +30,35 @@ QData bleConfigParam::getBleParamData() {
     }
     return bleParamData;
 }
+
+QData bleConfigParam::getSerialData() {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    if(serialData.empty()){
+        serialData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/serialConfig.json"));
+    }
+    return serialData;
+}
+
+shared_ptr<BLETelinkDongle> bleConfigParam::getSerial() {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    if(serial == nullptr){
+        string serialPort = getSerialData().getString("serial");
+        std::cout << "===>serialPort: " << serialPort << std::endl;
+        serial.reset(new BLETelinkDongle(serialPort));
+        serial->initDongle();
+        if(!serial->startDongle()){
+            std::cout << "===>failed in startDongle" << std::endl;
+            serial.reset();
+        }else{
+            std::cout << "===>success in startDongle" << std::endl;
+        }
+    }
+    return serial;
+}
+
+
+
+
+
 
 

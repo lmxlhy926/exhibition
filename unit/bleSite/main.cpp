@@ -8,7 +8,7 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 
-#include "bleConfigParam.h"
+#include "formatTrans/bleConfigParam.h"
 #include "qlibc/FileUtils.h"
 #include "serviceRequestHandler.h"
 #include "paramConfig.h"
