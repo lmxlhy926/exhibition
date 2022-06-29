@@ -12,12 +12,16 @@ using namespace std;
 const int BleSitePort = 60009;
 
 //服务ID
-const string Ble_Device_Control_Service_ID = "BleDeviceControl";
-
-const string Ble_Device_Command_Service_ID = "BleDeviceCommand";
+static const string Ble_Device_Command_Service_ID = "BleDeviceCommand";
 
 
-
+//控制命令
+#define SCAN                        "scan"
+#define SCANEND                     "scanEnd"
+#define CONNECT                     "connect"
+#define ASSIGN_GATEWAY_ADDRESS      "assignGateWayAddress"
+#define ASSIGN_NODE_ADDRESS         "assignNodeAddress"
+#define BIND                        "bind"
 
 
 #endif //EXHIBITION_PARAMCONFIG_H

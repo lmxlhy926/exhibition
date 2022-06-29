@@ -10,8 +10,8 @@ using namespace qlibc;
 
 class bleConfigParam {
 private:
-    string dataDirPath;
-    QData bleParamData;
+    string dataDirPath;                 //配置文件路径
+    QData bleParamData;                 //蓝牙命令配置数据
     static bleConfigParam* instance;
     std::recursive_mutex mutex_;
 

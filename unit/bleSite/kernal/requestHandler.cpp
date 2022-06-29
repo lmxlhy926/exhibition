@@ -9,6 +9,6 @@ void downCmdHandler(qlibc::QData& cmdData){
     unsigned char buf[100]{};
     size_t size = bleJsonCmd2Binaray(cmdData, buf, 100);
     for(int i = 0; i < size; i++){
-        printf("==>%2x\n", buf[i]);
+        printf("==>%2X\n", buf[i]);
     }
 }

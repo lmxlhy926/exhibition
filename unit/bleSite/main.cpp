@@ -28,13 +28,13 @@ int main(int argc, char* argv[]) {
     httplib::ThreadPool threadPool_(30);
     std::atomic<bool> http_server_thread_end(false);
 
-    //设置配置文件加载路径, 加载配置文件
-    bleConfigParam* configPathPtr = bleConfigParam::getInstance();
-    configPathPtr->setConfigPath(string(argv[1]));
-
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->setServerPort(BleSitePort);
+
+    //设置配置文件加载路径, 加载配置文件
+    bleConfigParam* configPathPtr = bleConfigParam::getInstance();
+    configPathPtr->setConfigPath(string(argv[1]));
 
     //注册蓝牙命令handler
     serviceSiteManager->registerServiceRequestHandler(Ble_Device_Command_Service_ID,

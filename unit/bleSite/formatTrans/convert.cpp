@@ -6,6 +6,7 @@
 #include "jsonCmd2Binary.h"
 #include "binary2JsonEvent.h"
 #include "controlCmd.h"
+#include "../paramConfig.h"
 
 
 size_t bleJsonCmd2Binaray(qlibc::QData& data, unsigned char* buf, size_t bufSize){
@@ -15,7 +16,9 @@ size_t bleJsonCmd2Binaray(qlibc::QData& data, unsigned char* buf, size_t bufSize
     if(pseudoCommand == "turnOn" || pseudoCommand == "turnOff"){
         return LightOnOff(data).getBinary(buf, bufSize);
 
-    }else if(pseudoCommand == "scan" || pseudoCommand == "add" || pseudoCommand == "delete"){
+    }else if(pseudoCommand == SCAN || pseudoCommand == SCANEND ||
+             pseudoCommand == CONNECT || pseudoCommand == ASSIGN_GATEWAY_ADDRESS ||
+             pseudoCommand == ASSIGN_NODE_ADDRESS || pseudoCommand == BIND){
         return LightScanAddDel(data).getBinary(buf, bufSize);
     }
 

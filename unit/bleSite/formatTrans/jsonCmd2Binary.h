@@ -12,13 +12,28 @@
 
 class JsonCmd2Binary{
 public:
-    //获取二进制格式蓝牙命令
+    /**
+     * 获取二进制控制命令
+     * @param buf       存放二进制命令的数组
+     * @param bufSize   数组的容量
+     * @return
+     */
     virtual size_t getBinary(unsigned char* buf, size_t bufSize) = 0;
 
-    //获取构造的字符串形式的二进制数据
+    /**
+     * 获取二进制命令的字符串表示
+     * @param bleConfigData 填入参数后的蓝牙格式数据
+     * @return  二进制命令的字符串表示
+     */
     static string getBinaryString(qlibc::QData& bleConfigData);
 
-    //将字符串转换为二进制格式
+    /**
+     * 将二进制命令的字符串表示转换为二进制表示
+     * @param binaryString  二进制命令的字符串表示
+     * @param buf   存放二进制命令的数组
+     * @param size  数据大小
+     * @return  二进制命令实际占用的字节数
+     */
     static size_t binaryString2binary(string& binaryString, unsigned char* buf, size_t size);
 private:
     class BinaryBuf{
@@ -38,8 +53,13 @@ private:
                 charInt = 0;
             }
             if(count_ < size_){
-                binaryBuf_[count_] = static_cast<unsigned char>(charInt);
-                count_++;
+                binaryBuf_[count_++] = static_cast<unsigned char>(charInt);
+            }
+        }
+
+        void append(char c){
+            if(count_ < size_){
+                binaryBuf_[count_++] = c;
             }
         }
 
