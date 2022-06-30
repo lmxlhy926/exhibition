@@ -8,10 +8,13 @@
 #include "qlibc/QData.h"
 #include "serial/BLETelinkDongle.h"
 #include <memory>
+#include <functional>
 
 using namespace qlibc;
 
 class bleConfigParam {
+public:
+    using SerialReceiveFunc = bool(unsigned char*, int);
 private:
     string dataDirPath;                         //配置文件路径
     QData bleParamData;                         //蓝牙命令配置数据
@@ -33,6 +36,8 @@ public:
     QData getBleParamData();
 
     QData getSerialData();
+
+    bool serialInit(SerialReceiveFunc receiveFuc);
 
     shared_ptr<BLETelinkDongle> getSerial();
 };

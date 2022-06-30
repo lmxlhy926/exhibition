@@ -14,4 +14,4 @@ target_link_libraries(ble_site PRIVATE common)
 target_link_libraries(ble_site PRIVATE format)
 target_link_libraries(ble_site PRIVATE serial)
 
-#add_subdirectory(test)
+add_subdirectory(test)

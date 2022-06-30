@@ -22,6 +22,14 @@ using json = nlohmann::json;
 static const string SYNERGY_SITE_ID = "BLE";
 static const string SYNERGY_SITE_ID_NAME = "BLE";
 
+bool serialReceive(unsigned char *data, int len){
+    printf("===>serialReceive....\n");
+    for(int i = 0; i < len; i++){
+        printf("%2X", data[i]);
+    }
+    printf("\n");
+    return true;
+}
 
 int main(int argc, char* argv[]) {
 
@@ -35,6 +43,16 @@ int main(int argc, char* argv[]) {
     //设置配置文件加载路径, 加载配置文件
     bleConfigParam* configPathPtr = bleConfigParam::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
+
+    //打开串口
+    while(!configPathPtr->serialInit(serialReceive)){
+        std::cout << "==>failed to open the serial<"
+                  << configPathPtr->getSerialData().getString("serial") << ">...." << std::endl;
+        std::cout << "===>try to open in 3 seconds....." << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
+    std::cout << "===>success in open serial<"
+              << configPathPtr->getSerialData().getString("serial") << ">...." << std::endl;
 
     //注册蓝牙命令handler
     serviceSiteManager->registerServiceRequestHandler(Ble_Device_Command_Service_ID,

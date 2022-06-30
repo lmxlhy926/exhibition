@@ -39,20 +39,28 @@ QData bleConfigParam::getSerialData() {
     return serialData;
 }
 
-shared_ptr<BLETelinkDongle> bleConfigParam::getSerial() {
+bool bleConfigParam::serialInit(bleConfigParam::SerialReceiveFunc receiveFuc) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(serial == nullptr){
         string serialPort = getSerialData().getString("serial");
         std::cout << "===>serialPort: " << serialPort << std::endl;
         serial.reset(new BLETelinkDongle(serialPort));
         serial->initDongle();
+        serial->regRecvDataProc(receiveFuc);
         if(!serial->startDongle()){
             std::cout << "===>failed in startDongle" << std::endl;
             serial.reset();
+            return false;
         }else{
             std::cout << "===>success in startDongle" << std::endl;
+            return true;
         }
     }
+    return false;
+}
+
+shared_ptr<BLETelinkDongle> bleConfigParam::getSerial() {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
     return serial;
 }
 
