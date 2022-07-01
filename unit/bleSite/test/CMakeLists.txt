@@ -10,3 +10,11 @@ target_link_libraries(httpRequest PRIVATE serial)
 target_link_libraries(httpRequest PRIVATE socket)
 
 
+
+add_executable(bleSiteRequest bleRequest.cpp)
+target_link_libraries(bleSiteRequest PRIVATE qlibc)
+target_link_libraries(bleSiteRequest PRIVATE format)
+target_link_libraries(bleSiteRequest PRIVATE serial)
+target_link_libraries(bleSiteRequest PRIVATE socket)
+
+

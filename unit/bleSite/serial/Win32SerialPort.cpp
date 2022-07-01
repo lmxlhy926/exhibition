@@ -166,6 +166,7 @@ bool Win32SerialPort::writeSerialData(uint8_t *buff, int32_t len) {
     int8_t count = 5;
     DWORD dwWrite_byte = 0;
     OVERLAPPED ov;
+    uint8_t _mdata[128] = {0x00};
 
     if(!is_opened)
         return false;
@@ -212,8 +213,8 @@ bool Win32SerialPort::writeSerialData(uint8_t *buff, int32_t len) {
         return false;
     }
 
-    bResult = WriteFile(m_hCom, buff, len, &dwWrite_byte, &ov);
-
+    memcpy(_mdata, buff, len);
+    bResult = WriteFile(m_hCom, _mdata, len, &dwWrite_byte, &ov);
     // deal with any error codes
     if (!bResult)
     {
@@ -306,8 +307,8 @@ void Win32SerialPort::procSerialData() {
             break;
 
         BytesRead = std::min(BytesRead, static_cast<DWORD>(ival_comm_buff_size - mBuffLen));
-
         bResult = ReadFile(m_hCom, (mSerialDataBuff + mBuffLen), BytesRead, &BytesRead, &ov);
+
         if (!bResult)
         {
             switch (dwError = GetLastError())

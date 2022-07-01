@@ -4,6 +4,7 @@
 #include <atomic>
 #include <cstdio>
 #include <functional>
+#include <sstream>
 
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
@@ -23,11 +24,41 @@ static const string SYNERGY_SITE_ID = "BLE";
 static const string SYNERGY_SITE_ID_NAME = "BLE";
 
 bool serialReceive(unsigned char *data, int len){
-    printf("===>serialReceive....\n");
-    for(int i = 0; i < len; i++){
-        printf("%2X", data[i]);
+    std::cout << "===>before decrypt>: ";
+    for(int i = 0; i < len; i++)
+        printf("%02X ", data[i]);
+    printf("\n######################\n");
+
+    stringstream ss;
+
+    for( int i = 0; i < len; i++){
+        ss << std::setw(2) << std::setfill('0') << std::hex << data[i] << " ";
     }
-    printf("\n");
+    ss << std::endl;
+    printf("%s\n", ss.str().c_str());
+    std::cout << ss.str() << std::endl;
+
+    if(len > 512)   return true;
+    int index = 0;
+    unsigned char buf[512];
+    memset(buf, 0, 512);
+
+    if(data[0] == 0x01 && data[len - 1] == 0x03){
+        for(int i = 1; i < len - 1; i++){
+            if(data[i] == 0x02){
+                buf[index++] = data[i + 1] & 0x0f;
+                i = i + 1;
+            }else{
+                buf[index++] = data[i];
+            }
+        }
+    }
+
+    std::cout << "===>after decrypt>: ";
+    for( int i = 0; i < index; i++){
+        std::cout << std::setw(2) << std::setfill('0') << std::hex << buf[i] << " ";
+    }
+    std::cout << std::endl;
     return true;
 }
 

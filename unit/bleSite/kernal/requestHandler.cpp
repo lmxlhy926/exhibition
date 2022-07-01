@@ -6,6 +6,9 @@
 #include "formatTrans/convert.h"
 #include "serial/BLETelinkDongle.h"
 #include "formatTrans/bleConfigParam.h"
+#include <mutex>
+
+std::mutex sendMutex;
 
 void downCmdHandler(qlibc::QData& cmdData){
     unsigned char buf[100]{};
@@ -17,6 +20,7 @@ void downCmdHandler(qlibc::QData& cmdData){
 
     shared_ptr<BLETelinkDongle> serial = bleConfigParam::getInstance()->getSerial();
     if(serial != nullptr){
+        std::lock_guard<std::mutex> lg(sendMutex);
         if(serial->sendData(buf, static_cast<int>(size))){
             printf("===>send success....\n");
         }
