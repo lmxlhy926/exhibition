@@ -2,8 +2,8 @@
 // Created by 78472 on 2022/6/7.
 //
 
-#ifndef EXHIBITION_BLECONFIGPARAM_H
-#define EXHIBITION_BLECONFIGPARAM_H
+#ifndef EXHIBITION_BLECONFIG_H
+#define EXHIBITION_BLECONFIG_H
 
 #include "qlibc/QData.h"
 #include "serial/BLETelinkDongle.h"
@@ -12,7 +12,7 @@
 
 using namespace qlibc;
 
-class bleConfigParam {
+class bleConfig {
 public:
     using SerialReceiveFunc = bool(unsigned char*, int);
 private:
@@ -20,14 +20,14 @@ private:
     QData bleParamData;                         //蓝牙命令配置数据
     QData serialData;                           //串口配置数据
     std::shared_ptr<BLETelinkDongle> serial;    //串口
-    static bleConfigParam* instance;
+    static bleConfig* instance;
     std::recursive_mutex mutex_;
 
 private:
-    bleConfigParam() = default;
+    bleConfig() = default;
 
 public:
-    static bleConfigParam* getInstance();
+    static bleConfig* getInstance();
 
     void setConfigPath(const string &configPath);
 
@@ -43,4 +43,4 @@ public:
 };
 
 
-#endif //EXHIBITION_BLECONFIGPARAM_H
+#endif //EXHIBITION_BLECONFIG_H

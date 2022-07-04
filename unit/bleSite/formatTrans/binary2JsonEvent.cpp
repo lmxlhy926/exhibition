@@ -4,109 +4,55 @@
 
 #include "binary2JsonEvent.h"
 #include <iostream>
+#include <cstring>
+#include <iomanip>
 
-#define HIGH4BITS(uc) (((uc) >> 4) & 0x0f)
-#define LOW4BITS(uc)  (((uc) >> 0) & 0x0f)
+bool Binary2JsonEvent::binary2JsonEvent(unsigned char *binaryStream, int size) {
+    if(size > 512)  return false;
 
-string CharArray2BinaryString::getBinaryString(const unsigned char *binaryStream, size_t size) {
-    const char digitsHex[] = "0123456789ABCDEF";
-    string data;
-    for(size_t i = 0; i < size; i++){
-        unsigned char chr = binaryStream[i];
-        data.append(1, digitsHex[HIGH4BITS(chr)]);
-        data.append(1, digitsHex[LOW4BITS(chr)]);
+    int index = 0;
+    unsigned char buf[512];
+    memset(buf, 0, 512);
+
+    if(binaryStream[0] == 0x01 && binaryStream[ size- 1] == 0x03){
+        for(int i = 1; i < size - 1; i++){
+            if(binaryStream[i] == 0x02){
+                buf[index++] = binaryStream[i + 1] & 0x0f;
+                ++i;
+            }else{
+                buf[index++] = binaryStream[i];
+            }
+        }
+
+        stringstream ss;
+        for( int i = 0; i < index; i++){
+            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << static_cast<int>(buf[i]);
+        }
+
+        string binaryString = ss.str();
+        printBinaryString(binaryString);
+        postEvent(binaryString);
+
+       return true;
     }
-    return data;
+
+    return false;
 }
 
-ReadBinaryString &ReadBinaryString::readByte(string &dest) {
-    if(binaryString_.size() - readIndex >= 2){
-        dest = binaryString_.substr(readIndex, 2);
-        readIndex += 2;
+
+void Binary2JsonEvent::printBinaryString(string &str) {
+    stringstream ss;
+    for(int i = 0; i < str.size() / 2; ++i){
+        ss << str.substr(i * 2, 2);
+        if(i < str.size() / 2 - 1)
+            ss << " ";
     }
-    return *this;
+    std::cout << "==>serial receive: " << ss.str() << std::endl;
 }
 
-ReadBinaryString &ReadBinaryString::readByte() {
-    if(binaryString_.size() - readIndex >= 2){
-        readIndex += 2;
-    }
-    return *this;
-}
-
-ReadBinaryString &ReadBinaryString::read2Byte(string &dest) {
-    if(binaryString_.size() - readIndex >= 4){
-        dest = binaryString_.substr(readIndex, 4);
-        readIndex += 4;
-    }
-    return *this;
-}
-
-ReadBinaryString &ReadBinaryString::read2Byte() {
-    if(binaryString_.size() - readIndex >= 4){
-        readIndex += 4;
-    }
-    return *this;
-}
-
-ReadBinaryString &ReadBinaryString::readBytes(string &dest, int readBytesNum) {
-    if(binaryString_.size() - readIndex >= readBytesNum * 2){
-        dest = binaryString_.substr(readIndex, readBytesNum * 2);
-        readIndex += readBytesNum * 2;
-    }
-    return *this;
-}
-
-ReadBinaryString &ReadBinaryString::readBytes(int readBytesNum) {
-    if(binaryString_.size() - readIndex >= readBytesNum * 2){
-        readIndex += readBytesNum * 2;
-    }
-    return *this;
-}
-
-string LightOnOffStatus::construct() {
-    return
-        unicast_address + '-' +
-        group_address   + '-' +
-        opcode          + '-' +
-        present_onOff   + '-' +
-        target_onOff    + '-' +
-        remaining_time;
-}
-
-void LightOnOffStatus::init() {
-    ReadBinaryString rs(sourceData);
-    rs.read2Byte(unicast_address);
-    rs.read2Byte(group_address);
-    rs.read2Byte(opcode);
-    rs.readByte(present_onOff);
-    rs.readByte(target_onOff);
-    rs.readByte(remaining_time);
-}
-
-string LightBrightStatus::construct() {
-    return
-            unicast_address + '-' +
-            group_address   + '-' +
-            opcode          + '-' +
-            present_lightness   + '-' +
-            target_lightness    + '-' +
-            remaining_time;
-}
-
-void LightBrightStatus::init() {
-    ReadBinaryString rs(sourceData);
-    rs.read2Byte(unicast_address);
-    rs.read2Byte(group_address);
-    rs.read2Byte(opcode);
-    rs.read2Byte(present_lightness);
-    rs.read2Byte(target_lightness);
-    rs.readByte(remaining_time);
-}
-
-string BinaryString2JsonEvent::getJsonStringEvent() {
+void Binary2JsonEvent::postEvent(string &statusString) {
     string hciType, subType, packageIndex;
-    ReadBinaryString rs(binaryString_);
+    ReadBinaryString rs(statusString);
     rs.read2Byte().readByte(hciType).readByte(subType).readByte(packageIndex);
 
     if(hciType == "91" && subType == "81"){
@@ -114,12 +60,12 @@ string BinaryString2JsonEvent::getJsonStringEvent() {
         rs.read2Byte().read2Byte().read2Byte(opcode);
         if(opcode == "8204"){
             rs.rollBack(6);
-            return LightOnOffStatus(rs.remainingString()).construct();
+            std::cout << "==>LightOnOffStatus: " << LightOnOffStatus(rs.remainingString()).construct() << std::endl;
 
         }else if(opcode == "824E"){
             rs.rollBack(6);
-            return LightBrightStatus(rs.remainingString()).construct();
+            std::cout << "==>LightBrightStatus: " << LightBrightStatus(rs.remainingString()).construct() << std::endl;
         }
     }
-    return string();
 }
+

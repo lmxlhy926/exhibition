@@ -2,28 +2,28 @@
 // Created by 78472 on 2022/6/7.
 //
 
-#include "bleConfigParam.h"
+#include "bleConfig.h"
 #include "qlibc/FileUtils.h"
 #include <iostream>
 
-bleConfigParam* bleConfigParam::instance = nullptr;
+bleConfig* bleConfig::instance = nullptr;
 
-bleConfigParam* bleConfigParam::getInstance() {
+bleConfig* bleConfig::getInstance() {
     if(instance == nullptr)
-        instance = new bleConfigParam;
+        instance = new bleConfig;
     return instance;
 }
 
-void bleConfigParam::setConfigPath(const string& configPath) {
+void bleConfig::setConfigPath(const string& configPath) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     dataDirPath = configPath;
 }
 
-string bleConfigParam::getconfigPath() {
+string bleConfig::getconfigPath() {
     return dataDirPath;
 }
 
-QData bleConfigParam::getBleParamData() {
+QData bleConfig::getBleParamData() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(bleParamData.empty()){
         bleParamData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/bleCommand.json"));
@@ -31,7 +31,7 @@ QData bleConfigParam::getBleParamData() {
     return bleParamData;
 }
 
-QData bleConfigParam::getSerialData() {
+QData bleConfig::getSerialData() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(serialData.empty()){
         serialData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/serialConfig.json"));
@@ -39,7 +39,7 @@ QData bleConfigParam::getSerialData() {
     return serialData;
 }
 
-bool bleConfigParam::serialInit(bleConfigParam::SerialReceiveFunc receiveFuc) {
+bool bleConfig::serialInit(bleConfig::SerialReceiveFunc receiveFuc) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(serial == nullptr){
         string serialPort = getSerialData().getString("serial");
@@ -59,7 +59,7 @@ bool bleConfigParam::serialInit(bleConfigParam::SerialReceiveFunc receiveFuc) {
     return false;
 }
 
-shared_ptr<BLETelinkDongle> bleConfigParam::getSerial() {
+shared_ptr<BLETelinkDongle> bleConfig::getSerial() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     return serial;
 }

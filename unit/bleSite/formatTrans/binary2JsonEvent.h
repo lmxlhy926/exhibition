@@ -6,80 +6,22 @@
 #define EXHIBITION_BINARY2JSONEVENT_H
 
 #include <string>
+#include <iostream>
+#include <sstream>
+#include "upStatus.h"
 using namespace std;
 
-class CharArray2BinaryString{
+class Binary2JsonEvent{
 public:
-    static string getBinaryString(const unsigned char* binaryStream, size_t size);
-};
+    explicit Binary2JsonEvent() = default;
 
-class ReadBinaryString{
-private:
-    string binaryString_;
-    size_t readIndex = 0;
-public:
-    explicit ReadBinaryString(string binaryString)
-        : binaryString_(std::move(binaryString)){}
+    //接收串口返回，产生相应的事件
+    static bool binary2JsonEvent(unsigned char* binaryStream, int size);
 
-    ReadBinaryString& readByte(string& dest);
-    ReadBinaryString& readByte();
-    ReadBinaryString& read2Byte(string& dest);
-    ReadBinaryString& read2Byte();
-    ReadBinaryString& readBytes(string& dest, int readBytesNum);
-    ReadBinaryString& readBytes(int readBytesNum);
+    //打印收到的响应
+    static void printBinaryString(string& str);
 
-    void reset() {readIndex = 0; }
-    void rollBack(size_t n) {
-        if(readIndex - n * 2 >= 0)
-            readIndex -= n * 2;
-    }
-    string remainingString(){ return binaryString_.substr(readIndex); }
-};
-
-class LightOnOffStatus{
-private:
-    string sourceData;
-    string unicast_address;
-    string group_address;
-    string opcode;
-    string present_onOff;
-    string target_onOff;
-    string remaining_time;
-public:
-    explicit LightOnOffStatus(string data) : sourceData(std::move(data)){
-        init();
-    }
-    string construct();
-private:
-    void init();
-};
-
-class LightBrightStatus{
-private:
-    string sourceData;
-    string unicast_address;
-    string group_address;
-    string opcode;
-    string present_lightness;
-    string target_lightness;
-    string remaining_time;
-public:
-    explicit LightBrightStatus(string data) : sourceData(std::move(data)){
-        init();
-    }
-    string construct();
-private:
-    void init();
-};
-
-
-class BinaryString2JsonEvent{
-private:
-    string binaryString_;
-public:
-    explicit BinaryString2JsonEvent(string binaryString) : binaryString_(std::move(binaryString)){}
-
-    string getJsonStringEvent();
+    static void postEvent(string& statusString);
 };
 
 

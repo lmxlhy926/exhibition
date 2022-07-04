@@ -2,7 +2,7 @@
 // Created by 78472 on 2022/6/7.
 //
 
-#include "jsonCmd2Binary.h"
+#include "JsonCmd2Binary.h"
 
 string JsonCmd2Binary::getBinaryString(QData &bleConfigData) {
     std::vector<string> commonBaseParamOrderVec;
@@ -51,9 +51,6 @@ size_t JsonCmd2Binary::binaryString2binary(string &binaryString, unsigned char *
     for(int i = 0; i < binaryString.size() / 2; i++){
         string charString = binaryString.substr(i * 2, 2);
         binaryBuf.append(charString);
-//        if(i != binaryString.size() / 2 - 1){
-//            binaryBuf.append(' ');
-//        }
     }
     return binaryBuf.size();
 }

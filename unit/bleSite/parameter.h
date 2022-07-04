@@ -2,8 +2,8 @@
 // Created by 78472 on 2022/5/18.
 //
 
-#ifndef EXHIBITION_PARAMCONFIG_H
-#define EXHIBITION_PARAMCONFIG_H
+#ifndef EXHIBITION_PARAMETER_H
+#define EXHIBITION_PARAMETER_H
 
 #include <string>
 
@@ -24,4 +24,4 @@ static const string Ble_Device_Command_Service_ID = "BleDeviceCommand";
 #define BIND                        "bind"
 
 
-#endif //EXHIBITION_PARAMCONFIG_H
+#endif //EXHIBITION_PARAMETER_H

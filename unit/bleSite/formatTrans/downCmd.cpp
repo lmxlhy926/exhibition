@@ -2,9 +2,26 @@
 // Created by 78472 on 2022/6/15.
 //
 
-#include "controlCmd.h"
-#include "bleConfigParam.h"
-#include "../paramConfig.h"
+#include "downCmd.h"
+#include "../parameter.h"
+
+
+size_t bleJsonCmd2Binaray(qlibc::QData& data, unsigned char* buf, size_t bufSize){
+    std::cout << "===>getBleCommandBinaray: " << data.toJsonString() << std::endl;
+    string pseudoCommand  = data.getData("request").getString("command");
+
+    if(pseudoCommand == "turnOn" || pseudoCommand == "turnOff"){
+        return LightOnOff(data).getBinary(buf, bufSize);
+
+    }else if(pseudoCommand == SCAN || pseudoCommand == SCANEND ||
+             pseudoCommand == CONNECT || pseudoCommand == ASSIGN_GATEWAY_ADDRESS ||
+             pseudoCommand == ASSIGN_NODE_ADDRESS || pseudoCommand == BIND){
+        return LightScanAddDel(data).getBinary(buf, bufSize);
+    }
+
+    return 0;
+}
+
 
 void LightScanAddDel::init(QData &data) {
     pseudoCommand  = data.getData("request").getString("command");
@@ -12,7 +29,7 @@ void LightScanAddDel::init(QData &data) {
 }
 
 size_t LightScanAddDel::getBinary(unsigned char *buf, size_t bufSize) {
-    qlibc::QData thisBleConfigData = bleConfigParam::getInstance()->getBleParamData();
+    qlibc::QData thisBleConfigData = bleConfig::getInstance()->getBleParamData();
     string binaryString;
 
     if(pseudoCommand == SCAN){
@@ -43,7 +60,7 @@ void LightOnOff::init(qlibc::QData &data) {
 }
 
 size_t LightOnOff::getBinary(unsigned char *buf, size_t bufSize) {
-    qlibc::QData thisBleConfigData = bleConfigParam::getInstance()->getBleParamData();
+    qlibc::QData thisBleConfigData = bleConfig::getInstance()->getBleParamData();
     thisBleConfigData.asValue()["commonBase"]["param"]["ADDRESS_DEST"] = address;
     thisBleConfigData.asValue()["commonBase"]["param"]["OPERATION"] = pseudoCommand;
 

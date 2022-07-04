@@ -8,12 +8,12 @@
 
 #include <iostream>
 #include "qlibc/QData.h"
-#include "bleConfigParam.h"
+#include "bleConfig.h"
 
 class JsonCmd2Binary{
 public:
     /**
-     * 获取二进制控制命令
+     * 获取二进制控制命令，各个具体派生类实现
      * @param buf       存放二进制命令的数组
      * @param bufSize   数组的容量
      * @return
@@ -35,6 +35,7 @@ public:
      * @return  二进制命令实际占用的字节数
      */
     static size_t binaryString2binary(string& binaryString, unsigned char* buf, size_t size);
+
 private:
     class BinaryBuf{
     private:

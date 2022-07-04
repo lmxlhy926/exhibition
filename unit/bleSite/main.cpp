@@ -9,10 +9,11 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 
-#include "formatTrans/bleConfigParam.h"
+#include "formatTrans/bleConfig.h"
 #include "qlibc/FileUtils.h"
+#include "formatTrans/binary2JsonEvent.h"
 #include "serviceRequestHandler.h"
-#include "paramConfig.h"
+#include "parameter.h"
 
 using namespace std;
 using namespace servicesite;
@@ -22,45 +23,6 @@ using json = nlohmann::json;
 
 static const string SYNERGY_SITE_ID = "BLE";
 static const string SYNERGY_SITE_ID_NAME = "BLE";
-
-bool serialReceive(unsigned char *data, int len){
-    std::cout << "===>before decrypt>: ";
-    for(int i = 0; i < len; i++)
-        printf("%02X ", data[i]);
-    printf("\n######################\n");
-
-    stringstream ss;
-
-    for( int i = 0; i < len; i++){
-        ss << std::setw(2) << std::setfill('0') << std::hex << data[i] << " ";
-    }
-    ss << std::endl;
-    printf("%s\n", ss.str().c_str());
-    std::cout << ss.str() << std::endl;
-
-    if(len > 512)   return true;
-    int index = 0;
-    unsigned char buf[512];
-    memset(buf, 0, 512);
-
-    if(data[0] == 0x01 && data[len - 1] == 0x03){
-        for(int i = 1; i < len - 1; i++){
-            if(data[i] == 0x02){
-                buf[index++] = data[i + 1] & 0x0f;
-                i = i + 1;
-            }else{
-                buf[index++] = data[i];
-            }
-        }
-    }
-
-    std::cout << "===>after decrypt>: ";
-    for( int i = 0; i < index; i++){
-        std::cout << std::setw(2) << std::setfill('0') << std::hex << buf[i] << " ";
-    }
-    std::cout << std::endl;
-    return true;
-}
 
 int main(int argc, char* argv[]) {
 
@@ -72,11 +34,11 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setServerPort(BleSitePort);
 
     //设置配置文件加载路径, 加载配置文件
-    bleConfigParam* configPathPtr = bleConfigParam::getInstance();
+    bleConfig* configPathPtr = bleConfig::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
     //打开串口
-    while(!configPathPtr->serialInit(serialReceive)){
+    while(!configPathPtr->serialInit(Binary2JsonEvent::binary2JsonEvent)){
         std::cout << "==>failed to open the serial<"
                   << configPathPtr->getSerialData().getString("serial") << ">...." << std::endl;
         std::cout << "===>try to open in 3 seconds....." << std::endl;
