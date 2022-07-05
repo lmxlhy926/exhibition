@@ -55,7 +55,17 @@ void Binary2JsonEvent::postEvent(string &statusString) {
     ReadBinaryString rs(statusString);
     rs.read2Byte().readByte(hciType).readByte(subType).readByte(packageIndex);
 
-    if(hciType == "91" && subType == "81"){
+
+    if(hciType == "91" && subType == "88"){     //扫描结果上报
+
+
+    }else if(hciType == "91" && subType == "B2"){   //节点配置完成
+
+
+    }else if(hciType == "91" && subType == "82"){   //绑定成功
+
+
+    }else if(hciType == "91" && subType == "81"){     //开关命令上报，灯亮度上报
         string opcode;
         rs.read2Byte().read2Byte().read2Byte(opcode);
         if(opcode == "8204"){

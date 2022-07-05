@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 project(exhibition)
 set(CMAKE_CXX_STANDARD 14)
 
+#设置可执行程序安装路径
 set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/out" CACHE STRING "The path to use for make install" FORCE)
 
 if(CYGWIN)
@@ -38,10 +39,8 @@ if("${libType}" STREQUAL "SHARED")
 elseif("${libType}" STREQUAL "STATIC")
     install(TARGETS config_site       DESTINATION bin)
     install(TARGETS synergy_site      DESTINATION bin)
+    install(TARGETS test_site         DESTINATION bin)
 endif()
-
-#install(TARGETS testSite    DESTINATION bin)
-
 
 
 

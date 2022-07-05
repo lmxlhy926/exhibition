@@ -3,6 +3,7 @@ FILE(GLOB mainSrc "*.cpp")
 FILE(GLOB kernalSrc "kernal/*.cpp")
 set(src ${mainSrc} ${kernalSrc})
 
+add_subdirectory(log)
 add_subdirectory(formatTrans)
 add_subdirectory(serial)
 

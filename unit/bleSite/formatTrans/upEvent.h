@@ -7,6 +7,7 @@
 
 #include <mutex>
 #include <condition_variable>
+#include <atomic>
 #include "qlibc/QData.h"
 
 class Event{
@@ -14,16 +15,24 @@ private:
     std::mutex mutex_;
     std::condition_variable cond_;
     qlibc::QData data_;
+    std::atomic<bool> flag_{false};
+
 public:
     void notify_one(qlibc::QData& data){
-        std::lock_guard<std::mutex> lg(mutex_);
-        data_ = data;
+        {
+            std::lock_guard<std::mutex> lg(mutex_);
+            data_ = data;
+            flag_.store(true);
+        }
         cond_.notify_one();
     }
 
     qlibc::QData wait(){
         std::unique_lock<std::mutex> ul(mutex_);
-        cond_.wait(ul);
+        cond_.wait(ul, [this](){
+            return flag_.load();
+        });
+        flag_.store(false);
         return data_;
     }
 };

@@ -49,7 +49,6 @@ ReadBinaryString &ReadBinaryString::readBytes(int readBytesNum) {
     return *this;
 }
 
-
 string LightOnOffStatus::construct() {
     return
             unicast_address + '-' +
@@ -89,3 +88,5 @@ void LightBrightStatus::init() {
     rs.read2Byte(target_lightness);
     rs.readByte(remaining_time);
 }
+
+

@@ -37,6 +37,73 @@ public:
     string remainingString(){ return binaryString_.substr(readIndex); }
 };
 
+
+class ScanResult{
+private:
+    string sourceData;
+    string devMac;
+public:
+    explicit ScanResult(string data) : sourceData(std::move(data)){
+        init();
+    }
+
+    string construct(){
+        return devMac;
+    }
+private:
+    void init(){
+        ReadBinaryString rs(sourceData);
+        rs.readBytes(devMac, 6);
+    }
+};
+
+
+class NodeAddressAssignAck{
+private:
+    string sourceData;
+    bool eventAck{false};
+public:
+    explicit NodeAddressAssignAck(string data) : sourceData(std::move(data)){
+        init();
+    }
+
+    string construct(){
+        if(eventAck)
+            return string("---node address assign success-----");
+    }
+private:
+    void init(){
+        ReadBinaryString rs(sourceData);
+        string dest;
+        rs.readByte(dest);
+        if(dest == "08")
+            eventAck = true;
+    }
+};
+
+class BindResult{
+private:
+    string sourceData;
+    bool eventAck{false};
+public:
+    explicit BindResult(string data) : sourceData(std::move(data)){
+        init();
+    }
+
+    string construct(){
+        if(eventAck)
+            return string("---bind success-----");
+    }
+private:
+    void init(){
+        ReadBinaryString rs(sourceData);
+        string dest;
+        rs.readByte(dest);
+        if(dest == "00")
+            eventAck = true;
+    }
+};
+
 class LightOnOffStatus{
 private:
     string sourceData;
