@@ -3,7 +3,7 @@
 //
 
 #include "contreteDeviceControl.h"
-#include "../paramConfig.h"
+#include "../param.h"
 
 void CommonControl::operator()(const DownCommandData &downCommand, qlibc::QData &deviceList, int sitePort) {
     for(int i = 0 ; i < deviceList.size(); i++){

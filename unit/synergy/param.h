@@ -2,8 +2,8 @@
 // Created by 78472 on 2022/5/18.
 //
 
-#ifndef EXHIBITION_PARAMETER_H
-#define EXHIBITION_PARAMCONFIG_H
+#ifndef EXHIBITION_PARAM_H
+#define EXHIBITION_PARAM_H
 
 const string RequestIp = "127.0.0.1";
 
@@ -17,4 +17,4 @@ const string Control_Device_Service_ID = "deviceControl";
 
 
 
-#endif //EXHIBITION_PARAMETER_H
+#endif //EXHIBITION_PARAM_H

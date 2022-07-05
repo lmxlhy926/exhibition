@@ -8,10 +8,9 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 
-#include "common/configParamUtil.h"
 #include "qlibc/FileUtils.h"
 #include "serviceRequestHandler.h"
-#include "paramConfig.h"
+#include "param.h"
 
 using namespace std;
 using namespace servicesite;
@@ -28,10 +27,6 @@ int main(int argc, char* argv[]) {
     httplib::ThreadPool threadPool_(30);
     std::atomic<bool> http_server_thread_end(false);
 
-    //设置配置文件加载路径, 加载配置文件
-    configParamUtil* configPathPtr = configParamUtil::getInstance();
-    configPathPtr->setConfigPath(string(argv[1]));
-
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->setServerPort(SynergySitePort);
@@ -47,10 +42,10 @@ int main(int argc, char* argv[]) {
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         // 启动服务器，参数为端口， 可用于单独的开发调试
-//        int code = serviceSiteManager->start();
+        int code = serviceSiteManager->start();
 
         // 通过注册的方式启动服务器， 需要提供site_id, site_name, port
-    	int code = serviceSiteManager->startByRegister();
+//    	int code = serviceSiteManager->startByRegister();
 
         if (code != 0) {
             printf("start error. code = %d\n", code);

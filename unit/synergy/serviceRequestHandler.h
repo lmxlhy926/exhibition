@@ -6,7 +6,7 @@
 #define EXHIBITION_SERVICEREQUESTHANDLER_H
 
 #include <string>
-#include <socket/httplib.h>
+#include <common/httplib.h>
 using namespace httplib;
 
 int device_control_service_handler(const Request& request, Response& response);

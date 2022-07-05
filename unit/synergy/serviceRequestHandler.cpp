@@ -6,7 +6,7 @@
 #include "siteService/nlohmann/json.hpp"
 #include "qlibc/QData.h"
 #include "deviceControl/contreteDeviceControl.h"
-#include "paramConfig.h"
+#include "param.h"
 
 static const nlohmann::json okResponse = {
         {"code", 0},
