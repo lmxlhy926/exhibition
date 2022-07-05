@@ -5,7 +5,7 @@
 #ifndef EXHIBITION_SOCKUTILS_H
 #define EXHIBITION_SOCKUTILS_H
 
-#include "httplib.h"
+#include "common/httplib.h"
 
 using namespace httplib;
 namespace sockCommon{

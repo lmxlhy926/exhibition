@@ -6,7 +6,7 @@
 #define EXHIBITION_SOCKETSERVER_H
 
 #include <string>
-#include "httplib.h"
+#include "common/httplib.h"
 #include "sockUtils.h"
 #include "qlibc/QData.h"
 #include "noncopyable.h"

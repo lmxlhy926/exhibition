@@ -9,9 +9,9 @@
 #include <unistd.h>
 #include <atomic>
 #include <stdio.h>
-#include "socket/httplib.h"
-#include "nlohmann/json.hpp"
-#include "service_site_manager.h"
+#include "common/httplib.h"
+#include "siteService/nlohmann/json.hpp"
+#include "siteService/service_site_manager.h"
 #include <fstream>
 #include "qlibc/QData.h"
 

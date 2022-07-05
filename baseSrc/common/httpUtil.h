@@ -6,7 +6,7 @@
 #define EXHIBITION_HTTPUTIL_H
 
 #include <string>
-#include "socket/httplib.h"
+#include "httplib.h"
 #include "qlibc/QData.h"
 
 using namespace httplib;

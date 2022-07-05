@@ -1,5 +1,5 @@
 add_library(mqttclient ${libType} mqttClient.cpp mqttMessageHandler.cpp)
-target_include_directories(mqttclient PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)
+target_include_directories(mqttclient PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 if(CYGWIN)
     if("${libType}" STREQUAL "STATIC")
@@ -18,6 +18,4 @@ endif()
 
 target_link_libraries(mqttclient PUBLIC qlibc)
 
-if(${TEST_ENABLE})
-    add_subdirectory(test)
-endif()
+add_subdirectory(test)

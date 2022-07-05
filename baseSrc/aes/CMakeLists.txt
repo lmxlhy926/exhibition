@@ -1,2 +1,2 @@
 add_library(aes ${libType} aes.c)
-target_include_directories(aes PUBLIC ${CMAKE_SOURCE_DIR}/baseSrc)
+target_include_directories(aes PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
