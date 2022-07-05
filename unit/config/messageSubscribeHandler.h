@@ -5,7 +5,7 @@
 #ifndef EXHIBITION_MESSAGESUBSCRIBEHANDLER_H
 #define EXHIBITION_MESSAGESUBSCRIBEHANDLER_H
 
-#include "socket/httplib.h"
+#include "common/httplib.h"
 using namespace httplib;
 
 void deviceStatus(const Request& request);

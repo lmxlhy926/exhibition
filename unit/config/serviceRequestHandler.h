@@ -6,11 +6,11 @@
 #define EXHIBITION_SERVICEREQUESTHANDLER_H
 
 #include <string>
-#include <socket/httplib.h>
+#include <common/httplib.h>
 #include "siteService/nlohmann/json.hpp"
 #include "socket/socketServer.h"
 #include "cloudUtil.h"
-#include "common/configParamUtil.h"
+#include "configParamUtil.h"
 
 using namespace std;
 using namespace httplib;

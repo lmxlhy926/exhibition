@@ -5,7 +5,7 @@
 #include "messageSubscribeHandler.h"
 #include "siteService/service_site_manager.h"
 #include "qlibc/QData.h"
-#include "paramconfig.h"
+#include "param.h"
 
 using namespace servicesite;
 

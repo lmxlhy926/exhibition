@@ -6,12 +6,12 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 
-#include "socket/httplib.h"
+#include "common/httplib.h"
 #include "serviceRequestHandler.h"
 #include "qlibc/FileUtils.h"
 #include "mqttPayloadHandle.h"
 #include "secretUtils.h"
-#include "paramconfig.h"
+#include "param.h"
 #include "messageSubscribeHandler.h"
 
 using namespace std;

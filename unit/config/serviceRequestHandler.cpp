@@ -3,7 +3,7 @@
 //
 
 #include "serviceRequestHandler.h"
-#include "paramconfig.h"
+#include "param.h"
 #include "common/httpUtil.h"
 #include "siteService/service_site_manager.h"
 using namespace servicesite;

@@ -8,8 +8,8 @@
 #include <string>
 #include <mutex>
 #include "qlibc/QData.h"
-#include "socket/httplib.h"
-#include "common/configParamUtil.h"
+#include "common/httplib.h"
+#include "configParamUtil.h"
 #include "mqtt/mqttClient.h"
 
 using namespace std;

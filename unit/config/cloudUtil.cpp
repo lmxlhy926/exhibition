@@ -8,7 +8,7 @@
 #include "common/httpUtil.h"
 #include <thread>
 #include <chrono>
-#include "paramconfig.h"
+#include "param.h"
 
 
 cloudUtil* cloudUtil::instance = nullptr;

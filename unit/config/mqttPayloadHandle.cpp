@@ -8,7 +8,7 @@
 #include "qlibc/QData.h"
 #include "qlibc/FileUtils.h"
 #include "siteService/service_site_manager.h"
-#include "common/configParamUtil.h"
+#include "configParamUtil.h"
 
 using namespace qlibc;
 using namespace servicesite;

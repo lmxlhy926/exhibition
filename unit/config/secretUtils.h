@@ -2,8 +2,8 @@
 // Created by 78472 on 2021/3/19.
 //
 
-#ifndef GAFDEV_MYUTIL_H
-#define GAFDEV_MYUTIL_H
+#ifndef EXHIBITION_SECRETUTILS_H
+#define EXHIBITION_SECRETUTILS_H
 
 #include <string>
 #include <mutex>
@@ -15,7 +15,7 @@
 #include "aes/aes.hpp"
 #include "qlibc/QData.h"
 #include "qlibc/FileUtils.h"
-#include "common/configParamUtil.h"
+#include "configParamUtil.h"
 
 typedef unsigned int b64_size_t;
 typedef unsigned char b64_data_t;
@@ -82,4 +82,4 @@ namespace lhytemp{
 
 
 
-#endif //GAFDEV_MYUTIL_H
+#endif //EXHIBITION_SECRETUTILS_H
