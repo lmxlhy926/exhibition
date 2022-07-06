@@ -6,10 +6,10 @@
 #define EXHIBITION_SERVICEREQUESTHANDLER_H
 
 #include <string>
-#include <socket/httplib.h>
+#include <common/httplib.h>
 #include "siteService/nlohmann/json.hpp"
 #include "socket/socketServer.h"
-#include "common/configParamUtil.h"
+#include "whiteListParamUtil.h"
 
 using namespace std;
 using namespace httplib;

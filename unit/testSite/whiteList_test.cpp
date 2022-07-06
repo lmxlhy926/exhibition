@@ -6,10 +6,11 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 
-#include "socket/httplib.h"
+#include "common/httplib.h"
 #include "serviceRequestHandler.h"
 #include "qlibc/FileUtils.h"
-#include "paramconfig.h"
+#include "param.h"
+#include "whiteListParamUtil.h"
 
 using namespace std;
 using namespace servicesite;
@@ -33,7 +34,7 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setSiteIdSummary(CONFIG_SITE_ID, CONFIG_SITE_ID_NAME);
 
     //. 设置配置文件加载路径
-    configParamUtil* configPathPtr = configParamUtil::getInstance();
+    whiteListParamUtil* configPathPtr = whiteListParamUtil::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
     //注册请求场景列表处理函数

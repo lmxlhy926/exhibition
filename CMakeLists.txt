@@ -37,9 +37,9 @@ if("${libType}" STREQUAL "SHARED")
     endif()
 
 elseif("${libType}" STREQUAL "STATIC")
-    install(TARGETS config_site       DESTINATION bin)
-    install(TARGETS synergy_site      DESTINATION bin)
-    install(TARGETS test_site         DESTINATION bin)
+    install(TARGETS config_site             DESTINATION bin)
+    install(TARGETS synergy_site            DESTINATION bin)
+    install(TARGETS whiteList_site          DESTINATION bin)
 endif()
 
 
