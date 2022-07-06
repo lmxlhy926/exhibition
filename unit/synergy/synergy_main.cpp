@@ -41,28 +41,25 @@ int main(int argc, char* argv[]) {
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
-        // 启动服务器，参数为端口， 可用于单独的开发调试
-        int code = serviceSiteManager->start();
-
-        // 通过注册的方式启动服务器， 需要提供site_id, site_name, port
-//    	int code = serviceSiteManager->startByRegister();
-
-        if (code != 0) {
-            printf("start error. code = %d\n", code);
+        while(true){
+            //自启动方式
+            int code = serviceSiteManager->start();
+            //注册启动方式
+//            int code = serviceSiteManager->startByRegister();
+            if(code != 0){
+                std::cout << "===>synergySite startByRegister error, code = " << code << std::endl;
+                std::cout << "===>synergySite startByRegister in 3 seconds...." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3));
+            }else{
+                std::cout << "===>configSite startByRegister successfully....." << std::endl;
+                break;
+            }
         }
-
-        http_server_thread_end.store(true);
     });
 
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-
     while(true){
-        if (http_server_thread_end){
-            printf("http end abnormally....\n");
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(30));
+        std::this_thread::sleep_for(std::chrono::seconds(60 *10));
     }
 
-    return -1;
+    return 0;
 }
