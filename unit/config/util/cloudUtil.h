@@ -16,9 +16,12 @@ using namespace std;
 
 
 /**
- * 1. 获取tv信息
- * 2. 加入大白名单
- * 3. 电视注册
+ * 和云端http服务器进行交互的单例模式类，提供以下操作：
+ *      1. 初始化服务器信息
+ *      2. 向云端发送http请求
+ *      2. 获取tv信息
+ *      3. 加入大白名单
+ *      4. 电视注册
  */
 class cloudUtil {
 private:
@@ -28,7 +31,7 @@ private:
     static cloudUtil* instance;
 
 private:
-    explicit cloudUtil();
+    explicit cloudUtil() = default;
 
 public:
     static cloudUtil* getInstance();

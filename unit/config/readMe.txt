@@ -11,4 +11,4 @@
         3. 加载mqtt服务器地址，设置回调函数和预处理函数，订阅相关主题，连接服务器。
         4. 设置服务回调函数
 
-/data/changhong/edge_midware/config /data/changhong/chiotedge/paramData &
+/data/changhong/edge_midware/config /data/changhong/edge_midware/paramData &

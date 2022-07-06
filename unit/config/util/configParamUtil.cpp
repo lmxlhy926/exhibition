@@ -9,8 +9,6 @@
 
 configParamUtil* configParamUtil::instance = nullptr;
 
-configParamUtil::configParamUtil(){}
-
 configParamUtil *configParamUtil::getInstance() {
     if(instance == nullptr)
         instance = new configParamUtil;

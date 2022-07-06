@@ -9,8 +9,8 @@
 #include <common/httplib.h>
 #include "siteService/nlohmann/json.hpp"
 #include "socket/socketServer.h"
-#include "cloudUtil.h"
-#include "configParamUtil.h"
+#include "util/cloudUtil.h"
+#include "util/configParamUtil.h"
 
 using namespace std;
 using namespace httplib;
@@ -37,6 +37,9 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
 
 //电视发声
 int tvSound_service_request_handler(const Request& request, Response& response);
+
+//获取白名单列表，通过向云端请求
+int whiteListCloud_service_request_handler(const Request& request, Response& response);
 
 
 

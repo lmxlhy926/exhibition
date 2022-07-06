@@ -126,7 +126,11 @@ int whiteList_service_request_handler(const Request& request, Response& response
     std::cout << "===>whiteList_service_request_handler: " << request.body <<  std::endl;
 
     qlibc::QData whiteListData = configParamUtil::getInstance()->getWhiteList();
-    response.set_content(whiteListData.toJsonString(), "text/json");
+    qlibc::QData data;
+    data.setInt("code", 0);
+    data.setString("msg", "ok");
+    data.putData("response", whiteListData);
+    response.set_content(data.toJsonString(), "text/json");
 
     return 0;
 }
@@ -146,11 +150,9 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
     httpUtil::sitePostRequest(RequestIp, SouthPort, deviceListRequest, southResponse);
 
     //初始列表为空
-    qlibc::QData data, initRes;
-    initRes.setValue("device_list", Json::Value(Json::arrayValue));
+    qlibc::QData data;
     data.setInt("code", 0);
     data.setString("error", "ok");
-    data.putData("response", initRes);
 
     //组装设备列表
     qlibc::QData deviceListAdapter = adapterResponse.getData("response").getData("device_list");
@@ -179,7 +181,6 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
     receiveRes.putData("device_list", deviceList);
     data.putData("response", receiveRes);
 
-
     response.set_content(data.toJsonString(), "text/json");
 
     return 0;
@@ -202,5 +203,10 @@ int tvSound_service_request_handler(const Request& request, Response& response){
     retData.setString("error", "ok");
     retData.putData("response", qlibc::QData());
     response.set_content(retData.toJsonString(), "text/json");
+    return 0;
+}
+
+int whiteListCloud_service_request_handler(const Request& request, Response& response){
+
     return 0;
 }

@@ -61,9 +61,9 @@ namespace lhytemp{
         static string byte2HexString(unsigned char* in, int length);
 
         /**
-         * 1. 如果秘钥文件不存在，则生成秘钥文件
+         * 1. 如果秘钥文件不存在，则在指定文件夹下生成秘钥文件
          * 2. 从秘钥文件中提取出pub_key
-         * 3. 用事先提供的固定秘钥，加密从秘钥文件中提取出的pub_key
+         * 3. 用事先提供的固定秘钥，加密从秘钥文件中提取出的pub_key及其它参数信息
          */
         static string getSecretMsg(const string& dirPath);
 

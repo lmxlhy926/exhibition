@@ -6,7 +6,6 @@
 #include <iostream>
 #include "mqttPayloadHandle.h"
 #include "qlibc/QData.h"
-#include "qlibc/FileUtils.h"
 #include "siteService/service_site_manager.h"
 #include "configParamUtil.h"
 
@@ -95,11 +94,7 @@ bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int le
     payload.setString("timeStamp", timeStr);
 
     //存储
-    qlibc::QData requestData;
-    requestData.setInt("code", 0);
-    requestData.setString("error", "ok");
-    requestData.putData("response", payload);
-    configParamUtil::getInstance()->saveWhiteListData(requestData);
+    configParamUtil::getInstance()->saveWhiteListData(payload);
 
     //发布
     qlibc::QData publishData;

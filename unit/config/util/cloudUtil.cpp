@@ -8,13 +8,10 @@
 #include "common/httpUtil.h"
 #include <thread>
 #include <chrono>
-#include "param.h"
+#include "../param.h"
 
 
 cloudUtil* cloudUtil::instance = nullptr;
-
-
-cloudUtil::cloudUtil(){}
 
 cloudUtil *cloudUtil::getInstance() {
     if(instance == nullptr)
@@ -33,7 +30,7 @@ void cloudUtil::init(const string&  ip, int port, const string& dataDirectoryPat
     serverIp = ip;
     serverPort = port;
     dataDirPath = dataDirectoryPath;
-    std::cout << "cloudUtil init: serverIp<" << serverIp << ">---serverPort<" << serverPort
+    std::cout << "cloudUtil init: httpServerIp<" << serverIp << ">---httpServerPort<" << serverPort
               << ">---dataDirPath<" << dataDirPath << ">" << std::endl;
 }
 

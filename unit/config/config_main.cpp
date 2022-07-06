@@ -5,14 +5,11 @@
 
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
-
-#include "common/httplib.h"
 #include "serviceRequestHandler.h"
 #include "qlibc/FileUtils.h"
-#include "mqttPayloadHandle.h"
-#include "secretUtils.h"
+#include "util/mqttPayloadHandle.h"
+#include "util/secretUtils.h"
 #include "param.h"
-#include "messageSubscribeHandler.h"
 
 using namespace std;
 using namespace servicesite;
@@ -27,7 +24,7 @@ static const string CONFIG_SITE_ID_NAME = "整体配置";
 int main(int argc, char* argv[]) {
 
     //. 设置线程池
-    httplib::ThreadPool threadPool_(30);
+    httplib::ThreadPool threadPool_(10);
     std::atomic<bool> http_server_thread_end(false);
 
     //. 配置本站点启动信息
@@ -38,6 +35,7 @@ int main(int argc, char* argv[]) {
     //. 设置配置文件加载路径
     configParamUtil* configPathPtr = configParamUtil::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
+
 
     //. 初始化cloudUtil, 加载http服务器配置信息
     QData httpConfigData = configPathPtr->getCloudServerData();
@@ -60,7 +58,6 @@ int main(int argc, char* argv[]) {
     //加载基础参数信息
     QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
     string domainID = baseInfoData.getString("domainID");
-
     string clientID = domainID.empty() ?
             "config" + std::to_string(time(nullptr)) : "config" + domainID + std::to_string(time(nullptr));
 
@@ -146,28 +143,25 @@ int main(int argc, char* argv[]) {
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
-        // 启动服务器，参数为端口， 可用于单独的开发调试
-        int code = serviceSiteManager->start();
-
-        // 通过注册的方式启动服务器， 需要提供site_id, site_name, port
-//    	int code = serviceSiteManager->startByRegister();
-
-        if (code != 0) {
-            printf("start error. code = %d\n", code);
+        while(true){
+            //自启动方式
+            int code = serviceSiteManager->start();
+            //注册启动方式
+//            int code = serviceSiteManager->startByRegister();
+            if(code != 0){
+                std::cout << "===>configSite startByRegister error, code = " << code << std::endl;
+                std::cout << "===>configSite startByRegister in 3 seconds...." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3));
+            }else{
+                std::cout << "===>configSite startByRegister successfully....." << std::endl;
+                break;
+            }
         }
-
-        http_server_thread_end.store(true);
     });
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-
     while(true){
-        if (http_server_thread_end.load()){
-            printf("http end abnormally....\n");
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(30));
+        std::this_thread::sleep_for(std::chrono::seconds(60 *10));
     }
 
-    return -1;
+    return 0;
 }

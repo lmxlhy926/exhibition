@@ -38,7 +38,7 @@ void mqttClient::paramConfig(const string &server, int port,
 
 void mqttClient::connect() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
-    std::cout << "start to connect to server...." << std::endl;
+    std::cout << "start to connect to mqttServer...." << std::endl;
     MQTTAsync_connectOptions connectOptions = MQTTAsync_connectOptions_initializer;
     connectOptions.keepAliveInterval = 10;
     connectOptions.cleansession = 1;
@@ -105,6 +105,7 @@ bool mqttClient::addDataHooker(MqttDataHooker dataHooker){
 }
 
 int mqttClient::onMsgArrvd(void *context, char *topicName, int topicLen, MQTTAsync_message *message) {
+    std::cout << "onMsgArrvd: <" << topicName << ">---payloadLen<" << message->payloadlen << ">..." << std::endl;
     auto client = (mqttClient *)(context);
     client->onMsgArrvd_member(topicName, topicLen, message->payload, message->payloadlen);
     MQTTAsync_freeMessage(&message);
@@ -147,7 +148,7 @@ void mqttClient::connlost_member(void *context, char *cause) {
 }
 
 void mqttClient::onConnect_member(void *context, MQTTAsync_successData *response) {
-    std::cout << "connect successfully....." << std::endl;
+    std::cout << "mqtt connect successfully....." << std::endl;
     for(auto& elem : topicMap){
         subscribe(elem.first, elem.second);
     }

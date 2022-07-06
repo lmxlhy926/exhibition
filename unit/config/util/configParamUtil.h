@@ -12,6 +12,11 @@
 using namespace std;
 using namespace qlibc;
 
+/*
+ *  存取配置参数，临时数据的工具类
+ *      1. 取：如果对象中没有数据，则将文件中的数据读取到对象中。如果对象中有数据，则直接返回对象。
+ *      2. 存：覆盖存储对象中的数据，并将数据写入到文件中
+ */
 class configParamUtil {
 private:
     string dataDirPath;                 //文件配置路径
@@ -25,7 +30,7 @@ private:
     std::recursive_mutex mutex_;
 
 private:
-    explicit configParamUtil();
+    explicit configParamUtil() = default;
 
 public:
     static configParamUtil *getInstance();
@@ -53,7 +58,6 @@ public:
     QData getWhiteList();
 
     void saveWhiteListData(QData &data);
-
 
 };
 
