@@ -6,6 +6,8 @@
 #define EXHIBITION_MQTTPAYLOADHANDLE_H
 
 #include <string>
+#include "qlibc/QData.h"
+
 
 using namespace std;
 
@@ -13,8 +15,9 @@ static const string WHITELIST_MESSAGE_ID = "whiteList";
 
 class mqttPayloadHandle {
 public:
-    static bool handle(const string& topic, char* payloadReceive, int len);
+    static qlibc::QData transform(const char* payloadReceive, int len);
 
+    static bool handle(const string& topic, char* payloadReceive, int len);
 };
 
 

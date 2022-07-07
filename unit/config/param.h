@@ -21,9 +21,9 @@ static const string TVSOUND_MESSAGE_ID = "getTvSound";              //电视发�
 static const string DEVICE_STATUS_MESSAGE_ID = "allDeviceStatus";   //设备状态上报
 
 //请求url
-static const string SCENELIST_URL = "/logic-device/scene/list";  //请求场景列表URL
-static const string SUBDEVICE_REGISTER_URL = "/logic-device/edge/deviceRegister";
-static const string WHITELIST_REQUEST_URL =  "";
+static const string SCENELIST_URL = "/logic-device/scene/list";                            //请求场景列表URL
+static const string SUBDEVICE_REGISTER_URL = "/logic-device/edge/deviceRegister";          //子设备注册
+static const string WHITELIST_REQUEST_URL =  "/logic-device/edge/getLittleWhiteList";     //获取白名单
 
 //服务ID, 对内提供
 static const string SCENELIST_REQUEST_SERVICE_ID = "sceneListRequest";

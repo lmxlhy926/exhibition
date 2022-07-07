@@ -5,21 +5,17 @@
 #include <algorithm>
 #include <iostream>
 #include "mqttPayloadHandle.h"
-#include "qlibc/QData.h"
 #include "siteService/service_site_manager.h"
 #include "configParamUtil.h"
 
 using namespace qlibc;
 using namespace servicesite;
 
-/*
- * 接收转换白名单，存储，发布
- */
-bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int len) {
+qlibc::QData mqttPayloadHandle::transform(const char* payloadReceive, int len){
     qlibc::QData payload(payloadReceive, len);
     if(payload.type() == Json::nullValue){
         std::cout  << "received mqttPayload is not a Json format......." << std::endl;
-        return false;
+        return qlibc::QData();
     }
 
     qlibc::QData devices;
@@ -93,9 +89,18 @@ bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int le
     string timeStr = std::to_string(time(nullptr));
     payload.setString("timeStamp", timeStr);
 
+    return payload;
+}
+
+
+/*
+ * 接收转换白名单，存储，发布
+ */
+bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int len) {
+    //转换白名单格式
+    qlibc::QData payload = transform(payloadReceive, len);
     //存储
     configParamUtil::getInstance()->saveWhiteListData(payload);
-
     //发布
     qlibc::QData publishData;
     publishData.setString("message_id", "whiteList");

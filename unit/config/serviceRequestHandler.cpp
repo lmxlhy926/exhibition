@@ -6,6 +6,7 @@
 #include "param.h"
 #include "common/httpUtil.h"
 #include "siteService/service_site_manager.h"
+#include "util/mqttPayloadHandle.h"
 using namespace servicesite;
 
 int test_service_request_handler(const Request& request, Response& response) {
@@ -35,7 +36,7 @@ int sceneListRequest_service_request_handler(const Request& request, Response& r
     std::cout << "===>sceneListRequest_service_request_handler: " << request.body <<  std::endl;
     qlibc::QData sceneListRequest, sceneListResponse;
     qlibc::QData param;
-    param.setString("familyCode", "XXXX");  //TODO 待定
+    param.setString("familyCode", "did:chisid:0x88508ea0601591e2afc95b662a9b279e75ef3f95");  //TODO 待定
     sceneListRequest.putData("param", param);
     sceneListRequest.setString("User-Agent", "curl");
 
@@ -123,15 +124,34 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 
 
 int whiteList_service_request_handler(const Request& request, Response& response){
-    std::cout << "===>whiteList_service_request_handler: " << request.body <<  std::endl;
+    std::cout << "===>whiteListCloud_service_request_handler: " << request.body <<  std::endl;
+    string tvDid = configParamUtil::getInstance()->getBaseInfo().getString("tvDid");
 
-    qlibc::QData whiteListData = configParamUtil::getInstance()->getWhiteList();
+    qlibc::QData whiteListRequest, whiteListResponse;
+    qlibc::QData param;
+    param.setString("familyCode", tvDid);
+    whiteListRequest.putData("param", param);
+    whiteListRequest.setString("User-Agent", "curl");
+
+    cloudUtil::getInstance()->ecb_httppost(WHITELIST_REQUEST_URL, whiteListRequest, whiteListResponse);
+
     qlibc::QData data;
-    data.setInt("code", 0);
-    data.setString("msg", "ok");
-    data.putData("response", whiteListData);
-    response.set_content(data.toJsonString(), "text/json");
+    if(whiteListResponse.getInt("code") == 200){
+        string payloadString = whiteListResponse.getData("data").toJsonString();
+        qlibc::QData payload = mqttPayloadHandle::transform(payloadString.c_str(), payloadString.size());
+        configParamUtil::getInstance()->saveWhiteListData(payload);
 
+        data.setInt("code", 0);
+        data.setString("error", whiteListResponse.getString("msg"));
+        data.putData("response", payload);
+
+    }else{
+        data.setInt("code", 1);
+        data.setString("error", whiteListResponse.getString("msg"));
+        data.putData("response", qlibc::QData());
+    }
+
+    response.set_content(data.toJsonString(), "text/json");
     return 0;
 }
 
@@ -203,10 +223,5 @@ int tvSound_service_request_handler(const Request& request, Response& response){
     retData.setString("error", "ok");
     retData.putData("response", qlibc::QData());
     response.set_content(retData.toJsonString(), "text/json");
-    return 0;
-}
-
-int whiteListCloud_service_request_handler(const Request& request, Response& response){
-
     return 0;
 }
