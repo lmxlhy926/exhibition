@@ -53,8 +53,13 @@ namespace muduo{
     class Logger {
     public:
         enum LogLevel{
-            INFO,
-            HLIGHT
+            H_WHITE,
+            H_DEEP_GREEN,
+            H_RED,
+            H_GREEN,
+            H_YELLOW,
+            H_BLUE,
+            H_PURPLE,
         };
 
         explicit Logger(const char* file, int line, LogLevel level);
@@ -110,9 +115,14 @@ namespace muduo{
     };
 
 
-    #define LOG_INFO    muduo::Logger(__FILE__, __LINE__, muduo::Logger::INFO).stream()
-    #define LOG_HLIGHT  muduo::Logger(__FILE__, __LINE__, muduo::Logger::HLIGHT).stream()
+    #define LOG_INFO    muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_WHITE).stream()
+    #define LOG_HLIGHT  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_DEEP_GREEN).stream()
 
+    #define LOG_RED  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_RED).stream()
+    #define LOG_GREEN  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_GREEN).stream()
+    #define LOG_YELLOW  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_YELLOW).stream()
+    #define LOG_BLUE  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_BLUE).stream()
+    #define LOG_PURPLE  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_PURPLE).stream()
 }
 
 

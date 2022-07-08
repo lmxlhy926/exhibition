@@ -2,7 +2,9 @@
 // Created by 78472 on 2022/7/4.
 //
 
-#include "upStatus.h"
+#include "lightUpStatus.h"
+
+EventTable* EventTable::eventTable = nullptr;
 
 ReadBinaryString &ReadBinaryString::readByte(string &dest) {
     if(avail() >= 2){
@@ -88,5 +90,3 @@ void LightBrightStatus::init() {
     rs.read2Byte(target_lightness);
     rs.readByte(remaining_time);
 }
-
-

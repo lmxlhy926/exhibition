@@ -8,7 +8,6 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include "upStatus.h"
 using namespace std;
 
 class Binary2JsonEvent{

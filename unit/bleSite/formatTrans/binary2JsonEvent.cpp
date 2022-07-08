@@ -6,6 +6,10 @@
 #include <iostream>
 #include <cstring>
 #include <iomanip>
+#include "log/Logging.h"
+#include "lightUpStatus.h"
+
+using namespace muduo;
 
 bool Binary2JsonEvent::binary2JsonEvent(unsigned char *binaryStream, int size) {
     if(size > 512)  return false;
@@ -28,9 +32,9 @@ bool Binary2JsonEvent::binary2JsonEvent(unsigned char *binaryStream, int size) {
         for( int i = 0; i < index; i++){
             ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << static_cast<int>(buf[i]);
         }
-
         string binaryString = ss.str();
         printBinaryString(binaryString);
+
         postEvent(binaryString);
 
        return true;
@@ -47,7 +51,7 @@ void Binary2JsonEvent::printBinaryString(string &str) {
         if(i < str.size() / 2 - 1)
             ss << " ";
     }
-    std::cout << "==>serial receive: " << ss.str() << std::endl;
+    LOG_INFO << "==>serial receive: " << ss.str();
 }
 
 void Binary2JsonEvent::postEvent(string &statusString) {
@@ -55,14 +59,17 @@ void Binary2JsonEvent::postEvent(string &statusString) {
     ReadBinaryString rs(statusString);
     rs.read2Byte().readByte(hciType).readByte(subType).readByte(packageIndex);
 
-
     if(hciType == "91" && subType == "88"){     //扫描结果上报
-
+        ScanResult sr(rs.remainingString());
+        sr.postEvent();
 
     }else if(hciType == "91" && subType == "B2"){   //节点配置完成
-
+        NodeAddressAssignAck nodeAck(rs.remainingString());
+        nodeAck.postEvent();
 
     }else if(hciType == "91" && subType == "82"){   //绑定成功
+        BindResult br(rs.remainingString());
+        br.postEvent();
 
 
     }else if(hciType == "91" && subType == "81"){     //开关命令上报，灯亮度上报
@@ -70,11 +77,11 @@ void Binary2JsonEvent::postEvent(string &statusString) {
         rs.read2Byte().read2Byte().read2Byte(opcode);
         if(opcode == "8204"){
             rs.rollBack(6);
-            std::cout << "==>LightOnOffStatus: " << LightOnOffStatus(rs.remainingString()).construct() << std::endl;
+            LOG_HLIGHT << "==>LightOnOffStatus: " << LightOnOffStatus(rs.remainingString()).construct();
 
         }else if(opcode == "824E"){
             rs.rollBack(6);
-            std::cout << "==>LightBrightStatus: " << LightBrightStatus(rs.remainingString()).construct() << std::endl;
+            LOG_HLIGHT << "==>LightBrightStatus: " << LightBrightStatus(rs.remainingString()).construct();
         }
     }
 }

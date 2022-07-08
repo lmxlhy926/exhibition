@@ -6,11 +6,13 @@
 #define EXHIBITION_SERVICEREQUESTHANDLER_H
 
 #include <string>
-#include <socket/httplib.h>
+#include "common/httplib.h"
 using namespace httplib;
 
 
 int BleDevice_command_service_handler(const Request& request, Response& response);
+
+int BleDevice_command_test_service_handler(const Request& request, Response& response);
 
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

@@ -2,10 +2,17 @@
 // Created by 78472 on 2022/7/4.
 //
 
-#ifndef EXHIBITION_UPSTATUS_H
-#define EXHIBITION_UPSTATUS_H
+#ifndef EXHIBITION_LIGHTUPSTATUS_H
+#define EXHIBITION_LIGHTUPSTATUS_H
 
 #include <string>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+#include <iostream>
+#include "qlibc/QData.h"
+#include "log/Logging.h"
+
 using namespace std;
 
 class ReadBinaryString{
@@ -37,28 +44,85 @@ public:
     string remainingString(){ return binaryString_.substr(readIndex); }
 };
 
+class Event{
+private:
+    std::mutex mutex_;
+    std::condition_variable cond_;
+    qlibc::QData data_;
+    std::atomic<bool> flag_{false};
 
-class ScanResult{
+public:
+    void notify_one(qlibc::QData data){
+        {
+            std::lock_guard<std::mutex> lg(mutex_);
+            data_ = std::move(data);
+            flag_.store(true);
+        }
+        cond_.notify_one();
+    }
+
+    qlibc::QData wait(){
+        std::unique_lock<std::mutex> ul(mutex_);
+        cond_.wait(ul, [this](){
+            return flag_.load();
+        });
+        flag_.store(false);
+        return data_;
+    }
+};
+
+
+class EventTable{
+public:
+    Event scanResultEvent;
+    Event nodeAddressAssignSuccessEvent;
+    Event bindSuccessEvent;
+private:
+    static EventTable* eventTable;
+
+    EventTable() = default;
+public:
+    static EventTable* getInstance(){
+        if(eventTable == nullptr){
+            eventTable = new EventTable;
+            return eventTable;
+        }else{
+            return eventTable;
+        }
+    }
+};
+
+
+class ReportEvent{
+public:
+    virtual void postEvent() = 0;
+};
+
+
+class ScanResult : ReportEvent{
 private:
     string sourceData;
-    string devMac;
+    string deviceSn;
 public:
     explicit ScanResult(string data) : sourceData(std::move(data)){
         init();
     }
 
-    string construct(){
-        return devMac;
+    void postEvent() override{
+        qlibc::QData data;
+        data.setString("deviceSn", deviceSn);
+        EventTable::getInstance()->scanResultEvent.notify_one(data);
+        LOG_HLIGHT << "scanResult Event, deviceSn = " << deviceSn;
     }
 private:
     void init(){
         ReadBinaryString rs(sourceData);
-        rs.readBytes(devMac, 6);
+        rs.readBytes(deviceSn, 6);
     }
 };
 
 
-class NodeAddressAssignAck{
+class NodeAddressAssignAck : public ReportEvent{
 private:
     string sourceData;
     bool eventAck{false};
@@ -67,10 +131,13 @@ public:
         init();
     }
 
-    string construct(){
-        if(eventAck)
-            return string("---node address assign success-----");
+    void postEvent() override{
+        if(eventAck){
+            EventTable::getInstance()->nodeAddressAssignSuccessEvent.notify_one(qlibc::QData());
+            LOG_HLIGHT << "nodeAddress assign operation completed.....";
+        }
     }
+
 private:
     void init(){
         ReadBinaryString rs(sourceData);
@@ -81,7 +148,8 @@ private:
     }
 };
 
-class BindResult{
+
+class BindResult : public ReportEvent{
 private:
     string sourceData;
     bool eventAck{false};
@@ -90,10 +158,13 @@ public:
         init();
     }
 
-    string construct(){
-        if(eventAck)
-            return string("---bind success-----");
+    void postEvent() override{
+        if(eventAck){
+            EventTable::getInstance()->bindSuccessEvent.notify_one(qlibc::QData());
+            LOG_HLIGHT << "bind operation success.....";
+        }
     }
+
 private:
     void init(){
         ReadBinaryString rs(sourceData);
@@ -142,4 +213,4 @@ private:
 };
 
 
-#endif //EXHIBITION_UPSTATUS_H
+#endif //EXHIBITION_LIGHTUPSTATUS_H

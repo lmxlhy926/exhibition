@@ -16,11 +16,26 @@ namespace muduo{
     static void defaultOutput(const char* msg, size_t length, Logger::LogLevel level){
         std::lock_guard<std::recursive_mutex> lg(logging_output_mutex_);
         switch(level){
-            case Logger::LogLevel::INFO:
+            case Logger::LogLevel::H_WHITE:
                 fprintf(stdout, WHITE "%s" COLOR_NONE, msg);
                 break;
-            case Logger::LogLevel::HLIGHT:
+            case Logger::LogLevel::H_DEEP_GREEN:
                 fprintf(stdout, DEEP_GREEN "%s" COLOR_NONE, msg);
+                break;
+            case Logger::LogLevel::H_RED:
+                fprintf(stdout, RED "%s" COLOR_NONE, msg);
+                break;
+            case Logger::LogLevel::H_GREEN:
+                fprintf(stdout, GREEN "%s" COLOR_NONE, msg);
+                break;
+            case Logger::LogLevel::H_YELLOW:
+                fprintf(stdout, YELLOW "%s" COLOR_NONE, msg);
+                break;
+            case Logger::LogLevel::H_BLUE:
+                fprintf(stdout, BLUE "%s" COLOR_NONE, msg);
+                break;
+            case Logger::LogLevel::H_PURPLE:
+                fprintf(stdout, PURPLE "%s" COLOR_NONE, msg);
                 break;
         }
         fflush(stdout);

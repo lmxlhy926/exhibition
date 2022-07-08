@@ -14,6 +14,7 @@
 #include "formatTrans/binary2JsonEvent.h"
 #include "serviceRequestHandler.h"
 #include "parameter.h"
+#include "formatTrans/lightUpStatus.h"
 
 using namespace std;
 using namespace servicesite;
@@ -26,8 +27,11 @@ static const string SYNERGY_SITE_ID_NAME = "BLE";
 
 int main(int argc, char* argv[]) {
 
-    httplib::ThreadPool threadPool_(30);
+    httplib::ThreadPool threadPool_(10);
     std::atomic<bool> http_server_thread_end(false);
+
+    //初始化单例EventTable单例对象
+//    EventTable::getInstance();
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
@@ -53,31 +57,33 @@ int main(int argc, char* argv[]) {
         return BleDevice_command_service_handler(request, response);
     });
 
+    serviceSiteManager->registerServiceRequestHandler(Ble_Device_Test_Command_Service_ID,
+                                                      [&](const Request& request, Response& response) -> int{
+                                                          return BleDevice_command_test_service_handler(request, response);
+                                                      });
+
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
-        // 启动服务器，参数为端口， 可用于单独的开发调试
-        int code = serviceSiteManager->start();
-
-        // 通过注册的方式启动服务器， 需要提供site_id, site_name, port
-        //code = serviceSiteManager->startByRegister(TEST_SITE_ID_1, TEST_SITE_NAME_1, 9001);
-
-        if (code != 0) {
-            printf("start error. code = %d\n", code);
+        while(true){
+            //自启动方式
+            int code = serviceSiteManager->start();
+            //注册启动方式
+//            int code = serviceSiteManager->startByRegister();
+            if(code != 0){
+                std::cout << "===>bleSite startByRegister error, code = " << code << std::endl;
+                std::cout << "===>bleSite startByRegister in 3 seconds...." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3));
+            }else{
+                std::cout << "===>bleSite startByRegister successfully....." << std::endl;
+                break;
+            }
         }
-
-        http_server_thread_end.store(true);
     });
 
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-
     while(true){
-        if (http_server_thread_end){
-            printf("http end abnormally....\n");
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(30));
+        std::this_thread::sleep_for(std::chrono::seconds(60 *10));
     }
 
-    return -1;
+    return 0;
 }

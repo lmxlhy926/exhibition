@@ -36,7 +36,6 @@ public:
      */
     static size_t binaryString2binary(string& binaryString, unsigned char* buf, size_t size);
 
-private:
     class BinaryBuf{
     private:
         unsigned char* binaryBuf_;
@@ -46,7 +45,7 @@ private:
         explicit BinaryBuf(unsigned char* buffer, size_t size)
                 : binaryBuf_(buffer), size_(size){}
 
-        void append(string& charString){
+        void append(const string& charString){
             int charInt;
             try{
                 charInt =  std::stoi(charString, nullptr, 16);
