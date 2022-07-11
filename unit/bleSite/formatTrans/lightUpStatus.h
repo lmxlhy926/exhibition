@@ -49,25 +49,29 @@ private:
     std::mutex mutex_;
     std::condition_variable cond_;
     qlibc::QData data_;
-    std::atomic<bool> flag_{false};
 
 public:
-    void notify_one(qlibc::QData data){
-        {
-            std::lock_guard<std::mutex> lg(mutex_);
-            data_ = std::move(data);
-            flag_.store(true);
-        }
+    void putData(const qlibc::QData& data){
+        std::lock_guard<std::mutex> lg(mutex_);
+        data_ = data;
+    }
+
+    qlibc::QData getData(){
+        std::lock_guard<std::mutex> lg(mutex_);
+        return data_;
+    }
+
+    void notify_one(){
         cond_.notify_one();
     }
 
-    qlibc::QData wait(){
+    void notify_all(){
+        cond_.notify_all();
+    };
+
+    void wait(int64_t seconds){
         std::unique_lock<std::mutex> ul(mutex_);
-        cond_.wait(ul, [this](){
-            return flag_.load();
-        });
-        flag_.store(false);
-        return data_;
+        cond_.wait_for(ul, std::chrono::seconds(seconds));
     }
 };
 
@@ -111,7 +115,8 @@ public:
     void postEvent() override{
         qlibc::QData data;
         data.setString("deviceSn", deviceSn);
-        EventTable::getInstance()->scanResultEvent.notify_one(data);
+        EventTable::getInstance()->scanResultEvent.putData(data);
+        EventTable::getInstance()->scanResultEvent.notify_one();
         LOG_HLIGHT << "scanResult Event, deviceSn = " << deviceSn;
     }
 private:
@@ -133,7 +138,7 @@ public:
 
     void postEvent() override{
         if(eventAck){
-            EventTable::getInstance()->nodeAddressAssignSuccessEvent.notify_one(qlibc::QData());
+            EventTable::getInstance()->nodeAddressAssignSuccessEvent.notify_one();
             LOG_HLIGHT << "nodeAddress assign operation completed.....";
         }
     }
@@ -160,7 +165,7 @@ public:
 
     void postEvent() override{
         if(eventAck){
-            EventTable::getInstance()->bindSuccessEvent.notify_one(qlibc::QData());
+            EventTable::getInstance()->bindSuccessEvent.notify_one();
             LOG_HLIGHT << "bind operation success.....";
         }
     }
