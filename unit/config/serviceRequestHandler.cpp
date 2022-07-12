@@ -31,6 +31,21 @@ int test_service_request_handler(const Request& request, Response& response) {
     return 0;
 }
 
+void extractFromWhiteList(qlibc::QData& deviceList){
+    qlibc::QData whiteList = configParamUtil::getInstance()->getWhiteList();
+    qlibc::QData whiteListDevices = whiteList.getData("info").getData("devices");
+    size_t size = whiteListDevices.size();
+    for(size_t i = 0; i < size; ++i){
+        qlibc::QData ithData;
+        whiteListDevices.getArrayElement(i, ithData);
+        qlibc::QData data;
+        data.setString("device_id", ithData.getString("device_sn"));
+        data.setString("online_state", "online");
+
+        deviceList.append(data);
+    }
+}
+
 
 int sceneListRequest_service_request_handler(const Request& request, Response& response) {
     std::cout << "===>sceneListRequest_service_request_handler: " << request.body <<  std::endl;
@@ -125,11 +140,11 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 
 int whiteList_service_request_handler(const Request& request, Response& response){
     std::cout << "===>whiteListCloud_service_request_handler: " << request.body <<  std::endl;
-    string tvDid = configParamUtil::getInstance()->getBaseInfo().getString("tvDid");
+    string domainID = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
 
     qlibc::QData whiteListRequest, whiteListResponse;
     qlibc::QData param;
-    param.setString("familyCode", tvDid);
+    param.setString("familyCode", domainID);
     whiteListRequest.putData("param", param);
     whiteListRequest.setString("User-Agent", "curl");
 
@@ -167,7 +182,6 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
 
     httpUtil::sitePostRequest(RequestIp, AdapterPort, deviceListRequest, adapterResponse);
     httpUtil::sitePostRequest(RequestIp, ZigBeeSitePort, deviceListRequest, zigBeeResponse);
-    httpUtil::sitePostRequest(RequestIp, SouthPort, deviceListRequest, southResponse);
 
     //初始列表为空
     qlibc::QData data;
@@ -177,7 +191,6 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
     //组装设备列表
     qlibc::QData deviceListAdapter = adapterResponse.getData("response").getData("device_list");
     qlibc::QData deviceListZigbee = zigBeeResponse.getData("response").getData("device_list");
-    qlibc::QData deviceListSouth = southResponse.getData("response").getData("device_list");
 
     qlibc::QData deviceList;
     for(int i = 0; i < deviceListAdapter.size(); i++){
@@ -190,11 +203,9 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
         deviceItem.setString("souceSite", "zigbee_light");
         deviceList.append(deviceItem);
     }
-    for(int i = 0; i < deviceListSouth.size(); i++){
-        qlibc::QData deviceItem = deviceListSouth.getArrayElement(i);
-        deviceItem.setString("souceSite", "south");
-        deviceList.append(deviceItem);
-    }
+
+    //加入白名单设备
+    extractFromWhiteList(deviceList);
 
     //写入获取到的设备列表
     qlibc::QData receiveRes;
