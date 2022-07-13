@@ -17,4 +17,11 @@ target_link_libraries(bleSiteRequest PRIVATE format)
 target_link_libraries(bleSiteRequest PRIVATE serial)
 target_link_libraries(bleSiteRequest PRIVATE socket)
 
+add_executable(logtest logtest.cpp)
+target_link_libraries(logtest PRIVATE qlibc)
+target_link_libraries(logtest PRIVATE format)
+target_link_libraries(logtest PRIVATE log)
+target_link_libraries(logtest PRIVATE common)
+
+
 
