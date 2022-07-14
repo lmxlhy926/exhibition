@@ -80,9 +80,12 @@ namespace muduo{
             size_t size_;
         public:
             explicit SourceFile(const char* fileName) : data_(fileName){
-                const char* slash = strrchr(data_, '/');
-                if(slash){      //提取出文件名
-                    data_ = slash + 1;
+                const char* slash1 = strrchr(data_, '/');
+                const char* slash2 = strrchr(data_, '\\');
+                if(slash1){      //提取出文件名
+                    data_ = slash1 + 1;
+                }else if(slash2){
+                    data_ = slash2 + 1;
                 }
                 size_ = strlen(data_);
             }

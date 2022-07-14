@@ -195,7 +195,7 @@ bool cloudUtil::ecb_httppost(const string &uri, const qlibc::QData &request, qli
     }
 
     string body = request.getData("param").toJsonString();
-    LOG_YELLOW << "===>httpRequest: " << body;
+    LOG_BLUE << "===>httpRequest: " << body;
 
     const char *key = "123456asdfgh1234";
     string out;

@@ -7,8 +7,10 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/out" CACHE STRING "The path to use
 
 if(CYGWIN)
     set(outDir cygwin)
+    message("===>CYGWIN")
 elseif(ANDROID)
     set(outDir android)
+    message("===>android")
 endif()
 
 set(libType "STATIC")
