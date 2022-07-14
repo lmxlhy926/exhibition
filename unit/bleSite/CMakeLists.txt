@@ -1,6 +1,5 @@
 FILE(GLOB src "*.cpp")
 
-add_subdirectory(log)
 add_subdirectory(serial)
 add_subdirectory(formatTrans)
 add_subdirectory(logic)
