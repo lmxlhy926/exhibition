@@ -7,6 +7,7 @@
 #include "mqttPayloadHandle.h"
 #include "siteService/service_site_manager.h"
 #include "configParamUtil.h"
+#include "log/Logging.h"
 
 using namespace qlibc;
 using namespace servicesite;
@@ -14,7 +15,7 @@ using namespace servicesite;
 qlibc::QData mqttPayloadHandle::transform(const char* payloadReceive, int len){
     qlibc::QData payload(payloadReceive, len);
     if(payload.type() == Json::nullValue){
-        std::cout  << "received mqttPayload is not a Json format......." << std::endl;
+        LOG_RED << "received mqttPayload is not a Json format.......";
         return qlibc::QData();
     }
 

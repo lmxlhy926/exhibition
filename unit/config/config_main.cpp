@@ -10,6 +10,7 @@
 #include "util/mqttPayloadHandle.h"
 #include "util/secretUtils.h"
 #include "param.h"
+#include "log/Logging.h"
 
 using namespace std;
 using namespace servicesite;
@@ -149,11 +150,11 @@ int main(int argc, char* argv[]) {
             //注册启动方式
             int code = serviceSiteManager->startByRegister();
             if(code != 0){
-                std::cout << "===>configSite startByRegister error, code = " << code << std::endl;
-                std::cout << "===>configSite startByRegister in 3 seconds...." << std::endl;
+                LOG_RED << "===>configSite startByRegister error, code = " << code;
+                LOG_RED << "===>configSite startByRegister in 3 seconds....";
                 std::this_thread::sleep_for(std::chrono::seconds(3));
             }else{
-                std::cout << "===>configSite startByRegister successfully....." << std::endl;
+                LOG_RED << "===>configSite startByRegister successfully.....";
                 break;
             }
         }

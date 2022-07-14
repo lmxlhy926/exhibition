@@ -4,6 +4,7 @@
 
 #include "secretUtils.h"
 #include <iostream>
+#include "log/Logging.h"
 
 extern "C" {
 #include "encrypt_sign.c"
@@ -191,7 +192,7 @@ namespace lhytemp{
             string secret_file_name_fullPath = FileUtils::contactFileName(secretDir, secret_file_name);
             if(FileUtils::fileExists(secret_file_name_fullPath)){
                 secretReadyFlag = true;
-                std::cout << "==>secret file already exists...." << std::endl;
+                LOG_HLIGHT << "==>secret file already exists....";
             }
         }
 
@@ -201,7 +202,7 @@ namespace lhytemp{
             uint32_t file_name_len = 256;
             generate_save_secp256k1_key(const_cast<char *>(secretDir.c_str()), file_name, &file_name_len);
             secret_file_name = string(reinterpret_cast<const char *>(file_name), 0, file_name_len);
-            std::cout << "===> generate secret file: " << secret_file_name.c_str() << std::endl;
+            LOG_HLIGHT << "===> generate secret file: " << secret_file_name.c_str();
 
             secretFileNameData.setString("filename", secret_file_name);
             configParamUtil::getInstance()->saveSecretFileNameData(secretFileNameData);
@@ -235,7 +236,7 @@ namespace lhytemp{
         b64_size_t out_len = 1024;
         lhytemp::secretUtil::Base64_encode(out, out_len, encrypt_buf, encrypt_len);
         string outstr(out, 0, strlen(out));
-        std::cout << "======secretMsg: " << outstr << std::endl;
+        LOG_HLIGHT << "======secretMsg: " << outstr;
 
         return outstr;
     }

@@ -9,6 +9,7 @@
 #include <thread>
 #include <chrono>
 #include "../param.h"
+#include "log/Logging.h"
 
 
 cloudUtil* cloudUtil::instance = nullptr;
@@ -30,8 +31,8 @@ void cloudUtil::init(const string&  ip, int port, const string& dataDirectoryPat
     serverIp = ip;
     serverPort = port;
     dataDirPath = dataDirectoryPath;
-    std::cout << "cloudUtil init: httpServerIp<" << serverIp << ">---httpServerPort<" << serverPort
-              << ">---dataDirPath<" << dataDirPath << ">" << std::endl;
+    LOG_PURPLE << "cloudUtil init: httpServerIp<" << serverIp << ">---httpServerPort<" << serverPort
+              << ">---dataDirPath<" << dataDirPath << ">";
 }
 
 bool cloudUtil::getTvInfo(string& tvMac, string& tvName, string& tvModel){
@@ -80,7 +81,7 @@ bool cloudUtil::joinTvWhite() {
             if(ret)
                 break;
             else{
-                std::cout << "---can no get tvInfo from adapter site, try again in 3 seconds......" << std::endl;
+                LOG_RED << "---can no get tvInfo from adapter site, try again in 3 seconds......";
                 std::this_thread::sleep_for(std::chrono::seconds(3));
             }
         }
@@ -105,7 +106,7 @@ bool cloudUtil::joinTvWhite() {
             if(returnMessage.getString("code") == "200")
                 break;
             std::this_thread::sleep_for(std::chrono::seconds(2));
-            std::cout << "===>join tvWhite failed, retry again-----" << std::endl;
+            LOG_RED << "===>join tvWhite failed, retry again-----";
         }
 
         string tvDid = returnMessage.getData("data").getString("deviceDid");
@@ -194,6 +195,8 @@ bool cloudUtil::ecb_httppost(const string &uri, const qlibc::QData &request, qli
     }
 
     string body = request.getData("param").toJsonString();
+    LOG_YELLOW << "===>httpRequest: " << body;
+
     const char *key = "123456asdfgh1234";
     string out;
     lhytemp::secretUtil::ecb_encrypt_withPadding(body, out, reinterpret_cast<const uint8_t *>(key));
@@ -204,7 +207,7 @@ bool cloudUtil::ecb_httppost(const string &uri, const qlibc::QData &request, qli
         lhytemp::secretUtil::ecb_decrypt_withPadding(http_res->body.c_str(), decryptOut,
                                                  reinterpret_cast<const uint8_t *>(key));
         response = qlibc::QData(decryptOut);
-        std::cout << "===>httpResponse: " << response.toJsonString() << std::endl;
+        LOG_YELLOW << "===>httpResponse: " << response.toJsonString();
         return true;
     }
     return false;

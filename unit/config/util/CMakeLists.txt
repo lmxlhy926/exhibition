@@ -7,5 +7,6 @@ target_link_libraries(configUtil PUBLIC aes)
 target_link_libraries(configUtil PUBLIC common)
 target_link_libraries(configUtil PUBLIC mqttclient)
 target_link_libraries(configUtil PUBLIC siteService)
+target_link_libraries(configUtil PUBLIC log)
 
 

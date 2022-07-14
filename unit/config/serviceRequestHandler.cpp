@@ -7,6 +7,7 @@
 #include "common/httpUtil.h"
 #include "siteService/service_site_manager.h"
 #include "util/mqttPayloadHandle.h"
+#include "log/Logging.h"
 using namespace servicesite;
 
 int test_service_request_handler(const Request& request, Response& response) {
@@ -48,7 +49,7 @@ void extractFromWhiteList(qlibc::QData& deviceList){
 
 
 int sceneListRequest_service_request_handler(const Request& request, Response& response) {
-    std::cout << "===>sceneListRequest_service_request_handler: " << request.body <<  std::endl;
+    LOG_INFO << "===>sceneListRequest_service_request_handler: " << request.body;
     qlibc::QData sceneListRequest, sceneListResponse;
     qlibc::QData param;
     param.setString("familyCode", "did:chisid:0x88508ea0601591e2afc95b662a9b279e75ef3f95");  //TODO 待定
@@ -71,7 +72,7 @@ int sceneListRequest_service_request_handler(const Request& request, Response& r
 }
 
 int subDeviceRegister_service_request_handler(const Request& request, Response& response) {
-    std::cout << "===>subDeviceRegister_service_request_handler: " << request.body <<  std::endl;
+    LOG_INFO << "===>subDeviceRegister_service_request_handler: " << request.body;
     qlibc::QData requestData(request.body);
 
     qlibc::QData registerRequest, registerResponse;
@@ -96,7 +97,7 @@ int subDeviceRegister_service_request_handler(const Request& request, Response& 
 }
 
 int domainIdRequest_service_request_handler(const Request& request, Response& response) {
-    std::cout << "===>domainIdRequest_service_request_handler: " << request.body <<  std::endl;
+    LOG_INFO << "===>domainIdRequest_service_request_handler: " << request.body;
 
     string domainId = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
     qlibc::QData res;
@@ -117,7 +118,7 @@ int domainIdRequest_service_request_handler(const Request& request, Response& re
 }
 
 int engineer_service_request_handler(mqttClient& mc, const Request& request, Response& response) {
-    std::cout << "===>engineer_service_request_handler: " << request.body <<  std::endl;
+    LOG_INFO << "===>engineer_service_request_handler: " << request.body;
 
     qlibc::QData requestData = qlibc::QData(request.body).getData("request");
     qlibc::QData registerRes;
@@ -139,7 +140,7 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 
 
 int whiteList_service_request_handler(const Request& request, Response& response){
-    std::cout << "===>whiteListCloud_service_request_handler: " << request.body <<  std::endl;
+    LOG_INFO << "===>whiteListCloud_service_request_handler: " << request.body;
     string domainID = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
 
     qlibc::QData whiteListRequest, whiteListResponse;
@@ -172,11 +173,11 @@ int whiteList_service_request_handler(const Request& request, Response& response
 
 int getAllDeviceList_service_request_handler(const Request& request, Response& response){
     //请求tvAdapter设备列表, 请求雷达、语音面板设备列表
-    std::cout << "getAllDeviceList_service_request_handler" << request.body << std::endl;
+    LOG_INFO << "getAllDeviceList_service_request_handler" << request.body;
 
     //像tvAdapter、zigbee、南向站点获取设备列表
     qlibc::QData deviceListRequest;
-    qlibc::QData adapterResponse, zigBeeResponse, southResponse;
+    qlibc::QData adapterResponse, zigBeeResponse;
     deviceListRequest.setString("service_id", "get_device_list");
     deviceListRequest.putData("request", qlibc::QData());
 
@@ -218,7 +219,7 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
 }
 
 int tvSound_service_request_handler(const Request& request, Response& response){
-    std::cout << "tvSound_service_request_handler" << request.body << std::endl;
+    LOG_INFO << "tvSound_service_request_handler" << request.body;
     qlibc::QData requestData = qlibc::QData(request.body).getData("request");
 
     qlibc::QData data, content;
