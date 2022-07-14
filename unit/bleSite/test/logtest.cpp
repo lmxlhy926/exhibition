@@ -1,6 +1,8 @@
 
 #include "log/Logging.h"
 #include "common/httplib.h"
+#include <fstream>
+#include "qlibc/QData.h"
 
 void allTypeTest(){
 
@@ -37,19 +39,19 @@ void threadLogTest(){
 
 
     threadPool.enqueue([](){
-        for(int i = 0; i < 1000; i++){
+        for(int i = 0; i < 3000; i++){
             allTypeTest();
         }
     });
 
     threadPool.enqueue([](){
-        for(int i = 0; i < 1000; i++){
+        for(int i = 0; i < 3000; i++){
             allTypeTest();
         }
     });
 
     threadPool.enqueue([](){
-        for(int i = 0; i < 10000; i++){
+        for(int i = 0; i < 30000; i++){
             allTypeTest();
         }
     });
@@ -58,12 +60,25 @@ void threadLogTest(){
 }
 
 
+void test(){
+    qlibc::QData f;
+    f.loadFromFile(R"(D:\bywg\project\exhibition\unit\bleSite\test\test.json)");
+    LOG_INFO << f.toJsonString();
+
+}
+
+
 
 int main(int argc, char* argv[]){
 
-    threadLogTest();
+//    threadLogTest();
+//    test();
 
-    LOG_INFO << "------main end----------";
+    LOG_INFO << "1";
+    LOG_RED << "1";
+    LOG_YELLOW << "1";
+    LOG_GREEN << "1";
+
 
     return 0;
 }

@@ -25,7 +25,7 @@ namespace muduo{
      *      添加：添加字符、移动位置
      *      转换：返回已存储的字符串
      */
-    const int SmallBufferSize = 1024 * 4;
+    const int SmallBufferSize = 1024 * 12;
 
     template<int SIZE>
     class FixedBuffer{
