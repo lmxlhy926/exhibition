@@ -10,6 +10,7 @@
 #include "siteService/service_site_manager.h"
 #include "qlibc/FileUtils.h"
 #include "log/Logging.h"
+#include "qlibc/QData.h"
 
 using namespace std;
 using namespace servicesite;
@@ -24,7 +25,16 @@ static const string CONFIG_SITE_ID_NAME = "测试站点";
 void message_handler(const Request& request) {
     // 消息的json字符串位于request.body
     auto message_json = json::parse(request.body);
-    LOG_GREEN << "==>RECEVIE: " << message_json.dump(4).c_str();
+    qlibc::QData data(request.body);
+
+    LOG_YELLOW << "qlibc---->" << data.toJsonString();
+    LOG_YELLOW << ".............................................................................";
+
+    LOG_PURPLE << "message_json.dump(4).c_str()------>" << message_json.dump(4).c_str();
+    LOG_PURPLE << ".............................................................................";
+
+    LOG_GREEN << "request.body------------->" << request.body;
+    LOG_GREEN << ".............................................................................";
 }
 
 
@@ -50,7 +60,7 @@ int main(int argc, char* argv[]) {
             int code;
             std::vector<string> messageIdList;
             messageIdList.push_back("whiteList");
-            code = serviceSiteManager->subscribeMessage("192.168.50.89", 9006, messageIdList);
+            code = serviceSiteManager->subscribeMessage("127.0.0.1", 9006, messageIdList);
 
             if (code == ServiceSiteManager::RET_CODE_OK) {
                 LOG_PURPLE << "subscribeMessage ok......";

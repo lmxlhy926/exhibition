@@ -119,7 +119,7 @@ void publish(){
     std::string password = configData.getString("password");
 
     mqttClient mc;
-    mc.paramConfig(server, port, username, password, "publish");
+    mc.paramConfig(server, port, username, password, "ssssss");
     mc.connect();
 
     string body = data.toJsonString();
@@ -128,7 +128,7 @@ void publish(){
     lhytemp::secretUtil::ecb_encrypt_withPadding(body, out, reinterpret_cast<const uint8_t *>(key));
 
     while(true){
-        mc.publish("publishtest", out, 0);
+        mc.publish("edge/did:chisid:0xd7b8e6f93525720551baabdf56ecc3035492860d/device/domainWhite", out, 0);
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
@@ -142,7 +142,7 @@ int main(int argc, char* argv[]){
     publish();
 
     while(true){
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+        std::this_thread::sleep_for(std::chrono::seconds(20));
     }
 
     return 0;
