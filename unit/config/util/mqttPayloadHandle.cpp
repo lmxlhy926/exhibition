@@ -102,12 +102,14 @@ bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int le
     qlibc::QData payload = transform(payloadReceive, len);
     //存储
     configParamUtil::getInstance()->saveWhiteListData(payload);
+
     //发布
     qlibc::QData publishData;
     publishData.setString("message_id", "whiteList");
     publishData.putData("content", payload);
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->publishMessage(WHITELIST_MESSAGE_ID, publishData.toJsonString());
+    LOG_PURPLE << "publish whiteList............";
 
     return true;
 }
