@@ -7,15 +7,13 @@
 
 #include "qlibc/QData.h"
 
-class bindDevice {
+class BindDevice {
 private:
     qlibc::QData deviceArray_;
 public:
-    explicit bindDevice(const qlibc::QData& deviceArray) : deviceArray_(deviceArray){}
-    void operator()();
+    explicit BindDevice(const qlibc::QData& deviceArray) : deviceArray_(deviceArray){}
 
-private:
-    bool addDevice();
+    void operator()();
 };
 
 
