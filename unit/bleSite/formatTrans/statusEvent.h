@@ -2,8 +2,8 @@
 // Created by 78472 on 2022/7/4.
 //
 
-#ifndef EXHIBITION_LIGHTUPSTATUS_H
-#define EXHIBITION_LIGHTUPSTATUS_H
+#ifndef EXHIBITION_STATUSEVENT_H
+#define EXHIBITION_STATUSEVENT_H
 
 #include <string>
 #include <mutex>
@@ -69,6 +69,11 @@ public:
         cond_.notify_all();
     };
 
+    void wait(){
+        std::unique_lock<std::mutex> ul(mutex_);
+        cond_.wait(ul);
+    }
+
     void wait(int64_t seconds){
         std::unique_lock<std::mutex> ul(mutex_);
         cond_.wait_for(ul, std::chrono::seconds(seconds));
@@ -78,9 +83,9 @@ public:
 
 class EventTable{
 public:
-    Event scanResultEvent;
-    Event nodeAddressAssignSuccessEvent;
-    Event bindSuccessEvent;
+    Event scanResultEvent;                      //扫描结果上报事件
+    Event nodeAddressAssignSuccessEvent;        //节点地址分配成功事件
+    Event bindSuccessEvent;                     //绑定成功事件
 private:
     static EventTable* eventTable;
 
@@ -115,9 +120,11 @@ public:
     void postEvent() override{
         qlibc::QData data;
         data.setString("deviceSn", deviceSn);
-        EventTable::getInstance()->scanResultEvent.putData(data);
-        EventTable::getInstance()->scanResultEvent.notify_one();
-        LOG_HLIGHT << "scanResult Event, deviceSn = " << deviceSn;
+        if(!deviceSn.empty()){
+            EventTable::getInstance()->scanResultEvent.putData(data);
+            EventTable::getInstance()->scanResultEvent.notify_one();
+            LOG_HLIGHT << "scanResult Event, deviceSn = " << deviceSn;
+        }
     }
 private:
     void init(){
@@ -218,4 +225,16 @@ private:
 };
 
 
-#endif //EXHIBITION_LIGHTUPSTATUS_H
+//解析上报的状态数据包，产生上报事件
+class PostStatusEvent{
+private:
+    string statusString;
+public:
+    explicit PostStatusEvent(string packageString) : statusString(std::move(packageString)){}
+
+    void operator()();
+};
+
+
+
+#endif //EXHIBITION_STATUSEVENT_H

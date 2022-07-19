@@ -2,11 +2,10 @@
 // Created by 78472 on 2022/6/15.
 //
 
-#include "lightControlCmd.h"
+#include "downBinaryCmd.h"
 #include "../parameter.h"
 
-
-size_t bleJsonCmd2Binaray(qlibc::QData& data, unsigned char* buf, size_t bufSize){
+size_t DownBinaryCmd::getBinary(QData &data, unsigned char *buf, size_t bufSize) {
     std::cout << "===>getBleCommandBinaray: " << data.toJsonString() << std::endl;
     string pseudoCommand  = data.getString("command");
 
@@ -37,5 +36,12 @@ size_t bleJsonCmd2Binaray(qlibc::QData& data, unsigned char* buf, size_t bufSize
     return 0;
 }
 
+bool DownBinaryCmd::serialSend(unsigned char *buf, int size){
+    return DownBinaryUtil::serialSend(buf, static_cast<int>(size));
+}
 
-
+bool DownBinaryCmd::transAndSendCmd(QData &controlData){
+    unsigned char buf[100]{};
+    size_t size = getBinary(controlData, buf, 100);
+    return serialSend(buf, static_cast<int>(size));
+}

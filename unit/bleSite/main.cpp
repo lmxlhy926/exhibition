@@ -9,12 +9,13 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 
-#include "formatTrans/bleConfig.h"
 #include "qlibc/FileUtils.h"
-#include "formatTrans/binary2JsonEvent.h"
 #include "serviceRequestHandler.h"
 #include "parameter.h"
-#include "formatTrans/lightUpStatus.h"
+#include "formatTrans/statusEvent.h"
+#include "formatTrans/bleConfig.h"
+#include "formatTrans/upBinayCmd.h"
+#include "formatTrans/downBinaryCmd.h"
 
 using namespace std;
 using namespace servicesite;
@@ -41,8 +42,8 @@ int main(int argc, char* argv[]) {
     bleConfig* configPathPtr = bleConfig::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
-    //打开串口
-    while(!configPathPtr->serialInit(Binary2JsonEvent::binary2JsonEvent)){
+    //注册串口上报回调函数，初始化并打开串口
+    while(!configPathPtr->serialInit(UpBinaryCmd::parseAndGenerateEvent)){
         std::cout << "==>failed to open the serial<"
                   << configPathPtr->getSerialData().getString("serial") << ">...." << std::endl;
         std::cout << "===>try to open in 3 seconds....." << std::endl;

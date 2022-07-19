@@ -1,8 +1,0 @@
-#ifndef EXHIBITION_CONFIGPATH_H
-#define EXHIBITION_CONFIGPATH_H
-
-
-const char* configPath = "${CONFIG_PATH}";
-
-
-#endif //EXHIBITION_CONFIGPATH_H

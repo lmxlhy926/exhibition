@@ -2,30 +2,42 @@
 // Created by 78472 on 2022/6/15.
 //
 
-#ifndef EXHIBITION_LIGHTCONTROLCMD_H
-#define EXHIBITION_LIGHTCONTROLCMD_H
+#ifndef EXHIBITION_DOWNBINARYCMD_H
+#define EXHIBITION_DOWNBINARYCMD_H
 
 #include <string>
 #include "qlibc/QData.h"
-#include "JsonCmd2Binary.h"
+#include "downBinaryUtil.h"
 
 using namespace std;
 
-/**
- * 依据下发的请求命令获得二进制控制命令
- * @param data      控制命令
- * @param buf       二进制命令数组
- * @param bufSize   数组容量
- * @return          二进制命令长度
- */
-size_t bleJsonCmd2Binaray(qlibc::QData& data, unsigned char* buf, size_t bufSize);
+class DownBinaryCmd{
+public:
+    /**
+     * 将json格式控制命令转换为二进制控制命令
+     * @param data      控制命令
+     * @param buf       二进制命令数组
+     * @param bufSize   数组容量
+     * @return          二进制命令长度
+     */
+    static size_t getBinary(qlibc::QData& data, unsigned char* buf, size_t bufSize);
 
+    //向串口发送二进制命令
+    static bool serialSend(unsigned char *buf, int size);
+
+    //将json格式控制命令转换为二进制格式，并向串口发送。
+    static bool transAndSendCmd(QData &controlData);
+};
+
+class JsonCmd2Binary{
+    virtual size_t getBinary(unsigned char* buf, size_t bufSize) = 0;
+};
 
 class LightScan : public JsonCmd2Binary{
 public:
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
         string binaryString = "E9FF00";
-        return binaryString2binary(binaryString, buf, bufSize);
+        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
     }
 };
 
@@ -33,7 +45,7 @@ class LightScanEnd : public JsonCmd2Binary{
 public:
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
         string binaryString = "E9FF01";
-        return binaryString2binary(binaryString, buf, bufSize);
+        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
     }
 };
 
@@ -45,7 +57,7 @@ public:
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
         string binaryString = "E9FF08" + deviceSn;
-        return binaryString2binary(binaryString, buf, bufSize);
+        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
     }
 };
 
@@ -53,7 +65,7 @@ class LightGatewayAddressAssign : public JsonCmd2Binary{
 public:
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
         string binaryString = "E9FF091112131415161718191A1B1C1D1E1F20000000112233440100";
-        return binaryString2binary(binaryString, buf, bufSize);
+        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
     }
 };
 
@@ -65,7 +77,7 @@ public:
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
         string binaryString = "E9FF0A1112131415161718191A1B1C1D1E1F2000000011223344" + nodeAddress;
-        return binaryString2binary(binaryString, buf, bufSize);
+        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
     }
 };
 
@@ -73,7 +85,7 @@ class LightBind : public JsonCmd2Binary{
 public:
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
         string binaryString = "E9FF0B00000060964771734FBD76E3B40519D1D94A48";
-        return binaryString2binary(binaryString, buf, bufSize);
+        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
     }
 };
 
@@ -95,11 +107,11 @@ public:
         thisBleConfigData.asValue()["commonBase"]["param"]["ADDRESS_DEST"] = address;
         thisBleConfigData.asValue()["commonBase"]["param"]["OPERATION"] = pseudoCommand;
 
-        string binaryString = getBinaryString(thisBleConfigData);
-        return binaryString2binary(binaryString, buf, bufSize);
+        string binaryString = DownBinaryUtil::getBinaryString(thisBleConfigData);
+        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
     }
 };
 
 
 
-#endif //EXHIBITION_LIGHTCONTROLCMD_H
+#endif //EXHIBITION_DOWNBINARYCMD_H

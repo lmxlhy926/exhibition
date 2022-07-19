@@ -5,11 +5,12 @@
 #include "serviceRequestHandler.h"
 #include "siteService/nlohmann/json.hpp"
 #include "qlibc/QData.h"
-#include "formatTrans/lightControlCmd.h"
+#include "formatTrans/downBinaryCmd.h"
 #include <regex>
 #include "log/Logging.h"
 #include "logic/logicControl.h"
-#include "formatTrans/lightControlCmd.h"
+#include "formatTrans/downBinaryCmd.h"
+#include "formatTrans/downBinaryUtil.h"
 
 static const nlohmann::json okResponse = {
         {"code", 0},
@@ -39,14 +40,12 @@ int BleDevice_command_service_handler(const Request& request, Response& response
     return 0;
 }
 
-
-
 int BleDevice_command_test_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
         string command = requestBody.getData("request").getString("command");
         unsigned char buf[100]{};
-        JsonCmd2Binary::BinaryBuf binaryBuf(buf, 100);
+        BinaryBuf binaryBuf(buf, 100);
 
         regex sep(" ");
         sregex_token_iterator p(command.cbegin(), command.cend(), sep, -1);
@@ -56,7 +55,7 @@ int BleDevice_command_test_service_handler(const Request& request, Response& res
         }
         LOG_HLIGHT << "--->send: " << command;
 
-        serialSend(buf, static_cast<int>(binaryBuf.size()));
+        DownBinaryUtil::serialSend(buf, static_cast<int>(binaryBuf.size()));
 
         response.set_content(okResponse.dump(), "text/json");
     }else{

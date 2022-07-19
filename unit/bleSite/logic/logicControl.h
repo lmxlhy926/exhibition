@@ -11,13 +11,6 @@
 
 using namespace std;
 
-//串口发送数据
-bool serialSend(unsigned char *buf, int size);
-
-//转换并发送命令
-bool transAndSendCmd(qlibc::QData& controlData);
-
-
 class LogicControl {
 private:
     static atomic<bool> scanFlag;

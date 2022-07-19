@@ -2,9 +2,15 @@
 // Created by 78472 on 2022/6/7.
 //
 
-#include "JsonCmd2Binary.h"
+#include "downBinaryUtil.h"
+#include <sstream>
+#include <iomanip>
+#include <mutex>
+#include "log/Logging.h"
 
-string JsonCmd2Binary::getBinaryString(QData &bleConfigData) {
+std::mutex DownBinaryUtil::sendMutex;
+
+string DownBinaryUtil::getBinaryString(QData &bleConfigData) {
     std::vector<string> commonBaseParamOrderVec;
     qlibc::QData commonBaseParamOrder = bleConfigData.getData("commonBase").getData("paramOrder");
     for(int i = 0; i < commonBaseParamOrder.size(); i++){
@@ -45,7 +51,7 @@ string JsonCmd2Binary::getBinaryString(QData &bleConfigData) {
     return binaryCommandString;
 }
 
-size_t JsonCmd2Binary::binaryString2binary(string &binaryString, unsigned char *buf, size_t size) {
+size_t DownBinaryUtil::binaryString2binary(string &binaryString, unsigned char *buf, size_t size) {
     std::cout << "==>binaryString: " << binaryString << std::endl;
     BinaryBuf binaryBuf(buf, size);
     for(int i = 0; i < binaryString.size() / 2; i++){
@@ -53,6 +59,28 @@ size_t JsonCmd2Binary::binaryString2binary(string &binaryString, unsigned char *
         binaryBuf.append(charString);
     }
     return binaryBuf.size();
+}
+
+bool DownBinaryUtil::serialSend(unsigned char *buf, int size) {
+    shared_ptr<BLETelinkDongle> serial = bleConfig::getInstance()->getSerial();
+    if(serial != nullptr){
+        std::lock_guard<std::mutex> lg(sendMutex);
+        if(serial->sendData(buf, static_cast<int>(size))){
+            printSendBinary(buf, size);
+            return true;
+        }
+    }
+    return false;
+}
+
+void DownBinaryUtil::printSendBinary(unsigned char *buf, int size) {
+    stringstream ss;
+    for(int i = 0; i < size; i++){
+        ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << static_cast<int>(buf[i]);
+        if(i < size -1)
+            ss << " ";
+    }
+    LOG_HLIGHT << "==>sendCmd: " << ss.str();
 }
 
 
