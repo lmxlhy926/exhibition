@@ -5,12 +5,13 @@
 #include "bleConfig.h"
 #include "qlibc/FileUtils.h"
 #include <iostream>
+#include "log/Logging.h"
 
 bleConfig* bleConfig::instance = nullptr;
 
 bleConfig* bleConfig::getInstance() {
     if(instance == nullptr)
-        instance = new bleConfig;
+        instance = new bleConfig(10);
     return instance;
 }
 
@@ -39,20 +40,34 @@ QData bleConfig::getSerialData() {
     return serialData;
 }
 
+QData bleConfig::getSnAddrData() {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    if(snAddressData.empty()){
+        snAddressData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/snAddress.json"));
+    }
+    return snAddressData;
+}
+
+void bleConfig::saveSnAddrData(qlibc::QData& data) {
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    snAddressData.setInitData(data);
+    snAddressData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/snAddress.json"), true);
+}
+
 bool bleConfig::serialInit(bleConfig::SerialReceiveFunc receiveFuc) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(serial == nullptr){
         string serialPort = getSerialData().getString("serial");
-        std::cout << "===>serialPort: " << serialPort << std::endl;
+        LOG_INFO << "===>serialPort: " << serialPort;
         serial.reset(new BLETelinkDongle(serialPort));
         serial->initDongle();
         serial->regRecvDataProc(receiveFuc);
         if(!serial->startDongle()){
-            std::cout << "===>failed in startDongle" << std::endl;
+            LOG_RED << "===>failed in startDongle";
             serial.reset();
             return false;
         }else{
-            std::cout << "===>success in startDongle" << std::endl;
+            LOG_INFO << "===>success in startDongle";
             return true;
         }
     }
@@ -63,6 +78,12 @@ shared_ptr<BLETelinkDongle> bleConfig::getSerial() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     return serial;
 }
+
+void bleConfig::enqueue(std::function<void()> fn) {
+    threadPool.enqueue(fn);
+}
+
+
 
 
 

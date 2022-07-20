@@ -74,9 +74,9 @@ public:
         cond_.wait(ul);
     }
 
-    void wait(int64_t seconds){
+    std::cv_status wait(int64_t seconds){
         std::unique_lock<std::mutex> ul(mutex_);
-        cond_.wait_for(ul, std::chrono::seconds(seconds));
+        return cond_.wait_for(ul, std::chrono::seconds(seconds));
     }
 };
 
@@ -123,7 +123,7 @@ public:
         if(!deviceSn.empty()){
             EventTable::getInstance()->scanResultEvent.putData(data);
             EventTable::getInstance()->scanResultEvent.notify_one();
-            LOG_HLIGHT << "scanResult Event, deviceSn = " << deviceSn;
+            LOG_GREEN << "<<===: scanResult Event, deviceSn = " << deviceSn;
         }
     }
 private:
@@ -146,7 +146,7 @@ public:
     void postEvent() override{
         if(eventAck){
             EventTable::getInstance()->nodeAddressAssignSuccessEvent.notify_one();
-            LOG_HLIGHT << "nodeAddress assign operation completed.....";
+            LOG_GREEN << "<<==: nodeAddress assign operation completed.....";
         }
     }
 
@@ -173,7 +173,7 @@ public:
     void postEvent() override{
         if(eventAck){
             EventTable::getInstance()->bindSuccessEvent.notify_one();
-            LOG_HLIGHT << "bind operation success.....";
+            LOG_GREEN << "<<===: bind operation success.....";
         }
     }
 

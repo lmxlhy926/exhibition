@@ -44,24 +44,24 @@ int main(int argc, char* argv[]) {
 
     //注册串口上报回调函数，初始化并打开串口
     while(!configPathPtr->serialInit(UpBinaryCmd::parseAndGenerateEvent)){
-        std::cout << "==>failed to open the serial<"
-                  << configPathPtr->getSerialData().getString("serial") << ">...." << std::endl;
-        std::cout << "===>try to open in 3 seconds....." << std::endl;
+        LOG_RED << "==>failed to open the serial<"
+                  << configPathPtr->getSerialData().getString("serial") << ">....";
+        LOG_RED << "===>try to open in 3 seconds.....";
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
-    std::cout << "===>success in open serial<"
-              << configPathPtr->getSerialData().getString("serial") << ">...." << std::endl;
+    LOG_INFO << "===>success in open serial<"
+              << configPathPtr->getSerialData().getString("serial") << ">....";
 
     //注册蓝牙命令handler
     serviceSiteManager->registerServiceRequestHandler(Ble_Device_Command_Service_ID,
-                                                      [&](const Request& request, Response& response) -> int{
+                                                      [](const Request& request, Response& response) -> int{
         return BleDevice_command_service_handler(request, response);
     });
 
     serviceSiteManager->registerServiceRequestHandler(Ble_Device_Test_Command_Service_ID,
-                                                      [&](const Request& request, Response& response) -> int{
-                                                          return BleDevice_command_test_service_handler(request, response);
-                                                      });
+                                                      [](const Request& request, Response& response) -> int{
+        return BleDevice_command_test_service_handler(request, response);
+    });
 
 
     // 站点监听线程启动

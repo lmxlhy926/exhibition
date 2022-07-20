@@ -19,18 +19,22 @@ static string AssignNodeAddressString = R"({"command":"assignNodeAddress", "node
 static string BindString = R"({"command":"bind"})";
 
 
-atomic<bool> LogicControl::scanFlag{false};
+atomic<bool> LogicControl::bindingFlag{false};
 
 bool LogicControl::parse(qlibc::QData &cmdData) {
+    if(bindingFlag.load())  return false;
 
     string pseudoCommand  = cmdData.getString("command");
     if(pseudoCommand == SCAN){
-        LOG_BLUE << "start to scan......";
+        LOG_YELLOW << "start to scan......";
         DownBinaryCmd::transAndSendCmd(cmdData);
 
     }else if(pseudoCommand == CONNECT){
+        bindingFlag.store(true);
         qlibc::QData deviceSnArray = cmdData.getData("deviceSn");
         BindDevice(deviceSnArray).operator()();
+        bindingFlag.store(false);
+
     }else{
         DownBinaryCmd::transAndSendCmd(cmdData);
     }

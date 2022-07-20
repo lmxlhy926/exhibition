@@ -9,8 +9,7 @@
 #include <regex>
 #include "log/Logging.h"
 #include "logic/logicControl.h"
-#include "formatTrans/downBinaryCmd.h"
-#include "formatTrans/downBinaryUtil.h"
+
 
 static const nlohmann::json okResponse = {
         {"code", 0},
@@ -24,7 +23,7 @@ static const nlohmann::json errResponse = {
         {"response",{}}
 };
 
-void downCmdHandler(qlibc::QData& request){
+void downCmdHandler(qlibc::QData request){
     qlibc::QData cmdData = request.getData("request");
     LogicControl::parse(cmdData);
 }
@@ -32,7 +31,9 @@ void downCmdHandler(qlibc::QData& request){
 int BleDevice_command_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
-        downCmdHandler(requestBody);
+        bleConfig::getInstance()->enqueue([requestBody]{
+            downCmdHandler(requestBody);
+        });
         response.set_content(okResponse.dump(), "text/json");
     }else{
         response.set_content(errResponse.dump(), "text/json");

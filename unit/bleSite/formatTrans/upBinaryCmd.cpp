@@ -51,7 +51,7 @@ void printBinaryString(string &str) {
 
 bool UpBinaryCmd::parseAndGenerateEvent(unsigned char *binaryStream, int size) {
     string binaryString = binaryCmd2String(binaryStream, size);
-    printBinaryString(binaryString);
+//    printBinaryString(binaryString);
     PostStatusEvent(binaryString).operator()();
     return true;
 }

@@ -114,11 +114,11 @@ void PostStatusEvent::operator()() {
         rs.read2Byte().read2Byte().read2Byte(opcode);
         if(opcode == "8204"){
             rs.rollBack(6);
-            LOG_HLIGHT << "==>LightOnOffStatus: " << LightOnOffStatus(rs.remainingString()).construct();
+            LOG_GREEN << "<<===: LightOnOffStatus: " << LightOnOffStatus(rs.remainingString()).construct();
 
         }else if(opcode == "824E"){
             rs.rollBack(6);
-            LOG_HLIGHT << "==>LightBrightStatus: " << LightBrightStatus(rs.remainingString()).construct();
+            LOG_GREEN << "<<===: LightBrightStatus: " << LightBrightStatus(rs.remainingString()).construct();
         }
     }
 }

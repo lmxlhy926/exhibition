@@ -23,5 +23,12 @@ target_link_libraries(logtest PRIVATE format)
 target_link_libraries(logtest PRIVATE log)
 target_link_libraries(logtest PRIVATE common)
 
+add_executable(snAddrTest snAddrTest.cpp)
+target_link_libraries(snAddrTest PRIVATE qlibc)
+target_link_libraries(snAddrTest PRIVATE format)
+target_link_libraries(snAddrTest PRIVATE log)
+target_link_libraries(snAddrTest PRIVATE common)
+target_link_libraries(snAddrTest PRIVATE bleLogic)
+
 
 

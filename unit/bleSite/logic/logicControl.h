@@ -13,7 +13,7 @@ using namespace std;
 
 class LogicControl {
 private:
-    static atomic<bool> scanFlag;
+    static atomic<bool> bindingFlag;
 public:
     static bool parse(qlibc::QData& cmdData);
 };

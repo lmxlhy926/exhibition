@@ -9,6 +9,7 @@
 #include "serial/BLETelinkDongle.h"
 #include <memory>
 #include <functional>
+#include "common/httplib.h"
 
 using namespace qlibc;
 
@@ -19,12 +20,14 @@ private:
     string dataDirPath;                         //配置文件路径
     QData bleParamData;                         //蓝牙命令配置数据
     QData serialData;                           //串口配置数据
+    QData snAddressData;                        //蓝牙设备地址表
     std::shared_ptr<BLETelinkDongle> serial;    //串口
+    httplib::ThreadPool threadPool;             //线程池
     static bleConfig* instance;
     std::recursive_mutex mutex_;
 
 private:
-    bleConfig() = default;
+    explicit bleConfig(size_t n) : threadPool(n){}
 
 public:
     static bleConfig* getInstance();
@@ -37,9 +40,15 @@ public:
 
     QData getSerialData();
 
+    QData getSnAddrData();
+
+    void saveSnAddrData(qlibc::QData& data);
+
     bool serialInit(SerialReceiveFunc receiveFuc);
 
     shared_ptr<BLETelinkDongle> getSerial();
+
+    void enqueue(std::function<void()> fn);
 };
 
 
