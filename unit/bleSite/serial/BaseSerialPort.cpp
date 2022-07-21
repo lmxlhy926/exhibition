@@ -66,7 +66,7 @@ bool BaseSerialPort::setDataStartEndByte(unsigned char start, unsigned char end)
 
 void BaseSerialPort::onSerialDataRead() {
 //    uint8_t* pMsg = nullptr;
-//    int32_t nM_len = 0;
+    int32_t nM_len = 0;
     uint8_t* pMsg_start = nullptr;
     uint8_t* pStart = mSerialDataBuff;
     int j = 0;
@@ -83,7 +83,7 @@ void BaseSerialPort::onSerialDataRead() {
                 {
                     nM_len = j - i +1;
 //                    pMsg = new uint8_t[nM_len];
-//                    if(pMsg != NULL)
+                    if(pMsg != NULL)
                     {
                         memcpy(pMsg, pStart + i, nM_len);
                         if(recv_call_back != nullptr)

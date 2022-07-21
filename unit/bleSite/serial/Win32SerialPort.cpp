@@ -187,6 +187,7 @@ bool Win32SerialPort::writeSerialData(uint8_t *buff, int32_t len) {
             bRet = false;
             break;
         }
+
         bResult = ClearCommError(m_hCom, &dwError, &comstat);
         if (!bResult)
         {
@@ -215,6 +216,7 @@ bool Win32SerialPort::writeSerialData(uint8_t *buff, int32_t len) {
 
     memcpy(_mdata, buff, len);
     bResult = WriteFile(m_hCom, _mdata, len, &dwWrite_byte, &ov);
+
     // deal with any error codes
     if (!bResult)
     {
@@ -223,6 +225,13 @@ bool Win32SerialPort::writeSerialData(uint8_t *buff, int32_t len) {
         {
             case ERROR_IO_PENDING:
                 // continue to GetOverlappedResuts()
+                ipp_LogE("continue to GetOverlappedResuts\n");
+                while(!GetOverlappedResult(m_hCom, &ov, &dwWrite_byte, TRUE))
+                {
+                    dwError = GetLastError();
+                    if(dwError == ERROR_IO_INCOMPLETE)
+                        continue;
+                }
                 break;
 
             default:

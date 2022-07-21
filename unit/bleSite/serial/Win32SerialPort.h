@@ -5,6 +5,7 @@
 #ifndef BLE_LIGHT_SITE_WIN32SERIALPORT_H
 #define BLE_LIGHT_SITE_WIN32SERIALPORT_H
 
+#include <mutex>
 #include <windows.h>
 #include "BaseSerialPort.h"
 
@@ -31,6 +32,7 @@ private:
     HANDLE m_hThr_shut_event;
     HANDLE m_hEvent_array[2];
     void procSerialData();
+    std::mutex rwMutex;
 };
 
 #endif //BLE_LIGHT_SITE_WIN32SERIALPORT_H

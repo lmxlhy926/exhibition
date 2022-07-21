@@ -75,7 +75,9 @@ bool PosixSerialPort::writeSerialData(uint8_t *buff, int32_t len) {
     }
 
     bool bRet = false;
-    uint8_t* start = buff;
+    //uint8_t* start = buff;
+    uint8_t start[128] = {0x00};
+    memcpy(start, buff, len);
     while (leftTry--)
     {
         int32_t ret = write(fd_serial, start, nLeft);
