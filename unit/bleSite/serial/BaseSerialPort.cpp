@@ -29,6 +29,7 @@ bool BaseSerialPort::startReadSerialData(){
     read_thread_ = new std::thread([this]() {
         readSerialData();
     });
+    //todo ???
     read_thread_->detach();
 
     return true;
@@ -76,12 +77,14 @@ void BaseSerialPort::onSerialDataRead() {
     {
         if (pStart[i] == data_start_byte)
         {
+            //定位到包头
             pMsg_start = pStart + i;
             for (j = i+1; j < mBuffLen; j++)
             {
+                //定位到包尾
                 if (pStart[j] == data_end_byte)
                 {
-                    nM_len = j - i +1;
+                    nM_len = j - i +1;      //包长度
 //                    pMsg = new uint8_t[nM_len];
                     if(pMsg != NULL)
                     {
@@ -89,17 +92,19 @@ void BaseSerialPort::onSerialDataRead() {
                         if(recv_call_back != nullptr)
                             recv_call_back(pMsg, nM_len);
                     }
+                    //移到已处理包的下一个位置
                     pMsg_start = pStart + i + nM_len;
                     i += nM_len;
 
-//                    delete pMsg;
-//                    pMsg = nullptr;
+                    //清空存放包数据的数组
                     memset(pMsg, 0x00, ival_comm_buff_size);
                     nM_len = 0;
                 }
             }
         }
     }
+
+    //保留剩余的未处理数据到缓冲区头部
     mBuffLen = (mSerialDataBuff + mBuffLen) - pMsg_start;
     memmove(mSerialDataBuff, pMsg_start, mBuffLen);
     memset(mSerialDataBuff + mBuffLen, 0, ival_comm_buff_size - mBuffLen);

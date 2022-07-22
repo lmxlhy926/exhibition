@@ -39,7 +39,7 @@ bool PosixSerialPort::initSerial(std::string serial_name, SerialParamStruct aStr
         ipp_LogE("%s open error:%d",realComName.c_str(), errno);
         return false;
     }
-    int res = fcntl(fd_serial, F_SETFL,0);
+    int res = fcntl(fd_serial, F_SETFL, 0);
     if(res)
     {
         ipp_LogE("fcntl failed\n");
@@ -78,9 +78,10 @@ bool PosixSerialPort::writeSerialData(uint8_t *buff, int32_t len) {
     //uint8_t* start = buff;
     uint8_t start[128] = {0x00};
     memcpy(start, buff, len);
+    uint8_t * ptr = start;
     while (leftTry--)
     {
-        int32_t ret = write(fd_serial, start, nLeft);
+        int32_t ret = write(fd_serial, ptr, nLeft);
         if(ret <= 0)
         {
             ipp_LogE("write error!\n");
@@ -93,7 +94,7 @@ bool PosixSerialPort::writeSerialData(uint8_t *buff, int32_t len) {
             bRet = true;
             break;
         }
-        start += ret;
+        ptr += ret;
     }
     if (!bRet)
     {

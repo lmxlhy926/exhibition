@@ -8,14 +8,16 @@
 #include <string>
 #include <atomic>
 #include "qlibc/QData.h"
+#include "bindDevice.h"
 
 using namespace std;
 
 class LogicControl {
 private:
-    static atomic<bool> bindingFlag;
+    atomic<bool> bindingFlag{false};
+    BindDevice bd;
 public:
-    static bool parse(qlibc::QData& cmdData);
+     bool parse(qlibc::QData& cmdData);
 };
 
 

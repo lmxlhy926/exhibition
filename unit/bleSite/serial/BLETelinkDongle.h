@@ -11,8 +11,8 @@ class BLETelinkDongle : public CommonDongle{
 public:
     explicit BLETelinkDongle(std::string _name);
 
+    //设置通信参数，设置起始结束字符，初始化串口配置
     bool initDongle() override;
-    bool setStartEndByte(unsigned char start, unsigned char end);
 };
 
 #endif //BLE_LIGHT_SITE_BLETELINKDONGLE_H

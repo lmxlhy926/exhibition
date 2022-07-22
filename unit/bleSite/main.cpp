@@ -16,6 +16,7 @@
 #include "formatTrans/bleConfig.h"
 #include "formatTrans/upBinayCmd.h"
 #include "formatTrans/downBinaryCmd.h"
+#include "logic/logicControl.h"
 
 using namespace std;
 using namespace servicesite;
@@ -30,9 +31,6 @@ int main(int argc, char* argv[]) {
 
     httplib::ThreadPool threadPool_(10);
     std::atomic<bool> http_server_thread_end(false);
-
-    //初始化单例EventTable单例对象
-//    EventTable::getInstance();
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
@@ -52,10 +50,13 @@ int main(int argc, char* argv[]) {
     LOG_INFO << "===>success in open serial<"
               << configPathPtr->getSerialData().getString("serial") << ">....";
 
+    //创建控制类，传递给注册的回调函数
+    LogicControl lc;
+
     //注册蓝牙命令handler
     serviceSiteManager->registerServiceRequestHandler(Ble_Device_Command_Service_ID,
-                                                      [](const Request& request, Response& response) -> int{
-        return BleDevice_command_service_handler(request, response);
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return BleDevice_command_service_handler(request, response, lc);
     });
 
     serviceSiteManager->registerServiceRequestHandler(Ble_Device_Test_Command_Service_ID,

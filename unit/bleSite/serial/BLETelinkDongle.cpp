@@ -7,7 +7,6 @@
 BLETelinkDongle::BLETelinkDongle(std::string _name):CommonDongle(_name){
 }
 
-
 bool BLETelinkDongle::initDongle(){
     if(pSerial != nullptr)
     {
@@ -18,7 +17,6 @@ bool BLETelinkDongle::initDongle(){
         _sp.baudrate = 115200;
 
         pSerial->setDataStartEndByte( 0x01, 0x03);
-
         return pSerial->initSerial(serial_name, _sp);
     }
 

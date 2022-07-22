@@ -14,13 +14,6 @@
 #include <iomanip>
 
 
-static string AssignGateWayAddressString = R"({"command":"assignGateWayAddress"})";
-static string AssignNodeAddressString = R"({"command":"assignNodeAddress", "nodeAddress":"0200"})";
-static string BindString = R"({"command":"bind"})";
-
-
-atomic<bool> LogicControl::bindingFlag{false};
-
 bool LogicControl::parse(qlibc::QData &cmdData) {
     if(bindingFlag.load())  return false;
 
@@ -32,7 +25,7 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
     }else if(pseudoCommand == CONNECT){
         bindingFlag.store(true);
         qlibc::QData deviceSnArray = cmdData.getData("deviceSn");
-        BindDevice(deviceSnArray).operator()();
+        bd.bind(deviceSnArray);
         bindingFlag.store(false);
 
     }else{

@@ -8,12 +8,19 @@
 #include "log/Logging.h"
 
 static string AssignGateWayAddressString = R"({"command":"assignGateWayAddress"})";
-static string AssignNodeAddressString1 = R"({"command":"assignNodeAddress", "nodeAddress":"0201"})";
-static string AssignNodeAddressString2 = R"({"command":"assignNodeAddress", "nodeAddress":"0202"})";
 static string BindString = R"({"command":"bind"})";
 
+void BindDevice::bind(QData &deviceArray) {
+    Json::ArrayIndex arraySize = deviceArray.size();
+    if(deviceArray.type() != Json::arrayValue) return;
+    for(Json::ArrayIndex i = 0; i < arraySize; i++){
+        string deviceSn = deviceArray.getArrayElement(i).asValue().asString();
+        addDevice(deviceSn, i);
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
+}
 
-bool addDevice(string& deviceSn, Json::ArrayIndex index) {
+bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
     //0. 扫描
     qlibc::QData scanData;
     scanData.setString("command", "scan");
@@ -42,35 +49,24 @@ bool addDevice(string& deviceSn, Json::ArrayIndex index) {
     LOG_RED << "<<: successed in connecting the device: <" << deviceSn << ">....";
 
 //    if(index == 0){
-        //2. 网关分配地址
-        LOG_YELLOW << ">>: start to assign gateway address....";
-        qlibc::QData gateAddressAssign(AssignGateWayAddressString);
-        DownBinaryCmd::transAndSendCmd(gateAddressAssign);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        LOG_RED << "<<: successed to assign gateway address....";
+    //2. 网关分配地址
+    LOG_YELLOW << ">>: start to assign gateway address....";
+    qlibc::QData gateAddressAssign(AssignGateWayAddressString);
+    DownBinaryCmd::transAndSendCmd(gateAddressAssign);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    LOG_RED << "<<: successed to assign gateway address....";
 //    }
 
     //3. 节点分配地址
     LOG_YELLOW << ">>: start to assgin node address....";
-    if(index == 0){
-        qlibc::QData nodeAddressAssign(AssignNodeAddressString1);
-        DownBinaryCmd::transAndSendCmd(nodeAddressAssign);
-        if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(30) == std::cv_status::no_timeout){
-            LOG_RED << "<<: successed to assgin node address....";
-        }else{
-            LOG_RED << "<<: FAILED TO ASSIGN NODE ADDRESS....";
-            return false;
-        }
-
-    }else if(index == 1){
-        qlibc::QData nodeAddressAssign(AssignNodeAddressString2);
-        DownBinaryCmd::transAndSendCmd(nodeAddressAssign);
-        if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(30) == std::cv_status::no_timeout){
-            LOG_RED << "<<: successed to assgin node address....";
-        }else{
-            LOG_RED << "<<: FAILED TO ASSIGN NODE ADDRESS....";
-            return false;
-        }
+    qlibc::QData nodeAddressAssign(snAddrMap.getNodeAssignAddr(deviceSn));
+    DownBinaryCmd::transAndSendCmd(nodeAddressAssign);
+    if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(30) == std::cv_status::no_timeout){
+        LOG_RED << "<<: successed to assgin node address....";
+    }else{
+        snAddrMap.deleteDeviceSn(deviceSn);
+        LOG_RED << "<<: FAILED TO ASSIGN NODE ADDRESS....";
+        return false;
     }
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
@@ -94,17 +90,5 @@ bool addDevice(string& deviceSn, Json::ArrayIndex index) {
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
     return true;
-}
-
-
-
-void BindDevice::operator()() {
-    Json::ArrayIndex arraySize = deviceArray_.size();
-    if(deviceArray_.type() != Json::arrayValue) return;
-    for(Json::ArrayIndex i = 0; i < arraySize; i++){
-        string deviceSn = deviceArray_.getArrayElement(i).asValue().asString();
-        addDevice(deviceSn, i);
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-    }
 }
 

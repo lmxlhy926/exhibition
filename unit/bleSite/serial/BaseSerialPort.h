@@ -14,10 +14,10 @@ const static uint16_t ival_comm_buff_size = 1024;
 const static uint16_t ival_comm_buff_max = 32768;
 
 typedef struct serial_param{
-    int databits;
-    int stopbits;
-    int parity;
-    int baudrate;
+    int databits;   //数据位
+    int stopbits;   //停止位
+    int parity;     //奇偶位
+    int baudrate;   //波特率
 }SerialParamStruct;
 
 class BaseSerialPort{
@@ -27,8 +27,11 @@ public:
     virtual bool initSerial(std::string serial_name, SerialParamStruct aStruct) = 0;
     bool startReadSerialData();
     bool stopReadSerialData();
+    //向串口写数据
     virtual bool writeSerialData(unsigned char *buff, int len) = 0;
+    //注册回调函数
     bool regSerialDataProcess(RECV_DATA_CALLBACK fun);
+    //设置起始、结束字符
     bool setDataStartEndByte(unsigned char start, unsigned char end);
 
 protected:

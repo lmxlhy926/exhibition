@@ -7,10 +7,11 @@
 
 #include <string>
 #include "common/httplib.h"
+#include "logic/logicControl.h"
 using namespace httplib;
 
 
-int BleDevice_command_service_handler(const Request& request, Response& response);
+int BleDevice_command_service_handler(const Request& request, Response& response, LogicControl& lc);
 
 int BleDevice_command_test_service_handler(const Request& request, Response& response);
 

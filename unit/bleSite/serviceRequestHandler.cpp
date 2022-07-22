@@ -23,16 +23,13 @@ static const nlohmann::json errResponse = {
         {"response",{}}
 };
 
-void downCmdHandler(qlibc::QData request){
-    qlibc::QData cmdData = request.getData("request");
-    LogicControl::parse(cmdData);
-}
 
-int BleDevice_command_service_handler(const Request& request, Response& response){
+int BleDevice_command_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
-        bleConfig::getInstance()->enqueue([requestBody]{
-            downCmdHandler(requestBody);
+        bleConfig::getInstance()->enqueue([requestBody, &lc]{
+            qlibc::QData cmdData = requestBody.getData("request");
+            lc.parse(cmdData);
         });
         response.set_content(okResponse.dump(), "text/json");
     }else{

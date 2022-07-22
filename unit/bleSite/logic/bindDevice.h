@@ -6,14 +6,18 @@
 #define EXHIBITION_BINDDEVICE_H
 
 #include "qlibc/QData.h"
+#include "snAddressMap.h"
 
 class BindDevice {
 private:
-    qlibc::QData deviceArray_;
+    SnAddressMap snAddrMap;
 public:
-    explicit BindDevice(const qlibc::QData& deviceArray) : deviceArray_(deviceArray){}
+    explicit BindDevice(){}
 
-    void operator()();
+    void bind(qlibc::QData& deviceArray);
+
+private:
+    bool addDevice(string& deviceSn, Json::ArrayIndex index);
 };
 
 
