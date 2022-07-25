@@ -4,20 +4,11 @@
 
 #include <string.h>
 #include "CommonDongle.h"
-//#if defined(__WIN32__) || defined(__CYGWIN__)
-//#include "Win32SerialPort.h"
-//#else
 #include "PosixSerialPort.h"
-//#endif
 
 CommonDongle::CommonDongle(std::string port_name){
     serial_name = port_name;
-//#if defined(__WIN32__) || defined(__CYGWIN__)
-//    pSerial = new Win32SerialPort();
-//#else
     pSerial = new PosixSerialPort();
-//#endif
-
     recv_data_proc = nullptr;
 }
 

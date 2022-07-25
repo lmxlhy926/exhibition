@@ -75,7 +75,6 @@ bool PosixSerialPort::writeSerialData(uint8_t *buff, int32_t len) {
     }
 
     bool bRet = false;
-    //uint8_t* start = buff;
     uint8_t start[128] = {0x00};
     memcpy(start, buff, len);
     uint8_t * ptr = start;
@@ -130,7 +129,7 @@ void PosixSerialPort::setSpeed(int speed){
     int   status;
     struct termios   Opt;
     tcgetattr(fd_serial, &Opt);
-    for(i=0; i<sizeof(speed_arr)/sizeof(int); i++)
+    for(i = 0; i < sizeof(speed_arr)/sizeof(int); i++)
     {
         if(speed == name_arr[i])
         {
@@ -172,18 +171,18 @@ bool PosixSerialPort::setParity(int databits, int stopbits, int parity)
     {
         case 'n':
         case 'N':
-            options.c_cflag &= ~PARENB;   /* Clear parity enable */
+            options.c_cflag &= ~PARENB;    /* Clear parity enable */
             options.c_iflag &= ~INPCK;     /* Enable parity checking */
             break;
         case 'o':
         case 'O':
-            options.c_cflag |= (PARODD | PARENB); /* 设置为奇效验*/
-            options.c_iflag |= INPCK;             /* Disnable parity checking */
+            options.c_cflag |= (PARODD | PARENB);   /* 设置为奇效验*/
+            options.c_iflag |= INPCK;               /* Disnable parity checking */
             break;
         case 'e':
         case 'E':
-            options.c_cflag |= PARENB;     /* Enable parity */
-            options.c_cflag &= ~PARODD;   /* 转换为偶效验*/
+            options.c_cflag |= PARENB;      /* Enable parity */
+            options.c_cflag &= ~PARODD;     /* 转换为偶效验*/
             options.c_iflag |= INPCK;       /* Disnable parity checking */
             break;
         case 'S':
@@ -212,12 +211,12 @@ bool PosixSerialPort::setParity(int databits, int stopbits, int parity)
         options.c_iflag |= INPCK;
 
     tcflush(fd_serial, TCIFLUSH);
-    options.c_cc[VTIME] = 150; /* 设置超时15 seconds*/
-    options.c_cc[VMIN] = 1; /* Update the options and do it NOW */
+    options.c_cc[VTIME] = 150;          /* 设置超时15 seconds*/
+    options.c_cc[VMIN] = 1;             /* Update the options and do it NOW */
 
-    options.c_lflag  &= ~(ICANON | ECHO | ECHOE | ISIG);  /*Input*/
-    options.c_oflag  &= ~OPOST;   /*Output*/
-    options.c_iflag  &= ~(ICRNL | IXON);//去掉过滤控制字符
+    options.c_lflag  &= ~(ICANON | ECHO | ECHOE | ISIG);    /*Input*/
+    options.c_oflag  &= ~OPOST;                             /*Output*/
+    options.c_iflag  &= ~(ICRNL | IXON);                    //去掉过滤控制字符
     if(tcsetattr(fd_serial ,TCSANOW, &options) != 0)
     {
         perror("SetupSerial 3");

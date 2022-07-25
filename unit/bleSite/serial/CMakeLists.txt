@@ -1,8 +1,8 @@
 
-IF(NOT CYGWIN)
-    add_library(serial BaseSerialPort.cpp  Win32SerialPort.cpp BLETelinkDongle.cpp CommonDongle.cpp)
-    target_include_directories(serial PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-ELSE()
-    add_library(serial BaseSerialPort.cpp  PosixSerialPort.cpp BLETelinkDongle.cpp CommonDongle.cpp )
-    target_include_directories(serial PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-ENDIF()
+set(SOURCE
+        BLETelinkDongle.cpp
+        CommonDongle.cpp
+        BaseSerialPort.cpp
+        PosixSerialPort.cpp)
+add_library(serial ${SOURCE})
+target_include_directories(serial PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)

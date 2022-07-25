@@ -9,9 +9,13 @@
 
 class BLETelinkDongle : public CommonDongle{
 public:
+    //指定串口名：注意windows下和unix下串口名称的不同
     explicit BLETelinkDongle(std::string _name);
 
-    //设置通信参数，设置起始结束字符，初始化串口配置
+    /*
+     * 设置串口通信参数
+     * 设备读起始结束字符
+     */
     bool initDongle() override;
 };
 
