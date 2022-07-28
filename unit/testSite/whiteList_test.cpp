@@ -22,6 +22,13 @@ static const string CONFIG_SITE_ID = "config";
 static const string CONFIG_SITE_ID_NAME = "整体配置";
 
 
+
+void serverTest(){
+    httplib::Server sv;
+
+}
+
+
 int main(int argc, char* argv[]) {
 
     //. 设置线程池

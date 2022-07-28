@@ -202,6 +202,8 @@ bool cloudUtil::ecb_httppost(const string &uri, const qlibc::QData &request, qli
     lhytemp::secretUtil::ecb_encrypt_withPadding(body, out, reinterpret_cast<const uint8_t *>(key));
 
     auto http_res = client.Post(uri.c_str(), header, out, "application/json");
+    client.stop();
+
     if (http_res != nullptr) {
         string decryptOut;
         lhytemp::secretUtil::ecb_decrypt_withPadding(http_res->body.c_str(), decryptOut,
