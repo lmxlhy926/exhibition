@@ -141,31 +141,38 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 
 int whiteList_service_request_handler(const Request& request, Response& response){
     LOG_INFO << "===>whiteListCloud_service_request_handler: " << request.body;
-    string domainID = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
 
-    qlibc::QData whiteListRequest, whiteListResponse;
-    qlibc::QData param;
-    param.setString("familyCode", domainID);
-    whiteListRequest.putData("param", param);
-    whiteListRequest.setString("User-Agent", "curl");
-
-    cloudUtil::getInstance()->ecb_httppost(WHITELIST_REQUEST_URL, whiteListRequest, whiteListResponse);
+//    string domainID = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
+//
+//    qlibc::QData whiteListRequest, whiteListResponse;
+//    qlibc::QData param;
+//    param.setString("familyCode", domainID);
+//    whiteListRequest.putData("param", param);
+//    whiteListRequest.setString("User-Agent", "curl");
+//
+//    cloudUtil::getInstance()->ecb_httppost(WHITELIST_REQUEST_URL, whiteListRequest, whiteListResponse);
+//
+//    qlibc::QData data;
+//    if(whiteListResponse.getInt("code") == 200){
+//        string payloadString = whiteListResponse.getData("data").toJsonString();
+//        qlibc::QData payload = mqttPayloadHandle::transform(payloadString.c_str(), payloadString.size());
+//        configParamUtil::getInstance()->saveWhiteListData(payload);
+//
+//        data.setInt("code", 0);
+//        data.setString("error", whiteListResponse.getString("msg"));
+//        data.putData("response", payload);
+//
+//    }else{
+//        data.setInt("code", 1);
+//        data.setString("error", whiteListResponse.getString("msg"));
+//        data.putData("response", qlibc::QData());
+//    }
 
     qlibc::QData data;
-    if(whiteListResponse.getInt("code") == 200){
-        string payloadString = whiteListResponse.getData("data").toJsonString();
-        qlibc::QData payload = mqttPayloadHandle::transform(payloadString.c_str(), payloadString.size());
-        configParamUtil::getInstance()->saveWhiteListData(payload);
-
-        data.setInt("code", 0);
-        data.setString("error", whiteListResponse.getString("msg"));
-        data.putData("response", payload);
-
-    }else{
-        data.setInt("code", 1);
-        data.setString("error", whiteListResponse.getString("msg"));
-        data.putData("response", qlibc::QData());
-    }
+    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
+    data.setInt("code", 0);
+    data.setString("error", "ok");
+    data.putData("response", payload);
 
     response.set_content(data.toJsonString(), "text/json");
     return 0;
