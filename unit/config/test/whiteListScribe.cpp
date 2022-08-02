@@ -52,14 +52,18 @@ int main(int argc, char* argv[]) {
 
     //注册订阅消息messageID;
     serviceSiteManager->registerMessageId("whiteList");
+    serviceSiteManager->registerMessageId("receivedWhiteList");
+
     //注册messageID对应的handler;
     serviceSiteManager->registerMessageHandler("whiteList", message_handler);
+    serviceSiteManager->registerMessageHandler("receivedWhiteList", message_handler);
 
     threadPool_.enqueue([&](){
         while(true){
             int code;
             std::vector<string> messageIdList;
             messageIdList.push_back("whiteList");
+            messageIdList.push_back("receivedWhiteList");
             code = serviceSiteManager->subscribeMessage("127.0.0.1", 9006, messageIdList);
 
             if (code == ServiceSiteManager::RET_CODE_OK) {

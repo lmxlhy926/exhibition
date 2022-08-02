@@ -129,7 +129,7 @@ void publish(){
 
     while(true){
         mc.publish("edge/did:chisid:0xd7b8e6f93525720551baabdf56ecc3035492860d/device/domainWhite", out, 0);
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+        std::this_thread::sleep_for(std::chrono::seconds(10));
     }
 
 }

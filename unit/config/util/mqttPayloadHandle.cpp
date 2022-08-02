@@ -109,9 +109,17 @@ bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int le
     publishData.putData("content", payload);
     LOG_INFO << "--->publishData: " << publishData.toJsonString();
 
+    qlibc::QData receivedData;
+    receivedData.setString("message_id", "receivedWhiteList");
+    receivedData.putData("content", qlibc::QData());
+
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->publishMessage(WHITELIST_MESSAGE_ID, publishData.toJsonString());
-    LOG_PURPLE << "publish whiteList............";
+    serviceSiteManager->publishMessage(RECEIVED_WHITELIST_ID, receivedData.toJsonString());
+
+
+    LOG_PURPLE << "......publish whiteList............";
+    LOG_PURPLE << "......publish receivedWhiteList............";
 
     return true;
 }
