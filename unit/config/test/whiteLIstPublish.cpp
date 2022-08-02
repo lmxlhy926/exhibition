@@ -106,8 +106,8 @@ bool payloadTest(){
  *
  */
 void publish(){
-    string dataFileName = R"(D:\bywg\project\exhibition\unit\config\test\origin.json)";
-    string configFileName = R"(D:\bywg\project\exhibition\unit\config\test\mqttConfig.json)";
+    string dataFileName = R"(D:\project\byjs\exhibition\unit\config\test\whiteList.json)";
+    string configFileName = R"(D:\project\byjs\exhibition\unit\config\test\mqttConfig.json)";
 
     QData data, configData;
     data.loadFromFile(dataFileName);
