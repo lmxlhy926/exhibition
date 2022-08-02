@@ -33,6 +33,7 @@ void cloudUtil::init(const string&  ip, int port, const string& dataDirectoryPat
     serverPort = port;
     dataDirPath = dataDirectoryPath;
     client_ = std::make_unique<httplib::Client>(serverIp, serverPort);
+    client_->set_keep_alive(true);
     LOG_PURPLE << "cloudUtil init: httpServerIp<" << serverIp << ">---httpServerPort<" << serverPort
               << ">---dataDirPath<" << dataDirPath << ">";
 }
