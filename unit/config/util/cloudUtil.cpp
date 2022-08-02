@@ -6,6 +6,7 @@
 #include "qlibc/FileUtils.h"
 #include "secretUtils.h"
 #include "common/httpUtil.h"
+#include <memory>
 #include <thread>
 #include <chrono>
 #include "../param.h"
@@ -31,6 +32,7 @@ void cloudUtil::init(const string&  ip, int port, const string& dataDirectoryPat
     serverIp = ip;
     serverPort = port;
     dataDirPath = dataDirectoryPath;
+    client_ = std::make_unique<httplib::Client>(serverIp, serverPort);
     LOG_PURPLE << "cloudUtil init: httpServerIp<" << serverIp << ">---httpServerPort<" << serverPort
               << ">---dataDirPath<" << dataDirPath << ">";
 }
@@ -179,7 +181,6 @@ bool cloudUtil::tvRegister(mqttClient& mc, qlibc::QData& engineerInfo, qlibc::QD
 }
 
 bool cloudUtil::ecb_httppost(const string &uri, const qlibc::QData &request, qlibc::QData &response) {
-    httplib::Client client(serverIp, serverPort);
 
     httplib::Headers header;
     Json::Value &root = request.asValue();
@@ -201,8 +202,7 @@ bool cloudUtil::ecb_httppost(const string &uri, const qlibc::QData &request, qli
     string out;
     lhytemp::secretUtil::ecb_encrypt_withPadding(body, out, reinterpret_cast<const uint8_t *>(key));
 
-    auto http_res = client.Post(uri.c_str(), header, out, "application/json");
-    client.stop();
+    auto http_res = client_->Post(uri.c_str(), header, out, "application/json");
 
     if (http_res != nullptr) {
         string decryptOut;

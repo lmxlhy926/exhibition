@@ -7,10 +7,12 @@
 #include <iostream>
 #include <cstdio>
 #include <cstring>
-#include "configPath.h"
 
 using namespace std;
 using namespace qlibc;
+
+static const char* configPath = "/cygdrive/d/project/byjs/exhibition/baseSrc/mqtt/test";
+
 
 int main(int argc, char* argv[]) {
 

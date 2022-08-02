@@ -5,9 +5,11 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
-#include "configPath.h"
 
 using namespace qlibc;
+
+static const char* configPath = "/cygdrive/d/project/byjs/exhibition/baseSrc/mqtt/test";
+
 
 int main(int argc, char* argv[]) {
 
