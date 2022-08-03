@@ -21,6 +21,8 @@ add_subdirectory(unit)
 install(TARGETS config_site             DESTINATION bin)
 install(TARGETS synergy_site            DESTINATION bin)
 install(TARGETS whiteList_site          DESTINATION bin)
+install(TARGETS whiteListPublish        DESTINATION bin)
+install(TARGETS whiteListScribe        DESTINATION bin)
 
 
 
