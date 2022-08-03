@@ -33,7 +33,12 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setServerPort(ConfigSitePort);
     serviceSiteManager->setSiteIdSummary(CONFIG_SITE_ID, CONFIG_SITE_ID_NAME);
 
-    //. 设置配置文件加载路径
+    //set site supported subscribed message
+    serviceSiteManager->registerMessageId(WHITELIST_MESSAGE_ID);
+    serviceSiteManager->registerMessageId(RECEIVED_WHITELIST_ID);
+
+
+   //. 设置配置文件加载路径
     configParamUtil* configPathPtr = configParamUtil::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 

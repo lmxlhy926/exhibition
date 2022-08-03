@@ -50,14 +50,6 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setSiteIdSummary(CONFIG_SITE_ID, CONFIG_SITE_ID_NAME);
 
 
-    //注册订阅消息messageID;
-    serviceSiteManager->registerMessageId("whiteList");
-    serviceSiteManager->registerMessageId("receivedWhiteList");
-
-    //注册messageID对应的handler;
-    serviceSiteManager->registerMessageHandler("whiteList", message_handler);
-    serviceSiteManager->registerMessageHandler("receivedWhiteList", message_handler);
-
     threadPool_.enqueue([&](){
         while(true){
             int code;
@@ -74,6 +66,10 @@ int main(int argc, char* argv[]) {
             std::this_thread::sleep_for(std::chrono::seconds(3));
             LOG_RED << "subscribed failed....., start to subscribe in 3 seconds";
         }
+
+        //注册messageID对应的handler;
+        serviceSiteManager->registerMessageHandler("whiteList", message_handler);
+        serviceSiteManager->registerMessageHandler("receivedWhiteList", message_handler);
     });
 
     // 站点监听线程启动
