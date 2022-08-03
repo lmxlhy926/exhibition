@@ -19,6 +19,9 @@ qlibc::QData mqttPayloadHandle::transform(const char* payloadReceive, int len){
         return qlibc::QData();
     }
 
+    //存储云端下发的原始白名单
+    configParamUtil::getInstance()->saveOriginWhiteListData(payload);
+
     qlibc::QData devices;
     payload.getData("info").getData("devices", devices);
     Json::ArrayIndex devicesItemCount = devices.size();
@@ -100,7 +103,8 @@ qlibc::QData mqttPayloadHandle::transform(const char* payloadReceive, int len){
 bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int len) {
     //转换白名单格式
     qlibc::QData payload = transform(payloadReceive, len);
-    //存储
+
+    //存储转换后的白名单
     configParamUtil::getInstance()->saveWhiteListData(payload);
 
     //发布

@@ -92,5 +92,11 @@ void configParamUtil::saveWhiteListData(QData &data) {
 }
 
 
+void configParamUtil::saveOriginWhiteListData(QData &data){
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    originWhiteListData.setInitData(data);
+    originWhiteListData.saveToFile(FileUtils::contactFileName(dataDirPath, "config/originWhiteList.json"), true);
+}
+
 
 

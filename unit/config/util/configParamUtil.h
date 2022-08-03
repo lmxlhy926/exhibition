@@ -25,7 +25,8 @@ private:
     QData secretFileNameData;           //获取文件名字
     QData mqttConfigData;               //获取mqtt配置信息
     QData cloudServerData;              //云端http服务器配置参数
-    QData whiteListData;                //云端下发的白名单信息
+    QData whiteListData;                //云端下发的转换后的白名单信息
+    QData originWhiteListData;          //远端下发的原始白名单
     static configParamUtil *instance;
     std::recursive_mutex mutex_;
 
@@ -58,6 +59,8 @@ public:
     QData getWhiteList();
 
     void saveWhiteListData(QData &data);
+
+    void saveOriginWhiteListData(QData &data);
 
 };
 
