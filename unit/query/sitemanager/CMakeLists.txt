@@ -1,0 +1,6 @@
+aux_source_directory(. SITEMANAGER_SOURCE_FILES)
+add_library(sitemg STATIC ${SITEMANAGER_SOURCE_FILES})
+target_include_directories(sitemg PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_link_libraries(sitemg PUBLIC siteService)
+target_link_libraries(sitemg PUBLIC common)
+target_link_libraries(sitemg PUBLIC qlibc)

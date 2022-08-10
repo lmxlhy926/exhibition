@@ -24,6 +24,8 @@ install(TARGETS whiteList_site          DESTINATION bin)
 install(TARGETS whiteListPublish        DESTINATION bin)
 install(TARGETS whiteListScribe         DESTINATION bin)
 install(TARGETS mdns                    DESTINATION bin)
+install(TARGETS sitemgs                 DESTINATION bin)
+
 
 
 
