@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cstdio>
 
 #include <fcntl.h>
 #ifdef _WIN32
@@ -370,8 +371,12 @@ size_t mdns_records_parse(int sock, const struct sockaddr* from, size_t addrlen,
 int mdns_unicast_send(int sock, const void* address, size_t address_size, const void* buffer,
                       size_t size) {
     if (sendto(sock, (const char*)buffer, (mdns_size_t)size, 0, (const struct sockaddr*)address,
-               (socklen_t)address_size) < 0)
+               (socklen_t)address_size) < 0){
+        printf("unicast send failed\r\n");
         return -1;
+    }
+
+    printf("unicast send success\r\n");
     return 0;
 }
 

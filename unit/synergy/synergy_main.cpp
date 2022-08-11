@@ -43,9 +43,9 @@ int main(int argc, char* argv[]) {
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-            int code = serviceSiteManager->start();
+//            int code = serviceSiteManager->start();
             //注册启动方式
-//            int code = serviceSiteManager->startByRegister();
+            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 std::cout << "===>synergySite startByRegister error, code = " << code << std::endl;
                 std::cout << "===>synergySite startByRegister in 3 seconds...." << std::endl;

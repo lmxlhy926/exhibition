@@ -437,9 +437,17 @@ int service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns
             printf("  --> answer %s.%s port %d (%s)\n", service_record->hostname,
                    service_record->service, service_record->port,
                    (unicast ? "unicast" : "multicast"));
+
+            printf("unicast: %d---%d\n", unicast, addrlen);
+            mdns_query_answer(sock, from, addrlen, sendbuffer, sizeof(sendbuffer), query_id,
+                              service_record->service, service_length, service_record->hostname,
+                              strlen(service_record->hostname), service_record->address_ipv4,
+                              service_record->address_ipv6, (uint16_t)service_record->port, 0,0);
+
             if (!unicast)
                 addrlen = 0;
 //            char txt_record[] = "test=1";
+            printf("multicast: %d---%d\n", unicast, addrlen);
             mdns_query_answer(sock, from, addrlen, sendbuffer, sizeof(sendbuffer), query_id,
                               service_record->service, service_length, service_record->hostname,
                               strlen(service_record->hostname), service_record->address_ipv4,
