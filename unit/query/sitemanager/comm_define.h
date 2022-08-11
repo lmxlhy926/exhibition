@@ -14,6 +14,8 @@
 #define SITE_PING_SERVICE_ID "site_ping"
 
 #define SITE_ONOFFLINE_MESSAGE_ID "site_onoffline"
+#define SITE_REGISTERAGAIN_MESSAGE_ID "register2QuerySiteAgain"
+
 
 #define CMD_PARAM "param"
 #define SITE_IP "ip"

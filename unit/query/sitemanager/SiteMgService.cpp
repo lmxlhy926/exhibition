@@ -12,9 +12,8 @@
 #include "StringUtils.h"
 #include "mdns/mdns_interface.h"
 #include "common/httplib.h"
+#include "qlibc/QData.h"
 
-
-//servicesite::ServiceSiteManager *ssm = nullptr;
 
 int sitemg_service_start(){
 
@@ -28,33 +27,50 @@ int sitemg_service_start(){
 
     // 创建 serviceSiteManager 对象
     servicesite::ServiceSiteManager *ssm = servicesite::ServiceSiteManager::getInstance();
-    if(nullptr != ssm)
-    {
-        // 设置 site id, summary
-        ssm->setSiteIdSummary("site_query", "服务站点查询");
 
-        // 设置 http 服务器端口
-        ssm->setServerPort(SITE_QUERY_SERVICE_PORT);
+    // 设置 site id, summary
+    ssm->setSiteIdSummary("site_query", "服务站点查询");
 
-        // 注册 Service 请求处理 handler
-        ssm->registerServiceRequestHandler(SITE_REGISTER_SERVICE_ID, site_register);
-        ssm->registerServiceRequestHandler(SITE_QUERY_SERVICE_ID, site_query);
-        ssm->registerServiceRequestHandler(SITE_PING_SERVICE_ID, site_ping);
+    // 设置 http 服务器端口
+    ssm->setServerPort(SITE_QUERY_SERVICE_PORT);
 
-        // 注册支持的消息ID， 有两个消息
-        ssm->registerMessageId(SITE_ONOFFLINE_MESSAGE_ID);
+    // 注册 Service 请求处理 handler
+    ssm->registerServiceRequestHandler(SITE_REGISTER_SERVICE_ID, site_register);
+    ssm->registerServiceRequestHandler(SITE_QUERY_SERVICE_ID, site_query);
+    ssm->registerServiceRequestHandler(SITE_PING_SERVICE_ID, site_ping);
 
-        // 注册 Message 请求处理 handler
-//    ssm->registerMessageHandler(TEST_MESSAGE_ID_1, message_handler_1);
+    // 注册支持的消息ID， 有两个消息
+    ssm->registerMessageId(SITE_ONOFFLINE_MESSAGE_ID);
+    ssm->registerMessageId(SITE_REGISTERAGAIN_MESSAGE_ID);
 
-        // 启动服务器
-        int ret = ssm->start();
 
-        // 通过注册的方式启动服务器， 需要提供site_id, site_name
-        // code = ssm->startByRegister(TEST_SITE_ID_1, TEST_SITE_NAME_1);
+    httplib::ThreadPool threadPool_(10);
+    threadPool_.enqueue([&](){
+        while(true){
+            //自启动方式
+            int code = ssm->start();
 
-        if (ret != 0)
-            printf("star error. code = %d\n", ret);
+            if(code != 0){
+                printf("===>querySite start error, code = %d\n", code);
+                printf("===>querySite start in 3 seconds....");
+                std::this_thread::sleep_for(std::chrono::seconds(3));
+            }else{
+                printf("===>querySite start successfully.....");
+                break;
+            }
+        }
+    });
+
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    qlibc::QData registerAgain;
+    registerAgain.setString("message_id", SITE_REGISTERAGAIN_MESSAGE_ID);
+    registerAgain.putData("content", qlibc::QData(Json::Value(Json::objectValue)));
+    ssm->publishMessage(SITE_REGISTERAGAIN_MESSAGE_ID, registerAgain.toJsonString());
+
+
+    while(true){
+        std::this_thread::sleep_for(std::chrono::seconds(60 *10));
     }
 
     return 0;

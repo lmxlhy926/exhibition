@@ -119,13 +119,16 @@ int main(int argc, char* argv[]) {
     // 注册 Message 请求处理 handler
     serviceSiteManager->registerMessageHandler("eventEnterArea", message_handler_1);
     serviceSiteManager->registerMessageHandler("eventLeaveArea", message_handler_1);
+    serviceSiteManager->registerMessageHandler("register2QuerySiteAgain", message_handler_1);
 
     // 订阅消息, 需要传入订阅站点的IP、端口号、消息ID列表
     int code;
     std::vector<string> messageIdList;
     messageIdList.push_back("eventEnterArea");
     messageIdList.push_back("eventLeaveArea");
-    code = serviceSiteManager->subscribeMessage("192.168.58.103", 9003, messageIdList);
+    messageIdList.push_back("register2QuerySiteAgain");
+
+    code = serviceSiteManager->subscribeMessage("127.0.0.1", 9000, messageIdList);
     if (code == ServiceSiteManager::RET_CODE_OK) {
         printf("subscribeMessage ok.\n");
     }else{
