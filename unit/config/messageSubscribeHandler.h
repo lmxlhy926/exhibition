@@ -8,8 +8,7 @@
 #include "common/httplib.h"
 using namespace httplib;
 
-void deviceStatus(const Request& request);
-
+void register2QuerySite(const Request& request);
 
 
 #endif //EXHIBITION_MESSAGESUBSCRIBEHANDLER_H

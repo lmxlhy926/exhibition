@@ -67,6 +67,7 @@ int sitemg_service_start(){
     registerAgain.setString("message_id", SITE_REGISTERAGAIN_MESSAGE_ID);
     registerAgain.putData("content", qlibc::QData(Json::Value(Json::objectValue)));
     ssm->publishMessage(SITE_REGISTERAGAIN_MESSAGE_ID, registerAgain.toJsonString());
+    printf("===>publish registerAgain message to notify all other sites to register again....\n");
 
 
     while(true){

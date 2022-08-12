@@ -11,10 +11,16 @@ static const int ZigBeeSitePort = 9002;
 static const int ConfigSitePort = 9006;
 static const int AdapterPort = 9008;
 static const int SouthPort = 9010;
+static const int QuerySitePort = 9000;
+
+//站点描述
+static const string CONFIG_SITE_ID = "config";
+static const string CONFIG_SITE_ID_NAME = "整体配置";
 
 //设备消息订阅ID
-static const string TVADAPTER_DEVICE_STATUS_MESSAGE_ID = "";        //tvAdapter设备消息订阅ID
-static const string RADAR_DEVICE_STATUS_MESSAGE_ID = "";            //南向站点消息订阅ID
+static const string TVADAPTER_DEVICE_STATUS_MESSAGE_ID = "";                //tvAdapter设备消息订阅ID
+static const string RADAR_DEVICE_STATUS_MESSAGE_ID = "";                    //南向站点消息订阅ID
+static const string REGISTERAGAIN_MESSAGE_ID = "register2QuerySiteAgain";   //重新向南向站点注册
 
 //消息发布ID
 static const string TVSOUND_MESSAGE_ID = "getTvSound";              //电视发声事件上报

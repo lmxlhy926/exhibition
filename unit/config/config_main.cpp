@@ -6,6 +6,7 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 #include "serviceRequestHandler.h"
+#include "messageSubscribeHandler.h"
 #include "qlibc/FileUtils.h"
 #include "util/mqttPayloadHandle.h"
 #include "util/secretUtils.h"
@@ -18,11 +19,14 @@ using namespace httplib;
 using namespace std::placeholders;
 using json = nlohmann::json;
 
-static const string CONFIG_SITE_ID = "config";
-static const string CONFIG_SITE_ID_NAME = "整体配置";
-
 
 int main(int argc, char* argv[]) {
+
+    if(argc != 2){
+        LOG_RED << "Usage Error.....";
+        LOG_PURPLE << "Try again with the format: config <DirPath>";
+        return 0;
+    }
 
     //. 设置线程池
     httplib::ThreadPool threadPool_(10);
@@ -116,36 +120,25 @@ int main(int argc, char* argv[]) {
     });
 
 
-
-#if 0
-    //注册订阅消息messageID;
-    serviceSiteManager->registerMessageId(TVADAPTER_DEVICE_STATUS_MESSAGE_ID);
-    serviceSiteManager->registerMessageId(RADAR_DEVICE_STATUS_MESSAGE_ID);
-
     //注册messageID对应的handler;
-    serviceSiteManager->registerMessageHandler(TVADAPTER_DEVICE_STATUS_MESSAGE_ID, deviceStatus);
-    serviceSiteManager->registerMessageHandler(RADAR_DEVICE_STATUS_MESSAGE_ID, deviceStatus);
+    serviceSiteManager->registerMessageHandler(REGISTERAGAIN_MESSAGE_ID, register2QuerySite);
 
     threadPool_.enqueue([&](){
         while(true){
-            int code1, code2;
-            std::vector<string> messageIdList1, messageIdList2;
-            messageIdList1.push_back(TVADAPTER_DEVICE_STATUS_MESSAGE_ID);
-            messageIdList2.push_back(RADAR_DEVICE_STATUS_MESSAGE_ID);
+            int code;
+            std::vector<string> messageIdList;
+            messageIdList.push_back(REGISTERAGAIN_MESSAGE_ID);
+            code = serviceSiteManager->subscribeMessage(RequestIp, QuerySitePort, messageIdList);
 
-            code1 = serviceSiteManager->subscribeMessage(RequestIp, AdapterPort, messageIdList1);
-            code2 = serviceSiteManager->subscribeMessage(RequestIp, 60003, messageIdList2);
-
-            if (code1 == ServiceSiteManager::RET_CODE_OK && code2 == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage ok.\n");
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                printf("subscribeMessage REGISTERAGAIN_MESSAGE_ID ok.\n");
                 break;
             }
 
             std::this_thread::sleep_for(std::chrono::seconds(3));
-            printf("subscribed failed....., start to subscribe in 3 seconds\n");
+            printf("subscribed REGISTERAGAIN_MESSAGE_ID failed....., start to subscribe in 3 seconds\n");
         }
     });
-#endif
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
