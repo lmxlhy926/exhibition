@@ -21,6 +21,7 @@ static const string Ble_Device_Test_Command_Service_ID = "BleDeviceCommands";
 #define SCAN                        "scan"
 #define SCANEND                     "scanEnd"
 #define BIND                        "bind"
+#define UNBIND                      "unbind"
 
 #define CONNECT                     "connect"
 #define ASSIGN_GATEWAY_ADDRESS      "assignGateWayAddress"

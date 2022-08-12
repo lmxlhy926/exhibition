@@ -31,6 +31,10 @@ size_t DownBinaryCmd::getBinary(QData &data, unsigned char *buf, size_t bufSize)
 
     }else if(pseudoCommand == BIND){
         return LightBind().getBinary(buf, bufSize);
+
+    }else if(pseudoCommand == UNBIND){
+        string deviceSn = data.getString("deviceSn");
+        return LightUnBind(deviceSn).getBinary(buf, bufSize);
     }
 
     return 0;

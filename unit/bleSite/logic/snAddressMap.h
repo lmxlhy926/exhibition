@@ -35,6 +35,8 @@ public:
     //获取设备列表
     qlibc::QData getDeviceList();
 
+    string deviceSn2Address(string deviceSn);
+
 private:
     //加载存储的<sn-address>数据到snAddMap中
     void loadCache2Map();

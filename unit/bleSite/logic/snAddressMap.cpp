@@ -34,6 +34,17 @@ qlibc::QData SnAddressMap::getDeviceList() {
     return data;
 }
 
+
+string SnAddressMap::deviceSn2Address(string deviceSn){
+    std::lock_guard<recursive_mutex> lg(mutex_);
+    for(auto& elem : snAddrMap){
+        if(elem.first == deviceSn){
+            return intAddr2FullAddr(elem.second);
+        }
+    }
+    return "";
+}
+
 void SnAddressMap::loadCache2Map() {
     qlibc::QData snAddressData = bleConfig::getInstance()->getSnAddrData();
     Json::Value::Members deviceSnVec = snAddressData.getMemberNames();

@@ -89,6 +89,18 @@ public:
     }
 };
 
+class LightUnBind : public JsonCmd2Binary{
+private:
+    string deviceSn;
+public:
+    explicit LightUnBind(string& sn) : deviceSn(sn){}
+
+    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+        string binaryString = "E8FF000000000203" + deviceSn + "8049";
+        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
+    }
+};
+
 
 class LightOnOff : public JsonCmd2Binary{
 private:
