@@ -30,10 +30,10 @@ const string TEST_MESSAGE_ID = "register2QuerySiteAgain";
 
 void publish_message(void){
     qlibc::QData data;
-    data.loadFromFile(R"(D:\bywg\project\exhibition\baseSrc\siteService\test\publish.json)");
-    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
+    data.setString("message_id", "register2QuerySiteAgain");
+    data.putData("content", qlibc::QData());
 
-    // 把要发布的消息 json 字符串传入即可， 由库来向订阅过的站点发送消息
+    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->publishMessage(TEST_MESSAGE_ID, data.toJsonString());
     std::cout << "---publish---" << std::endl;
 }
@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setServerPort(60003);
     serviceSiteManager->setSiteIdSummary(CONFIG_SITE_ID, CONFIG_SITE_ID_NAME);
 
+    serviceSiteManager->registerMessageId(TEST_MESSAGE_ID);
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){

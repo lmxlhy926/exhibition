@@ -13,11 +13,24 @@
 #include <semaphore.h>
 #include <queue>
 #include "common/httplib.h"
+
+#define SERV_LIB_LOG(...) printf(__VA_ARGS__)
+// #define SERV_LIB_LOG(...) easylogging_log(__VA_ARGS__)
  
 using namespace std;
 using namespace httplib;
 
+void http_exception_handler(const Request& request, Response& response, std::exception& e);
+
+void easylogging_log(const char* format, ...);
+
 namespace servicesite {
+
+typedef struct MessageIdT {
+    string messageId;
+    string name;
+    string summary;
+} MessageId;
 
 class SiteHandle;
 class MessageSubscriberSiteHandle;
@@ -43,7 +56,7 @@ using MessageHandler = std::function<void(const Request&)>;
 
 
 using ServiceRequestHandlers = std::vector<std::pair<string, ServiceRequestHandler>>;
-using MessageIds = std::vector<string>;
+using MessageIds = std::vector<MessageId>;
 using MessageHandlers = std::vector<std::pair<string, MessageHandler>>;
 
 /**
@@ -148,6 +161,16 @@ public:
      * @return int int 错误码参照错误码定义
      */
     int registerMessageId(string messageId);
+
+    /**
+     * @brief 注册消息ID
+     * 
+     * @param messageId 消息ID
+     * @param name 消息名称
+     * @param summary 消息描述
+     * @return int int 错误码参照错误码定义
+     */
+    int registerMessageId(string messageId, string name, string summary);
 
     /**
      * @brief 注册消息处理函数

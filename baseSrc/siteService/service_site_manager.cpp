@@ -6,6 +6,7 @@
  */
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include <unistd.h>
 #include <mutex>
 #include <semaphore.h>
@@ -28,6 +29,29 @@ using namespace servicesite;
 using namespace httplib;
 
 using json = nlohmann::json;
+
+void http_exception_handler(const Request& request, Response& response, std::exception& e) {
+    SERV_LIB_LOG("http_exception_handler request.method: %s\n", request.method.c_str());
+    SERV_LIB_LOG("http_exception_handler request.path: %s\n", request.path.c_str());
+    SERV_LIB_LOG("http_exception_handler request.body: %s\n", request.body.c_str());
+
+    SERV_LIB_LOG("http_exception_handler exception: %s\n", e.what());
+}
+
+void easylogging_log(const char* format, ...) {
+    char buf[1024]  = { 0 };
+
+	va_list arg_list;
+
+	va_start(arg_list, format);
+	vsprintf(buf, format, arg_list);
+    va_end(arg_list);
+
+    //如果将值直接传递给printf，不能直接解析
+    //printf(format, arg_list);
+
+	printf("%s", buf);
+}
 
 const string ServiceSiteManager::SERVICE_ID_GET_SERVICE_LIST = "get_service_list";
 const string ServiceSiteManager::SERVICE_ID_GET_MESSAGE_LIST = "get_message_list";
@@ -82,7 +106,25 @@ int ServiceSiteManager::registerServiceRequestHandler(string serviceId, ServiceR
 }
 
 int ServiceSiteManager::registerMessageId(string messageId) {
-    messageIds.push_back(messageId);
+    MessageId message_id;
+
+    message_id.messageId = messageId;
+    message_id.name = messageId;
+    message_id.summary = messageId;
+
+    messageIds.push_back(message_id);
+
+    return RET_CODE_OK;
+}
+
+int ServiceSiteManager::registerMessageId(string messageId, string name, string summary) {
+    MessageId message_id;
+
+    message_id.messageId = messageId;
+    message_id.name = name;
+    message_id.summary = summary;
+
+    messageIds.push_back(message_id);
 
     return RET_CODE_OK;
 }
@@ -115,7 +157,13 @@ int ServiceSiteManager::serviceRequestHandlerGetMessageList(const Request& reque
 	};
 
     for (const auto& item : messageIds) {
-        response_json["response"]["message_list"].push_back(item);
+        json message_json = {
+            {"message_id", item.messageId},
+            {"name", item.name},
+            {"summary", item.summary},
+        };
+
+        response_json["response"]["message_list"].push_back(message_json);
     }
 
     response.set_content(response_json.dump(), "text/plain");
@@ -276,6 +324,9 @@ int ServiceSiteManager::serviceRequestHandlerDebug(const Request& request, Respo
 }
 
 ServiceSiteManager::ServiceSiteManager() {
+    // 设置异常 handler, 发生异常时打印
+    server.set_exception_handler(http_exception_handler);
+
     registerServiceRequestHandler(SERVICE_ID_GET_SERVICE_LIST, ServiceSiteManager::serviceRequestHandlerGetServiceList);
     registerServiceRequestHandler(SERVICE_ID_GET_MESSAGE_LIST, ServiceSiteManager::serviceRequestHandlerGetMessageList);
     registerServiceRequestHandler(SERVICE_ID_SUBSCRIBE_MESSAGE, ServiceSiteManager::serviceRequestHandlerSubscribeMessage);
@@ -288,7 +339,7 @@ void ServiceSiteManager::rawHttpRequestHandler(const Request& request, Response&
     // 线程锁, 对象析构时解锁
     std::lock_guard<std::mutex> lockGuard(http_request_mutex);
 
-    // printf("%s\n", request.body.c_str());
+    // SERV_LIB_LOG("%s\n", request.body.c_str());
 
     if (!json::accept(request.body)) {
         response.set_content(ERROR_RESPONSE_JSON_FORMAT, "text/plain");
@@ -319,7 +370,7 @@ void ServiceSiteManager::rawHttpRequestHandler(const Request& request, Response&
         }
 
         // 没有匹配的 handler
-        printf("no handler for service_id: %s\n", request_service_id.c_str());
+        SERV_LIB_LOG("no handler for service_id: %s\n", request_service_id.c_str());
         response.set_content(ERROR_RESPONSE_NO_REQUEST_HANDLER_MATCH, "text/plain");
         return;
     }
@@ -340,7 +391,7 @@ void ServiceSiteManager::rawHttpRequestHandler(const Request& request, Response&
         }
 
         // 没有匹配的 handler
-        printf("no handler for message_id: %s\n", request_message_id.c_str());
+        SERV_LIB_LOG("no handler for message_id: %s\n", request_message_id.c_str());
         response.set_content(ERROR_RESPONSE_NO_MESSAGE_HANDLER_MATCH, "text/plain");
         return;
     }
@@ -394,35 +445,35 @@ int ServiceSiteManager::startByRegister(void) {
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
-        printf("client connect error.\n");
+        SERV_LIB_LOG("client connect error.\n");
         return RET_CODE_ERROR_REQ_CONN;
     }
 
     if (res->status != 200) {
-        printf("http status = %d, error.\n", res->status);
+        SERV_LIB_LOG("http status = %d, error.\n", res->status);
         return RET_CODE_ERROR_REQ_STATUS_CODE;
     }
 
     if (!json::accept(res->body)) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_NOT_JSON;
     }
 
     json response_json = json::parse(res->body);
 
     if (response_json["code"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     // if (response_json["response"].is_null()) {
-    //     printf("response_json format error.\n");
+    //     SERV_LIB_LOG("response_json format error.\n");
     //     return RET_CODE_ERROR_REQ_JSON_FORMAT;
     // }
 
     pingThreadP = new std::thread(service_site_ping_thread, siteId);
 
-    printf("http listen port: %d\n", serverPort);
+    SERV_LIB_LOG("http listen port: %d\n", serverPort);
 
     server.Post("/", ServiceSiteManager::rawHttpRequestHandler);
 
@@ -472,29 +523,29 @@ int ServiceSiteManager::subscribeMessage(string ip, int port, std::vector<string
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
-        printf("client connect error.\n");
+        SERV_LIB_LOG("client connect error.\n");
         return RET_CODE_ERROR_REQ_CONN;
     }
 
     if (res->status != 200) {
-        printf("http status = %d, error.\n", res->status);
+        SERV_LIB_LOG("http status = %d, error.\n", res->status);
         return RET_CODE_ERROR_REQ_STATUS_CODE;
     }
 
     if (!json::accept(res->body)) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_NOT_JSON;
     }
 
     json response_json = json::parse(res->body);
 
     if (response_json["code"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["code"] != 0) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_CODE;
     }
 
@@ -519,29 +570,29 @@ int ServiceSiteManager::unsubscribeMessage(string ip, int port, std::vector<stri
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
-        printf("client connect error.\n");
+        SERV_LIB_LOG("client connect error.\n");
         return RET_CODE_ERROR_REQ_CONN;
     }
 
     if (res->status != 200) {
-        printf("http status = %d, error.\n", res->status);
+        SERV_LIB_LOG("http status = %d, error.\n", res->status);
         return RET_CODE_ERROR_REQ_STATUS_CODE;
     }
 
     if (!json::accept(res->body)) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_NOT_JSON;
     }
 
     json response_json = json::parse(res->body);
 
     if (response_json["code"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["code"] != 0) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_CODE;
     }
 
@@ -558,7 +609,7 @@ int ServiceSiteManager::createDir(string sPathName) {
             DirName[i] = 0;
             if (access(DirName, F_OK) != 0) {
                 if (mkdir(DirName, 0755) == -1) {
-                    printf("mkdir error\n");
+                    SERV_LIB_LOG("mkdir error\n");
                     return -1;
                 }
             }
@@ -578,39 +629,39 @@ int ServiceSiteManager::getServiceList(string ip, int port, std::vector<string>&
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
-        printf("client connect error.\n");
+        SERV_LIB_LOG("client connect error.\n");
         return RET_CODE_ERROR_REQ_CONN;
     }
 
     if (res->status != 200) {
-        printf("http status = %d, error.\n", res->status);
+        SERV_LIB_LOG("http status = %d, error.\n", res->status);
         return RET_CODE_ERROR_REQ_STATUS_CODE;
     }
 
     if (!json::accept(res->body)) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_NOT_JSON;
     }
 
     json response_json = json::parse(res->body);
 
     if (response_json["code"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["code"] != 0) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_CODE;
     }
 
     if (response_json["response"].is_null()) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["response"]["service_list"].is_null()) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
@@ -632,44 +683,44 @@ int ServiceSiteManager::getMessageList(string ip, int port, std::vector<string>&
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
-        printf("client connect error.\n");
+        SERV_LIB_LOG("client connect error.\n");
         return RET_CODE_ERROR_REQ_CONN;
     }
 
     if (res->status != 200) {
-        printf("http status = %d, error.\n", res->status);
+        SERV_LIB_LOG("http status = %d, error.\n", res->status);
         return RET_CODE_ERROR_REQ_STATUS_CODE;
     }
 
     if (!json::accept(res->body)) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_NOT_JSON;
     }
 
     json response_json = json::parse(res->body);
 
     if (response_json["code"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["code"] != 0) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_CODE;
     }
 
     if (response_json["response"].is_null()) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["response"]["message_list"].is_null()) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     for (auto& item : response_json["response"]["message_list"]) {
-        messageIdList.push_back(item);
+        messageIdList.push_back(item["message_id"]);
     }
 
     return RET_CODE_OK;
@@ -686,62 +737,62 @@ int ServiceSiteManager::updateSiteHandleList(void) {
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
-        printf("client connect error.\n");
+        SERV_LIB_LOG("client connect error.\n");
         return RET_CODE_ERROR_REQ_CONN;
     }
 
     if (res->status != 200) {
-        printf("http status = %d, error.\n", res->status);
+        SERV_LIB_LOG("http status = %d, error.\n", res->status);
         return RET_CODE_ERROR_REQ_STATUS_CODE;
     }
 
     if (!json::accept(res->body)) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_NOT_JSON;
     }
 
     json response_json = json::parse(res->body);
 
     if (response_json["code"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["response"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["response"]["site_list"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["code"] != 0) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_CODE;
     }
 
     std::vector<SiteHandle> tempSiteHandleList;
     for (auto& json_item : response_json["response"]["site_list"]) {
         if (json_item["site_id"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
         if (json_item["summary"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
         // 与 query_site 一致 
         if (json_item["ip"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
         if (json_item["port"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
@@ -773,61 +824,61 @@ int ServiceSiteManager::querySiteList(std::vector<SiteHandle>& pSiteHandleList) 
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
-        printf("client connect error.\n");
+        SERV_LIB_LOG("client connect error.\n");
         return RET_CODE_ERROR_REQ_CONN;
     }
 
     if (res->status != 200) {
-        printf("http status = %d, error.\n", res->status);
+        SERV_LIB_LOG("http status = %d, error.\n", res->status);
         return RET_CODE_ERROR_REQ_STATUS_CODE;
     }
 
     if (!json::accept(res->body)) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_NOT_JSON;
     }
 
     json response_json = json::parse(res->body);
 
     if (response_json["code"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["response"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["response"]["site_list"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["code"] != 0) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_CODE;
     }
 
     for (auto& json_item : response_json["response"]["site_list"]) {
         if (json_item["site_id"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
         if (json_item["summary"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
         // 与 query_site 一致 
         if (json_item["ip"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
         if (json_item["port"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
@@ -859,61 +910,61 @@ int ServiceSiteManager::querySiteListBySiteId(string pSiteId, std::vector<SiteHa
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
-        printf("client connect error.\n");
+        SERV_LIB_LOG("client connect error.\n");
         return RET_CODE_ERROR_REQ_CONN;
     }
 
     if (res->status != 200) {
-        printf("http status = %d, error.\n", res->status);
+        SERV_LIB_LOG("http status = %d, error.\n", res->status);
         return RET_CODE_ERROR_REQ_STATUS_CODE;
     }
 
     if (!json::accept(res->body)) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_NOT_JSON;
     }
 
     json response_json = json::parse(res->body);
 
     if (response_json["code"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["response"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["response"]["site_list"].is_null()) {
-        printf("response_json format error.\n");
+        SERV_LIB_LOG("response_json format error.\n");
         return RET_CODE_ERROR_REQ_JSON_FORMAT;
     }
 
     if (response_json["code"] != 0) {
-        printf("response_json code error.\n");
+        SERV_LIB_LOG("response_json code error.\n");
         return RET_CODE_ERROR_REQ_CODE;
     }
 
     for (auto& json_item : response_json["response"]["site_list"]) {
         if (json_item["site_id"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
         if (json_item["summary"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
         // 与 query_site 一致 
         if (json_item["ip"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
         if (json_item["port"].is_null()) {
-            printf("response_json format error.\n");
+            SERV_LIB_LOG("response_json format error.\n");
             return RET_CODE_ERROR_REQ_JSON_FORMAT;
         }
 
@@ -1039,20 +1090,20 @@ void MessageSubscriberSiteHandle::sendFromThread(void) {
 
     auto res = cli->Post("/", message, "text/plain");
     if (!res) {
-        printf("client connect error. %s %d\n", ip.c_str(), port);
+        SERV_LIB_LOG("client connect error. %s %d\n", ip.c_str(), port);
 
         ++sendRetryCount;
     }
     else {
         if (res->status != 200) {
-            printf("http status = %d, error.\n", res->status);
+            SERV_LIB_LOG("http status = %d, error.\n", res->status);
 
             ++sendRetryCount;
         }
     }
 
     if (sendRetryCount >= MAX_SEND_RETRY) {
-        printf("sendRetryCount = %d, error.\n", sendRetryCount);
+        SERV_LIB_LOG("sendRetryCount = %d, error.\n", sendRetryCount);
         sendRetryCount = 0;
 
         // isStop = true;
@@ -1067,7 +1118,7 @@ void MessageSubscriberSiteHandle::sendMessage(string message) {
     queue_mutex.lock();
 
     if (queue.size() > MAX_QUEUE_SIZE) {
-        printf("queue is full.\n");
+        SERV_LIB_LOG("queue is full.\n");
 
         // 队列满， 清空
         while(!queue.empty()) {
@@ -1119,18 +1170,18 @@ void servicesite::ServiceSiteManager::saveMessageSubscriber(void) {
 
     string config_filename = messageSubscriberConfigPath + siteId + MESSAGE_SUBSCRIBER_CONFIG_FILE;
 
-    // printf("----%s\n", config_filename.c_str());
-    // printf("----%s\n", message_subscriber_list.dump(4).c_str());
+    // SERV_LIB_LOG("----%s\n", config_filename.c_str());
+    // SERV_LIB_LOG("----%s\n", message_subscriber_list.dump(4).c_str());
 
     if (0 != createDir(ServiceSiteManager::messageSubscriberConfigPath)) {
-        printf("createDir error: %s\n", messageSubscriberConfigPath.c_str());
+        SERV_LIB_LOG("createDir error: %s\n", messageSubscriberConfigPath.c_str());
         return;
     }
 
     int fd = open(config_filename.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0777);
     if(fd == -1)
     { 
-        printf("open error: %s\n", config_filename.c_str());
+        SERV_LIB_LOG("open error: %s\n", config_filename.c_str());
         return;
     } 
 
@@ -1139,7 +1190,7 @@ void servicesite::ServiceSiteManager::saveMessageSubscriber(void) {
 
     close(fd);
 
-    printf("saveMessageSubscriber ok.\n");
+    SERV_LIB_LOG("saveMessageSubscriber ok.\n");
 }
 
 void servicesite::ServiceSiteManager::loadMessageSubscriber(void) {
@@ -1148,12 +1199,12 @@ void servicesite::ServiceSiteManager::loadMessageSubscriber(void) {
     
     string config_filename = messageSubscriberConfigPath + siteId + MESSAGE_SUBSCRIBER_CONFIG_FILE;
 
-    // printf("----%s\n", config_filename.c_str());
+    // SERV_LIB_LOG("----%s\n", config_filename.c_str());
 
 	int fd = open(config_filename.c_str(), O_RDONLY);
 	if(fd == -1)
 	{
-		printf("open error: %s\n", config_filename.c_str());
+		SERV_LIB_LOG("open error: %s\n", config_filename.c_str());
 		return;
 	}
 
@@ -1161,49 +1212,49 @@ void servicesite::ServiceSiteManager::loadMessageSubscriber(void) {
 	close(fd);
 
     if (read_len == buf_size) {
-        printf("read_len error: %d\n", read_len);
+        SERV_LIB_LOG("read_len error: %d\n", read_len);
         return;
     }
 
     buf[read_len] = 0;
 
     if (!json::accept(string(buf))) {
-        printf("json::accept error: %s\n", buf);
+        SERV_LIB_LOG("json::accept error: %s\n", buf);
         return;
     }
 
     json message_subscriber_list = json::parse(buf);
 
-    // printf("----%s\n", message_subscriber_list.dump(4).c_str());
+    // SERV_LIB_LOG("----%s\n", message_subscriber_list.dump(4).c_str());
     for (json& item : message_subscriber_list) {
         if (!item["messageId"].is_string()) {
-            printf("json::parse messageId error: %s\n", item.dump().c_str());
+            SERV_LIB_LOG("json::parse messageId error: %s\n", item.dump().c_str());
             return;
         }
 
         string message_id = item["messageId"];
 
         if (!item["site_handle_list"].is_array()) {
-            printf("json::parse site_handle_list error: %s\n", item.dump().c_str());
+            SERV_LIB_LOG("json::parse site_handle_list error: %s\n", item.dump().c_str());
             return;
         }
 
         for (json& sub_item : item["site_handle_list"]) {
             if (!sub_item["ip"].is_string()) {
-                printf("json::parse ip error: %s\n", sub_item.dump().c_str());
+                SERV_LIB_LOG("json::parse ip error: %s\n", sub_item.dump().c_str());
                 return;
             }
             
             string ip = sub_item["ip"];
 
             if (!sub_item["port"].is_number_integer()) {
-                printf("json::parse ip port: %s\n", sub_item.dump().c_str());
+                SERV_LIB_LOG("json::parse ip port: %s\n", sub_item.dump().c_str());
                 return;
             }
 
             int port = sub_item["port"];
 
-            // printf("%s %s %d\n", messageId.c_str(), ip.c_str(), port);
+            // SERV_LIB_LOG("%s %s %d\n", messageId.c_str(), ip.c_str(), port);
 
             subscribeMessage(message_id, ip, port);
         }
@@ -1212,6 +1263,18 @@ void servicesite::ServiceSiteManager::loadMessageSubscriber(void) {
 
 bool servicesite::ServiceSiteManager::subscribeMessage(string message_id, string ip, int port) {
     bool need_save = false;
+    bool is_msg_id_ok = false;
+
+    // 检查是否支持此 消息ID
+    for (auto& item : messageIds) {
+        if (item.messageId == message_id) {
+            is_msg_id_ok = true;
+            break;
+        }
+    }
+    if (!is_msg_id_ok) {
+        return false;
+    }
 
     // 线程锁, 对象析构时解锁
     std::lock_guard<std::mutex> lockGuard(messageSubscriberList_mutex);
