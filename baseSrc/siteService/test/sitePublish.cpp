@@ -9,79 +9,71 @@
 #include <unistd.h>
 #include <atomic>
 #include <stdio.h>
+#include <fstream>
+
 #include "common/httplib.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
-#include <fstream>
 #include "qlibc/QData.h"
+#include "log/Logging.h"
+
 
 using namespace std;
 using namespace servicesite;
-
 using json = nlohmann::json;
 
-const string TEST_SITE_ID_1 = "publish";
-const string TEST_SITE_NAME_1 = "publish";
+static const string CONFIG_SITE_ID = "test";
+static const string CONFIG_SITE_ID_NAME = "测试站点";
 
-const string TEST_MESSAGE_ID_1 = "eventLeaveHome";
+
+const string TEST_MESSAGE_ID = "register2QuerySiteAgain";
 
 void publish_message(void){
     qlibc::QData data;
     data.loadFromFile(R"(D:\bywg\project\exhibition\baseSrc\siteService\test\publish.json)");
-
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
 
     // 把要发布的消息 json 字符串传入即可， 由库来向订阅过的站点发送消息
-    serviceSiteManager->publishMessage(TEST_MESSAGE_ID_1, data.toJsonString());
+    serviceSiteManager->publishMessage(TEST_MESSAGE_ID, data.toJsonString());
     std::cout << "---publish---" << std::endl;
-
-}
-
-// 标记线程错误
-std::atomic<bool> http_server_thread_end(false);
-
-void http_server_thread_func() {
-    int code;
-
-    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-
-    // 启动服务器，参数为端口， 可用于单独的开发调试
-    code = serviceSiteManager->start();
-
-    // 通过注册的方式启动服务器， 需要提供site_id, site_name, port
-//	code = serviceSiteManager->startByRegister(TEST_SITE_ID_1, TEST_SITE_NAME_1, 9001);
-
-    if (code != 0) {
-        printf("start error. code = %d\n", code);
-    }
-
-    http_server_thread_end = true;
 }
 
 int main(int argc, char* argv[]) {
-    // 创建 serviceSiteManager 对象, 单例
+
+    //. 设置线程池
+    httplib::ThreadPool threadPool_(10);
+    std::atomic<bool> http_server_thread_end(false);
+
+    //. 配置本站点启动信息
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-
     serviceSiteManager->setServerPort(60003);
+    serviceSiteManager->setSiteIdSummary(CONFIG_SITE_ID, CONFIG_SITE_ID_NAME);
 
-    // 创建线程, 启动服务器
-    std::thread http_server_thread(http_server_thread_func);
 
-    int code;
-
-    while (true) {
-        sleep(3);
-
-        if (http_server_thread_end) {
-            printf("启动 http 服务器线程错误.\n");
-            break;
+    // 站点监听线程启动
+    threadPool_.enqueue([&](){
+        while(true){
+            //自启动方式
+            int code = serviceSiteManager->start();
+            //注册启动方式
+//            int code = serviceSiteManager->startByRegister();
+            if(code != 0){
+                LOG_RED << "===>test_site startByRegister error, code = " << code;
+                LOG_RED << "===>test_site startByRegister in 3 seconds....";
+                std::this_thread::sleep_for(std::chrono::seconds(3));
+            }else{
+                LOG_RED << "===>test_site startByRegister successfully.....";
+                break;
+            }
         }
+    });
 
-        // 发布消息
+
+    while(true){
+        std::this_thread::sleep_for(std::chrono::seconds(2));
         publish_message();
     }
 
-    http_server_thread.join();
-
     return 0;
 }
+

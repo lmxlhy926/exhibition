@@ -1,5 +1,5 @@
 {
-  "message_id": "eventLeaveHome",
+  "message_id": "register2QuerySiteAgain",
   "content": {
     "funcName": "eventReport",
     "totalNum": 5,

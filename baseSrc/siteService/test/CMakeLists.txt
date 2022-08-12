@@ -7,3 +7,5 @@ target_link_libraries(site_subcribe_test PRIVATE siteService)
 
 add_executable(site_publish_test sitePublish.cpp)
 target_link_libraries(site_publish_test PRIVATE siteService)
+target_link_libraries(site_publish_test PRIVATE log)
+
