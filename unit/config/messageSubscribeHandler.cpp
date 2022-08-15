@@ -23,7 +23,7 @@ void register2QuerySite(const Request& request){
     data.setString("service_id", "site_register");
     data.putData("request", registerData);
 
-    while(true){
+    for(int i = 0; i < 3; i++){
         httpUtil::sitePostRequest(RequestIp, QuerySitePort, data, response);
 
         if(response.getInt("code") == 0){
@@ -35,4 +35,5 @@ void register2QuerySite(const Request& request){
             this_thread::sleep_for(std::chrono::seconds(3));
         }
     }
+
 }
