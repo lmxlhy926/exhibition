@@ -19,11 +19,20 @@ using namespace std;
  */
 class SnAddressMap {
 private:
-    map<string, int> snAddrMap;
-    std::recursive_mutex mutex_;
-public:
+    map<string, std::pair<string, int>> snAddrMap;
+    std::recursive_mutex rMutex_;
+
     SnAddressMap(){
         loadCache2Map();
+    }
+public:
+    static SnAddressMap* instance;
+
+    static SnAddressMap* getInstance(){
+        if(instance == nullptr){
+            instance = new SnAddressMap();
+        }
+        return instance;
     }
 
     //获取节点分配地址字符串并更新存储文件
@@ -35,7 +44,11 @@ public:
     //获取设备列表
     qlibc::QData getDeviceList();
 
+    //deviceSn--->unicastAddress
     string deviceSn2Address(string deviceSn);
+
+    //unicastAddress--->deviceSn
+    string address2DeviceSn(string address);
 
 private:
     //加载存储的<sn-address>数据到snAddMap中

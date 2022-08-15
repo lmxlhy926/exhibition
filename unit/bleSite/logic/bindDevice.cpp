@@ -59,12 +59,12 @@ bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
 
     //3. 节点分配地址
     LOG_YELLOW << ">>: start to assgin node address....";
-    qlibc::QData nodeAddressAssign(snAddrMap.getNodeAssignAddr(deviceSn));
+    qlibc::QData nodeAddressAssign(snAddrMapPtr->getNodeAssignAddr(deviceSn));
     DownBinaryCmd::transAndSendCmd(nodeAddressAssign);
     if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(30) == std::cv_status::no_timeout){
         LOG_RED << "<<: successed to assgin node address....";
     }else{
-        snAddrMap.deleteDeviceSn(deviceSn);
+        snAddrMapPtr->deleteDeviceSn(deviceSn);
         LOG_RED << "<<: FAILED TO ASSIGN NODE ADDRESS....";
         return false;
     }

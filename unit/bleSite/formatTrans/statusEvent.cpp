@@ -119,6 +119,11 @@ void PostStatusEvent::operator()() {
         }else if(opcode == "824E"){
             rs.rollBack(6);
             LOG_GREEN << "<<===: LightBrightStatus: " << LightBrightStatus(rs.remainingString()).construct();
+
+        }else if(opcode == "804A"){
+            rs.rollBack(6);
+            UnBindResult unBindResult(rs.remainingString());
+            unBindResult.postEvent();
         }
     }
 }

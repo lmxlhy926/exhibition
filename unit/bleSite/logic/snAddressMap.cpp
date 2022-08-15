@@ -8,8 +8,9 @@
 #include <vector>
 #include <sstream>
 
+SnAddressMap* SnAddressMap::instance;
+
 qlibc::QData SnAddressMap::getNodeAssignAddr(string deviceSn) {
-    std::lock_guard<recursive_mutex> lg(mutex_);
     qlibc::QData nodeAddrData;
     nodeAddrData.setString("command", "assignNodeAddress");
     nodeAddrData.setString("nodeAddress",getAddress(deviceSn));
@@ -17,7 +18,7 @@ qlibc::QData SnAddressMap::getNodeAssignAddr(string deviceSn) {
 }
 
 void SnAddressMap::deleteDeviceSn(string& deviceSn) {
-    std::lock_guard<recursive_mutex> lg(mutex_);
+    std::lock_guard<recursive_mutex> lg(rMutex_);
     auto pos = snAddrMap.find(deviceSn);
     if(pos != snAddrMap.end()){
         snAddrMap.erase(pos->first);
@@ -26,20 +27,30 @@ void SnAddressMap::deleteDeviceSn(string& deviceSn) {
 }
 
 qlibc::QData SnAddressMap::getDeviceList() {
-    std::lock_guard<recursive_mutex> lg(mutex_);
+    std::lock_guard<recursive_mutex> lg(rMutex_);
     qlibc::QData data;
     for(auto& elem : snAddrMap){
-        data.setString(elem.first, intAddr2FullAddr(elem.second));
+        data.setString(elem.first, elem.second.first);
     }
     return data;
 }
 
 
 string SnAddressMap::deviceSn2Address(string deviceSn){
-    std::lock_guard<recursive_mutex> lg(mutex_);
+    std::lock_guard<recursive_mutex> lg(rMutex_);
     for(auto& elem : snAddrMap){
         if(elem.first == deviceSn){
-            return intAddr2FullAddr(elem.second);
+            return elem.second.first;
+        }
+    }
+    return "";
+}
+
+string SnAddressMap::address2DeviceSn(string address){
+    std::lock_guard<recursive_mutex> lg(rMutex_);
+    for(auto& elem : snAddrMap){
+        if(elem.second.first == address){
+            return elem.first;
         }
     }
     return "";
@@ -50,16 +61,17 @@ void SnAddressMap::loadCache2Map() {
     Json::Value::Members deviceSnVec = snAddressData.getMemberNames();
     for(auto& deviceSn : deviceSnVec){
         int i = snAddressData.getData(deviceSn).getArrayElement(1).asValue().asInt();
-        snAddrMap.insert(std::make_pair(deviceSn, i));
+        insert(deviceSn, i);
     }
 }
 
 void SnAddressMap::insert(string &deviceSn, unsigned int intAddr) {
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     auto pos = snAddrMap.find(deviceSn);
     if(pos != snAddrMap.end()){
         snAddrMap.erase(pos);
     }
-    snAddrMap.insert(std::make_pair(deviceSn, intAddr));
+    snAddrMap.insert(std::make_pair(deviceSn, std::make_pair(intAddr2FullAddr(intAddr), intAddr)));
 }
 
 string SnAddressMap::intAddr2FullAddr(unsigned int i) {
@@ -69,11 +81,12 @@ string SnAddressMap::intAddr2FullAddr(unsigned int i) {
 }
 
 void SnAddressMap::map2JsonDataAndSave2File() {
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     qlibc::QData data;
     for(auto& elem : snAddrMap){
         qlibc::QData array;
-        array.append(intAddr2FullAddr(elem.second));
-        array.append(elem.second);
+        array.append(elem.second.first);
+        array.append(elem.second.second);
 
         data.putData(elem.first, array);
     }
@@ -82,6 +95,7 @@ void SnAddressMap::map2JsonDataAndSave2File() {
 
 
 string SnAddressMap::getAddress(string &deviceSn) {
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     //如果设备列表为空
     if(snAddrMap.empty()){
         insert(deviceSn, 0);
@@ -92,7 +106,7 @@ string SnAddressMap::getAddress(string &deviceSn) {
     //将数字地址存入vector并排序
     std::vector<int> addrVec;
     for(auto& elem : snAddrMap){
-        addrVec.push_back(elem.second);
+        addrVec.push_back(elem.second.second);
     }
     sort(addrVec.begin(), addrVec.end(), less<>());
 

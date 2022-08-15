@@ -10,9 +10,11 @@
 
 class BindDevice {
 private:
-    SnAddressMap snAddrMap;
+    std::unique_ptr<SnAddressMap> snAddrMapPtr;
 public:
-    explicit BindDevice(){}
+    explicit BindDevice(){
+        snAddrMapPtr.reset(SnAddressMap::getInstance());
+    }
 
     void bind(qlibc::QData& deviceArray);
 

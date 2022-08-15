@@ -12,6 +12,7 @@
 #include <iostream>
 #include "qlibc/QData.h"
 #include "log/Logging.h"
+#include "logic/snAddressMap.h"
 
 using namespace std;
 
@@ -86,6 +87,7 @@ public:
     Event scanResultEvent;                      //扫描结果上报事件
     Event nodeAddressAssignSuccessEvent;        //节点地址分配成功事件
     Event bindSuccessEvent;                     //绑定成功事件
+    Event unbindSuccessEvent;                   //成功解绑事件
 private:
     static EventTable* eventTable;
 
@@ -121,9 +123,9 @@ public:
         qlibc::QData data;
         data.setString("deviceSn", deviceSn);
         if(!deviceSn.empty()){
+            LOG_GREEN << "<<===: scanResult Event, deviceSn = " << deviceSn;
             EventTable::getInstance()->scanResultEvent.putData(data);
             EventTable::getInstance()->scanResultEvent.notify_one();
-            LOG_GREEN << "<<===: scanResult Event, deviceSn = " << deviceSn;
         }
     }
 private:
@@ -145,8 +147,8 @@ public:
 
     void postEvent() override{
         if(eventAck){
-            EventTable::getInstance()->nodeAddressAssignSuccessEvent.notify_one();
             LOG_GREEN << "<<==: nodeAddress assign operation completed.....";
+            EventTable::getInstance()->nodeAddressAssignSuccessEvent.notify_one();
         }
     }
 
@@ -172,8 +174,8 @@ public:
 
     void postEvent() override{
         if(eventAck){
-            EventTable::getInstance()->bindSuccessEvent.notify_one();
             LOG_GREEN << "<<===: bind operation success.....";
+            EventTable::getInstance()->bindSuccessEvent.notify_one();
         }
     }
 
@@ -184,6 +186,35 @@ private:
         rs.readByte(dest);
         if(dest == "00")
             eventAck = true;
+    }
+};
+
+class UnBindResult : public ReportEvent{
+private:
+    string sourceData;
+    string unicastAddress;
+    string groupAddress;
+public:
+    explicit UnBindResult(string data) : sourceData(std::move(data)){
+        init();
+    }
+
+    void postEvent() override{
+        string deviceSn = SnAddressMap::getInstance()->address2DeviceSn(unicastAddress);
+        LOG_GREEN << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
+
+        qlibc::QData unbindData;
+        unbindData.setString("unicastAddr", unicastAddress);
+        unbindData.setString("groupAddr", groupAddress);
+        EventTable::getInstance()->unbindSuccessEvent.putData(unbindData);
+        EventTable::getInstance()->unbindSuccessEvent.notify_one();
+    }
+
+private:
+    void init(){
+        ReadBinaryString rs(sourceData);
+        rs.read2Byte(unicastAddress);
+        rs.read2Byte(groupAddress);
     }
 };
 
@@ -204,7 +235,6 @@ public:
 private:
     void init();
 };
-
 
 class LightBrightStatus{
 private:
