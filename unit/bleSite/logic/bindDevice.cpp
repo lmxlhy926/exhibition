@@ -24,8 +24,7 @@ bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
     //0. 扫描
     qlibc::QData scanData;
     scanData.setString("command", "scan");
-    LOG_YELLOW << ">>: start to add device: <" << deviceSn << ">.........";
-    LOG_YELLOW << ">>: start to scan the device <" << deviceSn << ">.....";
+    LOG_INFO << ">>: start to scan the device <" << deviceSn << ">.....";
     DownBinaryCmd::transAndSendCmd(scanData);
     qlibc::QData retScanData;
     while(retScanData.getString("deviceSn") != deviceSn){
@@ -40,7 +39,7 @@ bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
     //1. 连接
-    LOG_YELLOW << ">>: start to connect the device: <" << deviceSn << ">....";
+    LOG_INFO << ">>: start to connect the device: <" << deviceSn << ">....";
     qlibc::QData connectData;
     connectData.setString("command", "connect");
     connectData.setString("deviceSn", deviceSn);
@@ -50,7 +49,7 @@ bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
 
 //    if(index == 0){
     //2. 网关分配地址
-    LOG_YELLOW << ">>: start to assign gateway address....";
+    LOG_INFO << ">>: start to assign gateway address....";
     qlibc::QData gateAddressAssign(AssignGateWayAddressString);
     DownBinaryCmd::transAndSendCmd(gateAddressAssign);
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -58,7 +57,7 @@ bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
 //    }
 
     //3. 节点分配地址
-    LOG_YELLOW << ">>: start to assgin node address....";
+    LOG_INFO << ">>: start to assgin node address....";
     qlibc::QData nodeAddressAssign(snAddrMapPtr->getNodeAssignAddr(deviceSn));
     DownBinaryCmd::transAndSendCmd(nodeAddressAssign);
     if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(30) == std::cv_status::no_timeout){
@@ -71,7 +70,7 @@ bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
     //4. 绑定
-    LOG_YELLOW << ">>: start to bind....";
+    LOG_INFO << ">>: start to bind....";
     qlibc::QData bind(BindString);
     DownBinaryCmd::transAndSendCmd(bind);
 

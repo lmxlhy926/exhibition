@@ -8,6 +8,7 @@
 #include <string>
 #include "qlibc/QData.h"
 #include "downBinaryUtil.h"
+#include "logic/snAddressMap.h"
 
 using namespace std;
 
@@ -96,7 +97,8 @@ public:
     explicit LightUnBind(string& sn) : deviceSn(sn){}
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
-        string binaryString = "E8FF000000000203" + deviceSn + "8049";
+        string addr = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
+        string binaryString = "E8FF000000000203" + addr + "8049";
         return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
     }
 };

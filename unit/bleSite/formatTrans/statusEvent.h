@@ -123,7 +123,7 @@ public:
         qlibc::QData data;
         data.setString("deviceSn", deviceSn);
         if(!deviceSn.empty()){
-            LOG_GREEN << "<<===: scanResult Event, deviceSn = " << deviceSn;
+//            LOG_GREEN << "<<===: scanResult Event, deviceSn = " << deviceSn;
             EventTable::getInstance()->scanResultEvent.putData(data);
             EventTable::getInstance()->scanResultEvent.notify_one();
         }
@@ -201,7 +201,9 @@ public:
 
     void postEvent() override{
         string deviceSn = SnAddressMap::getInstance()->address2DeviceSn(unicastAddress);
-        LOG_GREEN << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
+        SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
+        LOG_PURPLE << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
+
 
         qlibc::QData unbindData;
         unbindData.setString("unicastAddr", unicastAddress);
