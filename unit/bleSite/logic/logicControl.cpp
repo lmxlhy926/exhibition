@@ -16,19 +16,27 @@
 
 bool LogicControl::parse(qlibc::QData &cmdData) {
     if(bindingFlag.load())  return false;
-
     string pseudoCommand  = cmdData.getString("command");
-    if(pseudoCommand == SCAN){
-        LOG_YELLOW << "start to scan......";
-        DownBinaryCmd::transAndSendCmd(cmdData);
 
-    }else if(pseudoCommand == CONNECT){
+    if(pseudoCommand == BIND){
         bindingFlag.store(true);
         qlibc::QData deviceSnArray = cmdData.getData("deviceSn");
-//        getScanedDevices(deviceSnArray);
+        if(deviceSnArray.size() == 0){
+            getScanedDevices(deviceSnArray);
+        }
         bd.bind(deviceSnArray);
         bindingFlag.store(false);
 
+    }else if(pseudoCommand == UNBIND){
+        qlibc::QData deviceArray = cmdData.getData("deviceSn");
+        unsigned int size = deviceArray.size();
+        for(unsigned int i = 0; i < size; ++i){
+            qlibc::QData unbindData;
+            unbindData.setString("command", "unbind");
+            unbindData.setString("deviceSn", deviceArray.getArrayElement(i).asValue().asString());
+            DownBinaryCmd::transAndSendCmd(unbindData);
+            this_thread::sleep_for(std::chrono::seconds(1));
+        }
     }else{
         DownBinaryCmd::transAndSendCmd(cmdData);
     }
@@ -46,12 +54,12 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
     time_t time_current = time(nullptr);
 
     while(true){
-        if(EventTable::getInstance()->scanResultEvent.wait(20) == std::cv_status::no_timeout){
+        if(EventTable::getInstance()->scanResultEvent.wait(2) == std::cv_status::no_timeout){
             retScanData = EventTable::getInstance()->scanResultEvent.getData();
             string deviceSn = retScanData.getString("deviceSn");
             deviceMap.insert(std::make_pair(deviceSn, 0));
         }
-        if(time(nullptr) - time_current > 10){
+        if(time(nullptr) - time_current > 15){
             LOG_PURPLE << "===>SCAN END, start to bind devices......";
             break;
         }

@@ -22,46 +22,47 @@ void BindDevice::bind(QData &deviceArray) {
 
 bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
     //0. 扫描
+    LOG_INFO << ">>: start to scan the device <" << deviceSn << ">.....";
     qlibc::QData scanData;
     scanData.setString("command", "scan");
-    LOG_INFO << ">>: start to scan the device <" << deviceSn << ">.....";
     DownBinaryCmd::transAndSendCmd(scanData);
+
+    time_t time_current = time(nullptr);
     qlibc::QData retScanData;
     while(retScanData.getString("deviceSn") != deviceSn){
-        if(EventTable::getInstance()->scanResultEvent.wait(20) == std::cv_status::no_timeout){
+        if(EventTable::getInstance()->scanResultEvent.wait(2) == std::cv_status::no_timeout){
             retScanData = EventTable::getInstance()->scanResultEvent.getData();
-        }else{
+        }
+        if(time(nullptr) - time_current > 20){
             LOG_RED << "<<: FAILED TO SCAN THE DEVICE, QUIT TO ADD THE DEVICE <" << deviceSn << ">";
             return false;
         }
     }
-    LOG_RED << "<<: successed in scaning the device: <" << deviceSn << ">.......";
+    LOG_PURPLE << "<<: successed in scaning the device: <" << deviceSn << ">.......";
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    //1. 连接
+    //1. 连接；大约10秒
     LOG_INFO << ">>: start to connect the device: <" << deviceSn << ">....";
     qlibc::QData connectData;
     connectData.setString("command", "connect");
     connectData.setString("deviceSn", deviceSn);
     DownBinaryCmd::transAndSendCmd(connectData);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    LOG_RED << "<<: successed in connecting the device: <" << deviceSn << ">....";
+    LOG_PURPLE << "<<: successed in connecting the device: <" << deviceSn << ">....";
 
-//    if(index == 0){
     //2. 网关分配地址
     LOG_INFO << ">>: start to assign gateway address....";
     qlibc::QData gateAddressAssign(AssignGateWayAddressString);
     DownBinaryCmd::transAndSendCmd(gateAddressAssign);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    LOG_RED << "<<: successed to assign gateway address....";
-//    }
+    LOG_PURPLE << "<<: successed to assign gateway address....";
 
-    //3. 节点分配地址
+    //3. 节点分配地址；大约需要40秒
     LOG_INFO << ">>: start to assgin node address....";
     qlibc::QData nodeAddressAssign(snAddrMapPtr->getNodeAssignAddr(deviceSn));
     DownBinaryCmd::transAndSendCmd(nodeAddressAssign);
-    if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(30) == std::cv_status::no_timeout){
-        LOG_RED << "<<: successed to assgin node address....";
+    if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(60) == std::cv_status::no_timeout){
+        LOG_PURPLE << "<<: successed to assgin node address....";
     }else{
         snAddrMapPtr->deleteDeviceSn(deviceSn);
         LOG_RED << "<<: FAILED TO ASSIGN NODE ADDRESS....";
@@ -69,24 +70,22 @@ bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
     }
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    //4. 绑定
+    //4. 绑定；大约需要40秒
     LOG_INFO << ">>: start to bind....";
     qlibc::QData bind(BindString);
     DownBinaryCmd::transAndSendCmd(bind);
 
-    if(EventTable::getInstance()->bindSuccessEvent.wait(20) == std::cv_status::timeout){
-        LOG_RED << "<<: ..........BIND FAILED..........";
-        LOG_RED << "<<: -------------------------------";
-        LOG_RED << "<<: -------------------------------";
-        LOG_RED << "<<: -------------------------------";
+    if(EventTable::getInstance()->bindSuccessEvent.wait(60) == std::cv_status::timeout){
+        LOG_RED << "<<: .......BIND FAILED..........";
+        LOG_RED << "<<: ----------------------------";
+        LOG_RED << "<<: -----------------------------";
+        snAddrMapPtr->deleteDeviceSn(deviceSn);
         return false;
     }
-    LOG_RED << "<<: ..........BIND END SUCCESSFULLY..........";
-    LOG_RED << "<<: .............................";
-    LOG_RED << "<<: .............................";
-    LOG_RED << "<<: .............................";
 
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    LOG_PURPLE << "<<: ......BIND SUCCESSFULLY..... ";
+    LOG_PURPLE << "<<: .............................";
+    LOG_PURPLE << "<<: .............................";
 
     return true;
 }

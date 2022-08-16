@@ -10,9 +10,10 @@
 #include "logic/logicControl.h"
 using namespace httplib;
 
-
+//json控制指令
 int BleDevice_command_service_handler(const Request& request, Response& response, LogicControl& lc);
 
+//二进制控制指令
 int BleDevice_command_test_service_handler(const Request& request, Response& response);
 
 

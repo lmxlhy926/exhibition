@@ -52,7 +52,7 @@ string DownBinaryUtil::getBinaryString(QData &bleConfigData) {
 }
 
 size_t DownBinaryUtil::binaryString2binary(string &binaryString, unsigned char *buf, size_t size) {
-    std::cout << "==>binaryString: " << binaryString << std::endl;
+    LOG_INFO<< binaryString;
     BinaryBuf binaryBuf(buf, size);
     for(int i = 0; i < binaryString.size() / 2; i++){
         string charString = binaryString.substr(i * 2, 2);

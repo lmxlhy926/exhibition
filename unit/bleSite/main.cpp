@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
     LOG_INFO << "===>success in open serial<"
-              << configPathPtr->getSerialData().getString("serial") << ">....";
+              << configPathPtr->getSerialData().getString("serial") << ">";
 
     //创建控制类，传递给注册的回调函数
     LogicControl lc;

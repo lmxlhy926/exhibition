@@ -58,16 +58,15 @@ bool bleConfig::serialInit(bleConfig::SerialReceiveFunc receiveFuc) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(serial == nullptr){
         string serialPort = getSerialData().getString("serial");
-        LOG_INFO << "===>serialPort: " << serialPort;
         serial.reset(new BLETelinkDongle(serialPort));
         serial->initDongle();
         serial->regRecvDataProc(receiveFuc);
         if(!serial->startDongle()){
-            LOG_RED << "===>failed in startDongle";
+            LOG_INFO << "===>startDongle failed, serialPort <" << serialPort << ">.......";
             serial.reset();
             return false;
         }else{
-            LOG_INFO << "===>success in startDongle";
+            LOG_INFO << "===>startDongle successfully, serialPort <" << serialPort << ">.......";
             return true;
         }
     }

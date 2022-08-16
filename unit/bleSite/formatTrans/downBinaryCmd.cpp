@@ -4,9 +4,10 @@
 
 #include "downBinaryCmd.h"
 #include "../parameter.h"
+#include "log/Logging.h"
 
 size_t DownBinaryCmd::getBinary(QData &data, unsigned char *buf, size_t bufSize) {
-    std::cout << "===>getBleCommandBinaray: " << data.toJsonString() << std::endl;
+    LOG_INFO << data.toJsonString();
     string pseudoCommand  = data.getString("command");
 
     if(pseudoCommand == "turnOn" || pseudoCommand == "turnOff"){
