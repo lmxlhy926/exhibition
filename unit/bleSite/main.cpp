@@ -65,6 +65,33 @@ int main(int argc, char* argv[]) {
     });
 
 
+    //注册设备绑定回调
+    serviceSiteManager->registerServiceRequestHandler(Add_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return add_device_service_handler(request, response, lc);
+    });
+    //注册设备解绑回调
+    serviceSiteManager->registerServiceRequestHandler(Del_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return del_device_service_handler(request, response, lc);
+    });
+    //注册设备控制回调
+    serviceSiteManager->registerServiceRequestHandler(Control_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return control_device_service_handler(request, response, lc);
+    });
+    //获取设备列表
+    serviceSiteManager->registerServiceRequestHandler(Get_DeviceList_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return get_device_list_service_handler(request, response, lc);
+    });
+    //获取设备状态
+    serviceSiteManager->registerServiceRequestHandler(Get_DeviceState_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return get_device_state_service_handler(request, response, lc);
+    });
+
+
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){

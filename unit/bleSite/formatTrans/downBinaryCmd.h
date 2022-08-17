@@ -6,6 +6,8 @@
 #define EXHIBITION_DOWNBINARYCMD_H
 
 #include <string>
+#include <regex>
+#include <sstream>
 #include "qlibc/QData.h"
 #include "downBinaryUtil.h"
 #include "logic/snAddressMap.h"
@@ -32,6 +34,17 @@ public:
 
 class JsonCmd2Binary{
     virtual size_t getBinary(unsigned char* buf, size_t bufSize) = 0;
+
+    string skipWhiteSpace(string& str){
+        string retStr;
+        regex sep(" ");
+        sregex_token_iterator p(str.cbegin(), str.cend(), sep, -1);
+        sregex_token_iterator e;
+        for(; p != e; ++p){
+            retStr.append(*p);
+        }
+        return retStr;
+    }
 };
 
 class LightScan : public JsonCmd2Binary{
@@ -103,28 +116,91 @@ public:
     }
 };
 
-
+//开关
 class LightOnOff : public JsonCmd2Binary{
 private:
-    string pseudoCommand;
-    string address;
+    string deviceAddress;
+    string onOff;
 public:
-    explicit LightOnOff(qlibc::QData& data){ init(data); }
+    explicit LightOnOff(qlibc::QData& data) { init(data); }
 
     void init(qlibc::QData& data){
-        pseudoCommand  = data.getString("command");
-        address = data.getString("device_id");
+        deviceAddress = data.getString("deviceAddress");
+        onOff = data.getString("onOff");
     }
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
-        qlibc::QData thisBleConfigData = bleConfig::getInstance()->getBleParamData();
-        thisBleConfigData.asValue()["commonBase"]["param"]["ADDRESS_DEST"] = address;
-        thisBleConfigData.asValue()["commonBase"]["param"]["OPERATION"] = pseudoCommand;
+        string prefix = bleConfig::getInstance()->getBleParamData().getString("commonPrefix");
+        string stringCmd;
+        stringCmd.append(prefix).append(deviceAddress).append("8202");
+        if(onOff == "on"){
+            stringCmd.append("01");
+        }else if(onOff == "off"){
+            stringCmd.append("00");
+        }
+        stringCmd.append("000000");
 
-        string binaryString = DownBinaryUtil::getBinaryString(thisBleConfigData);
-        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
+        return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
     }
 };
+
+//亮度
+class LightLuminance : public JsonCmd2Binary{
+private:
+    string deviceAddress;
+    int luminanceVal;
+
+public:
+    explicit LightLuminance(qlibc::QData& data){ init(data); }
+
+    void init(qlibc::QData& data){
+        deviceAddress = data.getString("deviceAddress");
+        luminanceVal = data.getInt("luminanceVal");
+    }
+
+    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+        string prefix = bleConfig::getInstance()->getBleParamData().getString("commonPrefix");
+        stringstream ss;
+        ss << std::hex << std::uppercase << std::setw(4) << luminanceVal;
+
+        string stringCmd;
+        stringCmd.append(prefix).append(deviceAddress).append("824C").append(ss.str());
+        stringCmd.append("000000");
+
+        return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
+    }
+};
+
+//色温
+class LightColorTem : public JsonCmd2Binary{
+private:
+    string deviceAddress;
+    int ctlTemperature;
+
+public:
+    explicit LightColorTem(qlibc::QData& data){ init(data); }
+
+    void init(qlibc::QData& data){
+        deviceAddress = data.getString("deviceAddress");
+        ctlTemperature = data.getInt("ctlTemperature");
+    }
+
+    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+        string prefix = bleConfig::getInstance()->getBleParamData().getString("commonPrefix");
+        stringstream ss;
+        ss << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
+
+        string stringCmd;
+        stringCmd.append(prefix).append(deviceAddress).append("8264").append(ss.str());
+        stringCmd.append("0000");
+        stringCmd.append("000000");
+
+        return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
+    }
+};
+
+//
+
 
 
 

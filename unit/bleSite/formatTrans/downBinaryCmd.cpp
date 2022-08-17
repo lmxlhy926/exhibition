@@ -10,10 +10,7 @@ size_t DownBinaryCmd::getBinary(QData &data, unsigned char *buf, size_t bufSize)
     LOG_INFO << data.toJsonString();
     string pseudoCommand  = data.getString("command");
 
-    if(pseudoCommand == "turnOn" || pseudoCommand == "turnOff"){
-        return LightOnOff(data).getBinary(buf, bufSize);
-
-    }else if(pseudoCommand == SCAN){
+    if(pseudoCommand == SCAN){
         return LightScan().getBinary(buf, bufSize);
 
     }else if(pseudoCommand == SCANEND){
@@ -36,6 +33,15 @@ size_t DownBinaryCmd::getBinary(QData &data, unsigned char *buf, size_t bufSize)
     }else if(pseudoCommand == UNBIND){
         string deviceSn = data.getString("deviceSn");
         return LightUnBind(deviceSn).getBinary(buf, bufSize);
+
+    }else if(pseudoCommand == POWER){
+        return LightOnOff(data).getBinary(buf, bufSize);
+
+    }else if(pseudoCommand == LUMINANCE){
+        return LightLuminance(data).getBinary(buf, bufSize);
+
+    }else if(pseudoCommand == COLORTEMPERATURE){
+        return LightColorTem(data).getBinary(buf, bufSize);
     }
 
     return 0;

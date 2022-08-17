@@ -18,16 +18,16 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
     if(bindingFlag.load())  return false;
     string pseudoCommand  = cmdData.getString("command");
 
-    if(pseudoCommand == BIND){
+    if(pseudoCommand == BIND){      //设备批量绑定
         bindingFlag.store(true);
-        qlibc::QData deviceSnArray = cmdData.getData("deviceSn");
+        qlibc::QData deviceSnArray = cmdData.getData("device_list");
         if(deviceSnArray.size() == 0){
             getScanedDevices(deviceSnArray);
         }
         bd.bind(deviceSnArray);
         bindingFlag.store(false);
 
-    }else if(pseudoCommand == UNBIND){
+    }else if(pseudoCommand == UNBIND){  //设备批量解绑
         qlibc::QData deviceArray = cmdData.getData("deviceSn");
         unsigned int size = deviceArray.size();
         for(unsigned int i = 0; i < size; ++i){
@@ -37,7 +37,8 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
             DownBinaryCmd::transAndSendCmd(unbindData);
             this_thread::sleep_for(std::chrono::seconds(1));
         }
-    }else{
+
+    }else{  //设备控制指令
         DownBinaryCmd::transAndSendCmd(cmdData);
     }
 

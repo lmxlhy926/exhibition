@@ -1,6 +1,6 @@
 add_subdirectory(config)
 add_subdirectory(synergy)
 add_subdirectory(testSite)
-#add_subdirectory(bleSite)
+add_subdirectory(bleSite)
 add_subdirectory(mdns)
 add_subdirectory(query)

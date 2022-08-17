@@ -1,0 +1,153 @@
+
+//--------内部基础控制指令
+
+//扫描
+{
+	"command" : "scan"
+}
+
+//扫描结束
+{
+	"command" : "scanEnd"
+}
+
+//连接
+{
+	"command" : "connect",
+	"deviceSn" : "xxxxxxx"
+}
+
+
+//给网关分配地址
+{
+	"command" : "assignGateWayAddress",
+}
+
+
+//给节点分配地址
+{
+	"command" : "assignNodeAddress",
+	"nodeAddress" : "xxxx"
+}
+
+
+//绑定
+{
+	"command" : "bind"
+}
+
+
+//解绑
+{
+	"command" : "unbind",
+	"deviceSn" : "xxxx"
+}
+
+
+//开关灯
+{
+	"command" : "power",
+	"deviceAddress" : "xxxx",
+	"onOff" : "on"
+}
+
+
+//控制灯亮度
+{
+	"command" : "luminance",
+	"deviceAddress" : "xxxx",
+	"luminanceVal" : 255
+}
+
+
+//控制灯色温
+{
+	"command" : "color_temperature",
+	"deviceAddress" : "xxxx",
+	"ctlTemperature" : 255
+}
+
+
+//--------logicControl控制指令
+
+//批量绑定：绑定指定的设备，或者绑定所有扫描到的设备
+{
+    "command" : "bind",
+    "device_list" : [xxx, xxx,xxx]
+}
+
+//批量解绑：解绑指定的设备
+{
+    "command" : "unbind",
+    "device_list" : [xxx, xxx,xxx]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
