@@ -81,14 +81,14 @@ QData configParamUtil::getCloudServerData(){
 QData configParamUtil::getWhiteList() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(whiteListData.empty())
-        whiteListData.loadFromFile(FileUtils::contactFileName(dataDirPath, "config/whiteList.json"));
+        whiteListData.loadFromFile("/data/changhong/edge_midware/whitedevs-i.txt");
     return whiteListData;
 }
 
 void configParamUtil::saveWhiteListData(QData &data) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     whiteListData.setInitData(data);
-    whiteListData.saveToFile(FileUtils::contactFileName(dataDirPath, "config/whiteList.json"), true);
+    whiteListData.saveToFile("/data/changhong/edge_midware/whitedevs-i.txt", true);
 }
 
 

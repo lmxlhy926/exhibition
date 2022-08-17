@@ -1310,5 +1310,5 @@ bool servicesite::ServiceSiteManager::subscribeMessage(string message_id, string
         temp_messageSubscriber->addSiteMessageSubscriberSiteHandleP(temp_messageSubscriberSiteHandle);
     }
 
-    return need_save;
+    return true;
 }
