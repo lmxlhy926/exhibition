@@ -11,13 +11,10 @@
 int main(int argc, char* argv[]){
 
     qlibc::QData data;
-    data.setString("service_id", "sceneListRequest");
+    data.setString("service_id", "whiteListRequest");
     data.putData("request", qlibc::QData());
-    httplib::Client client_("192.168.174.129", 9006);
-    client_.set_keep_alive(true);
-    client_.set_connection_timeout(5);
-    client_.set_read_timeout(10);
-    client_.set_write_timeout(5);
+
+    httplib::Client client_("127.0.0.1", 9006);
 
     while(true){
         auto httpRes = client_.Post("/", data.toJsonString(), "application/json");
