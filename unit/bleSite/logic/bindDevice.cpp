@@ -6,6 +6,10 @@
 #include "formatTrans/downBinaryCmd.h"
 #include "formatTrans/statusEvent.h"
 #include "log/Logging.h"
+#include "../parameter.h"
+#include "siteService/service_site_manager.h"
+
+using namespace servicesite;
 
 static string AssignGateWayAddressString = R"({"command":"assignGateWayAddress"})";
 static string BindString = R"({"command":"bind"})";
@@ -15,12 +19,17 @@ void BindDevice::bind(QData &deviceArray) {
     if(deviceArray.type() != Json::arrayValue) return;
     for(Json::ArrayIndex i = 0; i < arraySize; i++){
         string deviceSn = deviceArray.getArrayElement(i).asValue().asString();
-        addDevice(deviceSn, i);
+        addDevice(deviceSn);
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
+
+    qlibc::QData publishData;
+    publishData.setString("message_id", BindEndMsg);
+    publishData.putData("content", qlibc::QData());
+    ServiceSiteManager::getInstance()->publishMessage(BindEndMsg, publishData.toJsonString());
 }
 
-bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
+bool BindDevice::addDevice(string &deviceSn) {
     //0. 扫描
     LOG_INFO << ">>: start to scan the device <" << deviceSn << ">.....";
     qlibc::QData scanData;
@@ -86,6 +95,12 @@ bool BindDevice::addDevice(string &deviceSn, Json::ArrayIndex index) {
     LOG_PURPLE << "<<: ......BIND SUCCESSFULLY..... ";
     LOG_PURPLE << "<<: .............................";
     LOG_PURPLE << "<<: .............................";
+
+    qlibc::QData content, publishData;
+    content.setString("device_id", deviceSn);
+    publishData.setString("message_id", SingleDeviceBindSuccessMsg);
+    publishData.putData("content", content);
+    ServiceSiteManager::getInstance()->publishMessage(SingleDeviceBindSuccessMsg, publishData.toJsonString());
 
     return true;
 }

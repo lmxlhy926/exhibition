@@ -65,6 +65,25 @@ int BleDevice_command_test_service_handler(const Request& request, Response& res
     return 0;
 }
 
+//扫描设备
+int scan_device_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    if(requestBody.type() != Json::nullValue){
+        qlibc::QData scanDeviceArray;
+        lc.getScanedDevices(scanDeviceArray);
+
+        qlibc::QData res, retData;
+        res.putData("device_list", scanDeviceArray);
+        retData.setInt("code", 0);
+        retData.setString("error", "ok");
+        retData.putData("response", res);
+
+        response.set_content(retData.toJsonString(), "text/json");
+    }else{
+        response.set_content(errResponse.dump(), "text/json");
+    }
+    return 0;
+}
 
 
 //添加设备
@@ -116,20 +135,22 @@ int control_device_service_handler(const Request& request, Response& response, L
                 qlibc::QData command_list = deviceList.getArrayElement(i).getData("command_list");
                 for(int j = 0; j < command_list.size(); ++j){
                     string command_id = command_list.getArrayElement(j).getString("command_id");
-                    string command_para = command_list.getArrayElement(j).getString("command_para");
 
                     qlibc::QData cmdData;
-                    cmdData.setString("command", command_id);
                     cmdData.setString("deviceAddress", device_address);
+                    cmdData.setString("command", command_id);
                     if(command_id == POWER){
-
+                        string command_para = command_list.getArrayElement(j).getString("command_para");
+                        cmdData.setString("commandPara", command_para);
 
                     }else if(command_id == LUMINANCE){
+                        int command_para = command_list.getArrayElement(j).getInt("command_para");
+                        cmdData.setInt("commandPara", command_para);
 
                     }else if(command_id == COLORTEMPERATURE){
-
+                        int command_para = command_list.getArrayElement(j).getInt("command_para");
+                        cmdData.setInt("commandPara", command_para);
                     }
-                    cmdData.setString("option", command_para);
 
                     lc.parse(cmdData);
                 }

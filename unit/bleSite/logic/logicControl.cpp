@@ -3,6 +3,7 @@
 //
 
 #include "logicControl.h"
+#include "siteService/service_site_manager.h"
 #include "../parameter.h"
 #include "log/Logging.h"
 #include "formatTrans/downBinaryUtil.h"
@@ -13,12 +14,13 @@
 #include <sstream>
 #include <iomanip>
 
+using namespace servicesite;
 
 bool LogicControl::parse(qlibc::QData &cmdData) {
     if(bindingFlag.load())  return false;
-    string pseudoCommand  = cmdData.getString("command");
+    string command  = cmdData.getString("command");
 
-    if(pseudoCommand == BIND){      //设备批量绑定
+    if(command == BIND){      //设备批量绑定
         bindingFlag.store(true);
         qlibc::QData deviceSnArray = cmdData.getData("device_list");
         if(deviceSnArray.size() == 0){
@@ -27,8 +29,8 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
         bd.bind(deviceSnArray);
         bindingFlag.store(false);
 
-    }else if(pseudoCommand == UNBIND){  //设备批量解绑
-        qlibc::QData deviceArray = cmdData.getData("deviceSn");
+    }else if(command == UNBIND){  //设备批量解绑
+        qlibc::QData deviceArray = cmdData.getData("device_list");
         unsigned int size = deviceArray.size();
         for(unsigned int i = 0; i < size; ++i){
             qlibc::QData unbindData;
@@ -45,6 +47,8 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
     return true;
 }
 
+
+//进行指定时间的扫描，获取可连接的设备列表
 void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
     qlibc::QData scanData;
     scanData.setString("command", "scan");
@@ -71,5 +75,11 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
     }
 
     LOG_HLIGHT << "==>deviceArray: " << deviceArray.toJsonString(true);
+
+    qlibc::QData content, publishData;
+    content.putData("device_list", deviceArray);
+    publishData.setString("message_id", ScanResultMsg);
+    publishData.putData("content", content);
+    ServiceSiteManager::getInstance()->publishMessage(ScanResultMsg, publishData.toJsonString());
 }
 

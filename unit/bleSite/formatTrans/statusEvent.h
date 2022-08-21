@@ -13,7 +13,10 @@
 #include "qlibc/QData.h"
 #include "log/Logging.h"
 #include "logic/snAddressMap.h"
+#include "siteService/service_site_manager.h"
+#include "../parameter.h"
 
+using namespace servicesite;
 using namespace std;
 
 class ReadBinaryString{
@@ -204,6 +207,11 @@ public:
         SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
         LOG_GREEN << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
 
+        qlibc::QData content, publishData;
+        content.setString("device_id", deviceSn);
+        publishData.setString("message_id", SingleDeviceUnbindSuccessMsg);
+        publishData.putData("content", content);
+        ServiceSiteManager::getInstance()->publishMessage(SingleDeviceUnbindSuccessMsg, publishData.toJsonString());
 
         qlibc::QData unbindData;
         unbindData.setString("unicastAddr", unicastAddress);

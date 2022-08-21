@@ -126,7 +126,7 @@ public:
 
     void init(qlibc::QData& data){
         deviceAddress = data.getString("deviceAddress");
-        onOff = data.getString("onOff");
+        onOff = data.getString("commandPara");
     }
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
@@ -155,7 +155,7 @@ public:
 
     void init(qlibc::QData& data){
         deviceAddress = data.getString("deviceAddress");
-        luminanceVal = data.getInt("luminanceVal");
+        luminanceVal = data.getInt("commandPara");
     }
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
@@ -182,7 +182,7 @@ public:
 
     void init(qlibc::QData& data){
         deviceAddress = data.getString("deviceAddress");
-        ctlTemperature = data.getInt("ctlTemperature");
+        ctlTemperature = data.getInt("commandPara");
     }
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
@@ -198,10 +198,6 @@ public:
         return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
     }
 };
-
-//
-
-
 
 
 #endif //EXHIBITION_DOWNBINARYCMD_H

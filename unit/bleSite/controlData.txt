@@ -1,6 +1,5 @@
 
 //--------内部基础控制指令
-
 //扫描
 {
 	"command" : "scan"
@@ -47,25 +46,26 @@
 //开关灯
 {
 	"command" : "power",
+	"commandPara" : "on"
 	"deviceAddress" : "xxxx",
-	"onOff" : "on"
 }
 
 
 //控制灯亮度
 {
 	"command" : "luminance",
+	"commandPara" : 255
 	"deviceAddress" : "xxxx",
-	"luminanceVal" : 255
 }
 
 
 //控制灯色温
 {
 	"command" : "color_temperature",
+	"commandPara" : 255
 	"deviceAddress" : "xxxx",
-	"ctlTemperature" : 255
 }
+
 
 
 //--------logicControl控制指令

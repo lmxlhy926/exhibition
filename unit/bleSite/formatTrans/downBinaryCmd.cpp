@@ -8,39 +8,39 @@
 
 size_t DownBinaryCmd::getBinary(QData &data, unsigned char *buf, size_t bufSize) {
     LOG_INFO << data.toJsonString();
-    string pseudoCommand  = data.getString("command");
+    string command  = data.getString("command");
 
-    if(pseudoCommand == SCAN){
+    if(command == SCAN){
         return LightScan().getBinary(buf, bufSize);
 
-    }else if(pseudoCommand == SCANEND){
+    }else if(command == SCANEND){
         return LightScanEnd().getBinary(buf, bufSize);
 
-    }else if(pseudoCommand == CONNECT){
+    }else if(command == CONNECT){
         string deviceSn = data.getString("deviceSn");
         return LightConnect(deviceSn).getBinary(buf, bufSize);
 
-    }else if(pseudoCommand == ASSIGN_GATEWAY_ADDRESS){
+    }else if(command == ASSIGN_GATEWAY_ADDRESS){
         return LightGatewayAddressAssign().getBinary(buf, bufSize);
 
-    }else if(pseudoCommand == ASSIGN_NODE_ADDRESS){
+    }else if(command == ASSIGN_NODE_ADDRESS){
         string nodeAddress = data.getString("nodeAddress");
         return LightNodeAddressAssign(nodeAddress).getBinary(buf, bufSize);
 
-    }else if(pseudoCommand == BIND){
+    }else if(command == BIND){
         return LightBind().getBinary(buf, bufSize);
 
-    }else if(pseudoCommand == UNBIND){
+    }else if(command == UNBIND){
         string deviceSn = data.getString("deviceSn");
         return LightUnBind(deviceSn).getBinary(buf, bufSize);
 
-    }else if(pseudoCommand == POWER){
+    }else if(command == POWER){
         return LightOnOff(data).getBinary(buf, bufSize);
 
-    }else if(pseudoCommand == LUMINANCE){
+    }else if(command == LUMINANCE){
         return LightLuminance(data).getBinary(buf, bufSize);
 
-    }else if(pseudoCommand == COLORTEMPERATURE){
+    }else if(command == COLORTEMPERATURE){
         return LightColorTem(data).getBinary(buf, bufSize);
     }
 

@@ -97,7 +97,7 @@ void PostStatusEvent::operator()() {
     ReadBinaryString rs(statusString);
     rs.read2Byte().readByte(hciType).readByte(subType).readByte(packageIndex);
 
-    if(hciType == "91" && subType == "88"){     //扫描结果上报
+    if(hciType == "91" && subType == "88"){         //扫描结果上报
         ScanResult sr(rs.remainingString());
         sr.postEvent();
 
@@ -109,18 +109,18 @@ void PostStatusEvent::operator()() {
         BindResult br(rs.remainingString());
         br.postEvent();
 
-    }else if(hciType == "91" && subType == "81"){     //开关命令上报，灯亮度上报
+    }else if(hciType == "91" && subType == "81"){   //开关命令上报，灯亮度上报
         string opcode;
         rs.read2Byte().read2Byte().read2Byte(opcode);
-        if(opcode == "8204"){
+        if(opcode == "8204"){           //开关状态
             rs.rollBack(6);
             LOG_GREEN << "<<===: LightOnOffStatus: " << LightOnOffStatus(rs.remainingString()).construct();
 
-        }else if(opcode == "824E"){
+        }else if(opcode == "824E"){    //亮度状态
             rs.rollBack(6);
             LOG_GREEN << "<<===: LightBrightStatus: " << LightBrightStatus(rs.remainingString()).construct();
 
-        }else if(opcode == "804A"){
+        }else if(opcode == "804A"){     //解绑消息
             rs.rollBack(6);
             UnBindResult unBindResult(rs.remainingString());
             unBindResult.postEvent();

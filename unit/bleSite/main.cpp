@@ -53,6 +53,14 @@ int main(int argc, char* argv[]) {
     //创建控制类，传递给注册的回调函数
     LogicControl lc;
 
+    //注册本站点支持的消息
+    serviceSiteManager->registerMessageId(ScanResultMsg);                  //扫描结果
+    serviceSiteManager->registerMessageId(SingleDeviceBindSuccessMsg);     //单个设备绑定结果
+    serviceSiteManager->registerMessageId(SingleDeviceUnbindSuccessMsg);   //单个设备解绑结果
+    serviceSiteManager->registerMessageId(BindEndMsg);                     //绑定结束
+    serviceSiteManager->registerMessageId(Device_State_Changed);           //设备状态改变
+
+
     //注册蓝牙命令handler
     serviceSiteManager->registerServiceRequestHandler(Ble_Device_Command_Service_ID,
                                                       [&lc](const Request& request, Response& response) -> int{
@@ -64,6 +72,12 @@ int main(int argc, char* argv[]) {
         return BleDevice_command_test_service_handler(request, response);
     });
 
+
+    //注册设备扫描回调
+    serviceSiteManager->registerServiceRequestHandler(Scan_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return add_device_service_handler(request, response, lc);
+    });
 
     //注册设备绑定回调
     serviceSiteManager->registerServiceRequestHandler(Add_Device_Service_ID,

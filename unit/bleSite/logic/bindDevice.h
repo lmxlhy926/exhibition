@@ -19,7 +19,7 @@ public:
     void bind(qlibc::QData& deviceArray);
 
 private:
-    bool addDevice(string& deviceSn, Json::ArrayIndex index);
+    bool addDevice(string& deviceSn);
 };
 
 

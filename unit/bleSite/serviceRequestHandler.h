@@ -16,6 +16,10 @@ int BleDevice_command_service_handler(const Request& request, Response& response
 //二进制控制指令
 int BleDevice_command_test_service_handler(const Request& request, Response& response);
 
+
+//扫描设备
+int scan_device_service_handler(const Request& request, Response& response, LogicControl& lc);
+
 //添加设备
 int add_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 
