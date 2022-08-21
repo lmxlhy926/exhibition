@@ -16,16 +16,17 @@ bleConfig* bleConfig::getInstance() {
 }
 
 void bleConfig::setConfigPath(const string& configPath) {
-    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     dataDirPath = configPath;
 }
 
 string bleConfig::getconfigPath() {
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     return dataDirPath;
 }
 
 QData bleConfig::getBleParamData() {
-    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     if(bleParamData.empty()){
         bleParamData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/bleCommand.json"));
     }
@@ -33,7 +34,7 @@ QData bleConfig::getBleParamData() {
 }
 
 QData bleConfig::getSerialData() {
-    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     if(serialData.empty()){
         serialData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/serialConfig.json"));
     }
@@ -41,7 +42,7 @@ QData bleConfig::getSerialData() {
 }
 
 QData bleConfig::getSnAddrData() {
-    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     if(snAddressData.empty()){
         snAddressData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/snAddress.json"));
     }
@@ -49,13 +50,13 @@ QData bleConfig::getSnAddrData() {
 }
 
 void bleConfig::saveSnAddrData(qlibc::QData& data) {
-    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     snAddressData.setInitData(data);
     snAddressData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/snAddress.json"), true);
 }
 
 bool bleConfig::serialInit(bleConfig::SerialReceiveFunc receiveFuc) {
-    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     if(serial == nullptr){
         string serialPort = getSerialData().getString("serial");
         serial.reset(new BLETelinkDongle(serialPort));
@@ -74,7 +75,7 @@ bool bleConfig::serialInit(bleConfig::SerialReceiveFunc receiveFuc) {
 }
 
 shared_ptr<BLETelinkDongle> bleConfig::getSerial() {
-    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
     return serial;
 }
 

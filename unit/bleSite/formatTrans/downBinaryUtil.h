@@ -41,22 +41,19 @@ public:
 };
 
 
+/*
+ * 1. 将命令的字符串表示，转换为二进制表示
+ * 2. 使用串口发送数据
+ * 3. 打印串口发送的数据
+ */
 class DownBinaryUtil{
     static std::mutex sendMutex;
 public:
-
-    /**
-     * 获取二进制命令的字符串表示
-     * @param bleConfigData     填入参数后的蓝牙格式数据
-     * @return                  二进制命令的字符串表示
-     */
-    static string getBinaryString(qlibc::QData& bleConfigData);
-
     /**
      * 将二进制命令的字符串表示转换为二进制表示
      * @param binaryString      二进制命令的字符串表示
      * @param buf               存放二进制命令的数组
-     * @param size              数据大小
+     * @param size              提供的数组容量
      * @return                  二进制命令实际占用的字节数
      */
     static size_t binaryString2binary(string& binaryString, unsigned char* buf, size_t size);
@@ -64,6 +61,7 @@ public:
     //串口发送数据
     static bool serialSend(unsigned char *buf, int size);
 
+private:
     //打印发送的二进制命令
     static void printSendBinary(unsigned char *buf, int size);
 };

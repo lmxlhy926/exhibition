@@ -13,8 +13,8 @@ using namespace std;
 
 class UpBinaryCmd{
 public:
-    //接收串口返回，产生相应的事件
-    static bool parseAndGenerateEvent(unsigned char* binaryStream, int size);
+    //接收串口返回，解析返回数据，产生相应的事件
+    static bool bleReceiveFunc(unsigned char* binaryStream, int size);
 };
 
 

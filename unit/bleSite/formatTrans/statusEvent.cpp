@@ -7,33 +7,19 @@
 EventTable* EventTable::eventTable = nullptr;
 
 ReadBinaryString &ReadBinaryString::readByte(string &dest) {
-    if(avail() >= 2){
-        dest = binaryString_.substr(readIndex, 2);
-        readIndex += 2;
-    }
-    return *this;
+   return readBytes(dest, 1);
 }
 
 ReadBinaryString &ReadBinaryString::readByte() {
-    if(avail() >= 2){
-        readIndex += 2;
-    }
-    return *this;
+   return readBytes(1);
 }
 
 ReadBinaryString &ReadBinaryString::read2Byte(string &dest) {
-    if(avail() >= 4){
-        dest = binaryString_.substr(readIndex, 4);
-        readIndex += 4;
-    }
-    return *this;
+   return readBytes(dest, 2);
 }
 
 ReadBinaryString &ReadBinaryString::read2Byte() {
-    if(avail() >= 4){
-        readIndex += 4;
-    }
-    return *this;
+   return readBytes(2);
 }
 
 ReadBinaryString &ReadBinaryString::readBytes(string &dest, int readBytesNum) {
@@ -49,6 +35,10 @@ ReadBinaryString &ReadBinaryString::readBytes(int readBytesNum) {
         readIndex += readBytesNum * 2;
     }
     return *this;
+}
+
+int ReadBinaryString::avail(){
+    return static_cast<int>(binaryString_.size() - readIndex);
 }
 
 string LightOnOffStatus::construct() {

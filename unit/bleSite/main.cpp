@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
     configPathPtr->setConfigPath(string(argv[1]));
 
     //注册串口上报回调函数，初始化并打开串口
-    while(!configPathPtr->serialInit(UpBinaryCmd::parseAndGenerateEvent)){
+    while(!configPathPtr->serialInit(UpBinaryCmd::bleReceiveFunc)){
         LOG_RED << "==>failed to open the serial<"
                   << configPathPtr->getSerialData().getString("serial") << ">....";
         LOG_RED << "===>try to open in 3 seconds.....";

@@ -25,9 +25,10 @@ private:
     SnAddressMap(){
         loadCache2Map();
     }
-public:
+
     static SnAddressMap* instance;
 
+public:
     static SnAddressMap* getInstance(){
         if(instance == nullptr){
             instance = new SnAddressMap();

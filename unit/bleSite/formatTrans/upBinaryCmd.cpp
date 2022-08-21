@@ -11,6 +11,10 @@
 
 using namespace muduo;
 
+/*
+ * 1. 处理转义数据
+ * 2. 二进制格式转换为字符串形式
+ */
 static string binaryCmd2String(const unsigned char *binaryStream, int size) {
     if (size > 512) return string();
 
@@ -49,9 +53,8 @@ void printBinaryString(string &str) {
 }
 
 
-bool UpBinaryCmd::parseAndGenerateEvent(unsigned char *binaryStream, int size) {
+bool UpBinaryCmd::bleReceiveFunc(unsigned char *binaryStream, int size) {
     string binaryString = binaryCmd2String(binaryStream, size);
-//    printBinaryString(binaryString);
     PostStatusEvent(binaryString).operator()();
     return true;
 }

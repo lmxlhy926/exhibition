@@ -34,9 +34,7 @@ public:
     ReadBinaryString& readBytes(string& dest, int readBytesNum);
     ReadBinaryString& readBytes(int readBytesNum);
 
-    int avail(){
-        return static_cast<int>(binaryString_.size() - readIndex);
-    }
+    int avail();
 
     void reset() {readIndex = 0; }
 
@@ -48,6 +46,13 @@ public:
     string remainingString(){ return binaryString_.substr(readIndex); }
 };
 
+
+/*
+ * 定义一个事件：
+ *      1. 存储数据
+ *      2. 通知
+ *      3. 等待
+ */
 class Event{
 private:
     std::mutex mutex_;
@@ -84,13 +89,13 @@ public:
     }
 };
 
-
+//事件表：记录关心的事件
 class EventTable{
 public:
-    Event scanResultEvent;                      //扫描结果上报事件
+    Event scanResultEvent;                      //单个扫描结果上报事件
     Event nodeAddressAssignSuccessEvent;        //节点地址分配成功事件
-    Event bindSuccessEvent;                     //绑定成功事件
-    Event unbindSuccessEvent;                   //成功解绑事件
+    Event bindSuccessEvent;                     //单个设备绑定成功事件
+    Event unbindSuccessEvent;                   //单个设备成功解绑事件
 private:
     static EventTable* eventTable;
 
@@ -113,6 +118,7 @@ public:
 };
 
 
+//单个设备扫描结果
 class ScanResult : ReportEvent{
 private:
     string sourceData;
@@ -139,6 +145,7 @@ private:
 };
 
 
+//节点分配成功事件
 class NodeAddressAssignAck : public ReportEvent{
 private:
     string sourceData;
@@ -166,6 +173,7 @@ private:
 };
 
 
+//绑定结果事件
 class BindResult : public ReportEvent{
 private:
     string sourceData;
@@ -192,6 +200,8 @@ private:
     }
 };
 
+
+//单个设备解绑事件
 class UnBindResult : public ReportEvent{
 private:
     string sourceData;
@@ -228,6 +238,7 @@ private:
     }
 };
 
+//设备状态
 class LightOnOffStatus{
 private:
     string sourceData;
@@ -246,6 +257,8 @@ private:
     void init();
 };
 
+
+//亮度状态
 class LightBrightStatus{
 private:
     string sourceData;

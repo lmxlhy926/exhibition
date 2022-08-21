@@ -16,6 +16,10 @@ using namespace std;
 
 class DownBinaryCmd{
 public:
+    //将json格式控制命令转换为二进制格式，并向串口发送。
+    static bool transAndSendCmd(QData &controlData);
+
+private:
     /**
      * 将json格式控制命令转换为二进制控制命令
      * @param data      控制命令
@@ -23,19 +27,17 @@ public:
      * @param bufSize   数组容量
      * @return          二进制命令长度
      */
-    static size_t getBinary(qlibc::QData& data, unsigned char* buf, size_t bufSize);
-
-    //向串口发送二进制命令
-    static bool serialSend(unsigned char *buf, int size);
-
-    //将json格式控制命令转换为二进制格式，并向串口发送。
-    static bool transAndSendCmd(QData &controlData);
+    static size_t getBinary(qlibc::QData& controlData, unsigned char* buf, size_t bufSize);
 };
 
+
 class JsonCmd2Binary{
+protected:
+    //获取二进制格式命令
     virtual size_t getBinary(unsigned char* buf, size_t bufSize) = 0;
 
-    string skipWhiteSpace(string& str){
+    //剔除字符串中间的空格
+    static string deleteWhiteSpace(string str){
         string retStr;
         regex sep(" ");
         sregex_token_iterator p(str.cbegin(), str.cend(), sep, -1);
@@ -130,7 +132,7 @@ public:
     }
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
-        string prefix = bleConfig::getInstance()->getBleParamData().getString("commonPrefix");
+        string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
         string stringCmd;
         stringCmd.append(prefix).append(deviceAddress).append("8202");
         if(onOff == "on"){
@@ -138,7 +140,7 @@ public:
         }else if(onOff == "off"){
             stringCmd.append("00");
         }
-        stringCmd.append("000000");
+        stringCmd.append(deleteWhiteSpace("00 00 00"));
 
         return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
     }
@@ -148,7 +150,7 @@ public:
 class LightLuminance : public JsonCmd2Binary{
 private:
     string deviceAddress;
-    int luminanceVal;
+    int luminanceVal = 0;
 
 public:
     explicit LightLuminance(qlibc::QData& data){ init(data); }
@@ -159,13 +161,13 @@ public:
     }
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
-        string prefix = bleConfig::getInstance()->getBleParamData().getString("commonPrefix");
+        string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
         stringstream ss;
         ss << std::hex << std::uppercase << std::setw(4) << luminanceVal;
 
         string stringCmd;
         stringCmd.append(prefix).append(deviceAddress).append("824C").append(ss.str());
-        stringCmd.append("000000");
+        stringCmd.append(deleteWhiteSpace("00 00 00"));
 
         return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
     }
@@ -186,14 +188,14 @@ public:
     }
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
-        string prefix = bleConfig::getInstance()->getBleParamData().getString("commonPrefix");
+        string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
         stringstream ss;
         ss << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
 
         string stringCmd;
         stringCmd.append(prefix).append(deviceAddress).append("8264").append(ss.str());
-        stringCmd.append("0000");
-        stringCmd.append("000000");
+        stringCmd.append(deleteWhiteSpace("00 00"));
+        stringCmd.append(deleteWhiteSpace("00 00 00"));
 
         return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
     }
