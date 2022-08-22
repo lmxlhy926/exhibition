@@ -98,26 +98,21 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(SUBDEVICE_REGISTER_SERVICE_ID, subDeviceRegister_service_request_handler);
     //注册获取家庭域Id处理函数
     serviceSiteManager->registerServiceRequestHandler(DOMAINID_REQUEST_SERVICE_ID, domainIdRequest_service_request_handler);
+
     //注册安装师傅信息上传请求函数
     serviceSiteManager->registerServiceRequestHandler(ENGINEER_REQUEST_SERVICE_ID,
                                                       [&](const Request& request, Response& response) -> int{
         return engineer_service_request_handler(mc, request, response);
     });
+
     //获取白名单列表
-    serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID,
-                                                      [&](const Request& request, Response& response) -> int{
-        return whiteList_service_request_handler(request, response);
-    });
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID,whiteList_service_request_handler);
+    //保存白名单列表
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_SAVE_REQUEST_SERVICE_ID,whiteList_save_service_request_handler);
     //获取灯控设备列表
-    serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID,
-                                                      [&](const Request& request, Response& response) -> int{
-        return getAllDeviceList_service_request_handler(request, response);
-    });
+    serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID,getAllDeviceList_service_request_handler);
     //让电视发声
-    serviceSiteManager->registerServiceRequestHandler(TVSOUND_REQUEST_SERVICE_ID,
-                                                      [&](const Request& request, Response& response) -> int{
-        return tvSound_service_request_handler(request, response);
-    });
+    serviceSiteManager->registerServiceRequestHandler(TVSOUND_REQUEST_SERVICE_ID,tvSound_service_request_handler);
 
 
     //注册messageID对应的handler;

@@ -32,13 +32,14 @@ static const string SUBDEVICE_REGISTER_URL = "/logic-device/edge/deviceRegister"
 static const string WHITELIST_REQUEST_URL =  "/logic-device/edge/getLittleWhiteList";     //获取白名单
 
 //服务ID, 对内提供
-static const string SCENELIST_REQUEST_SERVICE_ID = "sceneListRequest";
-static const string SUBDEVICE_REGISTER_SERVICE_ID = "subDeviceRegister";
-static const string DOMAINID_REQUEST_SERVICE_ID = "domainIdRequest";
-static const string ENGINEER_REQUEST_SERVICE_ID = "engineerAppInfo";
-static const string WHITELIST_REQUEST_SERVICE_ID = "whiteListRequest";
-static const string GETALLLIST_REQUEST_SERVICE_ID = "get_all_device_list";
-static const string TVSOUND_REQUEST_SERVICE_ID = "tvSound";
+static const string SCENELIST_REQUEST_SERVICE_ID =      "sceneListRequest";
+static const string SUBDEVICE_REGISTER_SERVICE_ID =     "subDeviceRegister";
+static const string DOMAINID_REQUEST_SERVICE_ID =       "domainIdRequest";
+static const string ENGINEER_REQUEST_SERVICE_ID =       "engineerAppInfo";
+static const string WHITELIST_REQUEST_SERVICE_ID =      "whiteListRequest";
+static const string WHITELIST_SAVE_REQUEST_SERVICE_ID = "whiteListSaveRequest";
+static const string GETALLLIST_REQUEST_SERVICE_ID =     "get_all_device_list";
+static const string TVSOUND_REQUEST_SERVICE_ID =        "tvSound";
 
 
 #endif //EXHIBITION_PARAM_H

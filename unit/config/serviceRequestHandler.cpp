@@ -178,6 +178,20 @@ int whiteList_service_request_handler(const Request& request, Response& response
     return 0;
 }
 
+int whiteList_save_service_request_handler(const Request& request, Response& response){
+    qlibc::QData data(request.body);
+    qlibc::QData whiteListData = data.getData("request");
+    configParamUtil::getInstance()->saveWhiteListData(whiteListData);
+
+    qlibc::QData ret;
+    ret.setInt("code", 0);
+    ret.setString("msg", "success");
+    response.set_content(ret.toJsonString(), "text/json");
+
+    return 0;
+}
+
+
 int getAllDeviceList_service_request_handler(const Request& request, Response& response){
     //请求tvAdapter设备列表, 请求雷达、语音面板设备列表
     LOG_INFO << "getAllDeviceList_service_request_handler" << request.body;
