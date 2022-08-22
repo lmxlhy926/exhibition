@@ -10,17 +10,15 @@
 
 class BindDevice {
 private:
-    std::unique_ptr<SnAddressMap> snAddrMapPtr;
+    std::mutex mutex_;
+
 public:
-    explicit BindDevice(){
-        snAddrMapPtr.reset(SnAddressMap::getInstance());
-    }
+    BindDevice()= default;
 
     void bind(qlibc::QData& deviceArray);
 
 private:
     bool addDevice(string& deviceSn);
 };
-
 
 #endif //EXHIBITION_BINDDEVICE_H

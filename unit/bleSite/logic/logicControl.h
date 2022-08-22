@@ -14,15 +14,13 @@ using namespace std;
 
 class LogicControl {
 private:
-    atomic<bool> bindingFlag{false};
+    atomic<bool> bindingFlag{false};    //标志是否处于绑定状态
     BindDevice bd;
 public:
      bool parse(qlibc::QData& cmdData);
 
      //获取需要绑定的设备
      void getScanedDevices(qlibc::QData& deviceArray);
-
 };
-
 
 #endif //EXHIBITION_LOGICCONTROL_H

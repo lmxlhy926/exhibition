@@ -29,7 +29,7 @@ static const string ScanResultMsg =                    "scanResult";
 static const string SingleDeviceBindSuccessMsg =       "singleDeviceBindSuccess";
 static const string SingleDeviceUnbindSuccessMsg =     "singleDeviceUnbindSuccess";
 static const string BindEndMsg =                       "bindEnd";
-static const string Device_State_Changed =          "device_state_changed";
+static const string Device_State_Changed =             "device_state_changed";
 
 
 

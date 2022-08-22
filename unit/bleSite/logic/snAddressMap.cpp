@@ -65,6 +65,19 @@ void SnAddressMap::loadCache2Map() {
     }
 }
 
+void SnAddressMap::map2JsonDataAndSave2File() {
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData data;
+    for(auto& elem : snAddrMap){
+        qlibc::QData array;
+        array.append(elem.second.first);
+        array.append(elem.second.second);
+
+        data.putData(elem.first, array);
+    }
+    bleConfig::getInstance()->saveSnAddrData(data);
+}
+
 void SnAddressMap::insert(string &deviceSn, unsigned int intAddr) {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     auto pos = snAddrMap.find(deviceSn);
@@ -79,20 +92,6 @@ string SnAddressMap::intAddr2FullAddr(unsigned int i) {
     ss << "02" << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << i;
     return ss.str();
 }
-
-void SnAddressMap::map2JsonDataAndSave2File() {
-    std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    qlibc::QData data;
-    for(auto& elem : snAddrMap){
-        qlibc::QData array;
-        array.append(elem.second.first);
-        array.append(elem.second.second);
-
-        data.putData(elem.first, array);
-    }
-    bleConfig::getInstance()->saveSnAddrData(data);
-}
-
 
 string SnAddressMap::getAddress(string &deviceSn) {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
