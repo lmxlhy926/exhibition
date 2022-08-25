@@ -101,6 +101,11 @@ bool BindDevice::addDevice(string &deviceSn) {
     LOG_PURPLE << "<<: .............................";
     LOG_PURPLE << "<<: .............................";
 
+    //将绑定成功设备存入列表中
+    insert2DeviceList(deviceSn);
+    //存入设备的默认状态
+    insertDefaultStatus(deviceSn);
+
     //发布单个设备绑定成功消息
     qlibc::QData content, publishData;
     content.setString("device_id", deviceSn);
@@ -109,5 +114,66 @@ bool BindDevice::addDevice(string &deviceSn) {
     ServiceSiteManager::getInstance()->publishMessage(SingleDeviceBindSuccessMsg, publishData.toJsonString());
 
     return true;
+}
+
+void BindDevice::insert2DeviceList(string &deviceID) {
+    qlibc::QData deviceListArray = bleConfig::getInstance()->getDeviceListData().getData("device_list");
+    size_t deviceListArraySize = deviceListArray.size();
+    for(size_t i = 0; i < deviceListArraySize; ++i){
+        qlibc::QData deviceItem = deviceListArray.getArrayElement(i);
+        if(deviceItem.getString("device_id") == deviceID){
+            //删除该条目
+
+            break;
+        }
+    }
+    qlibc::QData newItem;
+    newItem.setString("device_id", deviceID);
+    deviceListArray.append(newItem);
+
+    qlibc::QData saveData;
+    saveData.putData("device_list", deviceListArray);
+    bleConfig::getInstance()->saveDeviceListData(saveData);
+}
+
+void BindDevice::insertDefaultStatus(string &deviceID) {
+    qlibc::QData item;
+    item.setString("device_id", deviceID);
+    item.setString("online_state", "online");
+    item.putData("state_list", defaultStatus());
+
+    qlibc::QData statusListData = bleConfig::getInstance()->getStatusListData();
+    size_t statusListSize = statusListData.size();
+    for(Json::ArrayIndex i = 0; i < statusListSize; ++i){
+        if(statusListData.getArrayElement(i).getString("device_id") == deviceID){
+            //删除该条目
+            break;
+        }
+    }
+
+    statusListData.append(item);
+    bleConfig::getInstance()->saveStatusListData(statusListData);
+}
+
+qlibc::QData BindDevice::defaultStatus() {
+    qlibc::QData state_list;
+
+    qlibc::QData itemPower;
+    itemPower.setString("state_id", "power");
+    itemPower.setString("state_value", "on");
+
+    qlibc::QData itemLuminance;
+    itemLuminance.setString("state_id", "luminance");
+    itemLuminance.setInt("state_value", 255);
+
+    qlibc::QData itemColorTemperature;
+    itemColorTemperature.setString("state_id", "color_temperature");
+    itemColorTemperature.setInt("state_value", 3000);
+
+    state_list.append(itemPower);
+    state_list.append(itemLuminance);
+    state_list.append(itemColorTemperature);
+
+    return state_list;
 }
 

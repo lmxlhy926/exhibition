@@ -21,6 +21,8 @@ private:
     QData bleParamData;                         //蓝牙命令配置数据
     QData serialData;                           //串口配置数据
     QData snAddressData;                        //蓝牙设备地址表
+    QData deviceListData;                       //蓝牙设备列表
+    QData statusListData;                       //状态列表
     std::shared_ptr<BLETelinkDongle> serial;    //串口
     httplib::ThreadPool threadPool;             //线程池
     static bleConfig* instance;                 //静态对象
@@ -47,6 +49,21 @@ public:
 
     //存储device-mac记录表
     void saveSnAddrData(qlibc::QData& data);
+
+    //保存设备列表
+    QData getDeviceListData();
+
+    //存储设备列表
+    void saveDeviceListData(qlibc::QData& data);
+
+    //获取设备状态列表
+    QData getStatusListData();
+
+    //更新状态列表
+    QData updateStatusListData(qlibc::QData& data);
+
+    //存储设备状态列表
+    void saveStatusListData(qlibc::QData& data);
 
     //初始化串口类，设置读取数据回调函数
     bool serialInit(SerialReceiveFunc receiveFuc);

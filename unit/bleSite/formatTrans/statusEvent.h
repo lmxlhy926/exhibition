@@ -15,6 +15,7 @@
 #include "logic/snAddressMap.h"
 #include "siteService/service_site_manager.h"
 #include "../parameter.h"
+#include "bleConfig.h"
 
 using namespace servicesite;
 using namespace std;
@@ -239,7 +240,7 @@ private:
 };
 
 //设备状态
-class LightOnOffStatus{
+class LightOnOffStatus : ReportEvent{
 private:
     string sourceData;
     string unicast_address;
@@ -252,14 +253,35 @@ public:
     explicit LightOnOffStatus(string data) : sourceData(std::move(data)){
         init();
     }
-    string construct();
+
+    void postEvent() override{
+            string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
+            qlibc::QData status;
+            status.setString("device_id", device_id);
+            status.setString("state_id", "power");
+            if(present_onOff == "00")
+                status.setString("state_value", "on");
+            else
+                status.setString("state_value", "off");
+
+            bleConfig::getInstance()->updateStatusListData(status);
+    }
+
 private:
-    void init();
+    void init(){
+        ReadBinaryString rs(sourceData);
+        rs.read2Byte(unicast_address);
+        rs.read2Byte(group_address);
+        rs.read2Byte(opcode);
+        rs.readByte(present_onOff);
+        rs.readByte(target_onOff);
+        rs.readByte(remaining_time);
+    }
 };
 
 
 //亮度状态
-class LightBrightStatus{
+class LightBrightStatus : ReportEvent{
 private:
     string sourceData;
     string unicast_address;
@@ -272,9 +294,26 @@ public:
     explicit LightBrightStatus(string data) : sourceData(std::move(data)){
         init();
     }
-    string construct();
+
+    void postEvent() override{
+        string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
+        qlibc::QData status;
+        status.setString("device_id", device_id);
+        status.setString("state_id", "power");
+        status.setString("state_value", present_lightness);
+        bleConfig::getInstance()->updateStatusListData(status);
+    }
+
 private:
-    void init();
+    void init(){
+        ReadBinaryString rs(sourceData);
+        rs.read2Byte(unicast_address);
+        rs.read2Byte(group_address);
+        rs.read2Byte(opcode);
+        rs.read2Byte(present_lightness);
+        rs.read2Byte(target_lightness);
+        rs.readByte(remaining_time);
+    }
 };
 
 

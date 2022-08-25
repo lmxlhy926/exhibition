@@ -41,47 +41,6 @@ int ReadBinaryString::avail(){
     return static_cast<int>(binaryString_.size() - readIndex);
 }
 
-string LightOnOffStatus::construct() {
-    return
-            unicast_address + '-' +
-            group_address   + '-' +
-            opcode          + '-' +
-            present_onOff   + '-' +
-            target_onOff    + '-' +
-            remaining_time;
-}
-
-void LightOnOffStatus::init() {
-    ReadBinaryString rs(sourceData);
-    rs.read2Byte(unicast_address);
-    rs.read2Byte(group_address);
-    rs.read2Byte(opcode);
-    rs.readByte(present_onOff);
-    rs.readByte(target_onOff);
-    rs.readByte(remaining_time);
-}
-
-string LightBrightStatus::construct() {
-    return
-            unicast_address + '-' +
-            group_address   + '-' +
-            opcode          + '-' +
-            present_lightness   + '-' +
-            target_lightness    + '-' +
-            remaining_time;
-}
-
-void LightBrightStatus::init() {
-    ReadBinaryString rs(sourceData);
-    rs.read2Byte(unicast_address);
-    rs.read2Byte(group_address);
-    rs.read2Byte(opcode);
-    rs.read2Byte(present_lightness);
-    rs.read2Byte(target_lightness);
-    rs.readByte(remaining_time);
-}
-
-
 void PostStatusEvent::operator()() {
     string hciType, subType, packageIndex;
     ReadBinaryString rs(statusString);
@@ -104,11 +63,11 @@ void PostStatusEvent::operator()() {
         rs.read2Byte().read2Byte().read2Byte(opcode);
         if(opcode == "8204"){           //开关状态
             rs.rollBack(6);
-            LOG_GREEN << "<<===: LightOnOffStatus: " << LightOnOffStatus(rs.remainingString()).construct();
+            LightOnOffStatus(rs.remainingString()).postEvent();
 
         }else if(opcode == "824E"){    //亮度状态
             rs.rollBack(6);
-            LOG_GREEN << "<<===: LightBrightStatus: " << LightBrightStatus(rs.remainingString()).construct();
+            LightBrightStatus(rs.remainingString()).postEvent();
 
         }else if(opcode == "804A"){     //解绑消息
             rs.rollBack(6);
