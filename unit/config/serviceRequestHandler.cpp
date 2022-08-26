@@ -140,7 +140,7 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 
 
 int whiteList_service_request_handler(const Request& request, Response& response){
-    LOG_INFO << "===>whiteListCloud_service_request_handler: " << request.body;
+    LOG_INFO << "===>whiteList_service_request_handler: " << request.body;
 
 //    string domainID = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
 //
@@ -168,11 +168,15 @@ int whiteList_service_request_handler(const Request& request, Response& response
 //        data.putData("response", qlibc::QData());
 //    }
 
-    qlibc::QData data;
+
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
+    LOG_HLIGHT << "payload: " << payload.toJsonString();
+
+    qlibc::QData data;
     data.setInt("code", 0);
     data.setString("error", "ok");
     data.putData("response", payload);
+    LOG_HLIGHT << "data: " << data.toJsonString();
 
     response.set_content(data.toJsonString(), "text/json");
     return 0;
@@ -193,7 +197,8 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
 
 
 int whiteList_update_service_request_handler(const Request& request, Response& response){
-    qlibc::QData bleSiteDeviceList = qlibc::QData(request.body).getData("device_list");
+    LOG_HLIGHT << "==>whiteList_update_service_request_handler";
+    qlibc::QData bleSiteDeviceList = qlibc::QData(request.body).getData("request").getData("device_list");
     size_t bleSiteDeviceListSize = bleSiteDeviceList.size();
 
     qlibc::QData configWhiteList = configParamUtil::getInstance()->getWhiteList();
@@ -209,6 +214,12 @@ int whiteList_update_service_request_handler(const Request& request, Response& r
                 devices.append(item);
                 break;
             }
+        }
+        if(devices.size() == 0){
+            qlibc::QData item;
+            item.setString("category_code", "light");
+            item.setString("device_id", device_id);
+            devices.append(item);
         }
     }
 
