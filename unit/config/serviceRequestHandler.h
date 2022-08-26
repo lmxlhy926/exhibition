@@ -35,13 +35,13 @@ int whiteList_service_request_handler(const Request& request, Response& response
 //保存白名单列表
 int whiteList_save_service_request_handler(const Request& request, Response& response);
 
+//蓝牙站点添加新设备时更新白名单列表
+int whiteList_update_service_request_handler(const Request& request, Response& response);
+
 //获取灯控设备设备列表
 int getAllDeviceList_service_request_handler(const Request& request, Response& response);
 
 //电视发声
 int tvSound_service_request_handler(const Request& request, Response& response);
-
-
-
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

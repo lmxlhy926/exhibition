@@ -192,6 +192,37 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
 }
 
 
+int whiteList_update_service_request_handler(const Request& request, Response& response){
+    qlibc::QData bleSiteDeviceList = qlibc::QData(request.body).getData("device_list");
+    size_t bleSiteDeviceListSize = bleSiteDeviceList.size();
+
+    qlibc::QData configWhiteList = configParamUtil::getInstance()->getWhiteList();
+    qlibc::QData devices = configWhiteList.getData("info").getData("devices");
+
+    for(Json::ArrayIndex i = 0; i < bleSiteDeviceListSize; ++i){
+        string device_id = bleSiteDeviceList.getArrayElement(i).getString("device_id");
+        for(Json::ArrayIndex j = 0; j < devices.size(); ++j){
+            if(devices.getArrayElement(j).getString("device_id") != device_id && j == devices.size() -1){
+                qlibc::QData item;
+                item.setString("category_code", "light");
+                item.setString("device_id", device_id);
+                devices.append(item);
+                break;
+            }
+        }
+    }
+
+    configWhiteList.asValue()["info"]["devices"] = devices.asValue();
+    configParamUtil::getInstance()->saveWhiteListData(configWhiteList);
+
+    qlibc::QData ret;
+    ret.setInt("code", 0);
+    ret.setString("msg", "success");
+    response.set_content(ret.toJsonString(), "text/json");
+
+    return 0;
+}
+
 int getAllDeviceList_service_request_handler(const Request& request, Response& response){
     //请求tvAdapter设备列表, 请求雷达、语音面板设备列表
     LOG_INFO << "getAllDeviceList_service_request_handler" << request.body;
