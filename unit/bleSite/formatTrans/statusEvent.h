@@ -215,7 +215,13 @@ public:
 
     void postEvent() override{
         string deviceSn = SnAddressMap::getInstance()->address2DeviceSn(unicastAddress);
+
         SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
+        //从设备列表函数该设备
+        bleConfig::getInstance()->deleteDeviceItem(deviceSn);
+        //从状态列表移除该设备
+        bleConfig::getInstance()->deleteStatusItem(deviceSn);
+
         LOG_GREEN << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
 
         qlibc::QData content, publishData;
@@ -223,12 +229,6 @@ public:
         publishData.setString("message_id", SingleDeviceUnbindSuccessMsg);
         publishData.putData("content", content);
         ServiceSiteManager::getInstance()->publishMessage(SingleDeviceUnbindSuccessMsg, publishData.toJsonString());
-
-        qlibc::QData unbindData;
-        unbindData.setString("unicastAddr", unicastAddress);
-        unbindData.setString("groupAddr", groupAddress);
-        EventTable::getInstance()->unbindSuccessEvent.putData(unbindData);
-        EventTable::getInstance()->unbindSuccessEvent.notify_one();
     }
 
 private:

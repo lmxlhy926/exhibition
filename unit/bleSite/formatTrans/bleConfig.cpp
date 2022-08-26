@@ -63,6 +63,43 @@ QData bleConfig::getDeviceListData(){
     return deviceListData;
 }
 
+void bleConfig::insertDeviceItem(string& deviceID){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData deviceListArray = getDeviceListData().getData("device_list");
+    size_t deviceListArraySize = deviceListArray.size();
+    for(size_t i = 0; i < deviceListArraySize; ++i){
+        qlibc::QData deviceItem = deviceListArray.getArrayElement(i);
+        if(deviceItem.getString("device_id") == deviceID){
+            //删除该条目
+            deviceListArray.deleteArrayItem(i);
+            break;
+        }
+    }
+    qlibc::QData newItem;
+    newItem.setString("device_id", deviceID);
+    deviceListArray.append(newItem);
+
+    qlibc::QData saveData;
+    saveData.putData("device_list", deviceListArray);
+    saveDeviceListData(saveData);
+}
+
+void bleConfig::deleteDeviceItem(string& deviceID){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData device_list = getDeviceListData().getData("device_list");
+    size_t deviceListSize = device_list.size();
+    for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+        if(device_list.getArrayElement(i).getString("device_id") == deviceID){
+            device_list.deleteArrayItem(i);
+            break;
+        }
+    }
+
+    qlibc::QData saveData;
+    saveData.putData("device_list", device_list);
+    saveDeviceListData(saveData);
+}
+
 void bleConfig::saveDeviceListData(qlibc::QData& data){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     deviceListData.setInitData(data);
@@ -77,11 +114,32 @@ QData bleConfig::getStatusListData(){
     return statusListData;
 }
 
+void bleConfig::insertDefaultStatus(string& deviceID){
+    qlibc::QData item;
+    item.setString("device_id", deviceID);
+    item.setString("online_state", "online");
+    item.putData("state_list", defaultStatus());
+
+    qlibc::QData statusList = getStatusListData().getData("device_list");
+    size_t statusListSize = statusList.size();
+    for(Json::ArrayIndex i = 0; i < statusListSize; ++i){
+        if(statusList.getArrayElement(i).getString("device_id") == deviceID){
+            //删除该条目
+            statusList.deleteArrayItem(i);
+            break;
+        }
+    }
+    statusList.append(item);
+
+    qlibc::QData saveData;
+    saveData.putData("device_list", statusList);
+    saveStatusListData(saveData);
+}
+
 QData bleConfig::updateStatusListData(qlibc::QData& data){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     string device_id = data.getString("device_id");
     string state_id = data.getString("state_id");
-    string state_value = data.getString("state_value");
 
     Json::Value device_list = getStatusListData().asValue();
     size_t deviceListSize = device_list.size();
@@ -90,13 +148,29 @@ QData bleConfig::updateStatusListData(qlibc::QData& data){
             size_t statusListSize = device_list[i]["state_list"].size();
             for(Json::ArrayIndex j = 0; j < statusListSize; ++j){
                 if(device_list[i]["state_list"][j]["state_id"].asString() == state_id){
-                    device_list[i]["state_list"][j]["state_value"] = state_value;
+                    device_list[i]["state_list"][j]["state_value"] = data.asValue()["state_value"];
                     break;
                 }
             }
             break;
         }
     }
+}
+
+void bleConfig::deleteStatusItem(string& deviceID){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData device_list = getStatusListData().getData("device_list");
+    size_t deviceListSize = device_list.size();
+    for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+        if(device_list.getArrayElement(i).getString("device_id") == deviceID){
+            device_list.deleteArrayItem(i);
+            break;
+        }
+    }
+
+    qlibc::QData saveData;
+    saveData.putData("device_list", device_list);
+    saveStatusListData(saveData);
 }
 
 void bleConfig::saveStatusListData(qlibc::QData& data){
@@ -131,6 +205,28 @@ shared_ptr<BLETelinkDongle> bleConfig::getSerial() {
 
 void bleConfig::enqueue(std::function<void()> fn) {
     threadPool.enqueue(fn);
+}
+
+qlibc::QData bleConfig::defaultStatus() {
+    qlibc::QData state_list;
+
+    qlibc::QData itemPower;
+    itemPower.setString("state_id", "power");
+    itemPower.setString("state_value", "on");
+
+    qlibc::QData itemLuminance;
+    itemLuminance.setString("state_id", "luminance");
+    itemLuminance.setInt("state_value", 255);
+
+    qlibc::QData itemColorTemperature;
+    itemColorTemperature.setString("state_id", "color_temperature");
+    itemColorTemperature.setInt("state_value", 3000);
+
+    state_list.append(itemPower);
+    state_list.append(itemLuminance);
+    state_list.append(itemColorTemperature);
+
+    return state_list;
 }
 
 

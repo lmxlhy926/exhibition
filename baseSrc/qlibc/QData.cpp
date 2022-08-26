@@ -343,6 +343,10 @@ namespace qlibc{
         return *this;
     }
 
+    void QData::deleteArrayItem(Json::ArrayIndex index){
+        Json::Value value;
+        _value->removeIndex(index, &value);
+    }
 
 }
 

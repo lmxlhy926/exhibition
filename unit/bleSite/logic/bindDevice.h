@@ -20,14 +20,7 @@ public:
 private:
     bool addDevice(string& deviceSn);
 
-    //将新增设备插入设备列表
-    void insert2DeviceList(string& deviceID);
 
-    //对新增设备插入默认状态
-    void insertDefaultStatus(string& deviceID);
-
-    //产生设备的默认状态
-    qlibc::QData defaultStatus();
 };
 
 #endif //EXHIBITION_BINDDEVICE_H

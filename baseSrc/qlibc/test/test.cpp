@@ -139,9 +139,7 @@ void contactFileTest(){
 }
 
 
-int main(int argc, char* argv[]){
-
-
+void test4(){
     QData data;
     data.loadFromFile(R"(D:\bywg\project\exhibition\test\a.json)");
     Json::Value a;
@@ -157,14 +155,24 @@ int main(int argc, char* argv[]){
     data.arrayInsert(0, first);
     std::cout << endl;
     printValue("data", data);
+}
+
+int main(int argc, char* argv[]){
+    Json::Value value(Json::arrayValue);
+    value.append("1");
+    value.append("2");
+    value.append("3");
+
+    qlibc::QData data(value);
+    std::cout << data.toJsonString(true) << std::endl;
+
+    data.deleteArrayItem(4);
+    std::cout << data.toJsonString(true) << std::endl;
 
 
 
 
 
-    while(true){
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-    }
 
     return 0;
 }

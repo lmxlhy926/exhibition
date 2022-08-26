@@ -50,8 +50,14 @@ public:
     //存储device-mac记录表
     void saveSnAddrData(qlibc::QData& data);
 
-    //保存设备列表
+    //获取设备列表
     QData getDeviceListData();
+
+    //插入新绑定的设备条目
+    void insertDeviceItem(string& deviceID);
+
+    //删除解绑的设备
+    void deleteDeviceItem(string& deviceID);
 
     //存储设备列表
     void saveDeviceListData(qlibc::QData& data);
@@ -59,8 +65,14 @@ public:
     //获取设备状态列表
     QData getStatusListData();
 
+    //增加新绑定的设备的状态条目
+    void insertDefaultStatus(string& deviceID);
+
     //更新状态列表
     QData updateStatusListData(qlibc::QData& data);
+
+    //删除解绑设备的状态条目
+    void deleteStatusItem(string& deviceID);
 
     //存储设备状态列表
     void saveStatusListData(qlibc::QData& data);
@@ -73,6 +85,10 @@ public:
 
     //将函数加入线程池
     void enqueue(std::function<void()> fn);
+
+private:
+    //产生设备的默认状态
+    qlibc::QData defaultStatus();
 };
 
 

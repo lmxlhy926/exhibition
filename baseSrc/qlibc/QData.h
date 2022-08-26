@@ -78,6 +78,8 @@ namespace qlibc{
 
         QData& append(const Json::Value &value);
 
+        void deleteArrayItem(Json::ArrayIndex index);
+
     public:
         /**
         * 判断源字符串中是否含有目标字符串
