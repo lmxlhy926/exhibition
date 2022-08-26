@@ -30,10 +30,10 @@ int del_device_service_handler(const Request& request, Response& response, Logic
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 
 //获取设备列表
-int get_device_list_service_handler(const Request& request, Response& response, LogicControl& lc);
+int get_device_list_service_handler(const Request& request, Response& response);
 
 //获取设备状态
-int get_device_state_service_handler(const Request& request, Response& response, LogicControl& lc);
+int get_device_state_service_handler(const Request& request, Response& response);
 
 
 

@@ -25,10 +25,10 @@ static const string Ble_Device_Test_Command_Service_ID = "BleDeviceCommands";
 
 
 //站点支持的消息
-static const string ScanResultMsg =                    "scanResult";
-static const string SingleDeviceBindSuccessMsg =       "singleDeviceBindSuccess";
-static const string SingleDeviceUnbindSuccessMsg =     "singleDeviceUnbindSuccess";
-static const string BindEndMsg =                       "bindEnd";
+static const string ScanResultMsg =                    "scanResultMsg";
+static const string SingleDeviceBindSuccessMsg =       "singleDeviceBindSuccessMsg";
+static const string SingleDeviceUnbindSuccessMsg =     "singleDeviceUnbindSuccessMsg";
+static const string BindEndMsg =                       "bindEndMsg";
 static const string Device_State_Changed =             "device_state_changed";
 
 

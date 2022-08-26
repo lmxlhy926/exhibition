@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
     //注册设备扫描回调
     serviceSiteManager->registerServiceRequestHandler(Scan_Device_Service_ID,
                                                       [&lc](const Request& request, Response& response) -> int{
-        return add_device_service_handler(request, response, lc);
+        return scan_device_service_handler(request, response, lc);
     });
 
     //注册设备绑定回调
@@ -96,13 +96,13 @@ int main(int argc, char* argv[]) {
     });
     //获取设备列表
     serviceSiteManager->registerServiceRequestHandler(Get_DeviceList_Service_ID,
-                                                      [&lc](const Request& request, Response& response) -> int{
-        return get_device_list_service_handler(request, response, lc);
+                                                      [](const Request& request, Response& response) -> int{
+        return get_device_list_service_handler(request, response);
     });
     //获取设备状态
     serviceSiteManager->registerServiceRequestHandler(Get_DeviceState_Service_ID,
-                                                      [&lc](const Request& request, Response& response) -> int{
-        return get_device_state_service_handler(request, response, lc);
+                                                      [](const Request& request, Response& response) -> int{
+        return get_device_state_service_handler(request, response);
     });
 
 

@@ -62,9 +62,11 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
         if(EventTable::getInstance()->scanResultEvent.wait(2) == std::cv_status::no_timeout){
             retScanData = EventTable::getInstance()->scanResultEvent.getData();
             string deviceSn = retScanData.getString("deviceSn");
-            deviceMap.insert(std::make_pair(deviceSn, 0));
+            if(deviceSn.substr(0, 2) != "00"){
+                deviceMap.insert(std::make_pair(deviceSn, 0));
+            }
         }
-        if(time(nullptr) - time_current > 15){
+        if(time(nullptr) - time_current > 10){
             LOG_PURPLE << "===>SCAN END, start to bind devices......";
             break;
         }

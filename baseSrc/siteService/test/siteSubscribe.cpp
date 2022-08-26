@@ -15,70 +15,14 @@
 
 using namespace std;
 using namespace servicesite;
-
 using json = nlohmann::json;
 
-const string TEST_SITE_ID_1 = "subScribe";
-const string TEST_SITE_NAME_1 = "subScribe";
-
-const string TEST_SERVICE_ID_1 = "test_service_id_1";
-const string TEST_SERVICE_ID_2 = "test_service_id_2";
-
-int service_request_handler_1(const Request& request, Response& response);
-int service_request_handler_2(const Request& request, Response& response);
-
-const string TEST_MESSAGE_ID_1 = "eventLeaveHome";
-
-// test_service_id_1 服务请求处理函数
-int service_request_handler_1(const Request& request, Response& response) {
-    // HTTP库已判断字符串能否转成 JSON
-
-    // 请求的json字符串位于request.body
-    auto request_json = json::parse(request.body);
-
-    printf("request:\n%s\n", request_json.dump(4).c_str());
-
-    // 服务反馈
-    json response_json = {
-            {"code", 0},
-            {"error", "ok"},
-            {"response", {
-                             {"test_data", "from test_service_id_1"}
-                     }}
-    };
-    response.set_content(response_json.dump(), "text/plain");
-
-    return 0;
-}
-
-// test_service_id_2 服务请求处理函数
-int service_request_handler_2(const Request& request, Response& response) {
-    // HTTP库已判断字符串能否转成 JSON
-
-    // 请求的json字符串位于request.body
-    auto request_json = json::parse(request.body);
-
-    printf("request:\n%s\n", request_json.dump(4).c_str());
-
-    // 服务反馈
-    json response_json = {
-            {"code", 0},
-            {"error", "ok"},
-            {"response", {
-                             {"test_data", "from test_service_id_2"}
-                     }}
-    };
-    response.set_content(response_json.dump(), "text/plain");
-
-    return 0;
-}
-
 // test_message_id_1 消息处理函数
-void message_handler_1(const Request& request) {
+void message_handler(const Request& request) {
     // 消息的json字符串位于request.body
     auto message_json = json::parse(request.body);
 
-    printf("in subscribe message_handler_1, message:\n%s\n", message_json.dump(4).c_str());
+    printf("received message:\n%s\n", message_json.dump(4).c_str());
 }
 
 
@@ -106,29 +50,22 @@ void http_server_thread_func() {
 int main(int argc, char* argv[]) {
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-
     serviceSiteManager->setServerPort(60002);
 
-    // 注册 Service 请求处理 handler， 有两个 Service
-    serviceSiteManager->registerServiceRequestHandler(TEST_SERVICE_ID_1, service_request_handler_1);
-    serviceSiteManager->registerServiceRequestHandler(TEST_SERVICE_ID_2, service_request_handler_2);
-
-    // 注册支持的消息ID， 有两个消息
-    serviceSiteManager->registerMessageId(TEST_MESSAGE_ID_1);
-
     // 注册 Message 请求处理 handler
-    serviceSiteManager->registerMessageHandler("eventEnterArea", message_handler_1);
-    serviceSiteManager->registerMessageHandler("eventLeaveArea", message_handler_1);
-    serviceSiteManager->registerMessageHandler("register2QuerySiteAgain", message_handler_1);
+    serviceSiteManager->registerMessageHandler("scanResultMsg", message_handler);
+    serviceSiteManager->registerMessageHandler("singleDeviceBindSuccessMsg", message_handler);
+    serviceSiteManager->registerMessageHandler("bindEndMsg", message_handler);
+    serviceSiteManager->registerMessageHandler("singleDeviceUnbindSuccessMsg", message_handler);
 
     // 订阅消息, 需要传入订阅站点的IP、端口号、消息ID列表
     int code;
     std::vector<string> messageIdList;
-    messageIdList.push_back("eventEnterArea");
-    messageIdList.push_back("eventLeaveArea");
-    messageIdList.push_back("register2QuerySiteAgain");
-
-    code = serviceSiteManager->subscribeMessage("127.0.0.1", 9000, messageIdList);
+    messageIdList.push_back("scanResultMsg");
+    messageIdList.push_back("singleDeviceBindSuccessMsg");
+    messageIdList.push_back("bindEndMsg");
+    messageIdList.push_back("singleDeviceUnbindSuccessMsg");
+    code = serviceSiteManager->subscribeMessage("127.0.0.1", 60009, messageIdList);
     if (code == ServiceSiteManager::RET_CODE_OK) {
         printf("subscribeMessage ok.\n");
     }else{

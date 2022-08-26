@@ -69,16 +69,22 @@ int BleDevice_command_test_service_handler(const Request& request, Response& res
 int scan_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
+        //获取扫描结果
         qlibc::QData scanDeviceArray;
         lc.getScanedDevices(scanDeviceArray);
 
+        //返回扫描结果
         qlibc::QData res, retData;
         res.putData("device_list", scanDeviceArray);
         retData.setInt("code", 0);
         retData.setString("error", "ok");
         retData.putData("response", res);
-
         response.set_content(retData.toJsonString(), "text/json");
+
+        //结束扫描
+        qlibc::QData scanEnd;
+        scanEnd.setString("command", "scanEnd");
+        lc.parse(scanEnd);
     }else{
         response.set_content(errResponse.dump(), "text/json");
     }
@@ -128,17 +134,18 @@ int control_device_service_handler(const Request& request, Response& response, L
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
-            for(unsigned i = 0; i < deviceList.size(); ++i){
+            for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
                 string device_id = deviceList.getArrayElement(i).getString("device_id");
                 string device_address = SnAddressMap::getInstance()->deviceSn2Address(device_id);
 
                 qlibc::QData command_list = deviceList.getArrayElement(i).getData("command_list");
-                for(int j = 0; j < command_list.size(); ++j){
+                for(Json::ArrayIndex j = 0; j < command_list.size(); ++j){
                     string command_id = command_list.getArrayElement(j).getString("command_id");
 
                     qlibc::QData cmdData;
                     cmdData.setString("deviceAddress", device_address);
                     cmdData.setString("command", command_id);
+
                     if(command_id == POWER){
                         string command_para = command_list.getArrayElement(j).getString("command_para");
                         cmdData.setString("commandPara", command_para);
@@ -152,7 +159,8 @@ int control_device_service_handler(const Request& request, Response& response, L
                         cmdData.setInt("commandPara", command_para);
                     }
 
-                    lc.parse(cmdData);
+                    LOG_HLIGHT << "cmdData: " << cmdData.toJsonString(true);
+//                    lc.parse(cmdData);
                 }
             }
         });
@@ -166,12 +174,22 @@ int control_device_service_handler(const Request& request, Response& response, L
 
 
 //获取设备列表
-int get_device_list_service_handler(const Request& request, Response& response, LogicControl& lc){
+int get_device_list_service_handler(const Request& request, Response& response){
+    qlibc::QData postData;
+    postData.setInt("code", 0);
+    postData.setString("error", "ok");
+    postData.putData("response", bleConfig::getInstance()->getDeviceListData());
+    response.set_content(postData.toJsonString(), "text/json");
     return 0;
 }
 
 //获取设备状态
-int get_device_state_service_handler(const Request& request, Response& response, LogicControl& lc){
+int get_device_state_service_handler(const Request& request, Response& response){
+    qlibc::QData postData;
+    postData.setInt("code", 0);
+    postData.setString("error", "ok");
+    postData.putData("response", bleConfig::getInstance()->getStatusListData());
+    response.set_content(postData.toJsonString(), "text/json");
     return 0;
 }
 
