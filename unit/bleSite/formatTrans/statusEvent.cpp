@@ -42,6 +42,7 @@ int ReadBinaryString::avail(){
 }
 
 void PostStatusEvent::operator()() {
+    LOG_PURPLE << statusString;
     string hciType, subType, packageIndex;
     ReadBinaryString rs(statusString);
     rs.read2Byte().readByte(hciType).readByte(subType).readByte(packageIndex);

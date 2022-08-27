@@ -65,9 +65,10 @@ int BleDevice_command_test_service_handler(const Request& request, Response& res
     return 0;
 }
 
-//扫描设备
+//获取扫描结果
 int scan_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
     if(requestBody.type() != Json::nullValue){
         //获取扫描结果
         qlibc::QData scanDeviceArray;
@@ -92,9 +93,10 @@ int scan_device_service_handler(const Request& request, Response& response, Logi
 }
 
 
-//添加设备
+//绑定设备
 int add_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
@@ -113,6 +115,7 @@ int add_device_service_handler(const Request& request, Response& response, Logic
 //删除设备
 int del_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
@@ -131,36 +134,33 @@ int del_device_service_handler(const Request& request, Response& response, Logic
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
             for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
-                string device_id = deviceList.getArrayElement(i).getString("device_id");
-                string device_address = SnAddressMap::getInstance()->deviceSn2Address(device_id);
+                qlibc::QData deviceItem = deviceList.getArrayElement(i);
 
-                qlibc::QData command_list = deviceList.getArrayElement(i).getData("command_list");
+                string device_id = deviceItem.getString("device_id");
+                string device_address = SnAddressMap::getInstance()->deviceSn2Address(device_id);
+                qlibc::QData command_list = deviceItem.getData("command_list");
+
                 for(Json::ArrayIndex j = 0; j < command_list.size(); ++j){
-                    string command_id = command_list.getArrayElement(j).getString("command_id");
+                    qlibc::QData commandItem = command_list.getArrayElement(j);
+                    string command_id = commandItem.getString("command_id");
 
                     qlibc::QData cmdData;
                     cmdData.setString("deviceAddress", device_address);
                     cmdData.setString("command", command_id);
 
                     if(command_id == POWER){
-                        string command_para = command_list.getArrayElement(j).getString("command_para");
-                        cmdData.setString("commandPara", command_para);
+                        cmdData.setString("commandPara", commandItem.getString("command_para"));
 
-                    }else if(command_id == LUMINANCE){
-                        int command_para = command_list.getArrayElement(j).getInt("command_para");
-                        cmdData.setInt("commandPara", command_para);
-
-                    }else if(command_id == COLORTEMPERATURE){
-                        int command_para = command_list.getArrayElement(j).getInt("command_para");
-                        cmdData.setInt("commandPara", command_para);
+                    }else if(command_id == LUMINANCE || command_id == COLORTEMPERATURE){
+                        cmdData.setInt("commandPara", commandItem.getInt("command_para"));
                     }
 
-                    LOG_HLIGHT << "cmdData: " << cmdData.toJsonString(true);
-//                    lc.parse(cmdData);
+                    lc.parse(cmdData);
                 }
             }
         });
@@ -175,6 +175,7 @@ int control_device_service_handler(const Request& request, Response& response, L
 
 //获取设备列表
 int get_device_list_service_handler(const Request& request, Response& response){
+    LOG_INFO << "==>: " << qlibc::QData(request.body).toJsonString();
     qlibc::QData postData;
     postData.setInt("code", 0);
     postData.setString("error", "ok");
@@ -185,6 +186,7 @@ int get_device_list_service_handler(const Request& request, Response& response){
 
 //获取设备状态
 int get_device_state_service_handler(const Request& request, Response& response){
+    LOG_INFO << "==>: " << qlibc::QData(request.body).toJsonString();
     qlibc::QData postData;
     postData.setInt("code", 0);
     postData.setString("error", "ok");

@@ -43,8 +43,8 @@ namespace muduo{
 
     static Logger::OutputFunc g_output = nullptr;
 
-    Logger::Logger(const char* file, int line, muduo::Logger::LogLevel level)
-            : impl_(file, line, level){}
+    Logger::Logger(const char* file, int line, const char* func, muduo::Logger::LogLevel level)
+            : impl_(file, line, func, level){}
 
     Logger::~Logger() {
         impl_.finish();

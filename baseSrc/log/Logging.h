@@ -62,7 +62,7 @@ namespace muduo{
             H_PURPLE,
         };
 
-        explicit Logger(const char* file, int line, LogLevel level);
+        explicit Logger(const char* file, int line,  const char* func, LogLevel level);
 
         //析构时调用真正的输出函数，将日志内容输出
         ~Logger();
@@ -105,10 +105,10 @@ namespace muduo{
             TimeStamp timeStamp;        //时间戳
 
         public:
-            explicit Impl(const char* fileName, int line, Logger::LogLevel level)
+            explicit Impl(const char* fileName, int line, const char* func, Logger::LogLevel level)
                 : fileName_(fileName), line_(line), level_(level), timeStamp(TimeStamp::now()){
                 stream_ << timeStamp.toFormattedString() << "-<" << fileName_.data()
-                << "-" << line_ << "> ";
+                << "-" << line_  << "-" << func << "> ";
             }
 
             void finish(){ stream_ << "\n"; }
@@ -118,14 +118,14 @@ namespace muduo{
     };
 
 
-    #define LOG_INFO    muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_WHITE).stream()
-    #define LOG_HLIGHT  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_DEEP_GREEN).stream()
+    #define LOG_INFO    muduo::Logger(__FILE__, __LINE__, __FUNCTION__, muduo::Logger::H_WHITE).stream()
+    #define LOG_HLIGHT  muduo::Logger(__FILE__, __LINE__, __FUNCTION__,  muduo::Logger::H_DEEP_GREEN).stream()
 
-    #define LOG_RED  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_RED).stream()
-    #define LOG_GREEN  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_GREEN).stream()
-    #define LOG_YELLOW  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_YELLOW).stream()
-    #define LOG_BLUE  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_BLUE).stream()
-    #define LOG_PURPLE  muduo::Logger(__FILE__, __LINE__, muduo::Logger::H_PURPLE).stream()
+    #define LOG_RED  muduo::Logger(__FILE__, __LINE__, __FUNCTION__, muduo::Logger::H_RED).stream()
+    #define LOG_GREEN  muduo::Logger(__FILE__, __LINE__, __FUNCTION__, muduo::Logger::H_GREEN).stream()
+    #define LOG_YELLOW  muduo::Logger(__FILE__, __LINE__, __FUNCTION__, muduo::Logger::H_YELLOW).stream()
+    #define LOG_BLUE  muduo::Logger(__FILE__, __LINE__, __FUNCTION__, muduo::Logger::H_BLUE).stream()
+    #define LOG_PURPLE  muduo::Logger(__FILE__, __LINE__, __FUNCTION__, muduo::Logger::H_PURPLE).stream()
 }
 
 

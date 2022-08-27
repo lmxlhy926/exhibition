@@ -157,7 +157,12 @@ public:
 
     void init(qlibc::QData& data){
         deviceAddress = data.getString("deviceAddress");
-        luminanceVal = data.getInt("commandPara");
+        int tempLuminanceVal = data.getInt("commandPara");
+        if(0 <= tempLuminanceVal && tempLuminanceVal <= 0xffff){
+            luminanceVal = tempLuminanceVal;
+        }else{
+            luminanceVal = 0xffff;
+        }
     }
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
@@ -184,7 +189,12 @@ public:
 
     void init(qlibc::QData& data){
         deviceAddress = data.getString("deviceAddress");
-        ctlTemperature = data.getInt("commandPara");
+        int tempCtlTemperature = data.getInt("commandPara");
+        if(2700 <= tempCtlTemperature && tempCtlTemperature <= 6500){
+            ctlTemperature = tempCtlTemperature;
+        }else{
+            ctlTemperature = 6500;
+        }
     }
 
     size_t getBinary(unsigned char* buf, size_t bufSize) override{
@@ -194,8 +204,8 @@ public:
 
         string stringCmd;
         stringCmd.append(prefix).append(deviceAddress).append("8264").append(ss.str());
-        stringCmd.append(deleteWhiteSpace("00 00"));
         stringCmd.append(deleteWhiteSpace("00 00 00"));
+//        stringCmd.append(deleteWhiteSpace("00 00 00"));
 
         return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
     }

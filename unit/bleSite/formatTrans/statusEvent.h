@@ -116,6 +116,16 @@ public:
 class ReportEvent{
 public:
     virtual void postEvent() = 0;
+
+    string spaceIntervalFormat(string& str){
+        stringstream ss;
+        for(int i = 0; i < str.size() / 2; i++){
+            ss << str.substr(i * 2, 2);
+            if(i < str.size() / 2 - 1)
+                ss << " ";
+        }
+       return ss.str();
+    }
 };
 
 
@@ -260,15 +270,18 @@ public:
             status.setString("device_id", device_id);
             status.setString("state_id", "power");
             if(present_onOff == "00")
-                status.setString("state_value", "on");
-            else
                 status.setString("state_value", "off");
+            else
+                status.setString("state_value", "on");
 
-            bleConfig::getInstance()->updateStatusListData(status);
+            LOG_GREEN << "==>LightOnOffStatus: " << status.toJsonString();
+
+//            bleConfig::getInstance()->updateStatusListData(status);
     }
 
 private:
     void init(){
+        LOG_GREEN << "==>LightOnOffStatus: " << spaceIntervalFormat(sourceData);
         ReadBinaryString rs(sourceData);
         rs.read2Byte(unicast_address);
         rs.read2Byte(group_address);
@@ -299,13 +312,56 @@ public:
         string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
         qlibc::QData status;
         status.setString("device_id", device_id);
-        status.setString("state_id", "power");
-        status.setString("state_value", present_lightness);
-        bleConfig::getInstance()->updateStatusListData(status);
+        status.setString("state_id", "luminance");
+        status.setInt("state_value", stoi(present_lightness, nullptr, 16));
+
+        LOG_GREEN << "LightBrightStatus: " << status.toJsonString();
+//        bleConfig::getInstance()->updateStatusListData(status);
     }
 
 private:
     void init(){
+        LOG_GREEN << "LightBrightStatus: " << spaceIntervalFormat(sourceData);
+        ReadBinaryString rs(sourceData);
+        rs.read2Byte(unicast_address);
+        rs.read2Byte(group_address);
+        rs.read2Byte(opcode);
+        rs.read2Byte(present_lightness);
+        rs.read2Byte(target_lightness);
+        rs.readByte(remaining_time);
+    }
+};
+
+
+//亮度状态
+class LightColorTemperature : ReportEvent{
+private:
+    string sourceData;
+    string unicast_address;
+    string group_address;
+    string opcode;
+    string present_lightness;
+    string target_lightness;
+    string remaining_time;
+public:
+    explicit LightColorTemperature(string data) : sourceData(std::move(data)){
+        init();
+    }
+
+    void postEvent() override{
+        string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
+        qlibc::QData status;
+        status.setString("device_id", device_id);
+        status.setString("state_id", "luminance");
+        status.setInt("state_value", stoi(present_lightness, nullptr, 16));
+
+        LOG_GREEN << "LightBrightStatus: " << status.toJsonString();
+//        bleConfig::getInstance()->updateStatusListData(status);
+    }
+
+private:
+    void init(){
+        LOG_GREEN << "LightBrightStatus: " << spaceIntervalFormat(sourceData);
         ReadBinaryString rs(sourceData);
         rs.read2Byte(unicast_address);
         rs.read2Byte(group_address);

@@ -67,7 +67,7 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
             }
         }
         if(time(nullptr) - time_current > 10){
-            LOG_PURPLE << "===>SCAN END, start to bind devices......";
+            LOG_PURPLE << "===>SCAN END......";
             break;
         }
     }

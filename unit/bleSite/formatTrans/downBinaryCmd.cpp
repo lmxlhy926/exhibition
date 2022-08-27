@@ -13,7 +13,7 @@ bool DownBinaryCmd::transAndSendCmd(QData &controlData){
 }
 
 size_t DownBinaryCmd::getBinary(QData &controlData, unsigned char *buf, size_t bufSize) {
-    LOG_INFO << controlData.toJsonString();
+    LOG_INFO << "controlData: " << controlData.toJsonString();
     string command  = controlData.getString("command");
 
     if(command == SCAN){    //扫描命令
