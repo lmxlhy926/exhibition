@@ -59,6 +59,9 @@ public:
     //删除解绑的设备
     void deleteDeviceItem(string& deviceID);
 
+    //获取config白名单信息，更新设备列表属性
+    void updateDeviceListProperty();
+
     //存储设备列表
     void saveDeviceListData(qlibc::QData& data);
 
@@ -68,11 +71,11 @@ public:
     //增加新绑定的设备的状态条目
     void insertDefaultStatus(string& deviceID);
 
-    //更新状态列表
-    QData updateStatusListData(qlibc::QData& data);
-
     //删除解绑设备的状态条目
     void deleteStatusItem(string& deviceID);
+
+    //收到设备状态上报后，更新设备状态列表
+    void updateStatusListData(qlibc::QData& data);
 
     //存储设备状态列表
     void saveStatusListData(qlibc::QData& data);

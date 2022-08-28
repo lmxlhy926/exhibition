@@ -27,10 +27,10 @@ void BindDevice::bind(QData &deviceArray) {
     }
 
     //更新config白名单列表
-    qlibc::QData request;
-    request.setString("service_id", "whiteListUpdateRequest");
-    request.putData("request", bleConfig::getInstance()->getDeviceListData());
-    qlibc::QData response;
+//    qlibc::QData request;
+//    request.setString("service_id", "whiteListUpdateRequest");
+//    request.putData("request", bleConfig::getInstance()->getDeviceListData());
+//    qlibc::QData response;
 //    httpUtil::sitePostRequest("127.0.0.1", 9006, request, response);
 //    LOG_HLIGHT << "==>request2Config: " << request.toJsonString();
 
@@ -62,7 +62,6 @@ bool BindDevice::addDevice(string &deviceSn) {
     }
     LOG_PURPLE << "<<: successed in scaning the device: <" << deviceSn << ">.......";
     std::this_thread::sleep_for(std::chrono::seconds(1));
-
 
     //发送设备连接指令，等待1秒
     LOG_INFO << ">>: start to connect the device: <" << deviceSn << ">....";

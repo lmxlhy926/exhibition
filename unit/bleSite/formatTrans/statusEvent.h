@@ -117,7 +117,7 @@ class ReportEvent{
 public:
     virtual void postEvent() = 0;
 
-    string spaceIntervalFormat(string& str){
+    static string spaceIntervalFormat(string& str){
         stringstream ss;
         for(int i = 0; i < str.size() / 2; i++){
             ss << str.substr(i * 2, 2);
@@ -225,15 +225,15 @@ public:
 
     void postEvent() override{
         string deviceSn = SnAddressMap::getInstance()->address2DeviceSn(unicastAddress);
-
+        //从地址列表删除该设备
         SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
-        //从设备列表函数该设备
+        //从设备列表删除该设备
         bleConfig::getInstance()->deleteDeviceItem(deviceSn);
         //从状态列表移除该设备
         bleConfig::getInstance()->deleteStatusItem(deviceSn);
-
         LOG_GREEN << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
 
+        //发布设备解绑消息
         qlibc::QData content, publishData;
         content.setString("device_id", deviceSn);
         publishData.setString("message_id", SingleDeviceUnbindSuccessMsg);
@@ -249,7 +249,7 @@ private:
     }
 };
 
-//设备状态
+//开关状态
 class LightOnOffStatus : ReportEvent{
 private:
     string sourceData;
@@ -276,7 +276,7 @@ public:
 
             LOG_GREEN << "==>LightOnOffStatus: " << status.toJsonString();
 
-//            bleConfig::getInstance()->updateStatusListData(status);
+            bleConfig::getInstance()->updateStatusListData(status);
     }
 
 private:
@@ -316,7 +316,7 @@ public:
         status.setInt("state_value", stoi(present_lightness, nullptr, 16));
 
         LOG_GREEN << "LightBrightStatus: " << status.toJsonString();
-//        bleConfig::getInstance()->updateStatusListData(status);
+        bleConfig::getInstance()->updateStatusListData(status);
     }
 
 private:
@@ -333,7 +333,7 @@ private:
 };
 
 
-//亮度状态
+//色温状态
 class LightColorTemperature : ReportEvent{
 private:
     string sourceData;
@@ -355,13 +355,13 @@ public:
         status.setString("state_id", "luminance");
         status.setInt("state_value", stoi(present_lightness, nullptr, 16));
 
-        LOG_GREEN << "LightBrightStatus: " << status.toJsonString();
-//        bleConfig::getInstance()->updateStatusListData(status);
+        LOG_GREEN << "LightColorTemperature: " << status.toJsonString();
+        bleConfig::getInstance()->updateStatusListData(status);
     }
 
 private:
     void init(){
-        LOG_GREEN << "LightBrightStatus: " << spaceIntervalFormat(sourceData);
+        LOG_GREEN << "LightColorTemperature: " << spaceIntervalFormat(sourceData);
         ReadBinaryString rs(sourceData);
         rs.read2Byte(unicast_address);
         rs.read2Byte(group_address);
