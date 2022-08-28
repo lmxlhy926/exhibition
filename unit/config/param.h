@@ -38,6 +38,7 @@ static const string DOMAINID_REQUEST_SERVICE_ID =           "domainIdRequest";
 static const string ENGINEER_REQUEST_SERVICE_ID =           "engineerAppInfo";
 static const string WHITELIST_REQUEST_SERVICE_ID =          "whiteListRequest";
 static const string WHITELIST_UPDATE_REQUEST_SERVICE_ID =   "whiteListUpdateRequest";
+static const string WHITELIST_DELETE_REQUEST_SERVICE_ID =   "whiteListDeleteRequest";
 static const string WHITELIST_SAVE_REQUEST_SERVICE_ID =     "whiteListSaveRequest";
 static const string GETALLLIST_REQUEST_SERVICE_ID =         "get_all_device_list";
 static const string TVSOUND_REQUEST_SERVICE_ID =            "tvSound";

@@ -20,7 +20,7 @@ public:
 private:
     bool addDevice(string& deviceSn);
 
-
+    void updateDeviceList2ConfigSite();
 };
 
 #endif //EXHIBITION_BINDDEVICE_H

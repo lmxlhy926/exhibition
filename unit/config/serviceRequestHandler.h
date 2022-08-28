@@ -32,11 +32,14 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 //获取白名单列表
 int whiteList_service_request_handler(const Request& request, Response& response);
 
-//保存白名单列表
+//app保存白名单列表
 int whiteList_save_service_request_handler(const Request& request, Response& response);
 
-//蓝牙站点添加新设备时更新白名单列表
+//蓝牙站点添加新设备时，增加相应的条目
 int whiteList_update_service_request_handler(const Request& request, Response& response);
+
+//蓝牙站点解绑设备时，删除相应的条目
+int whiteList_delete_service_request_handler(const Request& request, Response& response);
 
 //获取灯控设备设备列表
 int getAllDeviceList_service_request_handler(const Request& request, Response& response);

@@ -26,13 +26,8 @@ void BindDevice::bind(QData &deviceArray) {
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
-    //更新config白名单列表
-//    qlibc::QData request;
-//    request.setString("service_id", "whiteListUpdateRequest");
-//    request.putData("request", bleConfig::getInstance()->getDeviceListData());
-//    qlibc::QData response;
-//    httpUtil::sitePostRequest("127.0.0.1", 9006, request, response);
-//    LOG_HLIGHT << "==>request2Config: " << request.toJsonString();
+    //更新配置站点的白名单
+    updateDeviceList2ConfigSite();
 
     //发布绑定结束消息
     qlibc::QData publishData;
@@ -122,6 +117,16 @@ bool BindDevice::addDevice(string &deviceSn) {
     ServiceSiteManager::getInstance()->publishMessage(SingleDeviceBindSuccessMsg, publishData.toJsonString());
 
     return true;
+}
+
+void BindDevice::updateDeviceList2ConfigSite() {
+    //更新config白名单列表
+    qlibc::QData request;
+    request.setString("service_id", "whiteListUpdateRequest");
+    request.putData("request", bleConfig::getInstance()->getDeviceListData());
+    qlibc::QData response;
+    httpUtil::sitePostRequest(Ip, ConfigPort, request, response);
+    LOG_HLIGHT << "==>updateDeviceList2ConfigSite";
 }
 
 

@@ -16,6 +16,7 @@
 #include "siteService/service_site_manager.h"
 #include "../parameter.h"
 #include "bleConfig.h"
+#include "common/httpUtil.h"
 
 using namespace servicesite;
 using namespace std;
@@ -233,6 +234,19 @@ public:
         bleConfig::getInstance()->deleteStatusItem(deviceSn);
         LOG_GREEN << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
 
+        //更新config白名单列表
+        Json::Value deviceItem, device_list, device_list_content;
+        deviceItem["device_id"] = deviceSn;
+        device_list[0] = deviceItem;
+        device_list_content["device_list"] = device_list;
+
+        qlibc::QData request;
+        request.setString("service_id", "whiteListDeleteRequest");
+        request.putData("request", qlibc::QData(device_list_content));
+        qlibc::QData response;
+        httpUtil::sitePostRequest(Ip, ConfigPort, request, response);
+        LOG_HLIGHT << "==>deleteDeviceList2ConfigSite: " << request.toJsonString();
+
         //发布设备解绑消息
         qlibc::QData content, publishData;
         content.setString("device_id", deviceSn);
@@ -276,7 +290,30 @@ public:
 
             LOG_GREEN << "==>LightOnOffStatus: " << status.toJsonString();
 
+            //更新状态列表
             bleConfig::getInstance()->updateStatusListData(status);
+
+            //发布状态变更消息
+            Json::Value stateItem, state_list, deviceItem, device_list, content;
+            stateItem["state_id"] = "power";
+            if(present_onOff == "00")
+                stateItem["state_value"] = "off";
+            else
+                stateItem["state_value"] = "on";
+
+            state_list[0] = stateItem;
+
+            deviceItem["device_id"] = device_id;
+            deviceItem["online_state"] = "online";
+            deviceItem["state_list"] = state_list;
+
+            device_list[0] = deviceItem;
+
+            qlibc::QData publishData;
+            publishData.setString("message_id", Device_State_Changed);
+            publishData.putData("content", qlibc::QData(device_list));
+            ServiceSiteManager::getInstance()->publishMessage(Device_State_Changed, publishData.toJsonString());
+            LOG_INFO << "Device_State_Changed: " << publishData.toJsonString();
     }
 
 private:
@@ -314,9 +351,29 @@ public:
         status.setString("device_id", device_id);
         status.setString("state_id", "luminance");
         status.setInt("state_value", stoi(present_lightness, nullptr, 16));
-
         LOG_GREEN << "LightBrightStatus: " << status.toJsonString();
+
+        //更新状态列表
         bleConfig::getInstance()->updateStatusListData(status);
+
+        //发布状态变更消息
+        Json::Value stateItem, state_list, deviceItem, device_list, content;
+        stateItem["state_id"] = "luminance";
+        stateItem["state_value"] = stoi(present_lightness, nullptr, 16);
+
+        state_list[0] = stateItem;
+
+        deviceItem["device_id"] = device_id;
+        deviceItem["online_state"] = "online";
+        deviceItem["state_list"] = state_list;
+
+        device_list[0] = deviceItem;
+
+        qlibc::QData publishData;
+        publishData.setString("message_id", Device_State_Changed);
+        publishData.putData("content", qlibc::QData(device_list));
+        ServiceSiteManager::getInstance()->publishMessage(Device_State_Changed, publishData.toJsonString());
+        LOG_INFO << "Device_State_Changed: " << publishData.toJsonString();
     }
 
 private:

@@ -107,8 +107,10 @@ int main(int argc, char* argv[]) {
 
     //获取白名单列表
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID,whiteList_service_request_handler);
-    //更新白名单列表
+    //增加白名单灯控设备条目
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_UPDATE_REQUEST_SERVICE_ID,whiteList_update_service_request_handler);
+    //删除白名单灯控设备条目
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_DELETE_REQUEST_SERVICE_ID,whiteList_delete_service_request_handler);
     //保存白名单列表
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_SAVE_REQUEST_SERVICE_ID,whiteList_save_service_request_handler);
     //获取灯控设备列表

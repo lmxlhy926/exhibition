@@ -205,12 +205,15 @@ int whiteList_update_service_request_handler(const Request& request, Response& r
     qlibc::QData devices = configWhiteList.getData("info").getData("devices");
 
     for(Json::ArrayIndex i = 0; i < bleSiteDeviceListSize; ++i){
-        string device_id = bleSiteDeviceList.getArrayElement(i).getString("device_id");
+        qlibc::QData deviceItem = bleSiteDeviceList.getArrayElement(i);
+        string device_id = deviceItem.getString("device_id");
         for(Json::ArrayIndex j = 0; j < devices.size(); ++j){
-            if(devices.getArrayElement(j).getString("device_id") != device_id && j == devices.size() -1){
+            if(devices.getArrayElement(j).getString("device_sn") == device_id){
+                break;
+            }else if(devices.getArrayElement(j).getString("device_sn") != device_id && j == devices.size() -1){
                 qlibc::QData item;
                 item.setString("category_code", "light");
-                item.setString("device_id", device_id);
+                item.setString("device_sn", device_id);
                 devices.append(item);
                 break;
             }
@@ -218,8 +221,37 @@ int whiteList_update_service_request_handler(const Request& request, Response& r
         if(devices.size() == 0){
             qlibc::QData item;
             item.setString("category_code", "light");
-            item.setString("device_id", device_id);
+            item.setString("device_sn", device_id);
             devices.append(item);
+        }
+    }
+
+    configWhiteList.asValue()["info"]["devices"] = devices.asValue();
+    configParamUtil::getInstance()->saveWhiteListData(configWhiteList);
+
+    qlibc::QData ret;
+    ret.setInt("code", 0);
+    ret.setString("msg", "success");
+    response.set_content(ret.toJsonString(), "text/json");
+
+    return 0;
+}
+
+int whiteList_delete_service_request_handler(const Request& request, Response& response){
+    LOG_HLIGHT << "==>whiteList_delete_service_request_handler";
+    qlibc::QData bleSiteDeviceList = qlibc::QData(request.body).getData("request").getData("device_list");
+    size_t bleSiteDeviceListSize = bleSiteDeviceList.size();
+
+    qlibc::QData configWhiteList = configParamUtil::getInstance()->getWhiteList();
+    qlibc::QData devices = configWhiteList.getData("info").getData("devices");
+
+    for(Json::ArrayIndex i = 0; i < bleSiteDeviceListSize; ++i){
+        qlibc::QData deviceItem = bleSiteDeviceList.getArrayElement(i);
+        string device_id = deviceItem.getString("device_id");
+        for(Json::ArrayIndex j = 0; j < devices.size(); ++j){
+            if(devices.getArrayElement(j).getString("device_sn") == device_id){
+                devices.deleteArrayItem(j);
+            }
         }
     }
 

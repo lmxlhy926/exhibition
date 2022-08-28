@@ -9,7 +9,9 @@
 
 using namespace std;
 
-const int BleSitePort = 60009;
+static const string Ip = "127.0.0.1";
+static const int ConfigPort = 9006;
+static const int BleSitePort = 60009;
 
 //服务ID
 static const string Control_Device_Service_ID     = "control_device";       //控制设备

@@ -179,7 +179,6 @@ void bleConfig::updateStatusListData(qlibc::QData& data){
             size_t statusListSize = state_list.size();
             for(Json::ArrayIndex j = 0; j < statusListSize; ++j){
                 if(state_list.getArrayElement(j).getString("state_id") == state_id){
-                    LOG_RED << "device_id" << device_id << ", state_id: " << state_id << ", state_value: " << data.asValue()["state_value"].asString();
                     device_list.asValue()[i]["state_list"][j]["state_value"] = data.asValue()["state_value"];
                     break;
                 }
