@@ -27,14 +27,14 @@ private:
      * @param bufSize   数组容量
      * @return          二进制命令长度
      */
-    static size_t getBinary(qlibc::QData& controlData, unsigned char* buf, size_t bufSize);
+    static string getBinaryString(qlibc::QData& controlData);
 };
 
 
 class JsonCmd2Binary{
 protected:
     //获取二进制格式命令
-    virtual size_t getBinary(unsigned char* buf, size_t bufSize) = 0;
+    virtual string getBinaryString() = 0;
 
     //剔除字符串中间的空格
     static string deleteWhiteSpace(string str){
@@ -51,17 +51,15 @@ protected:
 
 class LightScan : public JsonCmd2Binary{
 public:
-    size_t getBinary(unsigned char* buf, size_t bufSize) override{
-        string binaryString = "E9FF00";
-        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
+    string getBinaryString() override{
+        return string("E9FF00");
     }
 };
 
 class LightScanEnd : public JsonCmd2Binary{
 public:
-    size_t getBinary(unsigned char* buf, size_t bufSize) override{
-        string binaryString = "E9FF01";
-        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
+    string getBinaryString() override{
+        return string("E9FF01");
     }
 };
 
@@ -71,17 +69,17 @@ private:
 public:
     explicit LightConnect(string& sn) : deviceSn(sn){}
 
-    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+    string getBinaryString() override{
         string binaryString = "E9FF08" + deviceSn;
-        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
+        return binaryString;
     }
 };
 
 class LightGatewayAddressAssign : public JsonCmd2Binary{
 public:
-    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+    string getBinaryString() override{
         string binaryString = "E9FF091112131415161718191A1B1C1D1E1F20000000112233440100";
-        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
+        return binaryString;
     }
 };
 
@@ -91,17 +89,17 @@ private:
 public:
     explicit LightNodeAddressAssign(string& nodeAddr) : nodeAddress(nodeAddr){}
 
-    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+    string getBinaryString() override{
         string binaryString = "E9FF0A1112131415161718191A1B1C1D1E1F2000000011223344" + nodeAddress;
-        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
+        return binaryString;
     }
 };
 
 class LightBind : public JsonCmd2Binary{
 public:
-    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+    string getBinaryString() override{
         string binaryString = "E9FF0B00000060964771734FBD76E3B40519D1D94A48";
-        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
+        return binaryString;
     }
 };
 
@@ -111,10 +109,10 @@ private:
 public:
     explicit LightUnBind(string& sn) : deviceSn(sn){}
 
-    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+    string getBinaryString() override{
         string addr = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
         string binaryString = "E8FF000000000203" + addr + "8049";
-        return DownBinaryUtil::binaryString2binary(binaryString, buf, bufSize);
+        return binaryString;
     }
 };
 
@@ -131,7 +129,7 @@ public:
         onOff = data.getString("commandPara");
     }
 
-    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+    string getBinaryString() override{
         string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
         string stringCmd;
         stringCmd.append(prefix).append(deviceAddress).append("8202");
@@ -142,7 +140,7 @@ public:
         }
         stringCmd.append(deleteWhiteSpace("00 00 00"));
 
-        return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
+        return stringCmd;
     }
 };
 
@@ -165,7 +163,7 @@ public:
         }
     }
 
-    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+    string getBinaryString() override{
         string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
         stringstream ss;
         ss << std::hex << std::uppercase << std::setw(4) << luminanceVal;
@@ -174,7 +172,7 @@ public:
         stringCmd.append(prefix).append(deviceAddress).append("824C").append(ss.str());
         stringCmd.append(deleteWhiteSpace("00 00 00"));
 
-        return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
+        return stringCmd;
     }
 };
 
@@ -197,7 +195,7 @@ public:
         }
     }
 
-    size_t getBinary(unsigned char* buf, size_t bufSize) override{
+    string getBinaryString() override{
         string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
         stringstream ss;
         ss << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
@@ -207,7 +205,7 @@ public:
         stringCmd.append(deleteWhiteSpace("00 00 00"));
 //        stringCmd.append(deleteWhiteSpace("00 00 00"));
 
-        return DownBinaryUtil::binaryString2binary(stringCmd, buf, bufSize);
+        return stringCmd;
     }
 };
 

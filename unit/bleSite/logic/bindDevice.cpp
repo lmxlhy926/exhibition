@@ -23,7 +23,9 @@ void BindDevice::bind(QData &deviceArray) {
     for(Json::ArrayIndex i = 0; i < arraySize; i++){
         string deviceSn = deviceArray.getArrayElement(i).asValue().asString();
         addDevice(deviceSn);
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+        if(i != arraySize - 1 ){
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+        }
     }
 
     //更新配置站点的白名单
@@ -56,7 +58,6 @@ bool BindDevice::addDevice(string &deviceSn) {
         }
     }
     LOG_PURPLE << "<<: successed in scaning the device: <" << deviceSn << ">.......";
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     //发送设备连接指令，等待1秒
     LOG_INFO << ">>: start to connect the device: <" << deviceSn << ">....";

@@ -16,6 +16,7 @@
 #include "formatTrans/bleConfig.h"
 #include "formatTrans/upBinayCmd.h"
 #include "formatTrans/downBinaryCmd.h"
+#include "formatTrans/downBinaryFlowControl.h"
 #include "logic/logicControl.h"
 
 using namespace std;
@@ -31,6 +32,9 @@ int main(int argc, char* argv[]) {
 
     httplib::ThreadPool threadPool_(10);
     std::atomic<bool> http_server_thread_end(false);
+
+    //流控
+    downBinaryFlowControl::getInstance();
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
