@@ -361,20 +361,22 @@ public:
 
         //更新状态列表
         bleConfig::getInstance()->updateStatusListData(status);
-        //发布状态变更消息
-        publishState(device_id, "luminance", state_value);
-
-        //改变亮度导致的开关状态变化
         if(state_value.asInt() > 0){
             status.setString("state_id", "power");
             status.setValue("state_value", "on");
             bleConfig::getInstance()->updateStatusListData(status);
-            publishState(device_id, "power", "on");
 
         }else if(state_value.asInt() == 0){
             status.setString("state_id", "power");
             status.setValue("state_value", "off");
             bleConfig::getInstance()->updateStatusListData(status);
+        }
+
+        //发布状态变更消息
+        publishState(device_id, "luminance", state_value);
+        if(state_value.asInt() > 0){
+            publishState(device_id, "power", "on");
+        }else if(state_value.asInt() == 0){
             publishState(device_id, "power", "off");
         }
     }

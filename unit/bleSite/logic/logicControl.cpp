@@ -78,6 +78,7 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
 
     LOG_HLIGHT << "==>deviceArray: " << deviceArray.toJsonString(true);
 
+    //发布扫描结果
     qlibc::QData content, publishData;
     content.putData("device_list", deviceArray);
     publishData.setString("message_id", ScanResultMsg);
