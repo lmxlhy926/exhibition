@@ -5,8 +5,9 @@
 #include "downBinaryFlowControl.h"
 #include "downBinaryUtil.h"
 #include <chrono>
+#include "log/Logging.h"
 
-downBinaryFlowControl* downBinaryFlowControl::instance;
+downBinaryFlowControl* downBinaryFlowControl::instance = nullptr;
 
 void downBinaryFlowControl::push(string &command) {
     std::lock_guard<std::mutex> lg(mutex_);

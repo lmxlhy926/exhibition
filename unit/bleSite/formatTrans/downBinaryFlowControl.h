@@ -30,7 +30,7 @@ private:
 
 public:
     static downBinaryFlowControl * getInstance(){
-        if(instance){
+        if(!instance){
             instance = new downBinaryFlowControl();
         }
         return instance;
