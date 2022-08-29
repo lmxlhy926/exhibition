@@ -19,7 +19,7 @@ using namespace std;
  */
 class SnAddressMap {
 private:
-    map<string, std::pair<string, int>> snAddrMap;
+    map<string, Json::Value> snAddrMap;
     std::recursive_mutex rMutex_;
 
     SnAddressMap(){
@@ -36,14 +36,14 @@ public:
         return instance;
     }
 
-    //获取节点分配地址字符串并更新存储文件
+    //获取分配的单播地址
     qlibc::QData getNodeAssignAddr(string deviceSn);
 
     //删除对应的条目并更新存储文件
     void deleteDeviceSn(string& deviceSn);
 
     //获取设备列表
-    qlibc::QData getDeviceList();
+    qlibc::QData getAddrList();
 
     //deviceSn--->unicastAddress
     string deviceSn2Address(string deviceSn);

@@ -221,7 +221,7 @@ namespace qlibc{
 
     QData& QData::setValue(const string &key, const Json::Value &value) {
         std::lock_guard<std::recursive_mutex> lg(*_mutex);
-        if(!_value->isObject() || key.empty())  return *this;
+        if((!_value->isNull() && !_value->isObject()) || key.empty())  return *this;
         (*_value)[key] = value;
         return *this;
     }

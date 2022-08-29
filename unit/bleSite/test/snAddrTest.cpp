@@ -9,18 +9,16 @@
 #include "formatTrans/bleConfig.h"
 #include <vector>
 #include <algorithm>
+#include "qlibc/jsoncpp/json.h"
 
 
 int main(int argc, char* argv[]){
     bleConfig* configPathPtr = bleConfig::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
-    SnAddressMap sam;
-    for(int i = 0; i < 11; ++i){
-        string deviceSn = string("device").append(std::to_string(i));
-        LOG_RED << sam.getNodeAssignAddr(deviceSn).toJsonString(true);
-    }
-    LOG_HLIGHT << sam.getDeviceList().toJsonString();
+    SnAddressMap *samptr = SnAddressMap::getInstance();
+    string deviceSn = "0001";
+    LOG_RED << samptr->getNodeAssignAddr(deviceSn).toJsonString(true);
 
     return 0;
 }

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <vector>
 #include <sstream>
+#include "log/Logging.h"
 
 SnAddressMap* SnAddressMap::instance;
 
@@ -26,21 +27,20 @@ void SnAddressMap::deleteDeviceSn(string& deviceSn) {
     map2JsonDataAndSave2File();
 }
 
-qlibc::QData SnAddressMap::getDeviceList() {
+qlibc::QData SnAddressMap::getAddrList() {
     std::lock_guard<recursive_mutex> lg(rMutex_);
     qlibc::QData data;
     for(auto& elem : snAddrMap){
-        data.setString(elem.first, elem.second.first);
+        data.setValue(elem.first, elem.second);
     }
     return data;
 }
-
 
 string SnAddressMap::deviceSn2Address(string deviceSn){
     std::lock_guard<recursive_mutex> lg(rMutex_);
     for(auto& elem : snAddrMap){
         if(elem.first == deviceSn){
-            return elem.second.first;
+            return elem.second["unicast_address"].asString();
         }
     }
     return "";
@@ -49,7 +49,7 @@ string SnAddressMap::deviceSn2Address(string deviceSn){
 string SnAddressMap::address2DeviceSn(string address){
     std::lock_guard<recursive_mutex> lg(rMutex_);
     for(auto& elem : snAddrMap){
-        if(elem.second.first == address){
+        if(elem.second["unicast_address"] == address){
             return elem.first;
         }
     }
@@ -60,8 +60,8 @@ void SnAddressMap::loadCache2Map() {
     qlibc::QData snAddressData = bleConfig::getInstance()->getSnAddrData();
     Json::Value::Members deviceSnVec = snAddressData.getMemberNames();
     for(auto& deviceSn : deviceSnVec){
-        int i = snAddressData.getData(deviceSn).getArrayElement(1).asValue().asInt();
-        insert(deviceSn, i);
+        qlibc::QData propertyItem = snAddressData.getData(deviceSn);
+        snAddrMap.insert(std::make_pair(deviceSn, propertyItem.asValue()));
     }
 }
 
@@ -69,12 +69,9 @@ void SnAddressMap::map2JsonDataAndSave2File() {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     qlibc::QData data;
     for(auto& elem : snAddrMap){
-        qlibc::QData array;
-        array.append(elem.second.first);
-        array.append(elem.second.second);
-
-        data.putData(elem.first, array);
+        data.setValue(elem.first, elem.second);
     }
+
     bleConfig::getInstance()->saveSnAddrData(data);
 }
 
@@ -84,7 +81,10 @@ void SnAddressMap::insert(string &deviceSn, unsigned int intAddr) {
     if(pos != snAddrMap.end()){
         snAddrMap.erase(pos);
     }
-    snAddrMap.insert(std::make_pair(deviceSn, std::make_pair(intAddr2FullAddr(intAddr), intAddr)));
+    qlibc::QData propertyItem;
+    propertyItem.setString("unicast_address", intAddr2FullAddr(intAddr));
+
+    snAddrMap.insert(std::make_pair(deviceSn, propertyItem.asValue()));
 }
 
 string SnAddressMap::intAddr2FullAddr(unsigned int i) {
@@ -105,7 +105,9 @@ string SnAddressMap::getAddress(string &deviceSn) {
     //将数字地址存入vector并排序
     std::vector<int> addrVec;
     for(auto& elem : snAddrMap){
-        addrVec.push_back(elem.second.second);
+        int unicastInt = stoi(elem.second["unicast_address"].asString().substr(2, 2),
+                              nullptr, 16);
+        addrVec.push_back(unicastInt);
     }
     sort(addrVec.begin(), addrVec.end(), less<>());
 
