@@ -127,6 +127,26 @@ public:
         }
        return ss.str();
     }
+
+    static void publishState(string& device_id, string state_id, Json::Value state_value){
+        Json::Value stateItem, state_list, deviceItem, device_list, content;
+        stateItem["state_id"] = state_id;
+        stateItem["state_value"] = state_value;
+
+        state_list[0] = stateItem;
+
+        deviceItem["device_id"] = device_id;
+        deviceItem["online_state"] = "online";
+        deviceItem["state_list"] = state_list;
+
+        device_list[0] = deviceItem;
+
+        qlibc::QData publishData;
+        publishData.setString("message_id", Device_State_Changed);
+        publishData.putData("content", qlibc::QData(device_list));
+        ServiceSiteManager::getInstance()->publishMessage(Device_State_Changed, publishData.toJsonString());
+        LOG_INFO << "Device_State_Changed: " << publishData.toJsonString();
+    }
 };
 
 
@@ -280,13 +300,17 @@ public:
 
     void postEvent() override{
             string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
+            Json::Value state_value;
             qlibc::QData status;
             status.setString("device_id", device_id);
             status.setString("state_id", "power");
-            if(present_onOff == "00")
+            if(present_onOff == "00"){
                 status.setString("state_value", "off");
-            else
+                state_value = "off";
+            }else{
                 status.setString("state_value", "on");
+                state_value = "on";
+            }
 
             LOG_GREEN << "==>LightOnOffStatus: " << status.toJsonString();
 
@@ -294,26 +318,7 @@ public:
             bleConfig::getInstance()->updateStatusListData(status);
 
             //发布状态变更消息
-            Json::Value stateItem, state_list, deviceItem, device_list, content;
-            stateItem["state_id"] = "power";
-            if(present_onOff == "00")
-                stateItem["state_value"] = "off";
-            else
-                stateItem["state_value"] = "on";
-
-            state_list[0] = stateItem;
-
-            deviceItem["device_id"] = device_id;
-            deviceItem["online_state"] = "online";
-            deviceItem["state_list"] = state_list;
-
-            device_list[0] = deviceItem;
-
-            qlibc::QData publishData;
-            publishData.setString("message_id", Device_State_Changed);
-            publishData.putData("content", qlibc::QData(device_list));
-            ServiceSiteManager::getInstance()->publishMessage(Device_State_Changed, publishData.toJsonString());
-            LOG_INFO << "Device_State_Changed: " << publishData.toJsonString();
+            publishState(device_id, "power", state_value);
     }
 
 private:
@@ -347,33 +352,31 @@ public:
 
     void postEvent() override{
         string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
+        Json::Value state_value =  stoi(present_lightness, nullptr, 16);
         qlibc::QData status;
         status.setString("device_id", device_id);
         status.setString("state_id", "luminance");
-        status.setInt("state_value", stoi(present_lightness, nullptr, 16));
+        status.setValue("state_value", state_value);
         LOG_GREEN << "LightBrightStatus: " << status.toJsonString();
 
         //更新状态列表
         bleConfig::getInstance()->updateStatusListData(status);
-
         //发布状态变更消息
-        Json::Value stateItem, state_list, deviceItem, device_list, content;
-        stateItem["state_id"] = "luminance";
-        stateItem["state_value"] = stoi(present_lightness, nullptr, 16);
+        publishState(device_id, "luminance", state_value);
 
-        state_list[0] = stateItem;
+        //改变亮度导致的开关状态变化
+        if(state_value.asInt() > 0){
+            status.setString("state_id", "power");
+            status.setValue("state_value", "on");
+            bleConfig::getInstance()->updateStatusListData(status);
+            publishState(device_id, "power", "on");
 
-        deviceItem["device_id"] = device_id;
-        deviceItem["online_state"] = "online";
-        deviceItem["state_list"] = state_list;
-
-        device_list[0] = deviceItem;
-
-        qlibc::QData publishData;
-        publishData.setString("message_id", Device_State_Changed);
-        publishData.putData("content", qlibc::QData(device_list));
-        ServiceSiteManager::getInstance()->publishMessage(Device_State_Changed, publishData.toJsonString());
-        LOG_INFO << "Device_State_Changed: " << publishData.toJsonString();
+        }else if(state_value.asInt() == 0){
+            status.setString("state_id", "power");
+            status.setValue("state_value", "off");
+            bleConfig::getInstance()->updateStatusListData(status);
+            publishState(device_id, "power", "off");
+        }
     }
 
 private:

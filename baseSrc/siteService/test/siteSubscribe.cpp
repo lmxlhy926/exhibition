@@ -21,8 +21,7 @@ using json = nlohmann::json;
 void message_handler(const Request& request) {
     // 消息的json字符串位于request.body
     auto message_json = json::parse(request.body);
-
-    printf("received message:\n%s\n", message_json.dump(4).c_str());
+    printf("received message:\n%s\n\n", message_json.dump(4).c_str());
 }
 
 
@@ -57,14 +56,16 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageHandler("singleDeviceBindSuccessMsg", message_handler);
     serviceSiteManager->registerMessageHandler("bindEndMsg", message_handler);
     serviceSiteManager->registerMessageHandler("singleDeviceUnbindSuccessMsg", message_handler);
+    serviceSiteManager->registerMessageHandler("device_state_changed", message_handler);
 
     // 订阅消息, 需要传入订阅站点的IP、端口号、消息ID列表
     int code;
     std::vector<string> messageIdList;
-    messageIdList.push_back("scanResultMsg");
-    messageIdList.push_back("singleDeviceBindSuccessMsg");
-    messageIdList.push_back("bindEndMsg");
-    messageIdList.push_back("singleDeviceUnbindSuccessMsg");
+    messageIdList.push_back("scanResultMsg");                   //扫描结果
+    messageIdList.push_back("singleDeviceBindSuccessMsg");      //单个绑定成功
+    messageIdList.push_back("bindEndMsg");                      //全部绑定结束
+    messageIdList.push_back("singleDeviceUnbindSuccessMsg");    //单个解绑成功
+    messageIdList.push_back("device_state_changed");            //设备状态变更
     code = serviceSiteManager->subscribeMessage("127.0.0.1", 60009, messageIdList);
     if (code == ServiceSiteManager::RET_CODE_OK) {
         printf("subscribeMessage ok.\n");
