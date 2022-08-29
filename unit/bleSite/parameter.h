@@ -21,10 +21,8 @@ static const string Get_DeviceList_Service_ID     = "get_device_list";      //�
 static const string Get_DeviceState_Service_ID    = "get_device_state";     //获取设备状态
 static const string Scan_Device_Service_ID        = "scan_device";          //扫描设备结果
 
-//暂时服务ID
-static const string Ble_Device_Command_Service_ID = "BleDeviceCommand";
-static const string Ble_Device_Test_Command_Service_ID = "BleDeviceCommands";
-
+//二进制指令调试
+static const string Ble_Device_Test_Command_Service_ID = "BleDeviceCommand";
 
 //站点支持的消息
 static const string ScanResultMsg =                    "scanResultMsg";
@@ -32,7 +30,6 @@ static const string SingleDeviceBindSuccessMsg =       "singleDeviceBindSuccessM
 static const string SingleDeviceUnbindSuccessMsg =     "singleDeviceUnbindSuccessMsg";
 static const string BindEndMsg =                       "bindEndMsg";
 static const string Device_State_Changed =             "device_state_changed";
-
 
 
 //控制命令

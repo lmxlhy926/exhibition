@@ -10,13 +10,6 @@
 #include "logic/logicControl.h"
 using namespace httplib;
 
-//json控制指令
-int BleDevice_command_service_handler(const Request& request, Response& response, LogicControl& lc);
-
-//二进制控制指令
-int BleDevice_command_test_service_handler(const Request& request, Response& response);
-
-
 //扫描设备
 int scan_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 
@@ -36,11 +29,8 @@ int get_device_list_service_handler(const Request& request, Response& response);
 int get_device_state_service_handler(const Request& request, Response& response);
 
 
-
-
-
-
-
+//二进制控制指令
+int BleDevice_command_test_service_handler(const Request& request, Response& response);
 
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

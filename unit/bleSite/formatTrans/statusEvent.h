@@ -300,6 +300,10 @@ public:
 
     void postEvent() override{
             string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
+            if(device_id.empty()){
+                return;
+            }
+
             Json::Value state_value;
             qlibc::QData status;
             status.setString("device_id", device_id);
@@ -352,6 +356,10 @@ public:
 
     void postEvent() override{
         string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
+        if(device_id.empty()){
+            return;
+        }
+
         Json::Value state_value =  stoi(present_lightness, nullptr, 16);
         qlibc::QData status;
         status.setString("device_id", device_id);
@@ -412,6 +420,10 @@ public:
 
     void postEvent() override{
         string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
+        if(device_id.empty()){
+            return;
+        }
+
         qlibc::QData status;
         status.setString("device_id", device_id);
         status.setString("state_id", "luminance");

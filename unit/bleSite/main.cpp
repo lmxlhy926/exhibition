@@ -65,18 +65,6 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageId(Device_State_Changed);           //设备状态改变
 
 
-    //注册蓝牙命令handler
-    serviceSiteManager->registerServiceRequestHandler(Ble_Device_Command_Service_ID,
-                                                      [&lc](const Request& request, Response& response) -> int{
-        return BleDevice_command_service_handler(request, response, lc);
-    });
-
-    serviceSiteManager->registerServiceRequestHandler(Ble_Device_Test_Command_Service_ID,
-                                                      [](const Request& request, Response& response) -> int{
-        return BleDevice_command_test_service_handler(request, response);
-    });
-
-
     //注册设备扫描回调
     serviceSiteManager->registerServiceRequestHandler(Scan_Device_Service_ID,
                                                       [&lc](const Request& request, Response& response) -> int{
@@ -107,6 +95,12 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(Get_DeviceState_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return get_device_state_service_handler(request, response);
+    });
+
+    //接收二进制单步指令，用于单步指令调试
+    serviceSiteManager->registerServiceRequestHandler(Ble_Device_Test_Command_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return BleDevice_command_test_service_handler(request, response);
     });
 
 
