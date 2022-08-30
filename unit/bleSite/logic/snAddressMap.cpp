@@ -9,7 +9,7 @@
 #include <sstream>
 #include "log/Logging.h"
 
-SnAddressMap* SnAddressMap::instance;
+SnAddressMap* SnAddressMap::instance = nullptr;
 
 qlibc::QData SnAddressMap::getNodeAssignAddr(string deviceSn) {
     qlibc::QData nodeAddrData;

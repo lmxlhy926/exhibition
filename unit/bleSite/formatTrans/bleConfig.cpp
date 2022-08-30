@@ -199,6 +199,21 @@ void bleConfig::saveStatusListData(qlibc::QData& data){
     statusListData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/statusList.json"), true);
 }
 
+QData bleConfig::getGroupListData(){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    if(groupAddressData.empty()){
+        groupAddressData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/groupAddress.json"));
+    }
+    return groupAddressData;
+}
+
+
+void bleConfig::saveGroupListData(qlibc::QData& data){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    groupAddressData.setInitData(data);
+    groupAddressData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/groupAddress.json"), true);
+}
+
 bool bleConfig::serialInit(bleConfig::SerialReceiveFunc receiveFuc) {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     if(serial == nullptr){

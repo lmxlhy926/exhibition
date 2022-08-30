@@ -10,27 +10,30 @@
 #include "qlibc/QData.h"
 using namespace std;
 
-class groupAddressMap {
+class GroupAddressMap {
 private:
     map<string, Json::Value> groupAddrMap;
     std::recursive_mutex rMutex_;
 
-    groupAddressMap(){
+    GroupAddressMap(){
         loadCache2Map();
     }
 
-    static groupAddressMap* instance;
+    static GroupAddressMap* instance;
 
 public:
-    static groupAddressMap* getInstance(){
+    static GroupAddressMap* getInstance(){
         if(instance == nullptr){
-            instance = new groupAddressMap();
+            instance = new GroupAddressMap();
         }
         return instance;
     }
 
-    //分配组地址
-    string assignGroupAddr(string groupName);
+    //获取组地址
+    string getGroupAddr(string groupName);
+
+    //设备加入分组
+    void addDevice2Group(string& groupName, string& deviceSn);
 
     //删除对应的条目并更新存储文件
     void deleteGroupItem(string& groupName);
@@ -42,7 +45,7 @@ public:
     string groupName2Address(string groupName);
 
     //groupAddress--->groupName
-    string GroupAddr2GroupName(string groupAddr);
+    string groupAddr2GroupName(string groupAddr);
 
 private:
     //加载数据
@@ -58,7 +61,7 @@ private:
     void insert(string& groupName, unsigned int intAddr);
 
     //找到最小可用数值，将可用数值转换组为地址
-    string getAddress(string& deviceSn);
+    string getAddress(string& groupName);
 };
 
 #endif //EXHIBITION_GROUPADDRESSMAP_H

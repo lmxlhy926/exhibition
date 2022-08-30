@@ -11,14 +11,27 @@
 #include <algorithm>
 #include "qlibc/jsoncpp/json.h"
 
+#include "logic/groupAddressMap.h"
 
-int main(int argc, char* argv[]){
+void snAddrTest(char* argv[]){
     bleConfig* configPathPtr = bleConfig::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
     SnAddressMap *samptr = SnAddressMap::getInstance();
     string deviceSn = "0001";
     LOG_RED << samptr->getNodeAssignAddr(deviceSn).toJsonString(true);
+}
+
+
+int main(int argc, char* argv[]){
+    bleConfig* configPathPtr = bleConfig::getInstance();
+    configPathPtr->setConfigPath(string(argv[1]));
+
+    GroupAddressMap *gamptr = GroupAddressMap::getInstance();
+    string groupName = "group6";
+    string deviceSn = "mac3";
+    gamptr->addDevice2Group(groupName, deviceSn);
+
 
     return 0;
 }
