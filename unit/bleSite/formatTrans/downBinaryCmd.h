@@ -11,6 +11,7 @@
 #include "qlibc/QData.h"
 #include "downBinaryUtil.h"
 #include "logic/snAddressMap.h"
+#include "logic/groupAddressMap.h"
 
 using namespace std;
 
@@ -111,10 +112,37 @@ public:
 
     string getBinaryString() override{
         string addr = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
+        if(addr.empty()){
+            return "";
+        }
         string binaryString = "E8FF000000000203" + addr + "8049";
         return binaryString;
     }
 };
+
+
+class LightGroup : public JsonCmd2Binary{
+private:
+    string deviceSn;
+    string groupName;
+public:
+    explicit LightGroup(string& sn, string& name) : deviceSn(sn), groupName(name){}
+
+    string getBinaryString() override{
+        string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
+        string deviceAddress = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
+        if(deviceAddress.empty()){
+            return "";
+        }
+        string stringCmd;
+        stringCmd.append(prefix).append(deviceAddress).append("801B");
+        stringCmd.append(deviceAddress);
+        stringCmd.append(GroupAddressMap::getInstance()->getGroupAddr(groupName));
+        stringCmd.append("110200");
+        return stringCmd;
+    }
+};
+
 
 //开关
 class LightOnOff : public JsonCmd2Binary{

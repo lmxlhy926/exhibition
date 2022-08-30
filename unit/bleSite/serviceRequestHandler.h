@@ -22,6 +22,9 @@ int del_device_service_handler(const Request& request, Response& response, Logic
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 
+//设备分组
+int group_device_service_handler(const Request& request, Response& response, LogicControl& lc);
+
 //获取设备列表
 int get_device_list_service_handler(const Request& request, Response& response);
 

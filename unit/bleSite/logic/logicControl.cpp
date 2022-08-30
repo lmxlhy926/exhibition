@@ -37,7 +37,18 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
             unbindData.setString("command", "unbind");
             unbindData.setString("deviceSn", deviceArray.getArrayElement(i).asValue().asString());
             DownBinaryCmd::transAndSendCmd(unbindData);
-            this_thread::sleep_for(std::chrono::seconds(1));
+        }
+
+    }else if(command == GROUP){
+        string group_name = cmdData.getString("group_name");
+        qlibc::QData device_list = cmdData.getData("device_list");
+        size_t deviceListSize = device_list.size();
+        for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+            qlibc::QData groupData;
+            groupData.setString("command", "group");
+            groupData.setString("groupName", group_name);
+            groupData.setString("deviceSn", device_list.getArrayElement(i).asValue().asString());
+            DownBinaryCmd::transAndSendCmd(groupData);
         }
 
     }else{  //设备控制指令

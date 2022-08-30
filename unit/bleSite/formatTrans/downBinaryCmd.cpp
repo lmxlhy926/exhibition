@@ -41,6 +41,11 @@ string DownBinaryCmd::getBinaryString(QData &controlData) {
         string deviceSn = controlData.getString("deviceSn");
         return LightUnBind(deviceSn).getBinaryString();
 
+    }else if(command == GROUP){     //分组
+        string deviceSn = controlData.getString("deviceSn");
+        string groupName = controlData.getString("groupName");
+        return LightGroup(deviceSn, groupName).getBinaryString();
+
     }else if(command == POWER){     //开关
         return LightOnOff(controlData).getBinaryString();
 

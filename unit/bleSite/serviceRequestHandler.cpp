@@ -10,6 +10,7 @@
 #include "log/Logging.h"
 #include "logic/logicControl.h"
 #include "logic/snAddressMap.h"
+#include "logic/groupAddressMap.h"
 #include "parameter.h"
 
 
@@ -103,7 +104,14 @@ int control_device_service_handler(const Request& request, Response& response, L
                 qlibc::QData deviceItem = deviceList.getArrayElement(i);
 
                 string device_id = deviceItem.getString("device_id");
-                string device_address = SnAddressMap::getInstance()->deviceSn2Address(device_id);
+                string device_address;
+                device_address = SnAddressMap::getInstance()->deviceSn2Address(device_id);
+                if(device_address.empty()){
+                    device_address = GroupAddressMap::getInstance()->groupName2Address(device_id);
+                    if(device_address.empty()){
+                        continue;;
+                    }
+                }
                 qlibc::QData command_list = deviceItem.getData("command_list");
 
                 for(Json::ArrayIndex j = 0; j < command_list.size(); ++j){
@@ -124,6 +132,26 @@ int control_device_service_handler(const Request& request, Response& response, L
                     lc.parse(cmdData);
                 }
             }
+        });
+
+        response.set_content(okResponse.dump(), "text/json");
+    }else{
+        response.set_content(errResponse.dump(), "text/json");
+    }
+    return 0;
+}
+
+//设备分组
+int group_device_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    if(requestBody.type() != Json::nullValue){
+        bleConfig::getInstance()->enqueue([requestBody, &lc]{
+            qlibc::QData cmdData;
+            cmdData.setString("command", "group");
+            cmdData.setString("group_name", requestBody.getString("group_name"));
+            cmdData.putData("device_list", requestBody.getData("device_list"));
+            lc.parse(cmdData);
         });
 
         response.set_content(okResponse.dump(), "text/json");
