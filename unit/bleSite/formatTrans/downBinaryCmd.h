@@ -138,7 +138,7 @@ public:
         stringCmd.append(prefix).append(deviceAddress).append("801B");
         stringCmd.append(deviceAddress);
         stringCmd.append(GroupAddressMap::getInstance()->getGroupAddr(groupName));
-        stringCmd.append("110200");
+        stringCmd.append(deleteWhiteSpace("00 10"));
         return stringCmd;
     }
 };

@@ -149,8 +149,8 @@ int group_device_service_handler(const Request& request, Response& response, Log
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData cmdData;
             cmdData.setString("command", "group");
-            cmdData.setString("group_name", requestBody.getString("group_name"));
-            cmdData.putData("device_list", requestBody.getData("device_list"));
+            cmdData.setString("group_name", requestBody.getData("request").getString("group_name"));
+            cmdData.putData("device_list", requestBody.getData("request").getData("device_list"));
             lc.parse(cmdData);
         });
 

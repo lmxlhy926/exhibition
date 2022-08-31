@@ -26,6 +26,7 @@ install(TARGETS whiteListScribe         DESTINATION bin)
 install(TARGETS mdns_test               DESTINATION bin)
 install(TARGETS query_site              DESTINATION bin)
 install(TARGETS httpClient              DESTINATION bin)
+install(TARGETS ble_site                DESTINATION bin)
 
 
 

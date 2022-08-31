@@ -101,7 +101,7 @@ void GroupAddressMap::map2JsonDataAndSave2File() {
 
 string GroupAddressMap::intAddr2FullAddr(unsigned int i) {
     stringstream ss;
-    ss << "C0" << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << i;
+    ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << i << "C0";
     return ss.str();
 }
 
