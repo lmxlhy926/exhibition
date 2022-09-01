@@ -50,6 +50,7 @@ protected:
     }
 };
 
+//扫描
 class LightScan : public JsonCmd2Binary{
 public:
     string getBinaryString() override{
@@ -57,6 +58,7 @@ public:
     }
 };
 
+//结束扫描
 class LightScanEnd : public JsonCmd2Binary{
 public:
     string getBinaryString() override{
@@ -64,6 +66,7 @@ public:
     }
 };
 
+//连接
 class LightConnect : public JsonCmd2Binary{
 private:
     string deviceSn;
@@ -76,6 +79,7 @@ public:
     }
 };
 
+//给网关分配地址
 class LightGatewayAddressAssign : public JsonCmd2Binary{
 public:
     string getBinaryString() override{
@@ -84,6 +88,7 @@ public:
     }
 };
 
+//给节点分配地址
 class LightNodeAddressAssign : public JsonCmd2Binary{
 private:
     string nodeAddress;
@@ -96,6 +101,7 @@ public:
     }
 };
 
+//设备绑定
 class LightBind : public JsonCmd2Binary{
 public:
     string getBinaryString() override{
@@ -104,6 +110,8 @@ public:
     }
 };
 
+
+//设备解绑
 class LightUnBind : public JsonCmd2Binary{
 private:
     string deviceSn;
@@ -120,7 +128,7 @@ public:
     }
 };
 
-
+//设备分组
 class LightGroup : public JsonCmd2Binary{
 private:
     string deviceSn;
@@ -226,12 +234,14 @@ public:
     string getBinaryString() override{
         string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
         stringstream ss;
-        ss << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
+        ss << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
+        string ctlTemperatureStr = ss.str();
 
         string stringCmd;
-        stringCmd.append(prefix).append(deviceAddress).append("8264").append(ss.str());
+        stringCmd.append(prefix).append(deviceAddress).append("8264");
+        stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
+        stringCmd.append(deleteWhiteSpace("00 00"));
         stringCmd.append(deleteWhiteSpace("00 00 00"));
-//        stringCmd.append(deleteWhiteSpace("00 00 00"));
 
         return stringCmd;
     }

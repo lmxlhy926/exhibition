@@ -24,13 +24,18 @@ void snAddrTest(char* argv[]){
 
 
 int main(int argc, char* argv[]){
-    bleConfig* configPathPtr = bleConfig::getInstance();
-    configPathPtr->setConfigPath(string(argv[1]));
+//    bleConfig* configPathPtr = bleConfig::getInstance();
+//    configPathPtr->setConfigPath(string(argv[1]));
+//
+//    GroupAddressMap *gamptr = GroupAddressMap::getInstance();
+//    string groupName = "group6";
+//    string deviceSn = "mac3";
+//    gamptr->addDevice2Group(groupName, deviceSn);
 
-    GroupAddressMap *gamptr = GroupAddressMap::getInstance();
-    string groupName = "group6";
-    string deviceSn = "mac3";
-    gamptr->addDevice2Group(groupName, deviceSn);
+    stringstream ss;
+    int ctlTemperature = 0;
+    ss << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
+    std::cout << ss.str() << std::endl;
 
 
     return 0;
