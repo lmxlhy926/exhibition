@@ -12,13 +12,74 @@
 
 GroupAddressMap* GroupAddressMap::instance = nullptr;
 
-string GroupAddressMap::getGroupAddr(string groupName) {
-    return getAddress(groupName);
+bool GroupAddressMap::createGroup(string groupName) {
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    //组名必须唯一
+    for(auto& elem : groupAddrMap){
+        if(elem.second["group_name"].asString() == groupName){
+            return false;
+        }
+    }
+
+    //如果设备列表为空
+    if(groupAddrMap.empty()){
+        insert(groupName, 1);
+        map2JsonDataAndSave2File();
+        return true;
+    }
+
+    //将数字地址存入vector并排序
+    std::vector<int> addrVec;
+    for(auto& elem : groupAddrMap){
+        int unicastInt = stoi(elem.first.substr(0, 2),
+                              nullptr, 16);
+        addrVec.push_back(unicastInt);
+    }
+    sort(addrVec.begin(), addrVec.end(), less<>());
+
+    //如果有空隙，则返回最小空隙值
+    for(unsigned int i = 0; i < addrVec.size(); ++i){
+        if(addrVec[i] !=  i + 1){
+            insert(groupName, i + 1);
+            map2JsonDataAndSave2File();
+            return true;
+        }
+    }
+
+    //没有空隙
+    insert(groupName, addrVec.size() + 1);
+    map2JsonDataAndSave2File();
+    return true;
 }
 
-void GroupAddressMap::addDevice2Group(string& groupName, string& deviceSn){
+void GroupAddressMap::deleGroup(string &groupId) {
     std::lock_guard<recursive_mutex> lg(rMutex_);
-    auto pos = groupAddrMap.find(groupName);
+    auto pos = groupAddrMap.find(groupId);
+    if(pos != groupAddrMap.end()){
+        groupAddrMap.erase(pos->first);
+    }
+    map2JsonDataAndSave2File();
+}
+
+void GroupAddressMap::reNameGroup(string& groupId, string& groupName){
+    std::lock_guard<recursive_mutex> lg(rMutex_);
+    //如果组名已经存在则返回
+    for(auto& elem : groupAddrMap){
+        if(elem.second["group_name"].asString() == groupName){
+            return;
+        }
+    }
+
+    auto pos = groupAddrMap.find(groupId);
+    if(pos != groupAddrMap.end()){
+        pos->second["group_name"] = groupName;
+    }
+    map2JsonDataAndSave2File();
+}
+
+void GroupAddressMap::addDevice2Group(string& groupId, string& deviceSn){
+    std::lock_guard<recursive_mutex> lg(rMutex_);
+    auto pos = groupAddrMap.find(groupId);
     if(pos != groupAddrMap.end()){
         if(pos->second["device_list"].isNull()){
             pos->second["device_list"] = Json::Value(Json::arrayValue);
@@ -42,39 +103,60 @@ void GroupAddressMap::addDevice2Group(string& groupName, string& deviceSn){
     }
 }
 
-void GroupAddressMap::deleteGroupItem(string &groupName) {
+void GroupAddressMap::removeDeviceFromGroup(string& groupId, string& deviceSn){
     std::lock_guard<recursive_mutex> lg(rMutex_);
-    auto pos = groupAddrMap.find(groupName);
+    auto pos = groupAddrMap.find(groupId);
     if(pos != groupAddrMap.end()){
-        groupAddrMap.erase(pos->first);
+        if(pos->second["device_list"].isNull()){
+            return;
+
+        }else{
+            qlibc::QData deviceList(pos->second["device_list"]);
+            size_t deviceListSize = deviceList.size();
+
+            for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+                if(deviceList.getArrayElement(i).asValue().asString() == deviceSn){
+                    Json::Value value;
+                    pos->second["device_list"].removeIndex(i, &value);
+                }
+            }
+
+        }
+        map2JsonDataAndSave2File();
     }
-    map2JsonDataAndSave2File();
 }
 
 qlibc::QData GroupAddressMap::getGroupList() {
     std::lock_guard<recursive_mutex> lg(rMutex_);
-    qlibc::QData data;
+    qlibc::QData groupList;
     for(auto& elem : groupAddrMap){
-        data.setValue(elem.first, elem.second);
+        qlibc::QData data;
+        data.setValue("group_name", elem.second["group_name"]);
+        data.setValue("group_id", elem.first);
+        data.setValue("device_list", elem.second["device_list"]);
+        groupList.append(data);
     }
-    return data;
+
+    qlibc::QData retData;
+    retData.putData("group_list", groupList);
+    return retData;
 }
 
-string GroupAddressMap::groupName2Address(string groupName) {
+string GroupAddressMap::groupName2GroupAddressId(string groupName) {
     std::lock_guard<recursive_mutex> lg(rMutex_);
     for(auto& elem : groupAddrMap){
-        if(elem.first == groupName){
-            return elem.second["group_address"].asString();
+        if(elem.second["group_name"] == groupName){
+            return elem.first;
         }
     }
     return "";
 }
 
-string GroupAddressMap::groupAddr2GroupName(string groupAddr) {
+string GroupAddressMap::groupAddressId2GroupName(string groupAddrId) {
     std::lock_guard<recursive_mutex> lg(rMutex_);
     for(auto& elem : groupAddrMap){
-        if(elem.second["group_address"] == groupAddr){
-            return elem.first;
+        if(elem.first == groupAddrId){
+            return elem.second["group_name"].asString();
         }
     }
     return "";
@@ -82,10 +164,10 @@ string GroupAddressMap::groupAddr2GroupName(string groupAddr) {
 
 void GroupAddressMap::loadCache2Map() {
     qlibc::QData groupAddressData = bleConfig::getInstance()->getGroupListData();
-    Json::Value::Members groupNameVec = groupAddressData.getMemberNames();
-    for(auto& groupName : groupNameVec){
-        qlibc::QData propertyItem = groupAddressData.getData(groupName);
-        groupAddrMap.insert(std::make_pair(groupName, propertyItem.asValue()));
+    Json::Value::Members groupIdVec = groupAddressData.getMemberNames();
+    for(auto& groupId : groupIdVec){
+        qlibc::QData propertyItem = groupAddressData.getData(groupId);
+        groupAddrMap.insert(std::make_pair(groupId, propertyItem.asValue()));
     }
 }
 
@@ -107,51 +189,8 @@ string GroupAddressMap::intAddr2FullAddr(unsigned int i) {
 
 void GroupAddressMap::insert(string &groupName, unsigned int intAddr) {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    auto pos = groupAddrMap.find(groupName);
-    if(pos != groupAddrMap.end()){
-        groupAddrMap.erase(pos);
-    }
     qlibc::QData propertyItem;
-    propertyItem.setString("group_address", intAddr2FullAddr(intAddr));
+    propertyItem.setString("group_name", groupName);
 
-    groupAddrMap.insert(std::make_pair(groupName, propertyItem.asValue()));
-}
-
-string GroupAddressMap::getAddress(string &groupName) {
-    std::lock_guard<std::recursive_mutex> lg(rMutex_);
-
-    auto pos = groupAddrMap.find(groupName);
-    if( pos != groupAddrMap.end()){
-        return pos->second["group_address"].asString();
-    }
-
-    //如果设备列表为空
-    if(groupAddrMap.empty()){
-        insert(groupName, 1);
-        map2JsonDataAndSave2File();
-        return intAddr2FullAddr(1);
-    }
-
-    //将数字地址存入vector并排序
-    std::vector<int> addrVec;
-    for(auto& elem : groupAddrMap){
-        int unicastInt = stoi(elem.second["group_address"].asString().substr(2, 2),
-                              nullptr, 16);
-        addrVec.push_back(unicastInt);
-    }
-    sort(addrVec.begin(), addrVec.end(), less<>());
-
-    //如果有空隙，则返回最小空隙值
-    for(unsigned int i = 0; i < addrVec.size(); ++i){
-        if(addrVec[i] !=  i + 1){
-            insert(groupName, i + 1);
-            map2JsonDataAndSave2File();
-            return intAddr2FullAddr(i + 1);
-        }
-    }
-
-    //没有空隙
-    insert(groupName, addrVec.size() + 1);
-    map2JsonDataAndSave2File();
-    return intAddr2FullAddr(addrVec.size() + 1);
+    groupAddrMap.insert(std::make_pair(intAddr2FullAddr(intAddr), propertyItem.asValue()));
 }

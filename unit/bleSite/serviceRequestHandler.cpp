@@ -27,6 +27,46 @@ static const nlohmann::json errResponse = {
 };
 
 
+void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
+    for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
+        qlibc::QData deviceItem = deviceList.getArrayElement(i);
+        string device_id = deviceItem.getString("device_id");
+        string group_id = deviceItem.getString("group_id");
+        if(device_id.empty() && group_id.empty()){
+            continue;
+        }
+
+        string address;
+        if(!device_id.empty())
+            address = SnAddressMap::getInstance()->deviceSn2Address(device_id);
+        else
+            address = group_id;
+
+        if(address.empty())
+            continue;
+
+        qlibc::QData command_list = deviceItem.getData("command_list");
+        for(Json::ArrayIndex j = 0; j < command_list.size(); ++j){
+            qlibc::QData commandItem = command_list.getArrayElement(j);
+            string command_id = commandItem.getString("command_id");
+
+            qlibc::QData cmdData;
+            cmdData.setString("address", address);
+            cmdData.setString("command", command_id);
+
+            if(command_id == POWER){
+                cmdData.setString("commandPara", commandItem.getString("command_para"));
+
+            }else if(command_id == LUMINANCE || command_id == COLORTEMPERATURE){
+                cmdData.setInt("commandPara", commandItem.getInt("command_para"));
+            }
+
+            lc.parse(cmdData);
+        }
+    }
+}
+
+
 //获取扫描结果
 int scan_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
@@ -63,11 +103,12 @@ int add_device_service_handler(const Request& request, Response& response, Logic
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
             qlibc::QData cmdData;
-            cmdData.setString("command", "bind");
+            cmdData.setString("command", ADD_DEVICE);
             cmdData.putData("device_list", deviceList);
             lc.parse(cmdData);
         });
         response.set_content(okResponse.dump(), "text/json");
+
     }else{
         response.set_content(errResponse.dump(), "text/json");
     }
@@ -81,10 +122,13 @@ int del_device_service_handler(const Request& request, Response& response, Logic
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
-            qlibc::QData cmdData;
-            cmdData.setString("command", "unbind");
-            cmdData.putData("device_list", deviceList);
-            lc.parse(cmdData);
+            size_t deviceListSize = deviceList.size();
+            for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+                qlibc::QData cmdData;
+                cmdData.setString("command", "unbind");
+                cmdData.putData("deviceSn", deviceList.getArrayElement(i));
+                lc.parse(cmdData);
+            }
         });
         response.set_content(okResponse.dump(), "text/json");
     }else{
@@ -100,58 +144,7 @@ int control_device_service_handler(const Request& request, Response& response, L
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
-            for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
-                qlibc::QData deviceItem = deviceList.getArrayElement(i);
-
-                string device_id = deviceItem.getString("device_id");
-                string device_address;
-                device_address = SnAddressMap::getInstance()->deviceSn2Address(device_id);
-                if(device_address.empty()){
-                    device_address = GroupAddressMap::getInstance()->groupName2Address(device_id);
-                    if(device_address.empty()){
-                        continue;;
-                    }
-                }
-                qlibc::QData command_list = deviceItem.getData("command_list");
-
-                for(Json::ArrayIndex j = 0; j < command_list.size(); ++j){
-                    qlibc::QData commandItem = command_list.getArrayElement(j);
-                    string command_id = commandItem.getString("command_id");
-
-                    qlibc::QData cmdData;
-                    cmdData.setString("deviceAddress", device_address);
-                    cmdData.setString("command", command_id);
-
-                    if(command_id == POWER){
-                        cmdData.setString("commandPara", commandItem.getString("command_para"));
-
-                    }else if(command_id == LUMINANCE || command_id == COLORTEMPERATURE){
-                        cmdData.setInt("commandPara", commandItem.getInt("command_para"));
-                    }
-
-                    lc.parse(cmdData);
-                }
-            }
-        });
-
-        response.set_content(okResponse.dump(), "text/json");
-    }else{
-        response.set_content(errResponse.dump(), "text/json");
-    }
-    return 0;
-}
-
-//设备分组
-int group_device_service_handler(const Request& request, Response& response, LogicControl& lc){
-    qlibc::QData requestBody(request.body);
-    LOG_INFO << "==>: " << requestBody.toJsonString();
-    if(requestBody.type() != Json::nullValue){
-        bleConfig::getInstance()->enqueue([requestBody, &lc]{
-            qlibc::QData cmdData;
-            cmdData.setString("command", "group");
-            cmdData.setString("group_name", requestBody.getData("request").getString("group_name"));
-            cmdData.putData("device_list", requestBody.getData("request").getData("device_list"));
-            lc.parse(cmdData);
+            controlDevice(deviceList, lc);
         });
 
         response.set_content(okResponse.dump(), "text/json");
@@ -207,5 +200,161 @@ int BleDevice_command_test_service_handler(const Request& request, Response& res
         response.set_content(errResponse.dump(), "text/json");
     }
 
+    return 0;
+}
+
+
+//设备分组
+int group_device_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    if(requestBody.type() != Json::nullValue){
+        bleConfig::getInstance()->enqueue([requestBody, &lc]{
+            qlibc::QData cmdData;
+            cmdData.setString("command", "group");
+            cmdData.setString("group_name", requestBody.getData("request").getString("group_name"));
+            cmdData.putData("device_list", requestBody.getData("request").getData("device_list"));
+            lc.parse(cmdData);
+        });
+
+        response.set_content(okResponse.dump(), "text/json");
+    }else{
+        response.set_content(errResponse.dump(), "text/json");
+    }
+    return 0;
+}
+
+
+//创建分组
+int create_group_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    string groupName = requestBody.getData("request").getString("group_name");
+    GroupAddressMap::getInstance()->createGroup(groupName);
+
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
+
+//删除分组
+int delete_group_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    bleConfig::getInstance()->enqueue([requestBody, &lc]{
+        string group_id = requestBody.getData("request").getString("group_id");
+        qlibc::QData device_list;
+        qlibc::QData groupList = GroupAddressMap::getInstance()->getGroupList().getData("group_list");
+        size_t groupListSize = groupList.size();
+        for(Json::ArrayIndex i = 0; i < groupListSize; ++i){
+            qlibc::QData groupItem = groupList.getArrayElement(i);
+            if(groupItem.getString("group_id") == group_id){
+                device_list = groupItem.getData("device_list");
+            }
+        }
+
+        size_t deviceListSize = device_list.size();
+        for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+            qlibc::QData cmdData;
+            cmdData.setString("command", "delDeviceFromGroup");
+            cmdData.setString("group_id", group_id);
+            cmdData.setString("deviceSn", device_list.getArrayElement(i).asValue().asString());
+            lc.parse(cmdData);
+        }
+
+        GroupAddressMap::getInstance()->deleGroup(group_id);
+    });
+
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
+
+//重命名分组
+int rename_group_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    string groupId = requestBody.getData("request").getString("group_id");
+    string groupName = requestBody.getData("request").getString("group_name");
+    GroupAddressMap::getInstance()->reNameGroup(groupId, groupName);
+
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
+
+//添加设备进入分组
+int addDevice2Group_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    bleConfig::getInstance()->enqueue([requestBody, &lc]{
+        string group_id = requestBody.getData("request").getString("group_id");
+        qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
+        size_t deviceListSize = deviceList.size();
+        for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+            qlibc::QData cmdData;
+            cmdData.setString("command", "addDevice2Group");
+            cmdData.setString("group_id", group_id);
+            cmdData.putData("deviceSn", deviceList.getArrayElement(i));
+            lc.parse(cmdData);
+        }
+    });
+
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
+
+//从分组移除设备
+int removeDeviceFromGroup_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    bleConfig::getInstance()->enqueue([requestBody, &lc]{
+        string group_id = requestBody.getData("request").getString("group_id");
+        qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
+        size_t deviceListSize = deviceList.size();
+        for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+            qlibc::QData cmdData;
+            cmdData.setString("command", "delDeviceFromGroup");
+            cmdData.setString("group_id", group_id);
+            cmdData.putData("deviceSn", deviceList.getArrayElement(i));
+            lc.parse(cmdData);
+        }
+    });
+
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
+
+//控制分组
+int control_group_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+
+    if(requestBody.type() != Json::nullValue){
+        bleConfig::getInstance()->enqueue([requestBody, &lc]{
+            qlibc::QData groupList = requestBody.getData("request").getData("group_list");
+            controlDevice(groupList, lc);
+        });
+
+        response.set_content(okResponse.dump(), "text/json");
+    }else{
+        response.set_content(errResponse.dump(), "text/json");
+    }
+    return 0;
+}
+
+
+//获取分组列表
+int getGroupList_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    qlibc::QData retData;
+    retData.setInt("code", 0);
+    retData.setString("error", "ok");
+    retData.putData("response", GroupAddressMap::getInstance()->getGroupList());
+
+    response.set_content(retData.toJsonString(), "text/json");
     return 0;
 }

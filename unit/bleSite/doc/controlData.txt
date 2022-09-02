@@ -47,7 +47,7 @@
 {
 	"command" : "power",
 	"commandPara" : "on"
-	"deviceAddress" : "xxxx",
+	"address" : "xxxx",
 }
 
 
@@ -55,7 +55,7 @@
 {
 	"command" : "luminance",
 	"commandPara" : 255
-	"deviceAddress" : "xxxx",
+	"address" : "xxxx",
 }
 
 
@@ -63,14 +63,22 @@
 {
 	"command" : "color_temperature",
 	"commandPara" : 255
-	"deviceAddress" : "xxxx",
+	"address" : "xxxx",
 }
 
 
 //将设备添加进分组
 {
-    "command" : "group",
-	"groupName" : "group1"
+    "command" : "addDevice2Group",
+	"group_id" : "01C0"
+	"deviceSn" : "xxx"
+}
+
+
+//将设备从分组解除
+{
+    "command" : "delDeviceFromGroup",
+	"group_id" : "01C0"
 	"deviceSn" : "xxx"
 }
 
@@ -79,92 +87,7 @@
 
 //批量绑定：绑定指定的设备，或者绑定所有扫描到的设备
 {
-    "command" : "bind",
+    "command" : "add_device",
     "device_list" : [xxx, xxx,xxx]
 }
-
-//批量解绑：解绑指定的设备
-{
-    "command" : "unbind",
-    "device_list" : [xxx, xxx,xxx]
-}
-
-
-//将设备添加进分组
-{
-    "command" : "group",
-	"group_name" : "group1",
-	"device_list" : [
-	    "xxx",
-	    "xxx"
-	]
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

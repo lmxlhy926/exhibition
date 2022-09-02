@@ -24,19 +24,36 @@ void snAddrTest(char* argv[]){
 
 
 int main(int argc, char* argv[]){
-//    bleConfig* configPathPtr = bleConfig::getInstance();
-//    configPathPtr->setConfigPath(string(argv[1]));
-//
-//    GroupAddressMap *gamptr = GroupAddressMap::getInstance();
-//    string groupName = "group6";
-//    string deviceSn = "mac3";
-//    gamptr->addDevice2Group(groupName, deviceSn);
+    bleConfig* configPathPtr = bleConfig::getInstance();
+    configPathPtr->setConfigPath(string(argv[1]));
 
-    stringstream ss;
-    int ctlTemperature = 0;
-    ss << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
-    std::cout << ss.str() << std::endl;
+    GroupAddressMap *gamptr = GroupAddressMap::getInstance();
 
+    //创建分组
+    string groupName1 = "group1";
+    string groupName2 = "group2";
+    string groupName3 = "group4";
+//    LOG_INFO << gamptr->createGroup(groupName1);
+//    LOG_INFO << gamptr->createGroup(groupName2);
+//    LOG_INFO << gamptr->createGroup(groupName3);
+
+    //删除分组
+    string groupID = "02C0";
+//    gamptr->deleGroup(groupID);
+
+    //设备加入分组
+    string deviceSn1 = "sn1";
+    string deviceSn2 = "sn2";
+//    gamptr->addDevice2Group(groupID, deviceSn1);
+//    gamptr->addDevice2Group(groupID, deviceSn2);
+
+    //设备从分组剔除
+//    gamptr->removeDeviceFromGroup(groupID, deviceSn2);
+
+//    LOG_INFO << gamptr->getGroupList().toJsonString(true);
+
+    LOG_INFO << gamptr->groupName2GroupAddressId(groupName3);
+    LOG_INFO << gamptr->groupAddressId2GroupName(groupID);
 
     return 0;
 }

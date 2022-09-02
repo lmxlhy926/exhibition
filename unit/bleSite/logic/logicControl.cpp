@@ -20,7 +20,7 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
     if(bindingFlag.load())  return false;
     string command  = cmdData.getString("command");
 
-    if(command == BIND){      //设备批量绑定
+    if(command == ADD_DEVICE){      //设备批量绑定
         bindingFlag.store(true);
         qlibc::QData deviceSnArray = cmdData.getData("device_list");
         if(deviceSnArray.size() == 0){
@@ -28,28 +28,6 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
         }
         bd.bind(deviceSnArray);
         bindingFlag.store(false);
-
-    }else if(command == UNBIND){  //设备批量解绑
-        qlibc::QData deviceArray = cmdData.getData("device_list");
-        unsigned int size = deviceArray.size();
-        for(unsigned int i = 0; i < size; ++i){
-            qlibc::QData unbindData;
-            unbindData.setString("command", "unbind");
-            unbindData.setString("deviceSn", deviceArray.getArrayElement(i).asValue().asString());
-            DownBinaryCmd::transAndSendCmd(unbindData);
-        }
-
-    }else if(command == GROUP){
-        string group_name = cmdData.getString("group_name");
-        qlibc::QData device_list = cmdData.getData("device_list");
-        size_t deviceListSize = device_list.size();
-        for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
-            qlibc::QData groupData;
-            groupData.setString("command", "group");
-            groupData.setString("groupName", group_name);
-            groupData.setString("deviceSn", device_list.getArrayElement(i).asValue().asString());
-            DownBinaryCmd::transAndSendCmd(groupData);
-        }
 
     }else{  //设备控制指令
         DownBinaryCmd::transAndSendCmd(cmdData);

@@ -7,15 +7,15 @@
 #include "../parameter.h"
 #include "downBinaryFlowControl.h"
 
-bool DownBinaryCmd::transAndSendCmd(QData &controlData){
-    string binaryString = getBinaryString(controlData);
+bool DownBinaryCmd::transAndSendCmd(QData &cmdData){
+    string binaryString = getBinaryString(cmdData);
     downBinaryFlowControl::getInstance()->push(binaryString);
     return true;
 }
 
-string DownBinaryCmd::getBinaryString(QData &controlData) {
-    LOG_INFO << "controlData: " << controlData.toJsonString();
-    string command  = controlData.getString("command");
+string DownBinaryCmd::getBinaryString(QData &cmdData) {
+    LOG_INFO << "cmdData: " << cmdData.toJsonString();
+    string command  = cmdData.getString("command");
 
     if(command == SCAN){    //扫描命令
         return LightScan().getBinaryString();
@@ -24,36 +24,41 @@ string DownBinaryCmd::getBinaryString(QData &controlData) {
         return LightScanEnd().getBinaryString();
 
     }else if(command == CONNECT){   //连接命令
-        string deviceSn = controlData.getString("deviceSn");
+        string deviceSn = cmdData.getString("deviceSn");
         return LightConnect(deviceSn).getBinaryString();
 
     }else if(command == ASSIGN_GATEWAY_ADDRESS){    //分配网关地址
         return LightGatewayAddressAssign().getBinaryString();
 
     }else if(command == ASSIGN_NODE_ADDRESS){   //分配节点地址
-        string nodeAddress = controlData.getString("nodeAddress");
+        string nodeAddress = cmdData.getString("nodeAddress");
         return LightNodeAddressAssign(nodeAddress).getBinaryString();
 
     }else if(command == BIND){      //绑定
         return LightBind().getBinaryString();
 
     }else if(command == UNBIND){    //解绑
-        string deviceSn = controlData.getString("deviceSn");
+        string deviceSn = cmdData.getString("deviceSn");
         return LightUnBind(deviceSn).getBinaryString();
 
-    }else if(command == GROUP){     //分组
-        string deviceSn = controlData.getString("deviceSn");
-        string groupName = controlData.getString("groupName");
-        return LightGroup(deviceSn, groupName).getBinaryString();
+    }else if(command == AddDevice2Group){     //分组
+        string deviceSn = cmdData.getString("deviceSn");
+        string group_id = cmdData.getString("group_id");
+        return LightAdd2Group(deviceSn, group_id).getBinaryString();
+
+    }else if(command == DelDeviceFromGroup){
+        string deviceSn = cmdData.getString("deviceSn");
+        string group_id = cmdData.getString("group_id");
+        return LightDelFromGroup(deviceSn, group_id).getBinaryString();
 
     }else if(command == POWER){     //开关
-        return LightOnOff(controlData).getBinaryString();
+        return LightOnOff(cmdData).getBinaryString();
 
     }else if(command == LUMINANCE){     //亮度
-        return LightLuminance(controlData).getBinaryString();
+        return LightLuminance(cmdData).getBinaryString();
 
     }else if(command == COLORTEMPERATURE){  //色温
-        return LightColorTem(controlData).getBinaryString();
+        return LightColorTem(cmdData).getBinaryString();
     }
 
     return string();

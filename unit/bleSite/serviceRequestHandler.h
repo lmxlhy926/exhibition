@@ -22,9 +22,6 @@ int del_device_service_handler(const Request& request, Response& response, Logic
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 
-//设备分组
-int group_device_service_handler(const Request& request, Response& response, LogicControl& lc);
-
 //获取设备列表
 int get_device_list_service_handler(const Request& request, Response& response);
 
@@ -34,6 +31,28 @@ int get_device_state_service_handler(const Request& request, Response& response)
 
 //二进制控制指令
 int BleDevice_command_test_service_handler(const Request& request, Response& response);
+
+
+//创建分组
+int create_group_service_handler(const Request& request, Response& response);
+
+//删除分组
+int delete_group_service_handler(const Request& request, Response& response, LogicControl& lc);
+
+//重命名分组
+int rename_group_service_handler(const Request& request, Response& response);
+
+//添加设备进入分组
+int addDevice2Group_service_handler(const Request& request, Response& response, LogicControl& lc);
+
+//从分组移除设备
+int removeDeviceFromGroup_service_handler(const Request& request, Response& response, LogicControl& lc);
+
+//控制分组
+int control_group_service_handler(const Request& request, Response& response, LogicControl& lc);
+
+//获取分组列表
+int getGroupList_service_handler(const Request& request, Response& response);
 
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

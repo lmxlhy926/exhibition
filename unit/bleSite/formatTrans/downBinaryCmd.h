@@ -119,56 +119,87 @@ public:
     explicit LightUnBind(string& sn) : deviceSn(sn){}
 
     string getBinaryString() override{
-        string addr = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
-        if(addr.empty()){
+        string deviceAddress = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
+        if(deviceAddress.empty()){
             return "";
         }
-        string binaryString = "E8FF000000000203" + addr + "8049";
+        string binaryString = "E8FF000000000203" + deviceAddress + "8049";
         return binaryString;
     }
 };
 
 //设备分组
-class LightGroup : public JsonCmd2Binary{
+class LightAdd2Group : public JsonCmd2Binary{
 private:
     string deviceSn;
-    string groupName;
+    string group_id;
 public:
-    explicit LightGroup(string& sn, string& name) : deviceSn(sn), groupName(name){}
+    explicit LightAdd2Group(string& sn, string& address) : deviceSn(sn), group_id(address){}
 
     string getBinaryString() override{
         string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
         string deviceAddress = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
-        if(deviceAddress.empty()){
+        if(deviceAddress.empty() || group_id.empty()){
             return "";
         }
+
+        //添加设备进入分组
+        GroupAddressMap::getInstance()->addDevice2Group(group_id, deviceSn);
+
         string stringCmd;
         stringCmd.append(prefix).append(deviceAddress).append("801B");
         stringCmd.append(deviceAddress);
-        stringCmd.append(GroupAddressMap::getInstance()->getGroupAddr(groupName));
+        stringCmd.append(group_id);
         stringCmd.append(deleteWhiteSpace("00 10"));
         return stringCmd;
     }
 };
 
 
+//设备解除分组
+class LightDelFromGroup : public JsonCmd2Binary{
+private:
+    string deviceSn;
+    string group_id;
+public:
+    explicit LightDelFromGroup(string& sn, string& address) : deviceSn(sn), group_id(address){}
+
+    string getBinaryString() override{
+        string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
+        string deviceAddress = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
+        if(deviceAddress.empty() || group_id.empty()){
+            return "";
+        }
+
+        //设备从分组剔除
+        GroupAddressMap::getInstance()->removeDeviceFromGroup(group_id, deviceSn);
+
+        string stringCmd;
+        stringCmd.append(prefix).append(deviceAddress).append("801C");
+        stringCmd.append(deviceAddress);
+        stringCmd.append(group_id);
+        stringCmd.append(deleteWhiteSpace("00 10"));
+        return stringCmd;
+    }
+};
+
 //开关
 class LightOnOff : public JsonCmd2Binary{
 private:
-    string deviceAddress;
+    string address;
     string onOff;
 public:
     explicit LightOnOff(qlibc::QData& data) { init(data); }
 
     void init(qlibc::QData& data){
-        deviceAddress = data.getString("deviceAddress");
+        address = data.getString("address");
         onOff = data.getString("commandPara");
     }
 
     string getBinaryString() override{
         string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
         string stringCmd;
-        stringCmd.append(prefix).append(deviceAddress).append("8202");
+        stringCmd.append(prefix).append(address).append("8202");
         if(onOff == "on"){
             stringCmd.append("01");
         }else if(onOff == "off"){
@@ -180,17 +211,18 @@ public:
     }
 };
 
+
 //亮度
 class LightLuminance : public JsonCmd2Binary{
 private:
-    string deviceAddress;
+    string address;
     int luminanceVal = 0;
 
 public:
     explicit LightLuminance(qlibc::QData& data){ init(data); }
 
     void init(qlibc::QData& data){
-        deviceAddress = data.getString("deviceAddress");
+        address = data.getString("address");
         int tempLuminanceVal = data.getInt("commandPara");
         if(0 <= tempLuminanceVal && tempLuminanceVal <= 0xffff){
             luminanceVal = tempLuminanceVal;
@@ -205,24 +237,25 @@ public:
         ss << std::hex << std::uppercase << std::setw(4) << luminanceVal;
 
         string stringCmd;
-        stringCmd.append(prefix).append(deviceAddress).append("824C").append(ss.str());
+        stringCmd.append(prefix).append(address).append("824C").append(ss.str());
         stringCmd.append(deleteWhiteSpace("00 00 00"));
 
         return stringCmd;
     }
 };
 
+
 //色温
 class LightColorTem : public JsonCmd2Binary{
 private:
-    string deviceAddress;
+    string address;
     int ctlTemperature;
 
 public:
     explicit LightColorTem(qlibc::QData& data){ init(data); }
 
     void init(qlibc::QData& data){
-        deviceAddress = data.getString("deviceAddress");
+        address = data.getString("address");
         int tempCtlTemperature = data.getInt("commandPara");
         if(2700 <= tempCtlTemperature && tempCtlTemperature <= 6500){
             ctlTemperature = tempCtlTemperature;
@@ -238,7 +271,7 @@ public:
         string ctlTemperatureStr = ss.str();
 
         string stringCmd;
-        stringCmd.append(prefix).append(deviceAddress).append("8264");
+        stringCmd.append(prefix).append(address).append("8264");
         stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
         stringCmd.append(deleteWhiteSpace("00 00"));
         stringCmd.append(deleteWhiteSpace("00 00 00"));

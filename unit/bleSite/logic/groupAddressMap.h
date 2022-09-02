@@ -29,23 +29,29 @@ public:
         return instance;
     }
 
-    //获取组地址
-    string getGroupAddr(string groupName);
+    //创建分组
+    bool createGroup(string groupName);
+
+    //删除分组
+    void deleGroup(string& groupId);
+
+    //分组重命名
+    void reNameGroup(string& groupId, string& groupName);
 
     //设备加入分组
-    void addDevice2Group(string& groupName, string& deviceSn);
+    void addDevice2Group(string& groupId, string& deviceSn);
 
-    //删除对应的条目并更新存储文件
-    void deleteGroupItem(string& groupName);
+    //设备从分组剔除
+    void removeDeviceFromGroup(string& groupId, string& deviceSn);
 
-    //获取组列表
+    //返回分组列表
     qlibc::QData getGroupList();
 
-    //groupName--->groupAddress
-    string groupName2Address(string groupName);
+    //groupName--->groupAddressID
+    string groupName2GroupAddressId(string groupName);
 
     //groupAddress--->groupName
-    string groupAddr2GroupName(string groupAddr);
+    string groupAddressId2GroupName(string groupAddrId);
 
 private:
     //加载数据
@@ -57,11 +63,8 @@ private:
     //数值转换为组地址
     string intAddr2FullAddr(unsigned int i);
 
-    //插入条目，如果之前有此条目则先删除后插入
+    //插入条目
     void insert(string& groupName, unsigned int intAddr);
-
-    //找到最小可用数值，将可用数值转换组为地址
-    string getAddress(string& groupName);
 };
 
 #endif //EXHIBITION_GROUPADDRESSMAP_H

@@ -14,13 +14,21 @@ static const int ConfigPort = 9006;
 static const int BleSitePort = 60009;
 
 //服务ID
-static const string Control_Device_Service_ID     = "control_device";       //控制设备
+static const string Scan_Device_Service_ID        = "scan_device";          //扫描设备结果
 static const string Add_Device_Service_ID         = "add_device";           //添加设备
 static const string Del_Device_Service_ID         = "del_device";           //删除设备
-static const string Group_Device_Service_ID       = "group_device";         //设备分组
+static const string Control_Device_Service_ID     = "control_device";       //控制设备
 static const string Get_DeviceList_Service_ID     = "get_device_list";      //获取设备列表
 static const string Get_DeviceState_Service_ID    = "get_device_state";     //获取设备状态
-static const string Scan_Device_Service_ID        = "scan_device";          //扫描设备结果
+
+//分组
+static const string CreateGroup_Device_Service_ID               = "create_group";               //创建分组
+static const string DeleteGroup_Device_Service_ID               = "delete_group";               //删除分组
+static const string RenameGroup_Device_Service_ID               = "rename_group";               //重命名分组
+static const string AddDevice2Group_Device_Service_ID           = "add_device_to_group";        //添加设备进分组
+static const string RemoveDeviceFromGroup_Device_Service_ID     = "remove_device_from_group";   //从分组删除设备
+static const string ControlGroup_Device_Service_ID              = "control_group";              //控制分组
+static const string GetGroupList_Device_Service_ID              = "get_group_list";             //获取分组列表
 
 //二进制指令调试
 static const string Ble_Device_Test_Command_Service_ID = "BleDeviceCommand";
@@ -33,7 +41,7 @@ static const string BindEndMsg =                       "bindEndMsg";
 static const string Device_State_Changed =             "device_state_changed";
 
 
-//控制命令
+//内部基本控制指令
 #define SCAN                        "scan"
 #define SCANEND                     "scanEnd"
 #define BIND                        "bind"
@@ -41,7 +49,11 @@ static const string Device_State_Changed =             "device_state_changed";
 #define CONNECT                     "connect"
 #define ASSIGN_GATEWAY_ADDRESS      "assignGateWayAddress"
 #define ASSIGN_NODE_ADDRESS         "assignNodeAddress"
-#define GROUP                       "group"
+
+#define ADD_DEVICE                  "add_device"
+
+#define AddDevice2Group             "addDevice2Group"
+#define DelDeviceFromGroup          "delDeviceFromGroup"
 
 #define POWER                       "power"
 #define LUMINANCE                   "luminance"

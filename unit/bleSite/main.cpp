@@ -86,11 +86,6 @@ int main(int argc, char* argv[]) {
                                                       [&lc](const Request& request, Response& response) -> int{
         return control_device_service_handler(request, response, lc);
     });
-    //设备分组
-    serviceSiteManager->registerServiceRequestHandler(Group_Device_Service_ID,
-                                                      [&lc](const Request& request, Response& response) -> int{
-        return group_device_service_handler(request, response, lc);
-    });
 
     //获取设备列表
     serviceSiteManager->registerServiceRequestHandler(Get_DeviceList_Service_ID,
@@ -108,6 +103,40 @@ int main(int argc, char* argv[]) {
                                                       [](const Request& request, Response& response) -> int{
         return BleDevice_command_test_service_handler(request, response);
     });
+
+
+    //创建分组
+    serviceSiteManager->registerServiceRequestHandler(CreateGroup_Device_Service_ID, create_group_service_handler);
+
+    //删除分组
+    serviceSiteManager->registerServiceRequestHandler(DeleteGroup_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return delete_group_service_handler(request, response, lc);
+    });
+
+    //重命名分组
+    serviceSiteManager->registerServiceRequestHandler(RenameGroup_Device_Service_ID, rename_group_service_handler);
+
+    //添加设备进分组
+    serviceSiteManager->registerServiceRequestHandler(AddDevice2Group_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return addDevice2Group_service_handler(request, response, lc);
+    });
+
+    //从分组删除设备
+    serviceSiteManager->registerServiceRequestHandler(RemoveDeviceFromGroup_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return removeDeviceFromGroup_service_handler(request, response, lc);
+    });
+
+    //控制分组
+    serviceSiteManager->registerServiceRequestHandler(ControlGroup_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return control_group_service_handler(request, response, lc);
+    });
+
+    //获取分组列表
+    serviceSiteManager->registerServiceRequestHandler(GetGroupList_Device_Service_ID, getGroupList_service_handler);
 
 
     // 站点监听线程启动
