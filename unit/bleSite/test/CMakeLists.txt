@@ -8,8 +8,7 @@ target_link_libraries(httpRequest PRIVATE qlibc)
 target_link_libraries(httpRequest PRIVATE format)
 target_link_libraries(httpRequest PRIVATE serial)
 target_link_libraries(httpRequest PRIVATE socket)
-
-
+target_link_libraries(httpRequest PRIVATE common)
 
 add_executable(bleSiteRequest bleRequest.cpp)
 target_link_libraries(bleSiteRequest PRIVATE qlibc)

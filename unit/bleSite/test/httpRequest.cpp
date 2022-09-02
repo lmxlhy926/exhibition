@@ -3,25 +3,24 @@
 #include <iostream>
 #include <string>
 #include "common/httplib.h"
+#include "log/Logging.h"
 #include "qlibc/QData.h"
 
 int main(int argc, char* argv[]){
 
-    string on = R"({"service_id":"BleDeviceCommand","request":{"command":"turnOn","device_id":"FFFF","status_value":"on"}})";
-    string off = R"({"service_id":"BleDeviceCommand","request":{"command":"turnOff","device_id":"FFFF","status_value":"on"}})";
+    string on = R"({"service_id":"control_device","request":{"device_list":[{"device_id":"A8270F971B30","command_list":[{"command_id":"power","command_para":"on"}]}]}})";
+    string off = R"({"service_id":"control_device","request":{"device_list":[{"device_id":"A8270F971B30","command_list":[{"command_id":"power","command_para":"off"}]}]}})";
+
 
     httplib::Client client("127.0.0.1", 60009);
-    for(int i = 0; i < 1000 * 10; i++){
+    for(int i = 0; i < 60; i++){
         if( i % 2 == 0){
             httplib::Result result =  client.Post("/", on, "text/json");
-            if(result != nullptr){
-                printf("==>response: %s\n", result.value().body.c_str());
-            }
+            LOG_INFO << "--->ON.....";
+
         }else{
             httplib::Result result =  client.Post("/", off, "text/json");
-            if(result != nullptr){
-                printf("==>response: %s\n", result.value().body.c_str());
-            }
+            LOG_RED << "--->OFF.....";
         }
 
     }
