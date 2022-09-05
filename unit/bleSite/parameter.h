@@ -44,6 +44,10 @@ static const string BindEndMsg =                       "bindEndMsg";
 static const string Device_State_Changed =             "device_state_changed";
 
 
+//站点订阅的消息
+static const string WhiteList_Changed =   "whiteListModifiedByAppMsg";
+
+
 //内部基本控制指令
 #define SCAN                        "scan"
 #define SCANEND                     "scanEnd"

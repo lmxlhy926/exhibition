@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
     //set site supported subscribed message
     serviceSiteManager->registerMessageId(WHITELIST_MESSAGE_ID);
     serviceSiteManager->registerMessageId(RECEIVED_WHITELIST_ID);
+    serviceSiteManager->registerMessageId(WHITELIST_MODIFIED_MESSAGE_ID);
 
 
    //. 设置配置文件加载路径

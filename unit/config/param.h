@@ -23,8 +23,9 @@ static const string RADAR_DEVICE_STATUS_MESSAGE_ID = "";                    //�
 static const string REGISTERAGAIN_MESSAGE_ID = "register2QuerySiteAgain";   //重新向南向站点注册
 
 //消息发布ID
-static const string TVSOUND_MESSAGE_ID = "getTvSound";              //电视发声事件上报
-static const string DEVICE_STATUS_MESSAGE_ID = "allDeviceStatus";   //设备状态上报
+static const string TVSOUND_MESSAGE_ID = "getTvSound";                              //电视发声事件上报
+static const string DEVICE_STATUS_MESSAGE_ID = "allDeviceStatus";                   //设备状态上报
+static const string WHITELIST_MODIFIED_MESSAGE_ID = "whiteListModifiedByAppMsg";    //白名单被app修改
 
 //请求url
 static const string SCENELIST_URL = "/logic-device/scene/list";                            //请求场景列表URL

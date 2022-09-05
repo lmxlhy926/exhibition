@@ -55,4 +55,8 @@ int control_group_service_handler(const Request& request, Response& response, Lo
 int getGroupList_service_handler(const Request& request, Response& response);
 
 
+//通过白名单列表更新设备列表信息
+void updateDeviceList(const Request& request);
+
+
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H
