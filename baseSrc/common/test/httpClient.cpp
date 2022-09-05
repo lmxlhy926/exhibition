@@ -2,14 +2,10 @@
 #include "qlibc/QData.h"
 #include "common/httplib.h"
 #include "log/Logging.h"
+#include "../httpUtil.h"
 
-//{
-//"service_id": "sceneListRequest",
-//"request": {}
-//}
 
-int main(int argc, char* argv[]){
-
+void clientTest(){
     qlibc::QData data;
     data.setString("service_id", "whiteListRequest");
     data.putData("request", qlibc::QData());
@@ -24,7 +20,24 @@ int main(int argc, char* argv[]){
         }
         std::this_thread::sleep_for(std::chrono::milliseconds (1));
     }
+}
 
+
+
+int main(int argc, char* argv[]){
+    SiteRecord::getInstance()->addSite("config", "127.0.0.1", 9000);
+    SiteRecord::getInstance()->addSite("query", "127.0.0.1", 90006);
+    SiteRecord::getInstance()->addSite("query", "127.0.0.1", 90007);
+
+    qlibc::QData request;
+    request.setString("hello", "world");
+
+    qlibc::QData response;
+
+    bool flag = SiteRecord::getInstance()->sendRequest2Site("config", request, response);
+    std::cout << "flag: " << flag << std::endl;
+
+    SiteRecord::getInstance()->printMap();
 
     return 0;
 }
