@@ -18,6 +18,7 @@
 #include "formatTrans/downBinaryCmd.h"
 #include "formatTrans/downBinaryFlowControl.h"
 #include "logic/logicControl.h"
+#include "common/httpUtil.h"
 
 using namespace std;
 using namespace servicesite;
@@ -33,6 +34,8 @@ int main(int argc, char* argv[]) {
     httplib::ThreadPool threadPool_(10);
     std::atomic<bool> http_server_thread_end(false);
 
+    //站点请求管理
+    SiteRecord::getInstance()->addSite(ConfigSiteName, LocalIp, ConfigPort);
     //流控
     downBinaryFlowControl::getInstance();
 

@@ -9,8 +9,11 @@
 
 using namespace std;
 
-static const string Ip = "127.0.0.1";
+static const string LocalIp = "127.0.0.1";
+
+static const string ConfigSiteName = "config";
 static const int ConfigPort = 9006;
+
 static const int BleSitePort = 60009;
 
 //服务ID

@@ -264,7 +264,7 @@ public:
         request.setString("service_id", "whiteListDeleteRequest");
         request.putData("request", qlibc::QData(device_list_content));
         qlibc::QData response;
-        httpUtil::sitePostRequest(Ip, ConfigPort, request, response);
+        SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, request, response);
         LOG_HLIGHT << "==>deleteDeviceList2ConfigSite: " << request.toJsonString();
 
         //发布设备解绑消息

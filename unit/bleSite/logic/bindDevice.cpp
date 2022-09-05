@@ -126,7 +126,7 @@ void BindDevice::updateDeviceList2ConfigSite() {
     request.setString("service_id", "whiteListUpdateRequest");
     request.putData("request", bleConfig::getInstance()->getDeviceListData());
     qlibc::QData response;
-    httpUtil::sitePostRequest(Ip, ConfigPort, request, response);
+    SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, request, response);
     LOG_HLIGHT << "==>updateDeviceList2ConfigSite";
 }
 
