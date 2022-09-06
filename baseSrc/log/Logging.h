@@ -102,13 +102,11 @@ namespace muduo{
             int line_;                  //打印语句所在的行
             Logger::LogLevel level_;    //打印方式
             LogStream stream_;          //打印流，用于输出打印
-            TimeStamp timeStamp;        //时间戳
 
         public:
             explicit Impl(const char* fileName, int line, const char* func, Logger::LogLevel level)
-                : fileName_(fileName), line_(line), level_(level), timeStamp(TimeStamp::now()){
-                stream_ << timeStamp.toFormattedString() << "-<" << fileName_.data()
-                << "-" << line_  << "-" << func << "> ";
+                : fileName_(fileName), line_(line), level_(level){
+                stream_ << "<" << TimeStamp::toFormattedString() << "> ";
             }
 
             void finish(){ stream_ << "\n"; }

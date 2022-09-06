@@ -3,6 +3,9 @@
 #include "common/httplib.h"
 #include <fstream>
 #include "qlibc/QData.h"
+#include <ctime>
+#include <sys/time.h>
+
 
 void allTypeTest(){
 
@@ -67,18 +70,29 @@ void test(){
 
 }
 
+void printColor(){
+    LOG_INFO << "INFO";
+    LOG_GREEN << "GREEN";
+    LOG_HLIGHT << "HLIGHT";
+    LOG_BLUE << "BLUE";
+    LOG_RED << "RED";
+    LOG_YELLOW << "YELLOW";
 
+}
 
 int main(int argc, char* argv[]){
+    struct timeval tv;
+    struct timezone tz;
+    struct tm *t;
 
-//    threadLogTest();
-//    test();
+    gettimeofday(&tv, &tz);
+    t = localtime(&tv.tv_sec);
+    printf("time_now: %d-%d-%d %d:%d:%d.%ld\n", 1900 + t->tm_year, 1 + t->tm_mon, t->tm_mday,
+                                                t->tm_hour, t->tm_min, t->tm_sec, tv.tv_usec);
 
-    LOG_INFO << "1";
-    LOG_RED << "1";
-    LOG_YELLOW << "1";
-    LOG_GREEN << "1";
 
+
+    printColor();
 
     return 0;
 }

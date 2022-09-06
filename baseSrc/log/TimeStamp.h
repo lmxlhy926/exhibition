@@ -31,7 +31,7 @@ namespace muduo{
 
         static TimeStamp fromUnixTime(time_t t);
 
-        string toFormattedString(bool printOption = true) const;
+        static string toFormattedString(bool printOption = true);
     };
 }
 
