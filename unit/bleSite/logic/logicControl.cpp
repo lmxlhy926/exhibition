@@ -65,7 +65,7 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
         deviceArray.append(Json::Value(elem.first));
     }
 
-    LOG_HLIGHT << "==>deviceArray: " << deviceArray.toJsonString(true);
+    LOG_GREEN << "==>deviceArray: " << deviceArray.toJsonString(true);
 
     //发布扫描结果
     qlibc::QData content, publishData;

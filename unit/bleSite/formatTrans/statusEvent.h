@@ -164,7 +164,7 @@ public:
         qlibc::QData data;
         data.setString("deviceSn", deviceSn);
         if(!deviceSn.empty()){
-            LOG_GREEN << "<<===: scanResult Event, deviceSn = " << deviceSn;
+            LOG_YELLOW << "<<===: scanResult Event, deviceSn = " << deviceSn;
             EventTable::getInstance()->scanResultEvent.putData(data);
             EventTable::getInstance()->scanResultEvent.notify_one();
         }

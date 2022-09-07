@@ -146,22 +146,22 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageHandler(WhiteList_Changed, updateDeviceList);
 
     //订阅白名单改变消息
-    threadPool_.enqueue([&](){
-        while(true){
-            int code;
-            std::vector<string> messageIdList;
-            messageIdList.push_back(WhiteList_Changed);
-            code = serviceSiteManager->subscribeMessage(LocalIp, ConfigPort, messageIdList);
-
-            if (code == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage whiteListModifiedByAppMsg ok.\n");
-                break;
-            }
-
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-            printf("subscribed whiteListModifiedByAppMsg failed....., start to subscribe in 3 seconds\n");
-        }
-    });
+//    threadPool_.enqueue([&](){
+//        while(true){
+//            int code;
+//            std::vector<string> messageIdList;
+//            messageIdList.push_back(WhiteList_Changed);
+//            code = serviceSiteManager->subscribeMessage(LocalIp, ConfigPort, messageIdList);
+//
+//            if (code == ServiceSiteManager::RET_CODE_OK) {
+//                printf("subscribeMessage whiteListModifiedByAppMsg ok.\n");
+//                break;
+//            }
+//
+//            std::this_thread::sleep_for(std::chrono::seconds(3));
+//            printf("subscribed whiteListModifiedByAppMsg failed....., start to subscribe in 3 seconds\n");
+//        }
+//    });
 
 
     // 站点监听线程启动
