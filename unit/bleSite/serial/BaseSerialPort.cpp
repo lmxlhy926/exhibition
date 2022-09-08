@@ -5,11 +5,10 @@
 #include <memory.h>
 #include "BaseSerialPort.h"
 
-int nM_len = 0;
-unsigned char pMsg[ival_comm_buff_size] = {0x00};
+unsigned char packageMessage2Handled[MaxMessageSize] = {0x00};
 
 BaseSerialPort::BaseSerialPort(){
-    memset(mSerialDataBuff, 0, ival_comm_buff_size);
+    memset(mSerialDataBuff, 0, MaxMessageSize);
     mBuffLen = 0;
     m_bThread_alive = false;
     is_opened = false;
@@ -17,8 +16,8 @@ BaseSerialPort::BaseSerialPort(){
 
 BaseSerialPort::~BaseSerialPort() {
     if(read_thread_!= nullptr && read_thread_->joinable())
-        read_thread_->join();
-    delete read_thread_;
+        read_thread_->join();   //阻塞回收线程
+    delete read_thread_;        //线程析构
     read_thread_ = nullptr;
 }
 
@@ -26,10 +25,11 @@ bool BaseSerialPort::startReadSerialData(){
     if(!is_opened)
         return false;
 
+    //创建线程，读取数据
     read_thread_ = new std::thread([this]() {
         readSerialData();
     });
-    //todo ???
+
     read_thread_->detach();
 
     return true;
@@ -66,46 +66,50 @@ bool BaseSerialPort::setDataStartEndByte(unsigned char start, unsigned char end)
 }
 
 void BaseSerialPort::onSerialDataRead() {
-//    uint8_t* pMsg = nullptr;
-    int32_t nM_len = 0;
-    uint8_t* pMsg_start = nullptr;
-    uint8_t* pStart = mSerialDataBuff;
+    int32_t packageLength = 0;
+    uint8_t* possiblePackageStart = mSerialDataBuff + mBuffLen;
+    uint8_t* receiveBufBegin = mSerialDataBuff;
     int j = 0;
 
-    pMsg_start = mSerialDataBuff;
-    for (int i = 0; i < mBuffLen-1;i++)
+    possiblePackageStart = mSerialDataBuff;
+    for (unsigned int i = 0; i < mBuffLen;i++)
     {
-        if (pStart[i] == data_start_byte)
+        //定位到包消息头
+        if (receiveBufBegin[i] == data_start_byte)
         {
-            //定位到包头
-            pMsg_start = pStart + i;
+            possiblePackageStart = receiveBufBegin + i;
+
+            //寻找包尾
             for (j = i+1; j < mBuffLen; j++)
             {
                 //定位到包尾
-                if (pStart[j] == data_end_byte)
+                if (receiveBufBegin[j] == data_end_byte)
                 {
-                    nM_len = j - i +1;      //包长度
-//                    pMsg = new uint8_t[nM_len];
-                    if(pMsg != NULL)
-                    {
-                        memcpy(pMsg, pStart + i, nM_len);
-                        if(recv_call_back != nullptr)
-                            recv_call_back(pMsg, nM_len);
-                    }
+                    packageLength = j - i +1;      //包长度
+                    memcpy(packageMessage2Handled, receiveBufBegin + i, packageLength);
+                    if(recv_call_back != nullptr)
+                        recv_call_back(packageMessage2Handled, packageLength);
+
                     //移到已处理包的下一个位置
-                    pMsg_start = pStart + i + nM_len;
-                    i += nM_len;
+                    possiblePackageStart = receiveBufBegin + i + packageLength;
+                    i += packageLength - 1;
+
 
                     //清空存放包数据的数组
-                    memset(pMsg, 0x00, ival_comm_buff_size);
-                    nM_len = 0;
+                    memset(packageMessage2Handled, 0x00, MaxMessageSize);
+                    break;
+                }
+
+                //没有找到结束标志
+                if(mBuffLen -1 == j){
+                    i = mBuffLen - 1;
                 }
             }
         }
     }
 
     //保留剩余的未处理数据到缓冲区头部
-    mBuffLen = (mSerialDataBuff + mBuffLen) - pMsg_start;
-    memmove(mSerialDataBuff, pMsg_start, mBuffLen);
-    memset(mSerialDataBuff + mBuffLen, 0, ival_comm_buff_size - mBuffLen);
+    mBuffLen = (mSerialDataBuff + mBuffLen) - possiblePackageStart;
+    memmove(mSerialDataBuff, possiblePackageStart, mBuffLen);
+    memset(mSerialDataBuff + mBuffLen, 0, MaxMessageSize - mBuffLen);
 }

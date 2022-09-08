@@ -11,6 +11,16 @@
 
 using namespace muduo;
 
+
+void tempPrint(const unsigned char *binaryStream, int size){
+    stringstream ss;
+    for (int i = 0; i < size; i++) {
+        ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << static_cast<int>(binaryStream[i]);
+    }
+    LOG_INFO << ss.str();
+}
+
+
 /*
  * 1. 处理转义数据
  * 2. 二进制格式转换为字符串形式
@@ -54,8 +64,12 @@ void printBinaryString(string &str) {
 
 
 bool UpBinaryCmd::bleReceiveFunc(unsigned char *binaryStream, int size) {
-    string binaryString = binaryCmd2String(binaryStream, size);
-    PostStatusEvent(binaryString).operator()();
+
+    tempPrint(binaryStream, size);
+
+//    string binaryString = binaryCmd2String(binaryStream, size);
+//    PostStatusEvent(binaryString).operator()();
+
     return true;
 }
 

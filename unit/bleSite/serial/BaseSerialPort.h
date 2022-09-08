@@ -10,8 +10,7 @@
 
 typedef bool (*RECV_DATA_CALLBACK)(unsigned char *pMsg, int len);
 
-const static uint16_t ival_comm_buff_size = 1024;
-const static uint16_t ival_comm_buff_max = 32768;
+const static uint16_t MaxMessageSize = 1024;
 
 //设置串口参数结构体
 typedef struct serial_param{
@@ -48,7 +47,7 @@ protected:
     bool is_opened;                                         //串口是否打开
     std::thread *read_thread_ = nullptr;                    //线程
     std::string serial_port_name;                           //串口名
-    unsigned char mSerialDataBuff[ival_comm_buff_size];     //从串口读取到的数据
+    unsigned char mSerialDataBuff[MaxMessageSize];     //从串口读取到的数据
     unsigned int  mBuffLen;                                 //读取到的数据的长度
     unsigned char data_start_byte = 0x01;                   //起始读字符
     unsigned char data_end_byte = 0x03;                     //终止读字符
