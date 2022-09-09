@@ -88,6 +88,11 @@
 //批量绑定：绑定指定的设备，或者绑定所有扫描到的设备
 {
     "command" : "add_device",
-    "device_list" : [xxx, xxx,xxx]
+    "device_list" : [
+        {
+            "deviceSn": "xxxx",
+            "deviceType": "xxxx"
+        }
+    ]
 }
 

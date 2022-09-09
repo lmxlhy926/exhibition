@@ -18,7 +18,7 @@ public:
     void bind(qlibc::QData& deviceArray);
 
 private:
-    bool addDevice(string& deviceSn);
+    bool addDevice(string& deviceSn, string& deviceType);
 
     void updateDeviceList2ConfigSite();
 };

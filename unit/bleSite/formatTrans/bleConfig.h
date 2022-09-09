@@ -18,6 +18,7 @@ private:
     string dataDirPath;                         //配置文件路径
     QData bleParamData;                         //蓝牙命令配置数据
     QData serialData;                           //串口配置数据
+    QData deviceTypeData;                       //设备类型数据
     QData snAddressData;                        //蓝牙设备地址表
     QData groupAddressData;                     //组地址数据
     QData deviceListData;                       //蓝牙设备列表
@@ -43,6 +44,9 @@ public:
     //获取串口配置数据
     QData getSerialData();
 
+    //获取设备类型数据
+    QData getDeviceTypeData();
+
     //获取device-mac记录表
     QData getSnAddrData();
 
@@ -53,7 +57,7 @@ public:
     QData getDeviceListData();
 
     //插入新绑定的设备条目
-    void insertDeviceItem(string& deviceID);
+    void insertDeviceItem(string& deviceID, string& deviceType);
 
     //删除解绑的设备
     void deleteDeviceItem(string& deviceID);

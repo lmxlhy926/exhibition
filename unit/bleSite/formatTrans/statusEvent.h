@@ -17,6 +17,7 @@
 #include "../parameter.h"
 #include "bleConfig.h"
 #include "common/httpUtil.h"
+#include "deviceTypeExtract.h"
 
 using namespace servicesite;
 using namespace std;
@@ -155,6 +156,7 @@ class ScanResult : ReportEvent{
 private:
     string sourceData;
     string deviceSn;
+    string deviceUUID;
 public:
     explicit ScanResult(string data) : sourceData(std::move(data)){
         init();
@@ -163,6 +165,7 @@ public:
     void postEvent() override{
         qlibc::QData data;
         data.setString("deviceSn", deviceSn);
+        data.setString("deviceType", deviceTypeExtract(deviceUUID).getDeviceType());
         if(!deviceSn.empty()){
             LOG_YELLOW << "<<===: scanResult Event, deviceSn = " << deviceSn;
             EventTable::getInstance()->scanResultEvent.putData(data);
@@ -173,6 +176,7 @@ private:
     void init(){
         ReadBinaryString rs(sourceData);
         rs.readBytes(deviceSn, 6);
+        rs.readBytes(3).readBytes(deviceUUID, 16);
     }
 };
 

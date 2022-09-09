@@ -41,6 +41,14 @@ QData bleConfig::getSerialData() {
     return serialData;
 }
 
+QData bleConfig::getDeviceTypeData(){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    if(deviceTypeData.empty()){
+        deviceTypeData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/bleDeviceType.json"));
+    }
+    return deviceTypeData;
+}
+
 QData bleConfig::getSnAddrData() {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     if(snAddressData.empty()){
@@ -67,7 +75,7 @@ QData bleConfig::getDeviceListData(){
  * 如果设备列表有该条目，则先删除该条目
  * 将新设备添加入设备列表中
  */
-void bleConfig::insertDeviceItem(string& deviceID){
+void bleConfig::insertDeviceItem(string& deviceID, string& deviceType){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     qlibc::QData deviceListArray = getDeviceListData().getData("device_list");
     size_t deviceListArraySize = deviceListArray.size();
@@ -81,6 +89,7 @@ void bleConfig::insertDeviceItem(string& deviceID){
     }
     qlibc::QData newItem;
     newItem.setString("device_id", deviceID);
+    newItem.setString("device_type", deviceType);
     deviceListArray.append(newItem);
 
     qlibc::QData saveData;
