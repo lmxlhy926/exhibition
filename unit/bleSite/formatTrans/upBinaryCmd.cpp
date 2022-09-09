@@ -11,6 +11,7 @@
 
 using namespace muduo;
 
+#include "statusEvent.h"
 
 void tempPrint(const unsigned char *binaryStream, int size){
     stringstream ss;
@@ -32,6 +33,7 @@ static string binaryCmd2String(const unsigned char *binaryStream, int size) {
     unsigned char buf[512];
     memset(buf, 0, 512);
 
+    //去掉包头标识符、包尾标识符，转义包内容
     if (binaryStream[0] == 0x01 && binaryStream[size - 1] == 0x03) {
         for (int i = 1; i < size - 1; i++) {
             if (binaryStream[i] == 0x02) {
@@ -62,10 +64,33 @@ void printBinaryString(string &str) {
     LOG_INFO << "==>serial receive: " << ss.str();
 }
 
+string UpBinaryCmd::packageString;
+std::mutex UpBinaryCmd::mutex_;
 
 bool UpBinaryCmd::bleReceiveFunc(unsigned char *binaryStream, int size) {
+    std::lock_guard<std::mutex> lg(mutex_);
     string binaryString = binaryCmd2String(binaryStream, size);
-    PostStatusEvent(binaryString).operator()();
+
+    //组包
+    string hciType, subType, packageIndex;
+    ReadBinaryString rs(binaryString);
+    rs.read2Byte().readByte(hciType).readByte(subType).readByte(packageIndex);
+
+    if(packageIndex == "00"){   //整包
+        PostStatusEvent(binaryString).operator()();
+
+    }else if(packageIndex == "01"){
+        packageString.clear();
+        packageString.append(binaryString);
+
+    }else if(packageIndex == "02"){
+        packageString.append(rs.remainingString());
+
+    }else if(packageIndex == "03"){
+        packageString.append(rs.remainingString());
+        PostStatusEvent(packageString).operator()();
+        packageString.clear();
+    }
 
     return true;
 }
