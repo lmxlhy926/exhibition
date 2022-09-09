@@ -214,32 +214,36 @@ void bleConfig::saveGroupListData(qlibc::QData& data){
     groupAddressData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/groupAddress.json"), true);
 }
 
-bool bleConfig::serialInit(bleConfig::SerialReceiveFunc receiveFuc) {
+bool bleConfig::serialInit(PackageMsgHandleFuncType func) {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    if(serial == nullptr){
-        string serialPort = getSerialData().getString("serial");
-        serial.reset(new BLETelinkDongle(serialPort));
-        serial->initDongle();
-        serial->regRecvDataProc(receiveFuc);
-        if(!serial->startDongle()){
-            LOG_INFO << "===>startDongle failed, serialPort <" << serialPort << ">.......";
-            serial.reset();
-            return false;
-        }else{
-            LOG_INFO << "===>startDongle successfully, serialPort <" << serialPort << ">.......";
-            return true;
-        }
+    string serialPort = getSerialData().getString("serial");
+
+    SerialParamStruct _sp;
+    _sp.stopbits = 1;
+    _sp.databits = 8;
+    _sp.parity = 'N';
+    _sp.baudrate = 115200;
+
+    serial.reset(new TelinkDongle(serialPort, _sp));
+    serial->registerPkgMsgFunc(std::move(func));
+
+    if(!serial->startReadAndHandleSerial()){
+        LOG_INFO << "===>startDongle failed, serialPort <" << serialPort << ">.......";
+        serial.reset();
+        return false;
+    }else{
+        LOG_INFO << "===>startDongle successfully, serialPort <" << serialPort << ">.......";
+        return true;
     }
-    return false;
 }
 
-shared_ptr<BLETelinkDongle> bleConfig::getSerial() {
+shared_ptr<TelinkDongle> bleConfig::getSerial() {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     return serial;
 }
 
 void bleConfig::enqueue(std::function<void()> fn) {
-    threadPool.enqueue(fn);
+    threadPool.enqueue(std::move(fn));
 }
 
 qlibc::QData bleConfig::defaultStatus() {

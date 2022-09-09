@@ -1,0 +1,2 @@
+add_executable(serialTest serialtest.cpp)
+target_link_libraries(serialTest PRIVATE serial)

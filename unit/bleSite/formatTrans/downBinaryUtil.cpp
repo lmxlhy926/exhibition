@@ -22,9 +22,9 @@ size_t DownBinaryUtil::binaryString2binary(string &binaryString, unsigned char *
 
 bool DownBinaryUtil::serialSend(unsigned char *buf, int size) {
     std::lock_guard<std::mutex> lg(sendMutex);
-    shared_ptr<BLETelinkDongle> serial = bleConfig::getInstance()->getSerial();
+    shared_ptr<TelinkDongle> serial = bleConfig::getInstance()->getSerial();
     if(serial != nullptr){
-        if(serial->sendData(buf, size)){
+        if(serial->write2Seria(buf, size)){
             printSendBinary(buf, size);
             return true;
         }

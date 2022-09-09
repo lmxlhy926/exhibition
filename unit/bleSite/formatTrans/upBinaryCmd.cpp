@@ -64,11 +64,8 @@ void printBinaryString(string &str) {
 
 
 bool UpBinaryCmd::bleReceiveFunc(unsigned char *binaryStream, int size) {
-
-    tempPrint(binaryStream, size);
-
-//    string binaryString = binaryCmd2String(binaryStream, size);
-//    PostStatusEvent(binaryString).operator()();
+    string binaryString = binaryCmd2String(binaryStream, size);
+    PostStatusEvent(binaryString).operator()();
 
     return true;
 }

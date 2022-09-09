@@ -83,7 +83,7 @@ public:
 class LightGatewayAddressAssign : public JsonCmd2Binary{
 public:
     string getBinaryString() override{
-        string binaryString = "E9FF091112131415161718191A1B1C1D1E1F20000000112233440100";
+        string binaryString = "E9FF091112131415161718191A1B1C1D1E1F20000000112233440001";
         return binaryString;
     }
 };

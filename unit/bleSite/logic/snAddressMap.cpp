@@ -89,7 +89,7 @@ void SnAddressMap::insert(string &deviceSn, unsigned int intAddr) {
 
 string SnAddressMap::intAddr2FullAddr(unsigned int i) {
     stringstream ss;
-    ss << "02" << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << i;
+    ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << i << "02";
     return ss.str();
 }
 
@@ -105,7 +105,7 @@ string SnAddressMap::getAddress(string &deviceSn) {
     //将数字地址存入vector并排序
     std::vector<int> addrVec;
     for(auto& elem : snAddrMap){
-        int unicastInt = stoi(elem.second["unicast_address"].asString().substr(2, 2),
+        int unicastInt = stoi(elem.second["unicast_address"].asString().substr(0, 2),
                               nullptr, 16);
         addrVec.push_back(unicastInt);
     }

@@ -1,7 +1,9 @@
 #include <iostream>
-#include "BLETelinkDongle.h"
-#include "log_tool.h"
-#include "httplib.h"
+#include "common/httplib.h"
+#include "qlibc/QData.h"
+#include "log/Logging.h"
+#include "serial/BLETelinkDongle.h"
+
 
 //unsigned char test[6] = {0x01, 0xE9, 0xFF, 0x02, 0x10, 0x03};
 unsigned char test[3] = {0xE9, 0xFF, 0x00};
@@ -13,84 +15,64 @@ unsigned char cmd_off[14] = {0xE8,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0x00,0
 httplib::Server svr;
 BLETelinkDongle *telinkD;
 
-bool fun(unsigned char *data, int len){
-    memset(tmp_buf, 0x00, 256);
-    printf("rev data len is %d,data is: ",len);
-    for(int i=0; i<len; i++)
-        printf("%02X ", data[i]);
-    printf("\n*****************************\n");
-//    int j = 0;
-//    int end_index = len-1;
-//    if(data[0]== 0x01)
-//    {
-//        for(int i=1; i<end_index; i++)
-//        {
-//            if(data[i]==0x02)
-//            {
-//                tmp_buf[j] = data[i+1]&0x0F;
-//                i = i+1;
-//            }
-//            else
-//                tmp_buf[j] = data[i];
-//            j = j+1;
-//        }
-//    }
-//
-//    printf("tras buf len is %d,buf is: ",j);
-//    for(int i=0; i<j; i++)
-//        printf("%02X ", tmp_buf[i]);
-//    printf("\n######################\n");
-    return true;
+bool tempPrint(unsigned char *binaryStream, int size){
+    stringstream ss;
+    for (int i = 0; i < size; i++) {
+        ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << static_cast<int>(binaryStream[i]);
+    }
+    LOG_INFO << ss.str();
 }
 
-void on_process(const httplib::Request &req, httplib::Response &res){
-    unsigned char cmd_data[14] = {0xE8,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0x00,0x82,0x02,0x01,0x00};
-    telinkD->sendData(cmd_data, 14);
-    res.set_content("ok", "text/plain");
-    res.status = 200;
-}
-void off_process(const httplib::Request &req, httplib::Response &res){
-    unsigned char cmd_data[14] = {0xE8,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0x00,0x82,0x02,0x00,0x00};
-    telinkD->sendData(cmd_data, 14);
+
+void cmd(const httplib::Request &req, httplib::Response &res){
+
+    qlibc::QData requestBody(req.body);
+    string command = requestBody.getData("request").getString("command");
+    LOG_INFO << "command: " << command;
+
+    if(command == "scan"){
+        unsigned char cmd_data[3] = {0xE9,0xFF,0x00};
+        telinkD->sendData(cmd_data, 3);
+        LOG_HLIGHT << "SCAN....";
+    }else{
+        unsigned char cmd_data[3] = {0xE9,0xFF,0x01};
+        telinkD->sendData(cmd_data, 3);
+        LOG_RED << "SCANEND.....";
+    }
+
     res.set_content("ok", "text/plain");
     res.status = 200;
 }
 
-bool startHttpService()
+void startHttpService()
 {
-    bool ret;
-
-    svr.Post("/turnOn", on_process);
-    svr.Post("/turnOff", off_process);
-
-    ret = svr.listen("0.0.0.0", 60009);
-    return ret;
+    svr.Post("/cmd", cmd);
+    svr.listen("0.0.0.0", 60009);
 }
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << "start test......." << std::endl;
+
+    telinkD = new BLETelinkDongle("ttyS2");
+    telinkD->initDongle();
+    telinkD->regRecvDataProc(tempPrint);
+    bool ret = telinkD->startDongle();
+    if(!ret)
+        printf("startDongle() \n");
 
     std::thread httpservice(startHttpService);
     httpservice.detach();
 
-    telinkD = new BLETelinkDongle("COM10");//("\\\\.\\COM10");
-    ipp_LogD("fdsafajfalf\n");
-    telinkD->initDongle();
-    telinkD->regRecvDataProc(fun);
-    bool ret = telinkD->startDongle();
-    if(!ret)
-        printf("startDongle() \n");
-//    telinkD->sendData(test, 3);
-    sleep_ms(500);
-//    while(1)
-//    {
-//        telinkD->sendData(cmd_on, 14);
-//        sleep_ms(200);
-//        telinkD->sendData(cmd_off, 14);
-//        sleep_ms(200);
-//    }
+    while(true){
+        this_thread::sleep_for(std::chrono::seconds(100));
+    }
+
+    return 0;
+}
 
 
+
+void turnOnOffTest(){
     std::string on = R"({"service_id":"BleDeviceCommand","request":{"command":"turnOn","device_id":"FFFF","status_value":"on"}})";
     std::string off = R"({"service_id":"BleDeviceCommand","request":{"command":"turnOff","device_id":"FFFF","status_value":"on"}})";
 
@@ -107,9 +89,5 @@ int main() {
                 printf("==>response: %s\n", result.value().body.c_str());
             }
         }
-        sleep_s(1);
-
     }
-
-    return 0;
 }
