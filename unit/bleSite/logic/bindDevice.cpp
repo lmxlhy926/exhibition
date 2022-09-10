@@ -21,9 +21,10 @@ void BindDevice::bind(QData &deviceArray) {
     Json::ArrayIndex arraySize = deviceArray.size();
     if(deviceArray.type() != Json::arrayValue) return;
     for(Json::ArrayIndex i = 0; i < arraySize; i++){
-        string deviceSn = deviceArray.getArrayElement(i).getString("deviceSn");
-        string deviceType = deviceArray.getArrayElement(i).getString("deviceType");
-        addDevice(deviceSn, deviceType);
+        string deviceSn = deviceArray.getArrayElement(i).getString("device_id");
+        string device_type = deviceArray.getArrayElement(i).getString("device_type");
+        string device_model = deviceArray.getArrayElement(i).getString("device_model");
+        addDevice(deviceSn, device_type, device_model);
         if(i != arraySize - 1 ){
             std::this_thread::sleep_for(std::chrono::seconds(3));
         }
@@ -39,7 +40,7 @@ void BindDevice::bind(QData &deviceArray) {
     ServiceSiteManager::getInstance()->publishMessage(BindEndMsg, publishData.toJsonString());
 }
 
-bool BindDevice::addDevice(string &deviceSn, string& deviceType) {
+bool BindDevice::addDevice(string &deviceSn, string& device_type, string& device_model) {
     //发送扫描指令
     LOG_INFO << ">>: start to scan the device <" << deviceSn << ">.....";
     qlibc::QData scanData;
@@ -107,13 +108,15 @@ bool BindDevice::addDevice(string &deviceSn, string& deviceType) {
     LOG_PURPLE << "<<: .............................";
 
     //将绑定成功设备存入列表中
-    bleConfig::getInstance()->insertDeviceItem(deviceSn, deviceType);
+    bleConfig::getInstance()->insertDeviceItem(deviceSn, device_type, device_model);
     //存入设备的默认状态
     bleConfig::getInstance()->insertDefaultStatus(deviceSn);
 
     //发布单个设备绑定成功消息
     qlibc::QData content, publishData;
     content.setString("device_id", deviceSn);
+    content.setString("device_type", device_type);
+    content.setString("device_model", device_model);
     publishData.setString("message_id", SingleDeviceBindSuccessMsg);
     publishData.putData("content", content);
     ServiceSiteManager::getInstance()->publishMessage(SingleDeviceBindSuccessMsg, publishData.toJsonString());

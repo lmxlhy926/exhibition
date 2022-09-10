@@ -41,7 +41,7 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
     scanData.setString("command", "scan");
     DownBinaryCmd::transAndSendCmd(scanData);
 
-    std::map<string, string> deviceMap;
+    std::map<string, std::pair<string, string>> deviceMap;
     qlibc::QData retScanData;
     time_t time_current = time(nullptr);
 
@@ -49,8 +49,9 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
         if(EventTable::getInstance()->scanResultEvent.wait(2) == std::cv_status::no_timeout){
             retScanData = EventTable::getInstance()->scanResultEvent.getData();
             string deviceSn = retScanData.getString("deviceSn");
-            string deviceType = retScanData.getString("deviceType");
-            deviceMap.insert(std::make_pair(deviceSn, deviceType));
+            string device_type = retScanData.getString("device_type");
+            string device_model = retScanData.getString("device_model");
+            deviceMap.insert(std::make_pair(deviceSn, std::make_pair(device_type, device_model)));
         }
         if(time(nullptr) - time_current > 10){
             LOG_PURPLE << "===>SCAN END......";
@@ -58,23 +59,20 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
         }
     }
 
-    qlibc::QData publishDevicdArray;
+
     for(auto& elem : deviceMap){
         qlibc::QData item;
-        item.setString("deviceSn", elem.first);
-        item.setString("deviceType", elem.second);
-        deviceArray.append(item);
-
         item.setString("device_id", elem.first);
-        item.setString("device_type", elem.second);
-        publishDevicdArray.append(item);
+        item.setString("device_type", elem.second.first);
+        item.setString("device_model", elem.second.second);
+        deviceArray.append(item);
     }
 
     LOG_GREEN << "==>deviceArray: " << deviceArray.toJsonString(true);
 
     //发布扫描结果
     qlibc::QData content, publishData;
-    content.putData("device_list", publishDevicdArray);
+    content.putData("device_list", deviceArray);
     publishData.setString("message_id", ScanResultMsg);
     publishData.putData("content", content);
     ServiceSiteManager::getInstance()->publishMessage(ScanResultMsg, publishData.toJsonString());

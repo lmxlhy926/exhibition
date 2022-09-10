@@ -6,17 +6,27 @@
 #define EXHIBITION_DEVICETYPEEXTRACT_H
 
 #include <string>
+#include "qlibc/QData.h"
+#include "bleConfig.h"
 
 using namespace std;
 
 class deviceTypeExtract {
 private:
     std::string deviceUUID;
+    qlibc::QData deviceTypeData;
 
 public:
-    explicit deviceTypeExtract(string& uuid) : deviceUUID(uuid){}
+    explicit deviceTypeExtract(string& uuid) : deviceUUID(uuid){
+        deviceTypeData = bleConfig::getInstance()->getDeviceTypeData();
+    }
 
     string getDeviceType();
+
+    string getDeviceModel();
+
+private:
+    string getProductIndex();
 };
 
 

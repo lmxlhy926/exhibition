@@ -163,9 +163,12 @@ public:
     }
 
     void postEvent() override{
+        deviceTypeExtract extract(deviceUUID);
         qlibc::QData data;
         data.setString("deviceSn", deviceSn);
-        data.setString("deviceType", deviceTypeExtract(deviceUUID).getDeviceType());
+        data.setString("device_type", extract.getDeviceType());
+        data.setString("device_model", extract.getDeviceModel());
+
         if(!deviceSn.empty()){
             LOG_YELLOW << "<<===: scanResult Event, deviceSn = " << deviceSn;
             EventTable::getInstance()->scanResultEvent.putData(data);
