@@ -102,10 +102,9 @@ int add_device_service_handler(const Request& request, Response& response, Logic
     LOG_INFO << "==>: " << requestBody.toJsonString();
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
-            qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
             qlibc::QData cmdData;
             cmdData.setString("command", ADD_DEVICE);
-            cmdData.putData("device_list", deviceList);
+            cmdData.putData("param", requestBody.getData("param"));
             lc.parse(cmdData);
         });
         response.set_content(okResponse.dump(), "text/json");

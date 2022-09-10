@@ -22,8 +22,11 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
 
     if(command == ADD_DEVICE){      //设备批量绑定
         bindingFlag.store(true);
+
+        qlibc::QData param = cmdData.getData("param");
         qlibc::QData deviceSnArray;
         getScanedDevices(deviceSnArray);
+
         bd.bind(deviceSnArray);
         bindingFlag.store(false);
 
