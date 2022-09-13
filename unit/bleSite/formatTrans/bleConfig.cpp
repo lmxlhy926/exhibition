@@ -25,13 +25,6 @@ string bleConfig::getconfigPath() {
     return dataDirPath;
 }
 
-QData bleConfig::getBleParamData() {
-    std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    if(bleParamData.empty()){
-        bleParamData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/bleCommand.json"));
-    }
-    return bleParamData;
-}
 
 QData bleConfig::getSerialData() {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
@@ -41,13 +34,6 @@ QData bleConfig::getSerialData() {
     return serialData;
 }
 
-QData bleConfig::getDeviceTypeData(){
-    std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    if(deviceTypeData.empty()){
-        deviceTypeData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/bleDeviceType.json"));
-    }
-    return deviceTypeData;
-}
 
 QData bleConfig::getSnAddrData() {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
@@ -114,10 +100,6 @@ void bleConfig::deleteDeviceItem(string& deviceID){
     saveDeviceListData(saveData);
 }
 
-
-void bleConfig::updateDeviceListProperty(){
-
-}
 
 void bleConfig::saveDeviceListData(qlibc::QData& data){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);

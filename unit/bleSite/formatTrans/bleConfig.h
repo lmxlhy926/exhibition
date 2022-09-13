@@ -16,9 +16,7 @@ using namespace qlibc;
 class bleConfig {
 private:
     string dataDirPath;                         //配置文件路径
-    QData bleParamData;                         //蓝牙命令配置数据
     QData serialData;                           //串口配置数据
-    QData deviceTypeData;                       //设备类型数据
     QData snAddressData;                        //蓝牙设备地址表
     QData groupAddressData;                     //组地址数据
     QData deviceListData;                       //蓝牙设备列表
@@ -38,14 +36,8 @@ public:
     //获取配置路径
     string getconfigPath();
 
-    //获取蓝牙命令配置数据
-    QData getBleParamData();
-
     //获取串口配置数据
     QData getSerialData();
-
-    //获取设备类型数据
-    QData getDeviceTypeData();
 
     //获取device-mac记录表
     QData getSnAddrData();
@@ -61,9 +53,6 @@ public:
 
     //删除解绑的设备
     void deleteDeviceItem(string& deviceID);
-
-    //获取config白名单信息，更新设备列表属性
-    void updateDeviceListProperty();
 
     //存储设备列表
     void saveDeviceListData(qlibc::QData& data);

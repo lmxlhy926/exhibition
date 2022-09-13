@@ -18,7 +18,7 @@ private:
 
 public:
     explicit deviceTypeExtract(string& uuid) : deviceUUID(uuid){
-        deviceTypeData = bleConfig::getInstance()->getDeviceTypeData();
+        initDeviceTypeData();
     }
 
     string getDeviceType();
@@ -27,6 +27,8 @@ public:
 
 private:
     string getProductIndex();
+
+    void initDeviceTypeData();
 };
 
 

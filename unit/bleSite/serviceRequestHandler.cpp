@@ -28,6 +28,10 @@ static const nlohmann::json errResponse = {
 };
 
 
+/*
+ * 如果是单个设备控制：则需将设备mac转换为设备地址
+ * 如果是组控制：因为组id就是组地址，所以无需转换
+ */
 void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
     for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
         qlibc::QData deviceItem = deviceList.getArrayElement(i);

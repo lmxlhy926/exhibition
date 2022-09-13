@@ -7,6 +7,8 @@
 #include "../parameter.h"
 #include "downBinaryFlowControl.h"
 
+string JsonCmd2Binary::commandPrefix = "E8 FF 00 00 00 00 02 03";
+
 bool DownBinaryCmd::transAndSendCmd(QData &cmdData){
     string binaryString = getBinaryString(cmdData);
     downBinaryFlowControl::getInstance()->push(binaryString);

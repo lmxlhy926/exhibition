@@ -37,7 +37,7 @@ void downBinaryFlowControl::sendCommand() {
             unsigned char buf[100]{};
             size_t size = DownBinaryUtil::binaryString2binary(command, buf, sizeof buf);
             DownBinaryUtil::serialSend(buf, static_cast<int>(size));
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(800));
         }
     }
 }

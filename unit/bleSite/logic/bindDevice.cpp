@@ -68,16 +68,14 @@ bool BindDevice::addDevice(string &deviceSn, string& device_type, string& device
     connectData.setString("deviceSn", deviceSn);
     DownBinaryCmd::transAndSendCmd(connectData);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    LOG_PURPLE << "<<: successed in connecting the device: <" << deviceSn << ">....";
 
     //给网关分配地址，等待1秒
     LOG_INFO << ">>: start to assign gateway address....";
     qlibc::QData gateAddressAssign(AssignGateWayAddressString);
     DownBinaryCmd::transAndSendCmd(gateAddressAssign);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    LOG_PURPLE << "<<: successed to assign gateway address....";
 
-    //给节点分配地址，等待返回成功，最多等待60秒
+    //给节点分配地址，大约6秒，等待返回成功，最多等待60秒
     LOG_INFO << ">>: start to assgin node address....";
     qlibc::QData nodeAddressAssign(SnAddressMap::getInstance()->getNodeAssignAddr(deviceSn));
     DownBinaryCmd::transAndSendCmd(nodeAddressAssign);
@@ -90,7 +88,7 @@ bool BindDevice::addDevice(string &deviceSn, string& device_type, string& device
     }
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    //绑定；大约需要40秒
+    //绑定；大约需要10秒
     LOG_INFO << ">>: start to bind....";
     qlibc::QData bind(BindString);
     DownBinaryCmd::transAndSendCmd(bind);

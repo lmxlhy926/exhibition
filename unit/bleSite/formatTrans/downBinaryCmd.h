@@ -33,10 +33,12 @@ private:
 
 
 class JsonCmd2Binary{
+private:
+    static string commandPrefix;
 protected:
     //获取二进制格式命令
     virtual string getBinaryString() = 0;
-
+public:
     //剔除字符串中间的空格
     static string deleteWhiteSpace(string str){
         string retStr;
@@ -47,6 +49,10 @@ protected:
             retStr.append(*p);
         }
         return retStr;
+    }
+
+    string getCommandPrefix(){
+        return deleteWhiteSpace(commandPrefix);
     }
 };
 
@@ -137,7 +143,7 @@ public:
     explicit LightAdd2Group(string& sn, string& address) : deviceSn(sn), group_id(address){}
 
     string getBinaryString() override{
-        string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
+        string prefix = getCommandPrefix();
         string deviceAddress = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
         if(deviceAddress.empty() || group_id.empty()){
             return "";
@@ -165,7 +171,7 @@ public:
     explicit LightDelFromGroup(string& sn, string& address) : deviceSn(sn), group_id(address){}
 
     string getBinaryString() override{
-        string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
+        string prefix = getCommandPrefix();
         string deviceAddress = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
         if(deviceAddress.empty() || group_id.empty()){
             return "";
@@ -197,7 +203,7 @@ public:
     }
 
     string getBinaryString() override{
-        string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
+        string prefix = getCommandPrefix();
         string stringCmd;
         stringCmd.append(prefix).append(address).append("8202");
         if(onOff == "on"){
@@ -232,7 +238,7 @@ public:
     }
 
     string getBinaryString() override{
-        string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
+        string prefix = getCommandPrefix();
         stringstream ss;
         ss << std::hex << std::uppercase << std::setw(4) << luminanceVal;
 
@@ -265,7 +271,7 @@ public:
     }
 
     string getBinaryString() override{
-        string prefix = deleteWhiteSpace(bleConfig::getInstance()->getBleParamData().getString("commonPrefix"));
+        string prefix = getCommandPrefix();
         stringstream ss;
         ss << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
         string ctlTemperatureStr = ss.str();
