@@ -158,19 +158,11 @@ void test4(){
 }
 
 int main(int argc, char* argv[]){
-    Json::Value value(Json::arrayValue);
-    value.append("1");
-    value.append("2");
-    value.append("3");
-
-    qlibc::QData data(value);
-    std::cout << data.toJsonString(true) << std::endl;
-
-    data.deleteArrayItem(4);
-    std::cout << data.toJsonString(true) << std::endl;
+   qlibc::QData data;
+   data.loadFromFile(R"(D:\project\byjs\exhibition\baseSrc\qlibc\test\test.json)");
 
 
-
+    std::cout << data.toJsonString() << std::endl;
 
 
 
