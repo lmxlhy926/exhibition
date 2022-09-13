@@ -293,6 +293,10 @@ int addDevice2Group_service_handler(const Request& request, Response& response, 
     LOG_INFO << "==>: " << requestBody.toJsonString();
     bleConfig::getInstance()->enqueue([requestBody, &lc]{
         string group_id = requestBody.getData("request").getString("group_id");
+        if(!GroupAddressMap::getInstance()->isGroupExist(group_id)){
+            LOG_RED  << "group " << group_id << " is not exist....";
+            return;
+        }
         qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
         size_t deviceListSize = deviceList.size();
         for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
@@ -300,6 +304,14 @@ int addDevice2Group_service_handler(const Request& request, Response& response, 
             cmdData.setString("command", "addDevice2Group");
             cmdData.setString("group_id", group_id);
             cmdData.putData("deviceSn", deviceList.getArrayElement(i));
+
+            cmdData.setString("model_name", POWER);
+            lc.parse(cmdData);
+
+            cmdData.setString("model_name", LUMINANCE);
+            lc.parse(cmdData);
+
+            cmdData.setString("model_name", COLORTEMPERATURE);
             lc.parse(cmdData);
         }
     });
@@ -315,6 +327,10 @@ int removeDeviceFromGroup_service_handler(const Request& request, Response& resp
     LOG_INFO << "==>: " << requestBody.toJsonString();
     bleConfig::getInstance()->enqueue([requestBody, &lc]{
         string group_id = requestBody.getData("request").getString("group_id");
+        if(!GroupAddressMap::getInstance()->isGroupExist(group_id)){
+            LOG_RED << "group " << group_id << " is not exist....";
+            return;
+        }
         qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
         size_t deviceListSize = deviceList.size();
         for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
@@ -322,6 +338,14 @@ int removeDeviceFromGroup_service_handler(const Request& request, Response& resp
             cmdData.setString("command", "delDeviceFromGroup");
             cmdData.setString("group_id", group_id);
             cmdData.putData("deviceSn", deviceList.getArrayElement(i));
+
+            cmdData.setString("model_name", POWER);
+            lc.parse(cmdData);
+
+            cmdData.setString("model_name", LUMINANCE);
+            lc.parse(cmdData);
+
+            cmdData.setString("model_name", COLORTEMPERATURE);
             lc.parse(cmdData);
         }
     });

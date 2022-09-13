@@ -46,12 +46,14 @@ string DownBinaryCmd::getBinaryString(QData &cmdData) {
     }else if(command == AddDevice2Group){     //分组
         string deviceSn = cmdData.getString("deviceSn");
         string group_id = cmdData.getString("group_id");
-        return LightAdd2Group(deviceSn, group_id).getBinaryString();
+        string model_name = cmdData.getString("model_name");
+        return LightAdd2Group(deviceSn, group_id, model_name).getBinaryString();
 
-    }else if(command == DelDeviceFromGroup){
+    }else if(command == DelDeviceFromGroup){    //解除分组
         string deviceSn = cmdData.getString("deviceSn");
         string group_id = cmdData.getString("group_id");
-        return LightDelFromGroup(deviceSn, group_id).getBinaryString();
+        string model_name = cmdData.getString("model_name");
+        return LightDelFromGroup(deviceSn, group_id, model_name).getBinaryString();
 
     }else if(command == POWER){     //开关
         return LightOnOff(cmdData).getBinaryString();

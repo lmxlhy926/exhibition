@@ -47,6 +47,9 @@ public:
     //返回分组列表
     qlibc::QData getGroupList();
 
+    //分组是否存在
+    bool isGroupExist(string& groupId);
+
     //groupName--->groupAddressID
     string groupName2GroupAddressId(string groupName);
 

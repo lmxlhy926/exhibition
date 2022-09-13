@@ -142,6 +142,15 @@ qlibc::QData GroupAddressMap::getGroupList() {
     return retData;
 }
 
+bool GroupAddressMap::isGroupExist(string& groupId){
+    std::lock_guard<recursive_mutex> lg(rMutex_);
+    auto pos = groupAddrMap.find(groupId);
+    if(pos != groupAddrMap.end())
+        return true;
+    else
+        return false;
+}
+
 string GroupAddressMap::groupName2GroupAddressId(string groupName) {
     std::lock_guard<recursive_mutex> lg(rMutex_);
     for(auto& elem : groupAddrMap){

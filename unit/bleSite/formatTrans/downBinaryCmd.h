@@ -12,6 +12,7 @@
 #include "downBinaryUtil.h"
 #include "logic/snAddressMap.h"
 #include "logic/groupAddressMap.h"
+#include "../parameter.h"
 
 using namespace std;
 
@@ -139,8 +140,10 @@ class LightAdd2Group : public JsonCmd2Binary{
 private:
     string deviceSn;
     string group_id;
+    string model_name;
 public:
-    explicit LightAdd2Group(string& sn, string& address) : deviceSn(sn), group_id(address){}
+    explicit LightAdd2Group(string& sn, string& address, string& modelName)
+                            : deviceSn(sn), group_id(address), model_name(modelName){}
 
     string getBinaryString() override{
         string prefix = getCommandPrefix();
@@ -156,7 +159,16 @@ public:
         stringCmd.append(prefix).append(deviceAddress).append("801B");
         stringCmd.append(deviceAddress);
         stringCmd.append(group_id);
-        stringCmd.append(deleteWhiteSpace("00 10"));
+        if(model_name == POWER){
+            stringCmd.append(deleteWhiteSpace("00 10"));
+
+        }else if(model_name == LUMINANCE){
+            stringCmd.append(deleteWhiteSpace("00 13"));
+
+        }else if(model_name == COLORTEMPERATURE){
+            stringCmd.append(deleteWhiteSpace("06 13"));
+        }
+
         return stringCmd;
     }
 };
@@ -167,8 +179,10 @@ class LightDelFromGroup : public JsonCmd2Binary{
 private:
     string deviceSn;
     string group_id;
+    string model_name;
 public:
-    explicit LightDelFromGroup(string& sn, string& address) : deviceSn(sn), group_id(address){}
+    explicit LightDelFromGroup(string& sn, string& address, string& modelName)
+                            : deviceSn(sn), group_id(address), model_name(modelName){}
 
     string getBinaryString() override{
         string prefix = getCommandPrefix();
@@ -184,7 +198,16 @@ public:
         stringCmd.append(prefix).append(deviceAddress).append("801C");
         stringCmd.append(deviceAddress);
         stringCmd.append(group_id);
-        stringCmd.append(deleteWhiteSpace("00 10"));
+
+        if(model_name == POWER){
+            stringCmd.append(deleteWhiteSpace("00 10"));
+
+        }else if(model_name == LUMINANCE){
+            stringCmd.append(deleteWhiteSpace("00 13"));
+
+        }else if(model_name == COLORTEMPERATURE){
+            stringCmd.append(deleteWhiteSpace("06 13"));
+        }
         return stringCmd;
     }
 };

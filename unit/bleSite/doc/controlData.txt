@@ -70,16 +70,18 @@
 //将设备添加进分组
 {
     "command" : "addDevice2Group",
-	"group_id" : "01C0"
-	"deviceSn" : "xxx"
+	"group_id" : "01C0",
+	"deviceSn" : "xxx",
+	"model_name" : "";
 }
 
 
 //将设备从分组解除
 {
     "command" : "delDeviceFromGroup",
-	"group_id" : "01C0"
-	"deviceSn" : "xxx"
+	"group_id" : "01C0",
+	"deviceSn" : "xxx",
+	"model_name" : ""
 }
 
 
