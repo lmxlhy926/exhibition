@@ -79,6 +79,13 @@ const int ServiceSiteManager::RET_CODE_ERROR_REQ_CODE = -5;
 
 const string ServiceSiteManager::RET_OK = "ok";
 
+const string ServiceSiteManager::QUERY_SITE_IP = "127.0.0.1";
+
+const string ServiceSiteManager::QUERY_SITE_SERVICE_ID_SITE_REGISTER = "site_register";
+const string ServiceSiteManager::QUERY_SITE_SERVICE_ID_SITE_PING = "site_ping";
+
+const string ServiceSiteManager::QUERY_SITE_MESSAGE_ID_REGISTER_AGAIN = "register2QuerySiteAgain";
+
 const string ServiceSiteManager::MESSAGE_SUBSCRIBER_CONFIG_FILE = "_message_subscriber.json";
 string ServiceSiteManager::messageSubscriberConfigPath = "/data/changhong/edge_midware/";
 
@@ -323,6 +330,11 @@ int ServiceSiteManager::serviceRequestHandlerDebug(const Request& request, Respo
     return RET_CODE_OK;
 }
 
+void ServiceSiteManager::messageHandlerRegisterAgain(const Request& request) {
+    // 重新注册
+    registerSite();
+}
+
 ServiceSiteManager::ServiceSiteManager() {
     // 设置异常 handler, 发生异常时打印
     server.set_exception_handler(http_exception_handler);
@@ -416,14 +428,14 @@ int ServiceSiteManager::start(void) {
 
 void  service_site_ping_thread(string siteId) {
     json request_json = {
-		{"service_id", "site_ping"},
+		{"service_id", ServiceSiteManager::QUERY_SITE_SERVICE_ID_SITE_PING},
 		{"request", {
             {"site_id", siteId}
         }}
 	};
 
     while (true) {
-        Client cli("127.0.0.1", ServiceSiteManager::SITE_QUERY_PORT);
+        Client cli(ServiceSiteManager::QUERY_SITE_IP, ServiceSiteManager::QUERY_SITE_PORT);
 
         cli.Post("/", request_json.dump(), "text/plain");
 
@@ -432,44 +444,38 @@ void  service_site_ping_thread(string siteId) {
 }
 
 int ServiceSiteManager::startByRegister(void) {
-    json request_json = {
-		{"service_id", "site_register"},
-		{"request", {
-			{"site_id", siteId},
-            {"summary", summary},
-            {"port", serverPort}
-		}}
-	};
+    int ret;
 
-    Client cli("127.0.0.1", SITE_QUERY_PORT);
-
-    auto res = cli.Post("/", request_json.dump(), "text/plain");
-    if (!res) {
-        SERV_LIB_LOG("client connect error.\n");
-        return RET_CODE_ERROR_REQ_CONN;
+    // 注册站点
+    while (true) {
+        ret = registerSite();
+        if (ret == RET_CODE_OK) {
+            break;
+        }
+        else {
+            SERV_LIB_LOG("registerSite error ret = %d\n", ret);
+            sleep(2);
+        }
     }
 
-    if (res->status != 200) {
-        SERV_LIB_LOG("http status = %d, error.\n", res->status);
-        return RET_CODE_ERROR_REQ_STATUS_CODE;
+    // 消息列表
+	std::vector<string> messageIdList;
+    messageIdList.push_back(ServiceSiteManager::QUERY_SITE_MESSAGE_ID_REGISTER_AGAIN);
+
+    // 订阅消息
+    while (true) {
+        ret = subscribeMessage(ServiceSiteManager::QUERY_SITE_IP, ServiceSiteManager::QUERY_SITE_PORT, messageIdList);
+        if (ret == RET_CODE_OK) {
+            break;
+        }
+        else {
+            SERV_LIB_LOG("subscribeMessage error ret = %d\n", ret);
+            sleep(2);
+        }
     }
 
-    if (!json::accept(res->body)) {
-        SERV_LIB_LOG("response_json format error.\n");
-        return RET_CODE_ERROR_REQ_NOT_JSON;
-    }
-
-    json response_json = json::parse(res->body);
-
-    if (response_json["code"].is_null()) {
-        SERV_LIB_LOG("response_json format error.\n");
-        return RET_CODE_ERROR_REQ_JSON_FORMAT;
-    }
-
-    // if (response_json["response"].is_null()) {
-    //     SERV_LIB_LOG("response_json format error.\n");
-    //     return RET_CODE_ERROR_REQ_JSON_FORMAT;
-    // }
+    // 注册消息处理函数
+    registerMessageHandler(ServiceSiteManager::QUERY_SITE_MESSAGE_ID_REGISTER_AGAIN, ServiceSiteManager::messageHandlerRegisterAgain);
 
     pingThreadP = new std::thread(service_site_ping_thread, siteId);
 
@@ -732,8 +738,8 @@ int ServiceSiteManager::updateSiteHandleList(void) {
 	};
 
     // 先完成本机，后续完成mDNS， 本局域网
-    string query_site_ip = "127.0.0.1";
-    Client cli(query_site_ip, ServiceSiteManager::SITE_QUERY_PORT);
+    string query_site_ip = ServiceSiteManager::QUERY_SITE_IP;
+    Client cli(query_site_ip, ServiceSiteManager::QUERY_SITE_PORT);
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
@@ -819,8 +825,8 @@ int ServiceSiteManager::querySiteList(std::vector<SiteHandle>& pSiteHandleList) 
 	};
 
     // 先完成本机，后续完成mDNS， 本局域网
-    string query_site_ip = "127.0.0.1";
-    Client cli(query_site_ip, ServiceSiteManager::SITE_QUERY_PORT);
+    string query_site_ip = ServiceSiteManager::QUERY_SITE_IP;
+    Client cli(query_site_ip, ServiceSiteManager::QUERY_SITE_PORT);
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
@@ -905,8 +911,8 @@ int ServiceSiteManager::querySiteListBySiteId(string pSiteId, std::vector<SiteHa
 	};
 
     // 先完成本机，后续完成mDNS， 本局域网
-    string query_site_ip = "127.0.0.1";
-    Client cli(query_site_ip, ServiceSiteManager::SITE_QUERY_PORT);
+    string query_site_ip = ServiceSiteManager::QUERY_SITE_IP;
+    Client cli(query_site_ip, ServiceSiteManager::QUERY_SITE_PORT);
 
     auto res = cli.Post("/", request_json.dump(), "text/plain");
     if (!res) {
@@ -997,7 +1003,9 @@ string MessageSubscriber::getMessageId(void) {
     return messageId;
 }
 
-void MessageSubscriber::addSiteMessageSubscriberSiteHandleP(MessageSubscriberSiteHandle* pMessageSubscriberSiteHandle) {
+bool MessageSubscriber::addSiteMessageSubscriberSiteHandleP(MessageSubscriberSiteHandle* pMessageSubscriberSiteHandle) {
+    bool need_save = false;
+
     MessageSubscriberSiteHandle* temp = NULL;
     for (auto& item : siteMessageSubscriberSiteHandlePlist) {
         if (item == pMessageSubscriberSiteHandle) {
@@ -1010,9 +1018,13 @@ void MessageSubscriber::addSiteMessageSubscriberSiteHandleP(MessageSubscriberSit
     if (temp == NULL) {
         // 不存在 添加
         siteMessageSubscriberSiteHandlePlist.push_back(pMessageSubscriberSiteHandle);
+
+        need_save = true;
     }
 
     pMessageSubscriberSiteHandle->setIsStop(false);
+
+    return need_save;
 }
 
 void MessageSubscriber::delSiteMessageSubscriberSiteHandleP(MessageSubscriberSiteHandle* pMessageSubscriberSiteHandle) {
@@ -1261,6 +1273,49 @@ void servicesite::ServiceSiteManager::loadMessageSubscriber(void) {
     }
 }
 
+int servicesite::ServiceSiteManager::registerSite(void) {
+    json request_json = {
+		{"service_id", ServiceSiteManager::QUERY_SITE_SERVICE_ID_SITE_REGISTER},
+		{"request", {
+			{"site_id", siteId},
+            {"summary", summary},
+            {"port", serverPort}
+		}}
+	};
+
+    Client cli(ServiceSiteManager::QUERY_SITE_IP, ServiceSiteManager::QUERY_SITE_PORT);
+
+    auto res = cli.Post("/", request_json.dump(), "text/plain");
+    if (!res) {
+        SERV_LIB_LOG("client connect error.\n");
+        return RET_CODE_ERROR_REQ_CONN;
+    }
+
+    if (res->status != 200) {
+        SERV_LIB_LOG("http status = %d, error.\n", res->status);
+        return RET_CODE_ERROR_REQ_STATUS_CODE;
+    }
+
+    if (!json::accept(res->body)) {
+        SERV_LIB_LOG("response_json format error.\n");
+        return RET_CODE_ERROR_REQ_NOT_JSON;
+    }
+
+    json response_json = json::parse(res->body);
+
+    if (response_json["code"].is_null()) {
+        SERV_LIB_LOG("response_json format error.\n");
+        return RET_CODE_ERROR_REQ_JSON_FORMAT;
+    }
+
+    // if (response_json["response"].is_null()) {
+    //     SERV_LIB_LOG("response_json format error.\n");
+    //     return RET_CODE_ERROR_REQ_JSON_FORMAT;
+    // }
+
+    return RET_CODE_OK;
+}
+
 bool servicesite::ServiceSiteManager::subscribeMessage(string message_id, string ip, int port) {
     bool need_save = false;
     bool is_msg_id_ok = false;
@@ -1272,6 +1327,7 @@ bool servicesite::ServiceSiteManager::subscribeMessage(string message_id, string
             break;
         }
     }
+    // 不支持消息ID，返回false
     if (!is_msg_id_ok) {
         return false;
     }
@@ -1280,6 +1336,7 @@ bool servicesite::ServiceSiteManager::subscribeMessage(string message_id, string
     std::lock_guard<std::mutex> lockGuard(messageSubscriberList_mutex);
 
     MessageSubscriberSiteHandle* temp_messageSubscriberSiteHandle = NULL;
+    // 查找站点是否订阅过
     for (auto& item : messageSubscriberSiteHandlePList) {
         if (item->getIp() == ip) {
             if (item->getPort() == port) {
@@ -1288,17 +1345,21 @@ bool servicesite::ServiceSiteManager::subscribeMessage(string message_id, string
             }
         }
     }
+    // 未订阅创建新的站点handle
     if (temp_messageSubscriberSiteHandle == NULL) {
         temp_messageSubscriberSiteHandle = new MessageSubscriberSiteHandle(ip, port);
         messageSubscriberSiteHandlePList.push_back(temp_messageSubscriberSiteHandle);
     }
     
+    // 检查此消息ID的订阅者是否存在
     MessageSubscriber* temp_messageSubscriber = NULL;
     for (auto& item : messageSubscriberList) {
         if (message_id == item.getMessageId()) {
             temp_messageSubscriber = &item;
         }
     }
+
+    // 不已存在，创建订阅者
     if (temp_messageSubscriber == NULL) {
         temp_messageSubscriber = new MessageSubscriber(message_id);
         temp_messageSubscriber->addSiteMessageSubscriberSiteHandleP(temp_messageSubscriberSiteHandle);
@@ -1307,8 +1368,11 @@ bool servicesite::ServiceSiteManager::subscribeMessage(string message_id, string
         need_save = true;
     }
     else {
-        temp_messageSubscriber->addSiteMessageSubscriberSiteHandleP(temp_messageSubscriberSiteHandle);
+        // 已存在
+        if (temp_messageSubscriber->addSiteMessageSubscriberSiteHandleP(temp_messageSubscriberSiteHandle)) {
+            need_save = true;
+        }
     }
 
-    return true;
+    return need_save;
 }

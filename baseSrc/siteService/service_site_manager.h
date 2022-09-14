@@ -89,6 +89,8 @@ class ServiceSiteManager {
 
     static int serviceRequestHandlerDebug(const Request& request, Response& response);
 
+    static void messageHandlerRegisterAgain(const Request& request);
+
     static string siteId;
     static string summary;
 
@@ -103,6 +105,7 @@ class ServiceSiteManager {
     static void saveMessageSubscriber(void);
     static void loadMessageSubscriber(void);
 
+    static int registerSite(void);
     static bool subscribeMessage(string message_id, string ip, int port);
 
     ServiceSiteManager();
@@ -118,12 +121,20 @@ public:
 
     static const string RET_OK;
 
+    static const string QUERY_SITE_IP;
+
     /**
      * @brief 查询站点端口， 约定为 9000， 其他站点端口再次基础上增加
      * 
      */
-    static const int SITE_QUERY_PORT = 9000;
+    static const int QUERY_SITE_PORT = 9000;
     static const int PING_PER_SECONDS = 10;
+
+    static const string QUERY_SITE_SERVICE_ID_SITE_REGISTER;
+    static const string QUERY_SITE_SERVICE_ID_SITE_PING;
+
+    static const string QUERY_SITE_MESSAGE_ID_REGISTER_AGAIN;
+
 
     static ServiceSiteManager* getInstance() {
         return &instance;                                                   
@@ -179,7 +190,7 @@ public:
      * @param handler 消息处理函数指针
      * @return int 错误码参照错误码定义
      */
-    int registerMessageHandler(string messageId, MessageHandler handler);
+    static int registerMessageHandler(string messageId, MessageHandler handler);
 
     /**
      * @brief 发布消息
@@ -242,7 +253,7 @@ public:
      * @param messageIdList 消息ID
      * @return int 错误码参照错误码定义   
      */
-    int subscribeMessage(string ip, int port, std::vector<string> messageIdList);
+    static int subscribeMessage(string ip, int port, std::vector<string> messageIdList);
 
     /**
      * @brief 取消订阅消息
@@ -322,7 +333,7 @@ class MessageSubscriber {
 public:
     MessageSubscriber(string pMessageId);
     string getMessageId(void);
-    void addSiteMessageSubscriberSiteHandleP(MessageSubscriberSiteHandle* pMessageSubscriberSiteHandle);
+    bool addSiteMessageSubscriberSiteHandleP(MessageSubscriberSiteHandle* pMessageSubscriberSiteHandle);
     void delSiteMessageSubscriberSiteHandleP(MessageSubscriberSiteHandle* pMessageSubscriberSiteHandle);
     std::vector<MessageSubscriberSiteHandle*> getSiteMessageSubscriberSiteHandlePlist(void);
 };
