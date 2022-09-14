@@ -214,7 +214,11 @@ int whiteList_update_service_request_handler(const Request& request, Response& r
         qlibc::QData deviceItem = bleSiteDeviceList.getArrayElement(i);
         string device_id = deviceItem.getString("device_id");
         string device_type = deviceItem.getString("device_type");
-        string device_model = deviceItem.getString("device_model");
+        string device_typeCode = deviceItem.getString("device_typeCode");
+        string device_modelCode = deviceItem.getString("device_modelCode");
+        string room_name = deviceItem.getData("location").getString("room_name");
+        string room_no = deviceItem.getData("location").getString("room_no");
+
         for(Json::ArrayIndex j = 0; j < devices.size(); ++j){
             if(devices.getArrayElement(j).getString("device_sn") == device_id){
                 break;
@@ -222,7 +226,10 @@ int whiteList_update_service_request_handler(const Request& request, Response& r
                 qlibc::QData item;
                 item.setString("category_code", device_type);
                 item.setString("device_sn", device_id);
-                item.setString("device_model", device_model);
+                item.setString("device_type", device_typeCode);
+                item.setString("device_model", device_modelCode);
+                item.setString("room_name", room_name);
+                item.setString("room_no", room_no);
                 devices.append(item);
                 break;
             }
@@ -231,7 +238,10 @@ int whiteList_update_service_request_handler(const Request& request, Response& r
             qlibc::QData item;
             item.setString("category_code", device_type);
             item.setString("device_sn", device_id);
-            item.setString("device_model", device_model);
+            item.setString("device_type", device_typeCode);
+            item.setString("device_model", device_modelCode);
+            item.setString("room_name", room_name);
+            item.setString("room_no", room_no);
             devices.append(item);
         }
     }
