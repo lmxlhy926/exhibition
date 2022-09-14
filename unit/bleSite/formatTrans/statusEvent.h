@@ -167,7 +167,9 @@ public:
         qlibc::QData data;
         data.setString("deviceSn", deviceSn);
         data.setString("device_type", extract.getDeviceType());
+        data.setString("device_typeCode", extract.getDeviceTypeCode());
         data.setString("device_model", extract.getDeviceModel());
+        data.setString("device_modelCode", extract.getDeviceModelCode());
 
         if(!deviceSn.empty()){
             LOG_YELLOW << "<<===: scanResult Event, deviceSn = " << deviceSn;

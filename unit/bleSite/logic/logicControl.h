@@ -20,7 +20,7 @@ public:
      bool parse(qlibc::QData& cmdData);
 
      //获取需要绑定的设备
-     void getScanedDevices(qlibc::QData& deviceArray);
+     void getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& param);
 };
 
 #endif //EXHIBITION_LOGICCONTROL_H

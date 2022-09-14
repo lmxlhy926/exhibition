@@ -21,13 +21,15 @@ public:
         initDeviceTypeData();
     }
 
-    string getDeviceType();
-
     string getDeviceModel();
 
-private:
-    string getProductIndex();
+    string getDeviceModelCode();
 
+    string getDeviceType();
+
+    string getDeviceTypeCode();
+
+private:
     void initDeviceTypeData();
 };
 

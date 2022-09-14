@@ -41,7 +41,8 @@ int main(int argc, char* argv[]) {
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-    serviceSiteManager->setServerPort(BleSitePort);
+    serviceSiteManager->setServerPort(BLE_SITE_PORT);
+    serviceSiteManager->setSiteIdSummary(BLE_SITE_ID, BLE_SITE_ID_NAME);
 
     //设置配置文件加载路径, 加载配置文件
     bleConfig* configPathPtr = bleConfig::getInstance();

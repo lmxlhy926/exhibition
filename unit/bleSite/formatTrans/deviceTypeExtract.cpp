@@ -6,46 +6,62 @@
 #include "statusEvent.h"
 #include "log/Logging.h"
 
-string deviceTypeExtract::getDeviceType() {
-   string productIndex = getProductIndex();
-   ssize_t size = deviceTypeData.size();
-   for(Json::ArrayIndex i = 0; i < size; ++i){
-       qlibc::QData item = deviceTypeData.getArrayElement(i);
-       Json::Value::Members members = item.getMemberNames();
-       for(auto& key :members){
-           if(key == productIndex){
-               return item.getString("device_type");
-           }
-       }
-   }
-   return string("UNDEFINEDTYPE");
-}
-
 string deviceTypeExtract::getDeviceModel() {
-    string productIndex = getProductIndex();
+    string deviceModelCode = getDeviceModelCode();
     ssize_t size = deviceTypeData.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = deviceTypeData.getArrayElement(i);
         Json::Value::Members members = item.getMemberNames();
         for(auto& key :members){
-            if(key == productIndex){
+            if(key == deviceModelCode){
                 return item.getString(key);
             }
         }
     }
-    return string("UNDEFINEDTYPE");
+    return string("undefined_model");
 }
 
-string deviceTypeExtract::getProductIndex() {
+string deviceTypeExtract::getDeviceModelCode(){
     string productId;
     ReadBinaryString rs(deviceUUID);
     rs.readBytes(3).readBytes(productId, 2);
     return productId.substr(2, 2);
 }
 
+string deviceTypeExtract::getDeviceType() {
+    string deviceModelCode = getDeviceModelCode();
+    ssize_t size = deviceTypeData.size();
+    for(Json::ArrayIndex i = 0; i < size; ++i){
+       qlibc::QData item = deviceTypeData.getArrayElement(i);
+       Json::Value::Members members = item.getMemberNames();
+       for(auto& key :members){
+           if(key == deviceModelCode){
+               return item.getString("device_type");
+           }
+       }
+    }
+    return string("undefined_type");
+}
+
+string deviceTypeExtract::getDeviceTypeCode(){
+    string deviceModelCode = getDeviceModelCode();
+    ssize_t size = deviceTypeData.size();
+    for(Json::ArrayIndex i = 0; i < size; ++i){
+        qlibc::QData item = deviceTypeData.getArrayElement(i);
+        Json::Value::Members members = item.getMemberNames();
+        for(auto& key :members){
+            if(key == deviceModelCode){
+                return item.getString("device_typeCode");
+            }
+        }
+    }
+    return string("");
+}
+
 void deviceTypeExtract::initDeviceTypeData() {
     Json::Value lightData;
     lightData["device_type"] = "LIGHT";
+    lightData["device_typeCode"] = "7";
     lightData["10"] = "方形吸顶灯";
     lightData["11"] = "全彩分子灯";
     lightData["12"] = "彩光灯带";
@@ -62,11 +78,13 @@ void deviceTypeExtract::initDeviceTypeData() {
 
     Json::Value socketData;
     socketData["device_type"] = "SOCKET";
+    socketData["device_typeCode"] = "8";
     socketData["30"] = "墙壁插座";
     socketData["31"] = "移动插座";
 
     Json::Value switchData;
     switchData["device_type"]  = "SWITCH";
+    switchData["device_typeCode"] = "9";
     switchData["40"] = "移动型照明开关";
     switchData["41"] = "墙壁型照明开关";
     switchData["42"] = "移动型情景开关";
@@ -78,6 +96,7 @@ void deviceTypeExtract::initDeviceTypeData() {
 
     Json::Value sensorData;
     sensorData["device_type"] = "SENSOR";
+    sensorData["device_typeCode"] = "10";
     sensorData["50"] = "门窗传感器";
     sensorData["51"] = "人体传感器";
     sensorData["52"] = "温湿度传感器";
@@ -89,6 +108,7 @@ void deviceTypeExtract::initDeviceTypeData() {
 
     Json::Value curtainData;
     curtainData["device_type"] = "CURTAIN";
+    curtainData["device_typeCode"] = "11";
     curtainData["60"] = "智能窗帘";
 
     deviceTypeData.append(lightData).append(socketData).append(switchData).append(sensorData).append(curtainData);

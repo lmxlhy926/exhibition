@@ -22,11 +22,9 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
 
     if(command == ADD_DEVICE){      //设备批量绑定
         bindingFlag.store(true);
-
         qlibc::QData param = cmdData.getData("param");
         qlibc::QData deviceSnArray;
-        getScanedDevices(deviceSnArray);
-
+        getScanedDevices(deviceSnArray, param);
         bd.bind(deviceSnArray);
         bindingFlag.store(false);
 
@@ -39,12 +37,12 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
 
 
 //进行指定时间的扫描，获取可连接的设备列表
-void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
+void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& param){
     qlibc::QData scanData;
     scanData.setString("command", "scan");
     DownBinaryCmd::transAndSendCmd(scanData);
 
-    std::map<string, std::pair<string, string>> deviceMap;
+    std::map<string, Json::Value> deviceMap;
     qlibc::QData retScanData;
     time_t time_current = time(nullptr);
 
@@ -52,9 +50,11 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
         if(EventTable::getInstance()->scanResultEvent.wait(2) == std::cv_status::no_timeout){
             retScanData = EventTable::getInstance()->scanResultEvent.getData();
             string deviceSn = retScanData.getString("deviceSn");
-            string device_type = retScanData.getString("device_type");
-            string device_model = retScanData.getString("device_model");
-            deviceMap.insert(std::make_pair(deviceSn, std::make_pair(device_type, device_model)));
+            if(!deviceSn.empty()){
+                retScanData.setString("room_name", param.getString("room_name"));
+                retScanData.setString("room_no", param.getString("room_no"));
+                deviceMap.insert(std::make_pair(deviceSn, retScanData.asValue()));
+            }
         }
         if(time(nullptr) - time_current > 10){
             LOG_PURPLE << "===>SCAN END......";
@@ -63,19 +63,22 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray){
     }
 
 
+    qlibc::QData scanedArray;
     for(auto& elem : deviceMap){
+        deviceArray.append(elem.second);
+
         qlibc::QData item;
         item.setString("device_id", elem.first);
-        item.setString("device_type", elem.second.first);
-        item.setString("device_model", elem.second.second);
-        deviceArray.append(item);
+        item.setString("device_type", elem.second["device_type"].asString());
+        item.setString("device_model", elem.second["device_model"].asString());
+        scanedArray.append(item);
     }
 
     LOG_GREEN << "==>deviceArray: " << deviceArray.toJsonString(true);
 
     //发布扫描结果
     qlibc::QData content, publishData;
-    content.putData("device_list", deviceArray);
+    content.putData("device_list", scanedArray);
     publishData.setString("message_id", ScanResultMsg);
     publishData.putData("content", content);
     ServiceSiteManager::getInstance()->publishMessage(ScanResultMsg, publishData.toJsonString());

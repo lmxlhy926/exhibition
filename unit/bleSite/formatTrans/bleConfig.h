@@ -49,7 +49,7 @@ public:
     QData getDeviceListData();
 
     //插入新绑定的设备条目
-    void insertDeviceItem(string& deviceID, string& deviceType, string& deviceModel);
+    void insertDeviceItem(string& deviceID, qlibc::QData& property);
 
     //删除解绑的设备
     void deleteDeviceItem(string& deviceID);

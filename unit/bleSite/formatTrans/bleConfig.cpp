@@ -61,7 +61,7 @@ QData bleConfig::getDeviceListData(){
  * 如果设备列表有该条目，则先删除该条目
  * 将新设备添加入设备列表中
  */
-void bleConfig::insertDeviceItem(string& deviceID, string& deviceType, string& deviceModel){
+void bleConfig::insertDeviceItem(string& deviceID, qlibc::QData& property){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     qlibc::QData deviceListArray = getDeviceListData().getData("device_list");
     size_t deviceListArraySize = deviceListArray.size();
@@ -73,10 +73,18 @@ void bleConfig::insertDeviceItem(string& deviceID, string& deviceType, string& d
             break;
         }
     }
-    qlibc::QData newItem;
+
+    qlibc::QData location, newItem;
+    location.setString("room_name", property.getString("room_name"));
+    location.setString("room_no", property.getString("room_no"));
+
     newItem.setString("device_id", deviceID);
-    newItem.setString("device_type", deviceType);
-    newItem.setString("device_model", deviceModel);
+    newItem.setString("device_type", property.getString("device_type"));
+    newItem.setString("device_typeCode", property.getString("device_typeCode"));
+    newItem.setString("device_model", property.getString("device_model"));
+    newItem.setString("device_modelCode", property.getString("device_modelCode"));
+    newItem.putData("location", location);
+
     deviceListArray.append(newItem);
 
     qlibc::QData saveData;

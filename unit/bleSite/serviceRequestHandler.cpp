@@ -79,7 +79,8 @@ int scan_device_service_handler(const Request& request, Response& response, Logi
     if(requestBody.type() != Json::nullValue){
         //获取扫描结果
         qlibc::QData scanDeviceArray;
-        lc.getScanedDevices(scanDeviceArray);
+        qlibc::QData emptyParam;
+        lc.getScanedDevices(scanDeviceArray, emptyParam);
 
         //返回扫描结果
         qlibc::QData res, retData;
@@ -108,7 +109,7 @@ int add_device_service_handler(const Request& request, Response& response, Logic
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData cmdData;
             cmdData.setString("command", ADD_DEVICE);
-            cmdData.putData("param", requestBody.getData("param"));
+            cmdData.putData("param", requestBody.getData("request"));
             lc.parse(cmdData);
         });
         response.set_content(okResponse.dump(), "text/json");
