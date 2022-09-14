@@ -61,8 +61,9 @@ int sitemg_service_start(){
         }
     });
 
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
+    //重新启动后，发布注册消息，使各个站点重新进行注册
     qlibc::QData registerAgain;
     registerAgain.setString("message_id", SITE_REGISTERAGAIN_MESSAGE_ID);
     registerAgain.putData("content", qlibc::QData(Json::Value(Json::objectValue)));

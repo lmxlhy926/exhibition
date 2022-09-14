@@ -6,7 +6,6 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 #include "serviceRequestHandler.h"
-#include "messageSubscribeHandler.h"
 #include "qlibc/FileUtils.h"
 #include "util/mqttPayloadHandle.h"
 #include "util/secretUtils.h"
@@ -118,35 +117,14 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID,getAllDeviceList_service_request_handler);
     //让电视发声
     serviceSiteManager->registerServiceRequestHandler(TVSOUND_REQUEST_SERVICE_ID,tvSound_service_request_handler);
-    //注册messageID对应的handler;
-    serviceSiteManager->registerMessageHandler(REGISTERAGAIN_MESSAGE_ID, register2QuerySite);
-
-#if 0
-    threadPool_.enqueue([&](){
-        while(true){
-            int code;
-            std::vector<string> messageIdList;
-            messageIdList.push_back(REGISTERAGAIN_MESSAGE_ID);
-            code = serviceSiteManager->subscribeMessage(RequestIp, QuerySitePort, messageIdList);
-
-            if (code == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage REGISTERAGAIN_MESSAGE_ID ok.\n");
-                break;
-            }
-
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-            printf("subscribed REGISTERAGAIN_MESSAGE_ID failed....., start to subscribe in 3 seconds\n");
-        }
-    });
-#endif
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-            int code = serviceSiteManager->start();
+//            int code = serviceSiteManager->start();
             //注册启动方式
-//            int code = serviceSiteManager->startByRegister();
+            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 LOG_RED << "===>configSite startByRegister error, code = " << code;
                 LOG_RED << "===>configSite startByRegister in 3 seconds....";

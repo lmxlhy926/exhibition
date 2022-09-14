@@ -213,21 +213,25 @@ int whiteList_update_service_request_handler(const Request& request, Response& r
     for(Json::ArrayIndex i = 0; i < bleSiteDeviceListSize; ++i){
         qlibc::QData deviceItem = bleSiteDeviceList.getArrayElement(i);
         string device_id = deviceItem.getString("device_id");
+        string device_type = deviceItem.getString("device_type");
+        string device_model = deviceItem.getString("device_model");
         for(Json::ArrayIndex j = 0; j < devices.size(); ++j){
             if(devices.getArrayElement(j).getString("device_sn") == device_id){
                 break;
             }else if(devices.getArrayElement(j).getString("device_sn") != device_id && j == devices.size() -1){
                 qlibc::QData item;
-                item.setString("category_code", "light");
+                item.setString("category_code", device_type);
                 item.setString("device_sn", device_id);
+                item.setString("device_model", device_model);
                 devices.append(item);
                 break;
             }
         }
         if(devices.size() == 0){
             qlibc::QData item;
-            item.setString("category_code", "light");
+            item.setString("category_code", device_type);
             item.setString("device_sn", device_id);
+            item.setString("device_model", device_model);
             devices.append(item);
         }
     }
