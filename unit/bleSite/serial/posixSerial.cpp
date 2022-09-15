@@ -136,10 +136,10 @@ bool PosixSerial::setParity(int databits, int stopbits, int parity) {
     struct termios options{};
     if (tcgetattr(fd_serial, &options) != 0)
     {
-        perror("SetupSerial 1");
-        return(false);
+        LOG_RED << "setParity Error, <tcgetattr>....";
+        return false;
     }
-    options.c_cflag &= ~CSIZE;
+    options.c_cflag &= ~CSIZE;  //屏蔽字符大小位
     switch (databits) /*设置数据位数*/
     {
         case 7:
@@ -149,8 +149,8 @@ bool PosixSerial::setParity(int databits, int stopbits, int parity) {
             options.c_cflag |= CS8;
             break;
         default:
-            fprintf(stderr,"Unsupported data size\n");
-            return (false);
+            LOG_RED << "setParity Error, <unsupported data size>...";
+            return false;
     }
     switch (parity)
     {
@@ -173,7 +173,8 @@ bool PosixSerial::setParity(int databits, int stopbits, int parity) {
         case 'S':
         case 's':  /*as no parity*/
             options.c_cflag &= ~PARENB;
-            options.c_cflag &= ~CSTOPB;break;
+            options.c_cflag &= ~CSTOPB;
+            break;
         default:
             fprintf(stderr,"Unsupported parity\n");
             return (false);
@@ -211,25 +212,28 @@ bool PosixSerial::setParity(int databits, int stopbits, int parity) {
     return true;
 }
 
-void PosixSerial::setSpeed(int speed) {
-    int   i;
-    int   status;
-    struct termios   Opt{};
-    tcgetattr(fd_serial, &Opt);
-    for(i = 0; i < sizeof(speed_arr)/sizeof(int); i++)
+bool PosixSerial::setSpeed(int speed) const{
+    struct termios Opt{};
+    if(tcgetattr(fd_serial, &Opt) != 0){    //获取现有配置信息
+        LOG_RED << "uart set speed Error, <tcgetattr>....";
+        return false;
+    }
+
+    for(int i = 0; i < sizeof(speed_arr)/sizeof(int); i++)
     {
         if(speed == name_arr[i])
         {
             tcflush(fd_serial, TCIOFLUSH);
             cfsetispeed(&Opt, speed_arr[i]);
             cfsetospeed(&Opt, speed_arr[i]);
-            status = tcsetattr(fd_serial, TCSANOW, &Opt);
+            int status = tcsetattr(fd_serial, TCSANOW, &Opt);   //保存配置
             if (status != 0)
             {
-                perror("tcsetattr fd1");
-                return;
+                LOG_RED << "uart set speed Error, <tcsetattr>....";
+                return false;
             }
             tcflush(fd_serial, TCIOFLUSH);
+            return true;
         }
     }
 }

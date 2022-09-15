@@ -24,7 +24,6 @@ typedef struct serial_param{
 /**
  *  创建对象时自动打开对应的串口文件， 先调用isOpened()判断串口是否打开
  *  进行串口的数据读写，如果读写过程中发生错误，会关闭串口文件
- *
  */
 
 class PosixSerial {
@@ -73,7 +72,7 @@ private:
 
     bool setParity(int databits,int stopbits,int parity);   //设置串口数据位、停止位、奇偶位
 
-    void setSpeed(int speed);                               //设置波特率
+    bool setSpeed(int speed) const;   //设置波特率
 };
 
 #endif //EXHIBITION_POSIXSERIAL_H
