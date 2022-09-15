@@ -170,13 +170,10 @@ int whiteList_service_request_handler(const Request& request, Response& response
 
 
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
-    LOG_HLIGHT << "payload: " << payload.toJsonString();
-
     qlibc::QData data;
     data.setInt("code", 0);
     data.setString("error", "ok");
     data.putData("response", payload);
-    LOG_HLIGHT << "data: " << data.toJsonString();
 
     response.set_content(data.toJsonString(), "text/json");
     return 0;
@@ -184,6 +181,7 @@ int whiteList_service_request_handler(const Request& request, Response& response
 
 int whiteList_save_service_request_handler(const Request& request, Response& response){
     qlibc::QData data(request.body);
+    LOG_INFO << "==>whiteList_save_service_request_handler: " << data.toJsonString();
     qlibc::QData whiteListData = data.getData("request");
     configParamUtil::getInstance()->saveWhiteListData(whiteListData);
 

@@ -173,11 +173,37 @@ int get_device_list_service_handler(const Request& request, Response& response){
 
 //获取设备状态
 int get_device_state_service_handler(const Request& request, Response& response){
-    LOG_INFO << "==>: " << qlibc::QData(request.body).toJsonString();
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+
+    qlibc::QData statusItems;
+    qlibc::QData statusListData = bleConfig::getInstance()->getStatusListData().getData("device_list");
+    ssize_t statusListSize = statusListData.size();
+    qlibc::QData requestDeviceList = requestBody.getData("request").getData("device_list");
+    ssize_t requestDeviceListSize = requestDeviceList.size();
+
+    for(ssize_t i = 0; i < requestDeviceListSize; ++i){
+        string device_id = requestDeviceList.getArrayElement(i).getString("device_id");
+        for(ssize_t j = 0; j < statusListSize; ++j){
+            qlibc::QData item = statusListData.getArrayElement(j);
+            if(item.getString("device_id") == device_id){
+                statusItems.append(item);
+                break;
+            }
+        }
+    }
+
+    qlibc::QData deviceList;
+    if(requestDeviceListSize == 0){
+        deviceList.putData("device_list", statusListData);
+    }else{
+        deviceList.putData("device_list", statusItems);
+    }
+
     qlibc::QData postData;
     postData.setInt("code", 0);
     postData.setString("error", "ok");
-    postData.putData("response", bleConfig::getInstance()->getStatusListData());
+    postData.putData("response", deviceList);
     response.set_content(postData.toJsonString(), "text/json");
     return 0;
 }
@@ -391,61 +417,56 @@ int getGroupList_service_handler(const Request& request, Response& response){
 
 void updateDeviceList(const Request& request){
     //获取白名单列表
+    LOG_INFO << "updateDeviceList: " << request.body;
     qlibc::QData whiteListRequest, whiteListResponse;
     whiteListRequest.setString("service_id", "whiteListRequest");
     whiteListRequest.putData("request", qlibc::QData());
     SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, whiteListRequest, whiteListResponse);
+
     if(whiteListResponse.getInt("code") == 0){
         qlibc::QData configWhiteListDevices = whiteListResponse.getData("response").getData("info").getData("devices");
         size_t configWhiteListDevicesSize = configWhiteListDevices.size();
+        if(0 == configWhiteListDevicesSize){
+            return;
+        }
+
+        qlibc::QData lightDevices;
+        for(int i = 0; i < configWhiteListDevicesSize; ++i){
+            qlibc::QData item = configWhiteListDevices.getArrayElement(i);
+            string category_code = item.getString("category_code");
+            if(category_code == "LIGHT" || category_code == "light"){
+                lightDevices.append(item);
+            }
+        }
+        ssize_t lightDeviceSize = lightDevices.size();
+        if(0 == lightDeviceSize){
+            return;
+        }
 
         qlibc::QData deviceList = bleConfig::getInstance()->getDeviceListData().getData("device_list");
         size_t deviceListSize = deviceList.size();
-
         qlibc::QData newDeviceList;
 
         for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
             qlibc::QData deviceItem =  deviceList.getArrayElement(i);
 
-            if(configWhiteListDevicesSize == 0){
-                qlibc::QData item;
-                item.setString("device_id", deviceItem.getString("device_id"));
-                newDeviceList.append(item);
-                continue;
-            }
-
-            for(Json::ArrayIndex j = 0; j < configWhiteListDevicesSize; ++j){
-                qlibc::QData configDevice = configWhiteListDevices.getArrayElement(j);
-
-                if(configDevice.getString("category_code") != "light"){
-                    if(j == configWhiteListDevicesSize -1){
-                        qlibc::QData item;
-                        item.setString("device_id", deviceItem.getString("device_id"));
-                        newDeviceList.append(item);
-                    }
-                    continue;
-                }
+            for(Json::ArrayIndex j = 0; j < lightDeviceSize; ++j){
+                qlibc::QData configDevice = lightDevices.getArrayElement(j);
 
                 if(configDevice.getString("device_sn") == deviceItem.getString("device_id")){
                     qlibc::QData location;
                     location.setString("room_name", configDevice.getString("room_name"));
                     location.setString("room_no", configDevice.getString("room_no"));
+                    deviceItem.setString("device_name", configDevice.getString("device_name"));
+                    deviceItem.setString("device_brand", configDevice.getString("device_brand"));
+                    deviceItem.putData("location", location);
 
-                    qlibc::QData item;
-                    item.setString("device_id", configDevice.getString("device_sn"));
-                    item.setString("device_name", configDevice.getString("device_name"));
-                    item.setString("device_type", configDevice.getString("device_type"));
-                    item.setString("device_brand", configDevice.getString("device_brand"));
-                    item.putData("location", location);
-
-                    newDeviceList.append(item);
+                    newDeviceList.append(deviceItem);
                     break;
                 }
 
                 if(j == configWhiteListDevicesSize -1){
-                    qlibc::QData item;
-                    item.setString("device_id", deviceItem.getString("device_id"));
-                    newDeviceList.append(item);
+                    newDeviceList.append(deviceItem);
                 }
             }
         }

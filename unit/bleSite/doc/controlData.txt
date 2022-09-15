@@ -39,7 +39,8 @@
 //解绑
 {
 	"command" : "unbind",
-	"deviceSn" : "xxxx"
+	"deviceSn" : "xxxx"，
+	"isForce" : false;   //是否强制删除，不等待网关回复
 }
 
 
@@ -72,7 +73,7 @@
     "command" : "addDevice2Group",
 	"group_id" : "01C0",
 	"deviceSn" : "xxx",
-	"model_name" : "";
+	"model_name" : "";      //加入的分组类型
 }
 
 
