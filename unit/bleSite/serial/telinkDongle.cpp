@@ -6,13 +6,9 @@
 #include <cstring>
 #include <log/Logging.h>
 
-unsigned char packageMessage2Handled[MaxMessageSize] = {0x00};
 
-TelinkDongle::TelinkDongle(std::string& serial_name, SerialParamStruct& aStruct)
-                    : posixSerial(serial_name, aStruct){
-    memset(mSerialDataBuff, 0, MaxMessageSize);
-    mBuffLen = 0;
-}
+TelinkDongle::TelinkDongle(std::string& serial_name)
+    : commonSerial(serial_name){}
 
 /**
  * 关闭串口，退出读取线程
@@ -25,13 +21,29 @@ TelinkDongle::~TelinkDongle() {
     read_thread_ = nullptr;
 }
 
+bool TelinkDongle::openSerial(SerialParamStruct aStruct){
+    return commonSerial.openSerial(aStruct);
+}
+
+void TelinkDongle::closeSerial() {
+    commonSerial.closeSerial();
+}
+
+bool TelinkDongle::write2Seria(std::vector<uint8_t>& data) {
+    {
+        std::lock_guard<std::mutex> lg(sendMutex);
+        sendQueue.push(data);
+    }
+    sendConVar.notify_one();
+}
+
 void TelinkDongle::registerPkgMsgFunc(PackageMsgHandleFuncType fun) {
     packageMsgHandledFunc = std::move(fun);
 }
 
-bool TelinkDongle::startReadAndHandleSerial() {
-    if(!posixSerial.isOpened()){
-        LOG_RED << posixSerial.getSerialName() << " is not opened....";
+bool TelinkDongle::startReceive() {
+    if(!commonSerial.isOpened()){
+        LOG_RED << commonSerial.getSerialName() << " is not opened....";
         return false;
     }
 
@@ -43,94 +55,89 @@ bool TelinkDongle::startReadAndHandleSerial() {
     return true;
 }
 
-bool TelinkDongle::write2Seria(unsigned char *buff, int len) {
-    return posixSerial.writeSerialData(buff, len);
+void TelinkDongle::sendThreadFunc(){
+    while(true){
+        std::unique_lock<std::mutex> ul(sendMutex);
+        if(sendQueue.empty()){
+            sendConVar.wait(ul, [this](){
+                return !sendQueue.empty();
+            });
+        }
+
+        std::vector<uint8_t> message = sendQueue.front();
+        sendQueue.pop();
+        if(commonSerial.isOpened()){
+            commonSerial.write2Serial(message.data(), static_cast<int>(message.size()));
+            this_thread::sleep_for(std::chrono::milliseconds(800));
+        }else{
+            break;
+        }
+    }
 }
 
-void TelinkDongle::closeSerial() {
-    posixSerial.closeSerial();
-}
 
-void TelinkDongle::readFromSerialAndHandle() {
-    if(posixSerial.isOpened())
+void TelinkDongle::handleReceiveData() {
+    fd_set readSet, allset;
+    FD_ZERO(&allset);
+    FD_SET(commonSerial.getSerialFd(), &allset);
+
+    while (true)
     {
-        fd_set readSet, allset;
-        FD_ZERO(&allset);
-        FD_SET(posixSerial.getSerialFd(), &allset);
-
-        while (true)
-        {
-            readSet = allset;
-            if(posixSerial.isOpened()){
-                select(posixSerial.getSerialFd() + 1, &readSet, nullptr, nullptr, nullptr);
-
-                int BytesToRead = MaxMessageSize - mBuffLen;
-                BytesToRead = static_cast<int>(posixSerial.readSerialData(mSerialDataBuff+mBuffLen, BytesToRead));
-                if (BytesToRead > 0)    //读取到数据则进行处理
-                {
-                    mBuffLen += BytesToRead;
-                    onSerialDataRead();
+        readSet = allset;
+        if(commonSerial.isOpened()){
+            int nReady = select(commonSerial.getSerialFd() + 1, &readSet, nullptr, nullptr, nullptr);
+            if(nReady > 0){
+                uint8_t buffer[MaxReadOneShot]{};
+                ssize_t nRead = commonSerial.readFromSerial(buffer, MaxReadOneShot);
+                if(nRead > 0){
+                    joinPackage(buffer, nRead);
                 }
             }else{
                 break;
             }
+        }else{
+            break;
         }
     }
 }
 
-/**
- *  1. 定位到包头，如果找不到包头，丢弃所有数据
- *  2. 定位到包尾，如果找不到包尾，将包头至末端的数据左移至缓冲区开头
- *  3. 处理提取到的包数据
- *  4. 读取缓冲区剩余容量的数据到缓冲区，重复上述操作
- */
-void TelinkDongle::onSerialDataRead() {
-    uint8_t* possiblePackageStart = mSerialDataBuff;
-    uint8_t* receiveBufBegin = mSerialDataBuff;
-
-    for (unsigned int i = 0; i < mBuffLen; i++)
-    {
-        //定位到包消息头
-        if (receiveBufBegin[i] == data_start_byte)
-        {
-            possiblePackageStart = receiveBufBegin + i;
-
-            //寻找包尾
-            for (unsigned int j = i+1; j < mBuffLen; j++)
-            {
-                //定位到包尾
-                if (receiveBufBegin[j] == data_end_byte)
-                {
-                    int packageLength = j - i +1;      //包长度
-                    memcpy(packageMessage2Handled, possiblePackageStart, packageLength);
-                    if(packageMsgHandledFunc != nullptr)
-                        packageMsgHandledFunc(packageMessage2Handled, packageLength);
-
-                    //移到已处理包的下一个位置
-                    possiblePackageStart += packageLength;
-                    i += packageLength - 1;
-
-
-                    //清空存放包数据的数组
-                    memset(packageMessage2Handled, 0x00, MaxMessageSize);
-                    break;
-                }
-
-                //没有找到结束标志,退出查找
-                if(mBuffLen -1 == j){
-                    i = mBuffLen - 1;
-                }
+void TelinkDongle::joinPackage(uint8_t *data, ssize_t length){
+    for(ssize_t i = 0; i < length; ++i){
+        if(parseState == HEAD){
+            if(data[i] == PackageStartIndex){
+                packageFrame.push_back(data[i]);
+                parseState = DATA;
+            }else{
+                continue;
             }
 
-        }else{  //未定位到开头，则向前移动
-            possiblePackageStart += 1;
+        }else if(parseState == DATA){
+            packageFrame.push_back(data[i]);
+            if(data[i] == PackageEndIndex){
+                {
+                    std::lock_guard<std::mutex> lg(recvMutex);
+                    recvQueue.push(packageFrame);
+                }
+                recvConVar.notify_one();
+                packageFrame.clear();
+                parseState = HEAD;
+            }
         }
     }
-
-    //保留剩余的未处理数据到缓冲区头部
-    mBuffLen = (mSerialDataBuff + mBuffLen) - possiblePackageStart;
-    memmove(mSerialDataBuff, possiblePackageStart, mBuffLen);
-    memset(mSerialDataBuff + mBuffLen, 0, MaxMessageSize - mBuffLen);
 }
 
+void TelinkDongle::packageHandel(){
+    while(true){
+        std::unique_lock<std::mutex> ul(recvMutex);
+        if(recvQueue.empty()){
+            recvConVar.wait(ul, [this](){
+                return !recvQueue.empty();
+            });
+        }
+
+        std::vector<uint8_t> packageMessage = recvQueue.front();
+        recvQueue.pop();
+        packageMsgHandledFunc(packageMessage);
+    }
+}
 

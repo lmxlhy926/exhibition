@@ -11,98 +11,26 @@
 const static int speed_arr[] = {B115200, B38400, B19200, B9600, B4800, B2400, B1200, B300};
 const static int name_arr[] = {115200, 38400, 19200, 9600, 4800, 2400, 1200, 300};
 
-PosixSerial::PosixSerial(string &serial_name, SerialParamStruct aStruct)
-            : fd_serial(-1), serialName(serial_name){
-    initSerial(serial_name, aStruct);
-}
+CommonSerial::CommonSerial(string &serial_name)
+            : fd_serial(-1), serialName(serial_name){}
 
-PosixSerial::~PosixSerial() {
+CommonSerial::~CommonSerial() {
     closeSerial();
 }
 
-bool PosixSerial::writeSerialData(unsigned char *buff, int writeLen) {
-    std::lock_guard<std::mutex> lg(readMutex);
-    if(!isSerialOpened.load()){
-        LOG_RED << serialName << " is no opened....";
-        return false;
-    }
-
-    int8_t leftTry = ival_comm_write_try_times_;
-    size_t nLeft = writeLen;
-
-    if (buff == nullptr || writeLen <= 0 || fd_serial <= 0) {
-        LOG_RED << "buf is null or len <=0 or com port not open.";
-        return false;
-    }
-
-    uint8_t start[128] = {0x00};
-    memcpy(start, buff, writeLen);
-    uint8_t * ptr = start;
-    while (leftTry--)
-    {
-        ssize_t ret = write(fd_serial, ptr, nLeft);
-        if(ret <= 0)
-        {
-            LOG_RED << "Write Error!......";
-            closeSerial();
-            return false;
-        }
-
-        nLeft -= ret;
-
-        if(nLeft <= 0)
-        {
-            return true;
-        }
-        ptr += ret;
-    }
-
-    return true;
-}
-
-
-ssize_t PosixSerial::readSerialData(unsigned char *receiveBuff, int readLen) {
-    std::lock_guard<std::mutex> lg(writeMutex);
-    if(!isSerialOpened.load()){
-        LOG_RED << serialName << " is not opened...";
-        return -1;
-    }
-
-    ssize_t readCount =  read(fd_serial, receiveBuff, readLen);
-    if(readCount < 0){
-        closeSerial();
-        return -1;
-    }else{
-        return readCount;
-    }
-}
-
-void PosixSerial::closeSerial(){
+bool CommonSerial::openSerial(SerialParamStruct aStruct){
     if(isSerialOpened.load()){
-        isSerialOpened.store(false);
-        close(fd_serial);
-    }
-}
-
-bool PosixSerial::initSerial(std::string& serial_name, SerialParamStruct aStruct) {
-    if(isSerialOpened.load()){
-        LOG_INFO << "serial already opened...";
+        LOG_RED << "serial already opened...";
         return true;
     }
 
-    if(serial_name.empty())
+    fd_serial = open(serialName.c_str(), O_RDWR|O_NOCTTY|O_NDELAY);
+    if(fd_serial < 0)
     {
-        LOG_RED << "port name is empty";
+        LOG_RED << serialName << " open error: " << errno;
         return false;
     }
 
-    std::string realComName = "/dev/" + serial_name;
-    fd_serial = open(realComName.c_str(), O_RDWR|O_NOCTTY|O_NDELAY);
-    if(fd_serial < 0)
-    {
-        LOG_RED << realComName << " open error: " << errno;
-        return false;
-    }
     int res = fcntl(fd_serial, F_SETFL, 0);
     if(res)
     {
@@ -118,10 +46,9 @@ bool PosixSerial::initSerial(std::string& serial_name, SerialParamStruct aStruct
         return false;
     }
 
-    setSpeed(aStruct.baudrate);
-    if(setParity(aStruct.databits, aStruct.stopbits, aStruct.parity) == false)
+    if(setProperty(aStruct.databits, aStruct.stopbits, aStruct.parity, aStruct.baudrate) == false)
     {
-        LOG_RED << "Set Parity Error";
+        LOG_RED << "Set Property Error";
         close(fd_serial);
         return false;
     }
@@ -132,7 +59,39 @@ bool PosixSerial::initSerial(std::string& serial_name, SerialParamStruct aStruct
     return true;
 }
 
-bool PosixSerial::setParity(int databits, int stopbits, int parity) {
+bool CommonSerial::closeSerial(){
+    if(isSerialOpened.load()){
+        isSerialOpened.store(false);
+        close(fd_serial);
+    }
+}
+
+bool CommonSerial::write2Serial(const void *buff, int writeLen) {
+    if (buff == nullptr || writeLen <= 0 || fd_serial <= 0) {
+        LOG_RED << "buff is null or len <=0 or com port not open.";
+        return false;
+    }
+
+    ssize_t nWrite = write(fd_serial, buff, writeLen);
+    if(nWrite != writeLen)
+    {
+        LOG_RED << "Write Error!......";
+        return false;
+    }
+    return true;
+}
+
+
+ssize_t CommonSerial::readFromSerial(void *receiveBuff, int readLen) {
+    if(receiveBuff == nullptr || readLen <= 0 || fd_serial <= 0){
+        LOG_RED << "receiveBuff is nullptr or len <=0 or com port not open.";
+        return 0;
+    }
+   return read(fd_serial, receiveBuff, readLen);
+}
+
+
+bool CommonSerial::setProperty(int databits, int stopbits, int parity, int speed) {
     struct termios options{};
     if (tcgetattr(fd_serial, &options) != 0)
     {
@@ -149,7 +108,7 @@ bool PosixSerial::setParity(int databits, int stopbits, int parity) {
             options.c_cflag |= CS8;
             break;
         default:
-            LOG_RED << "setParity Error, <unsupported data size>...";
+            LOG_RED << "setDatabits Error, <unsupported data size>...";
             return false;
     }
     switch (parity)
@@ -176,8 +135,8 @@ bool PosixSerial::setParity(int databits, int stopbits, int parity) {
             options.c_cflag &= ~CSTOPB;
             break;
         default:
-            fprintf(stderr,"Unsupported parity\n");
-            return (false);
+            LOG_RED << "setParity Error, <unsupported parity>...";
+            return false;
     }
     /* 设置停止位*/
     switch (stopbits)
@@ -189,9 +148,10 @@ bool PosixSerial::setParity(int databits, int stopbits, int parity) {
             options.c_cflag |= CSTOPB;
             break;
         default:
-            fprintf(stderr,"Unsupported stop bits\n");
-            return (false);
+            LOG_RED << "setStopbits Error, <unsupported stop bits>...";
+            return false;
     }
+
     /* Set input parity option */
     if (parity != 'n')
         options.c_iflag |= INPCK;
@@ -205,14 +165,14 @@ bool PosixSerial::setParity(int databits, int stopbits, int parity) {
     options.c_iflag  &= ~(ICRNL | IXON);                    //去掉过滤控制字符
     if(tcsetattr(fd_serial ,TCSANOW, &options) != 0)
     {
-        perror("SetupSerial 3");
+        LOG_RED << "set uart Error...";
         return false;
     }
 
-    return true;
+    return setSpeed(speed);
 }
 
-bool PosixSerial::setSpeed(int speed) const{
+bool CommonSerial::setSpeed(int speed) const{
     struct termios Opt{};
     if(tcgetattr(fd_serial, &Opt) != 0){    //获取现有配置信息
         LOG_RED << "uart set speed Error, <tcgetattr>....";

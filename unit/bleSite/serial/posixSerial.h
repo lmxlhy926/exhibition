@@ -26,31 +26,28 @@ typedef struct serial_param{
  *  进行串口的数据读写，如果读写过程中发生错误，会关闭串口文件
  */
 
-class PosixSerial {
+class CommonSerial {
 private:
     string serialName;                                      //串口名称
     int fd_serial;                                          //串口文件描述符
     std::atomic<bool> isSerialOpened{false};             //串口是否打开
-    std::mutex readMutex;                                   //保护并发读
-    std::mutex writeMutex;                                  //保护并发写
-    const static int8_t ival_comm_write_try_times_ = 3;     //最大写入次数
 
 public:
-    explicit PosixSerial(std::string& serial_name, SerialParamStruct aStruct);
+    explicit CommonSerial(std::string& serial_name);
 
-    ~PosixSerial();
+    ~CommonSerial();
 
-    /*
-     * 向串口文件中写数据
-     * 一次写操作最多执行三次，最多写128字节
-     */
-    bool writeSerialData(unsigned char *buff, int writeLen);
-
-    //读取数据到指定buffer中
-    ssize_t readSerialData(unsigned char *receiveBuff, int readLen);
+    //用指定参数打开串口
+    bool openSerial(SerialParamStruct aStruct);
 
     //关闭串口文件, 设置isSerialOpened为false.
-    void closeSerial();
+    bool closeSerial();
+
+    //像串口写数据
+    bool write2Serial(const void *buff, int writeLen);
+
+    //从串口读数据
+    ssize_t readFromSerial(void *receiveBuff, int readLen);
 
     //串口是否打开
     bool isOpened(){
@@ -68,9 +65,7 @@ public:
     }
 
 private:
-    bool initSerial(std::string& serial_name, SerialParamStruct aStruct);   //打开串口文件，设置通信参数
-
-    bool setParity(int databits,int stopbits,int parity);   //设置串口数据位、停止位、奇偶位
+    bool setProperty(int databits,int stopbits,int parity, int speed);   //设置串口数据位、停止位、奇偶位
 
     bool setSpeed(int speed) const;   //设置波特率
 };
