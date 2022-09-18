@@ -5,7 +5,8 @@
 #include "serviceRequestHandler.h"
 #include "siteService/nlohmann/json.hpp"
 #include "qlibc/QData.h"
-#include "formatTrans/downBinaryCmd.h"
+#include "formatTrans/downUtil.h"
+#include "formatTrans/bleConfig.h"
 #include <regex>
 #include "log/Logging.h"
 #include "logic/logicControl.h"
@@ -209,6 +210,7 @@ int get_device_state_service_handler(const Request& request, Response& response)
 }
 
 int BleDevice_command_test_service_handler(const Request& request, Response& response){
+#if 0
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
         string command = requestBody.getData("request").getString("command");
@@ -231,6 +233,8 @@ int BleDevice_command_test_service_handler(const Request& request, Response& res
         response.set_content(errResponse.dump(), "text/json");
     }
 
+    return 0;
+#endif
     return 0;
 }
 

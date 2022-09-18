@@ -2,20 +2,25 @@
 // Created by 78472 on 2022/6/15.
 //
 
-#include "downBinaryCmd.h"
+#include "downUtil.h"
 #include "log/Logging.h"
+#include "bleConfig.h"
+#include "serial/telinkDongle.h"
 #include "../parameter.h"
-#include "downBinaryFlowControl.h"
 
-string JsonCmd2Binary::commandPrefix = "E8 FF 00 00 00 00 02 03";
+string BuildBinaryString::commandPrefix = "E8 FF 00 00 00 00 02 03";
 
-bool DownBinaryCmd::transAndSendCmd(QData &cmdData){
-    string binaryString = getBinaryString(cmdData);
-    downBinaryFlowControl::getInstance()->push(binaryString);
+
+bool DownUtility::parse2Send(qlibc::QData &cmdData){
+    string binaryString = cmdData2BinaryCommandString(cmdData);
+    string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
+    TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
+    telinkDonglePtr->write2Seria(binaryString);
     return true;
 }
 
-string DownBinaryCmd::getBinaryString(QData &cmdData) {
+
+string DownUtility::cmdData2BinaryCommandString(QData &cmdData) {
     LOG_INFO << "cmdData: " << cmdData.toJsonString();
     string command  = cmdData.getString("command");
 

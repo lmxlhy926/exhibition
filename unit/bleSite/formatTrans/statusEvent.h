@@ -107,10 +107,8 @@ public:
     static EventTable* getInstance(){
         if(eventTable == nullptr){
             eventTable = new EventTable;
-            return eventTable;
-        }else{
-            return eventTable;
         }
+        return eventTable;
     }
 };
 
@@ -119,6 +117,7 @@ class ReportEvent{
 public:
     virtual void postEvent() = 0;
 
+    //用空格分隔字符串
     static string spaceIntervalFormat(string& str){
         stringstream ss;
         for(int i = 0; i < str.size() / 2; i++){
@@ -129,6 +128,7 @@ public:
        return ss.str();
     }
 
+    //发布状态消息
     static void publishState(string& device_id, string state_id, Json::Value state_value){
         Json::Value stateItem, state_list, deviceItem, device_list, content;
         stateItem["state_id"] = state_id;
@@ -454,18 +454,5 @@ private:
         rs.readByte(remaining_time);
     }
 };
-
-
-//解析上报的状态数据包，产生上报事件
-class PostStatusEvent{
-private:
-    string statusString;
-public:
-    explicit PostStatusEvent(string packageString) : statusString(std::move(packageString)){}
-
-    void operator()();
-};
-
-
 
 #endif //EXHIBITION_STATUSEVENT_H

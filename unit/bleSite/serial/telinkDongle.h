@@ -16,21 +16,22 @@
 #define MaxReadOneShot (1024)
 
 //包消息处理
-using PackageMsgHandleFuncType = std::function<bool(std::vector<uint8_t>&)>;
+using PackageMsgHandleFuncType = std::function<bool(std::string&)>;
 
 class TelinkDongle {
 private:
+    static TelinkDongle* instance;
     CommonSerial commonSerial;
 
-    std::queue<std::vector<uint8_t>> recvQueue;
+    std::queue<string> recvQueue;     //包队列
     std::mutex recvMutex;
     std::condition_variable recvConVar;
 
-    std::queue<std::vector<uint8_t>> sendQueue;
+    std::queue<string> sendQueue;     //发送队列
     std::mutex sendMutex;
     std::condition_variable sendConVar;
 
-    std::vector<uint8_t> packageFrame;
+    std::vector<uint8_t> packageFrame;  //存储一个完整的未转义的包数据
     PackageMsgHandleFuncType packageMsgHandledFunc = nullptr;   //处理读取数据的回调函数
 
     enum state{
@@ -45,8 +46,15 @@ private:
     std::thread *receiveThread = nullptr;             //从串口读消息，拼接为包，加入队列
     std::thread *packageHandleThread = nullptr;       //从队列读取包数据进行处理
 
-public:
     explicit TelinkDongle(std::string& serial_name);
+
+public:
+    static TelinkDongle* getInstance(std::string& serial_name){
+        if(instance == nullptr){
+            instance = new TelinkDongle(serial_name);
+        }
+        return instance;
+    }
 
     ~TelinkDongle();
 
@@ -57,7 +65,7 @@ public:
     void closeSerial();
 
     //向串口写数据
-    bool write2Seria(std::vector<uint8_t>& data);
+    bool write2Seria(std::string& commandString);
 
     //注册包消息处理函数
     void registerPkgMsgFunc(PackageMsgHandleFuncType fun);
@@ -66,11 +74,17 @@ public:
     bool startReceive();
 
 private:
+    std::vector<uint8_t> commandString2BinaryByte(string& commandString);   //字符串转换为二进制数据
+
+    string binary2SendString(std::vector<uint8_t>& sendVec);    //打印待发送的数据
+
     void sendThreadFunc();  //发送数据指令线程例程
 
     void handleReceiveData();    //从串口读取数据并处理
 
-    void joinPackage(uint8_t *data, ssize_t length);  //拼接为数据包后，加入队列
+    void joinPackage(uint8_t *data, ssize_t length);  //拼接包数据、转义、加入队列
+
+    string packageEscape(std::vector<uint8_t>& originFrame) const;  //转义包数据后，转换为字符串
 
     void packageHandel();   //从队列中读取包并处理
 };

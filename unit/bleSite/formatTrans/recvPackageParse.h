@@ -2,8 +2,8 @@
 // Created by 78472 on 2022/6/13.
 //
 
-#ifndef EXHIBITION_UPBINAYCMD_H
-#define EXHIBITION_UPBINAYCMD_H
+#ifndef EXHIBITION_RECVPACKAGEPARSE_H
+#define EXHIBITION_RECVPACKAGEPARSE_H
 
 #include <string>
 #include <iostream>
@@ -12,13 +12,16 @@
 
 using namespace std;
 
-class UpBinaryCmd{
+class RecvPackageParse{
     static mutex mutex_;
     static string packageString;
 public:
     //接收串口返回，解析返回数据，产生相应的事件
-    static bool bleReceiveFunc(unsigned char* binaryStream, int size);
+    static bool handlePackageString(string& subPackageString);
+
+private:
+    static void parse2Event(string& completePackageString);
 };
 
 
-#endif //EXHIBITION_UPBINAYCMD_H
+#endif //EXHIBITION_RECVPACKAGEPARSE_H

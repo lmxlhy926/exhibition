@@ -2,38 +2,32 @@
 // Created by 78472 on 2022/6/15.
 //
 
-#ifndef EXHIBITION_DOWNBINARYCMD_H
-#define EXHIBITION_DOWNBINARYCMD_H
+#ifndef EXHIBITION_DOWNUTIL_H
+#define EXHIBITION_DOWNUTIL_H
 
 #include <string>
 #include <regex>
 #include <sstream>
+#include <iomanip>
 #include "qlibc/QData.h"
-#include "downBinaryUtil.h"
 #include "logic/snAddressMap.h"
 #include "logic/groupAddressMap.h"
 #include "../parameter.h"
 
 using namespace std;
 
-class DownBinaryCmd{
+class DownUtility{
 public:
-    //将json格式控制命令转换为二进制格式，并向串口发送。
-    static bool transAndSendCmd(QData &controlData);
+    //将json格式控制命令转换为二进制字符串，并发送
+    static bool parse2Send(qlibc::QData &controlData);
 
 private:
-    /**
-     * 将json格式控制命令转换为二进制控制命令
-     * @param data      控制命令
-     * @param buf       二进制命令数组
-     * @param bufSize   数组容量
-     * @return          二进制命令长度
-     */
-    static string getBinaryString(qlibc::QData& controlData);
+    //将json格式控制命令转换为二进制字符串
+    static string cmdData2BinaryCommandString(qlibc::QData& controlData);
 };
 
 
-class JsonCmd2Binary{
+class BuildBinaryString{
 private:
     static string commandPrefix;
 protected:
@@ -58,7 +52,7 @@ public:
 };
 
 //扫描
-class LightScan : public JsonCmd2Binary{
+class LightScan : public BuildBinaryString{
 public:
     string getBinaryString() override{
         return string("E9FF00");
@@ -66,7 +60,7 @@ public:
 };
 
 //结束扫描
-class LightScanEnd : public JsonCmd2Binary{
+class LightScanEnd : public BuildBinaryString{
 public:
     string getBinaryString() override{
         return string("E9FF01");
@@ -74,7 +68,7 @@ public:
 };
 
 //连接
-class LightConnect : public JsonCmd2Binary{
+class LightConnect : public BuildBinaryString{
 private:
     string deviceSn;
 public:
@@ -87,7 +81,7 @@ public:
 };
 
 //给网关分配地址
-class LightGatewayAddressAssign : public JsonCmd2Binary{
+class LightGatewayAddressAssign : public BuildBinaryString{
 public:
     string getBinaryString() override{
         string binaryString = "E9FF091112131415161718191A1B1C1D1E1F20000000112233440001";
@@ -96,7 +90,7 @@ public:
 };
 
 //给节点分配地址
-class LightNodeAddressAssign : public JsonCmd2Binary{
+class LightNodeAddressAssign : public BuildBinaryString{
 private:
     string nodeAddress;
 public:
@@ -109,7 +103,7 @@ public:
 };
 
 //设备绑定
-class LightBind : public JsonCmd2Binary{
+class LightBind : public BuildBinaryString{
 public:
     string getBinaryString() override{
         string binaryString = "E9FF0B00000060964771734FBD76E3B40519D1D94A48";
@@ -119,7 +113,7 @@ public:
 
 
 //设备解绑
-class LightUnBind : public JsonCmd2Binary{
+class LightUnBind : public BuildBinaryString{
 private:
     string deviceSn;
 public:
@@ -136,7 +130,7 @@ public:
 };
 
 //设备分组
-class LightAdd2Group : public JsonCmd2Binary{
+class LightAdd2Group : public BuildBinaryString{
 private:
     string deviceSn;
     string group_id;
@@ -175,7 +169,7 @@ public:
 
 
 //设备解除分组
-class LightDelFromGroup : public JsonCmd2Binary{
+class LightDelFromGroup : public BuildBinaryString{
 private:
     string deviceSn;
     string group_id;
@@ -213,7 +207,7 @@ public:
 };
 
 //开关
-class LightOnOff : public JsonCmd2Binary{
+class LightOnOff : public BuildBinaryString{
 private:
     string address;
     string onOff;
@@ -242,7 +236,7 @@ public:
 
 
 //亮度
-class LightLuminance : public JsonCmd2Binary{
+class LightLuminance : public BuildBinaryString{
 private:
     string address;
     int luminanceVal = 0;
@@ -275,7 +269,7 @@ public:
 
 
 //色温
-class LightColorTem : public JsonCmd2Binary{
+class LightColorTem : public BuildBinaryString{
 private:
     string address;
     int ctlTemperature;
@@ -310,4 +304,4 @@ public:
 };
 
 
-#endif //EXHIBITION_DOWNBINARYCMD_H
+#endif //EXHIBITION_DOWNUTIL_H

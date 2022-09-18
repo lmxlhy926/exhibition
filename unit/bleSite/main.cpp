@@ -14,11 +14,11 @@
 #include "parameter.h"
 #include "formatTrans/statusEvent.h"
 #include "formatTrans/bleConfig.h"
-#include "formatTrans/upBinayCmd.h"
-#include "formatTrans/downBinaryCmd.h"
-#include "formatTrans/downBinaryFlowControl.h"
+#include "formatTrans/recvPackageParse.h"
+#include "formatTrans/downUtil.h"
 #include "logic/logicControl.h"
 #include "common/httpUtil.h"
+#include "serial/telinkDongle.h"
 
 using namespace std;
 using namespace servicesite;
@@ -36,8 +36,6 @@ int main(int argc, char* argv[]) {
 
     //站点请求管理
     SiteRecord::getInstance()->addSite(ConfigSiteName, LocalIp, ConfigPort);
-    //流控
-    downBinaryFlowControl::getInstance();
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
@@ -49,14 +47,25 @@ int main(int argc, char* argv[]) {
     configPathPtr->setConfigPath(string(argv[1]));
 
     //注册串口上报回调函数，初始化并打开串口
-    while(!configPathPtr->serialInit(UpBinaryCmd::bleReceiveFunc)){
-        LOG_RED << "==>failed to open the serial<"
-                  << configPathPtr->getSerialData().getString("serial") << ">....";
-        LOG_RED << "===>try to open in 3 seconds.....";
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+    SerialParamStruct serialParam;
+    serialParam.stopbits = 1;
+    serialParam.databits = 8;
+    serialParam.parity = 'N';
+    serialParam.baudrate = 115200;
+
+    string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
+    TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
+    telinkDonglePtr->registerPkgMsgFunc(RecvPackageParse::handlePackageString);
+    while(true){
+        if(telinkDonglePtr->openSerial(serialParam)){
+            telinkDonglePtr->startReceive();
+            LOG_INFO << "===>startDongle successfully, serialName <" << serialName << ">.......";
+            break;
+        }else{
+            LOG_RED << "==>failed to open the serial<" << serialName << ">....";
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+        }
     }
-    LOG_INFO << "===>success in open serial<"
-              << configPathPtr->getSerialData().getString("serial") << ">";
 
     //创建控制类，传递给注册的回调函数
     LogicControl lc;

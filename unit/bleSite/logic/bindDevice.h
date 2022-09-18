@@ -15,11 +15,14 @@ private:
 public:
     BindDevice()= default;
 
+    //绑定设备，更新配置站点白名单
     void bind(qlibc::QData& deviceArray);
 
 private:
+    //绑定设备
     bool addDevice(string& deviceSn, qlibc::QData& property);
 
+    //更新白名单
     void updateDeviceList2ConfigSite();
 };
 

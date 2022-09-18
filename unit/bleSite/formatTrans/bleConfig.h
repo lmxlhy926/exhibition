@@ -9,7 +9,6 @@
 #include <functional>
 #include "common/httplib.h"
 #include "qlibc/QData.h"
-#include "serial/telinkDongle.h"
 
 using namespace qlibc;
 
@@ -21,7 +20,6 @@ private:
     QData groupAddressData;                     //组地址数据
     QData deviceListData;                       //蓝牙设备列表
     QData statusListData;                       //状态列表
-    std::shared_ptr<TelinkDongle> serial;       //串口
     httplib::ThreadPool threadPool;             //线程池
     static bleConfig* instance;                 //静态对象
     std::recursive_mutex rMutex_;
@@ -77,12 +75,6 @@ public:
 
     //保存组地址列表
     void saveGroupListData(qlibc::QData& data);
-
-    //初始化串口类，设置读取数据回调函数
-    bool serialInit(PackageMsgHandleFuncType func);
-
-    //获取串口操作对象
-    shared_ptr<TelinkDongle> getSerial();
 
     //将函数加入线程池
     void enqueue(std::function<void()> fn);

@@ -3,7 +3,7 @@
 //
 
 #include "bindDevice.h"
-#include "formatTrans/downBinaryCmd.h"
+#include "formatTrans/downUtil.h"
 #include "formatTrans/statusEvent.h"
 #include "log/Logging.h"
 #include "../parameter.h"
@@ -44,7 +44,7 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     LOG_INFO << ">>: start to scan the device <" << deviceSn << ">.....";
     qlibc::QData scanData;
     scanData.setString("command", "scan");
-    DownBinaryCmd::transAndSendCmd(scanData);
+    DownUtility::parse2Send(scanData);
 
     //等待扫描到指定的设备
     time_t time_current = time(nullptr);
@@ -65,19 +65,19 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     qlibc::QData connectData;
     connectData.setString("command", "connect");
     connectData.setString("deviceSn", deviceSn);
-    DownBinaryCmd::transAndSendCmd(connectData);
+    DownUtility::parse2Send(connectData);
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
     //给网关分配地址，等待1秒
     LOG_INFO << ">>: start to assign gateway address....";
     qlibc::QData gateAddressAssign(AssignGateWayAddressString);
-    DownBinaryCmd::transAndSendCmd(gateAddressAssign);
+    DownUtility::parse2Send(gateAddressAssign);
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
     //给节点分配地址，大约6秒，等待返回成功，最多等待60秒
     LOG_INFO << ">>: start to assgin node address....";
     qlibc::QData nodeAddressAssign(SnAddressMap::getInstance()->getNodeAssignAddr(deviceSn));
-    DownBinaryCmd::transAndSendCmd(nodeAddressAssign);
+    DownUtility::parse2Send(nodeAddressAssign);
     if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(60) == std::cv_status::no_timeout){
         LOG_PURPLE << "<<: successed to assgin node address....";
     }else{
@@ -90,7 +90,7 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     //绑定；大约需要10秒
     LOG_INFO << ">>: start to bind....";
     qlibc::QData bind(BindString);
-    DownBinaryCmd::transAndSendCmd(bind);
+    DownUtility::parse2Send(bind);
 
     if(EventTable::getInstance()->bindSuccessEvent.wait(60) == std::cv_status::timeout){
         LOG_RED << "<<: .......BIND FAILED..........";

@@ -46,7 +46,7 @@ bool CommonSerial::openSerial(SerialParamStruct aStruct){
         return false;
     }
 
-    if(setProperty(aStruct.databits, aStruct.stopbits, aStruct.parity, aStruct.baudrate) == false)
+    if(!setProperty(aStruct.databits, aStruct.stopbits, aStruct.parity, aStruct.baudrate))
     {
         LOG_RED << "Set Property Error";
         close(fd_serial);
@@ -75,7 +75,7 @@ bool CommonSerial::write2Serial(const void *buff, int writeLen) {
     ssize_t nWrite = write(fd_serial, buff, writeLen);
     if(nWrite != writeLen)
     {
-        LOG_RED << "Write Error!......";
+        LOG_RED << "write2Serial Error!......";
         return false;
     }
     return true;

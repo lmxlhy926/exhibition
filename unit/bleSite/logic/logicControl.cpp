@@ -6,10 +6,8 @@
 #include "siteService/service_site_manager.h"
 #include "../parameter.h"
 #include "log/Logging.h"
-#include "formatTrans/downBinaryUtil.h"
-#include "formatTrans/downBinaryCmd.h"
+#include "formatTrans/downUtil.h"
 #include "formatTrans/statusEvent.h"
-#include "formatTrans/downBinaryUtil.h"
 #include "bindDevice.h"
 #include <sstream>
 #include <iomanip>
@@ -29,7 +27,7 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
         bindingFlag.store(false);
 
     }else{  //设备控制指令
-        DownBinaryCmd::transAndSendCmd(cmdData);
+        DownUtility::parse2Send(cmdData);
     }
 
     return true;
@@ -40,7 +38,7 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
 void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& param){
     qlibc::QData scanData;
     scanData.setString("command", "scan");
-    DownBinaryCmd::transAndSendCmd(scanData);
+    DownUtility::parse2Send(scanData);
 
     std::map<string, Json::Value> deviceMap;
     qlibc::QData retScanData;
