@@ -133,6 +133,7 @@ void TelinkDongle::handleReceiveData() {
             if(nReady > 0){
                 uint8_t buffer[MaxReadOneShot]{};
                 ssize_t nRead = commonSerial.readFromSerial(buffer, MaxReadOneShot);
+                LOG_INFO << "nRead: " << nRead;
                 if(nRead > 0){
                     joinPackage(buffer, nRead);
                 }
@@ -158,7 +159,7 @@ void TelinkDongle::joinPackage(uint8_t *data, ssize_t length){
         }else{
             packageFrame.push_back(data[i]);
             if(data[i] == PackageEndIndex){
-                string packageString = packageEscape(packageFrame);
+                string packageString = packageEscape(packageFrame); //转义包数据
                 {
                     std::lock_guard<std::mutex> lg(recvMutex);
                     LOG_YELLOW << "===>packageString: " << packageString;

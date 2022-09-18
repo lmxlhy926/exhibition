@@ -46,12 +46,20 @@ bool CommonSerial::openSerial(SerialParamStruct aStruct){
         return false;
     }
 
-    if(!setProperty(aStruct.databits, aStruct.stopbits, aStruct.parity, aStruct.baudrate))
+//    if(!setProperty(aStruct.databits, aStruct.stopbits, aStruct.parity, aStruct.baudrate))
+//    {
+//        LOG_RED << "Set Property Error";
+//        close(fd_serial);
+//        return false;
+//    }
+
+    if(!setUartProperty())
     {
-        LOG_RED << "Set Property Error";
+        LOG_RED << "setUartProperty Error.....";
         close(fd_serial);
         return false;
     }
+
 
     //串口成功打开
     isSerialOpened.store(true);
@@ -196,6 +204,40 @@ bool CommonSerial::setSpeed(int speed) const{
             return true;
         }
     }
+}
+
+bool CommonSerial::setUartProperty() {
+    struct termios options{};
+    if (tcgetattr(fd_serial, &options) != 0)
+    {
+        LOG_RED << "tcgetattr Error....";
+        return false;
+    }
+
+    options.c_iflag  &= ~(ICRNL | IXON | INPCK);            //禁止CR->NL转换、禁止输出流控制起作用、禁止输入奇偶校验
+    options.c_oflag  &= ~OPOST;                             //禁止输出处理
+    options.c_lflag  &= ~(ICANON | ECHO | ECHOE | ISIG);    //非规范模式、禁止回显、禁止信号
+
+    options.c_cflag &= ~CSIZE;      //字符大小屏蔽字
+    options.c_cflag |= CS8;         //数据位
+    options.c_cflag &= ~CSTOPB;     //一位停止位
+    options.c_cflag &= ~PARENB;     //禁用奇偶校验
+
+    options.c_cc[VTIME] = 1;
+    options.c_cc[VMIN] = 100;           //每次读取100个字节，如果在一秒内没有读取到，则返回
+
+    cfsetispeed(&options, B115200);     //输入波特率
+    cfsetospeed(&options, B115200);     //输出波特率
+
+    tcflush(fd_serial, TCIOFLUSH);
+    int status = tcsetattr(fd_serial, TCSANOW, &options);
+    if (status != 0)
+    {
+        LOG_RED << "tcsetattr Error.....";
+        return false;
+    }
+
+    return true;
 }
 
 

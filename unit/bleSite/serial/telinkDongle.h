@@ -80,7 +80,7 @@ private:
 
     void sendThreadFunc();  //发送数据指令线程例程
 
-    void handleReceiveData();    //从串口读取数据并处理
+    void handleReceiveData();    //从串口读取数据，截取到数据包后，存入队列
 
     void joinPackage(uint8_t *data, ssize_t length);  //拼接包数据、转义、加入队列
 
