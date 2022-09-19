@@ -70,6 +70,8 @@ private:
     bool setSpeed(int speed) const;   //设置波特率
 
     bool setUartProperty();
+
+    bool setUartProperty_try();
 };
 
 #endif //EXHIBITION_POSIXSERIAL_H

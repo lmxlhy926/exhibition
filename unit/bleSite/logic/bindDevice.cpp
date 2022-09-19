@@ -92,7 +92,7 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     qlibc::QData bind(BindString);
     DownUtility::parse2Send(bind);
 
-    if(EventTable::getInstance()->bindSuccessEvent.wait(60) == std::cv_status::timeout){
+    if(EventTable::getInstance()->bindSuccessEvent.wait(80) == std::cv_status::timeout){
         LOG_RED << "<<: .......BIND FAILED..........";
         LOG_RED << "<<: ----------------------------";
         LOG_RED << "<<: -----------------------------";

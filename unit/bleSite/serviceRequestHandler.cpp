@@ -14,6 +14,7 @@
 #include "logic/groupAddressMap.h"
 #include "common/httpUtil.h"
 #include "parameter.h"
+#include "serial/telinkDongle.h"
 
 
 static const nlohmann::json okResponse = {
@@ -210,22 +211,15 @@ int get_device_state_service_handler(const Request& request, Response& response)
 }
 
 int BleDevice_command_test_service_handler(const Request& request, Response& response){
-#if 0
+
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
         string command = requestBody.getData("request").getString("command");
         LOG_HLIGHT << "--->received command: " << command;
 
-        unsigned char buf[100]{};
-        BinaryBuf binaryBuf(buf, 100);
-        regex sep(" ");
-        sregex_token_iterator p(command.cbegin(), command.cend(), sep, -1);
-        sregex_token_iterator e;
-        for(; p != e; ++p){
-            binaryBuf.append(*p);
-        }
-
-        DownBinaryUtil::serialSend(buf, static_cast<int>(binaryBuf.size()));
+        string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
+        TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
+        telinkDonglePtr->write2Seria(command);
 
         response.set_content(okResponse.dump(), "text/json");
 
@@ -233,8 +227,6 @@ int BleDevice_command_test_service_handler(const Request& request, Response& res
         response.set_content(errResponse.dump(), "text/json");
     }
 
-    return 0;
-#endif
     return 0;
 }
 

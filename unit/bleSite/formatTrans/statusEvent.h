@@ -172,7 +172,7 @@ public:
         data.setString("device_modelCode", extract.getDeviceModelCode());
 
         if(!deviceSn.empty()){
-            LOG_YELLOW << "<<===: scanResult Event, deviceSn = " << deviceSn;
+            LOG_GREEN<< "<<===: scanResult Event, deviceSn = " << deviceSn;
             EventTable::getInstance()->scanResultEvent.putData(data);
             EventTable::getInstance()->scanResultEvent.notify_one();
         }
