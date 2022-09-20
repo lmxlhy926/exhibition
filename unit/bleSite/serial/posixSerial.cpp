@@ -224,14 +224,21 @@ bool CommonSerial::setUartProperty() {
     options.c_cflag |= CS8;             //数据位
     options.c_cflag &= ~CSTOPB;         //一位停止位
     options.c_cflag &= ~PARENB;         //禁用奇偶校验
-    options.c_cflag |= CLOCAL | CREAD;
+    options.c_cflag |= (CLOCAL);
     options.c_cflag &= ~CRTSCTS;        //不使用硬件流控制
+    options.c_cflag &= ~HUPCL;
+    options.c_cflag |= CREAD;
 
     options.c_cc[VTIME] = 1;
     options.c_cc[VMIN] = 100;           //每次读取100个字节，如果在一秒内没有读取到，则返回
 
     cfsetispeed(&options, B115200);     //输入波特率
     cfsetospeed(&options, B115200);     //输出波特率
+
+    checkCflag(options);
+    LOG_PURPLE << "***************";
+    checkIflag(options);
+    LOG_RED << "------------------";
 
     tcflush(fd_serial, TCIOFLUSH);
     int status = tcsetattr(fd_serial, TCSANOW, &options);
@@ -240,6 +247,19 @@ bool CommonSerial::setUartProperty() {
         LOG_RED << "tcsetattr Error.....";
         return false;
     }
+
+    struct termios setattribute{};
+    if (tcgetattr(fd_serial, &setattribute) != 0)
+    {
+        LOG_RED << "tcgetattr Error....";
+        return false;
+    }
+
+    checkCflag(setattribute);
+    LOG_PURPLE << "***************";
+    checkIflag(setattribute);
+
+    LOG_INFO <<  setattribute.c_cc[VTIME] << " " << setattribute.c_cc[VMIN];
 
     return true;
 }
@@ -294,6 +314,69 @@ bool CommonSerial::setUartProperty_try() {
     }
 
     return true;
+}
+
+void CommonSerial::checkCflag(struct termios options) {
+    if(options.c_cflag & CLOCAL){
+        LOG_INFO << "CLOCAL: " << "true";
+    }
+    if(options.c_cflag & CREAD){
+        LOG_INFO << "CREAD: " << "true";
+    }
+    if(options.c_cflag & CSIZE){
+        LOG_INFO << "CSIZE: " << "true";
+    }
+    if(options.c_cflag & CSTOPB){
+        LOG_INFO << "CSTOPB: " << "true";
+    }
+    if(options.c_cflag & HUPCL){
+        LOG_INFO << "HUPCL: " << "true";
+    }
+    if(options.c_cflag & PARENB){
+        LOG_INFO << "PARENB: " << "true";
+    }
+    if(options.c_cflag & PARODD){
+        LOG_INFO << "PARODD: " << "true";
+    }
+}
+
+void CommonSerial::checkIflag(struct termios options) {
+    if(options.c_iflag & BRKINT){
+        LOG_HLIGHT << "BRKINT: " << "true";
+    }
+    if(options.c_iflag & ICRNL){
+        LOG_HLIGHT << "ICRNL: " << "true";
+    }
+    if(options.c_iflag & IGNBRK){
+        LOG_HLIGHT << "IGNBRK: " << "true";
+    }
+    if(options.c_iflag & IGNCR){
+        LOG_HLIGHT << "IGNCR: " << "true";
+    }
+    if(options.c_iflag & IGNPAR){
+        LOG_HLIGHT << "IGNPAR: " << "true";
+    }
+    if(options.c_iflag & INLCR){
+        LOG_HLIGHT << "INLCR: " << "true";
+    }
+    if(options.c_iflag & INPCK){
+        LOG_HLIGHT << "INPCK: " << "true";
+    }
+    if(options.c_iflag & ISTRIP){
+        LOG_HLIGHT << "ISTRIP: " << "true";
+    }
+    if(options.c_iflag & IXANY){
+        LOG_HLIGHT << "IXANY: " << "true";
+    }
+    if(options.c_iflag & IXOFF){
+        LOG_HLIGHT << "IXOFF: " << "true";
+    }
+    if(options.c_iflag & IXON){
+        LOG_HLIGHT << "IXON: " << "true";
+    }
+    if(options.c_iflag & PARMRK){
+        LOG_HLIGHT << "PARMRK: " << "true";
+    }
 }
 
 

@@ -129,7 +129,9 @@ void TelinkDongle::handleReceiveData() {
     {
         readSet = allset;
         if(commonSerial.isOpened()){
+            LOG_INFO << "WAIT.....";
             int nReady = select(commonSerial.getSerialFd() + 1, &readSet, nullptr, nullptr, nullptr);
+            LOG_INFO << "nReady: " << nReady;
             if(nReady > 0){
                 uint8_t buffer[MaxReadOneShot]{};
                 ssize_t nRead = commonSerial.readFromSerial(buffer, MaxReadOneShot);
@@ -137,8 +139,6 @@ void TelinkDongle::handleReceiveData() {
                 if(nRead > 0){
                     joinPackage(buffer, nRead);
                 }
-            }else{
-                break;
             }
         }else{
             break;

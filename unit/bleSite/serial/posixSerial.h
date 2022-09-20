@@ -72,6 +72,10 @@ private:
     bool setUartProperty();
 
     bool setUartProperty_try();
+
+    void checkCflag(struct termios options);
+
+    void checkIflag(struct termios options);
 };
 
 #endif //EXHIBITION_POSIXSERIAL_H
