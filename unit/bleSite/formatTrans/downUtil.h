@@ -211,12 +211,16 @@ class LightOnOff : public BuildBinaryString{
 private:
     string address;
     string onOff;
+    string transTime;
 public:
     explicit LightOnOff(qlibc::QData& data) { init(data); }
 
     void init(qlibc::QData& data){
         address = data.getString("address");
         onOff = data.getString("commandPara");
+        stringstream ss;
+        ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
+        transTime = ss.str();
     }
 
     string getBinaryString() override{
@@ -228,8 +232,9 @@ public:
         }else if(onOff == "off"){
             stringCmd.append("00");
         }
-        stringCmd.append(deleteWhiteSpace("00 00 00"));
-
+        stringCmd.append("00");
+        stringCmd.append(transTime);
+        stringCmd.append("00");
         return stringCmd;
     }
 };
@@ -240,6 +245,7 @@ class LightLuminance : public BuildBinaryString{
 private:
     string address;
     int luminanceVal = 0;
+    string transTime;
 
 public:
     explicit LightLuminance(qlibc::QData& data){ init(data); }
@@ -252,6 +258,9 @@ public:
         }else{
             luminanceVal = 0xffff;
         }
+        stringstream ss;
+        ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
+        transTime = ss.str();
     }
 
     string getBinaryString() override{
@@ -261,7 +270,9 @@ public:
 
         string stringCmd;
         stringCmd.append(prefix).append(address).append("824C").append(ss.str());
-        stringCmd.append(deleteWhiteSpace("00 00 00"));
+        stringCmd.append("00");
+        stringCmd.append(transTime);
+        stringCmd.append("00");
 
         return stringCmd;
     }
@@ -273,6 +284,7 @@ class LightColorTem : public BuildBinaryString{
 private:
     string address;
     int ctlTemperature;
+    string transTime;
 
 public:
     explicit LightColorTem(qlibc::QData& data){ init(data); }
@@ -285,6 +297,9 @@ public:
         }else{
             ctlTemperature = 6500;
         }
+        stringstream ss;
+        ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
+        transTime = ss.str();
     }
 
     string getBinaryString() override{
@@ -297,7 +312,9 @@ public:
         stringCmd.append(prefix).append(address).append("8264");
         stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
         stringCmd.append(deleteWhiteSpace("00 00"));
-        stringCmd.append(deleteWhiteSpace("00 00 00"));
+        stringCmd.append("00");
+        stringCmd.append(transTime);
+        stringCmd.append("00");
 
         return stringCmd;
     }

@@ -56,10 +56,15 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
         for(Json::ArrayIndex j = 0; j < command_list.size(); ++j){
             qlibc::QData commandItem = command_list.getArrayElement(j);
             string command_id = commandItem.getString("command_id");
-
+            int transTime = commandItem.getInt("transTime");
+            if(transTime < 0 || transTime >= 255){
+                transTime = 0;
+            }
+            
             qlibc::QData cmdData;
             cmdData.setString("address", address);
             cmdData.setString("command", command_id);
+            cmdData.setInt("transTime", transTime);
 
             if(command_id == POWER){
                 cmdData.setString("commandPara", commandItem.getString("command_para"));

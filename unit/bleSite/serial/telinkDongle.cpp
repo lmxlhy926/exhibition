@@ -129,13 +129,13 @@ void TelinkDongle::handleReceiveData() {
     {
         readSet = allset;
         if(commonSerial.isOpened()){
-            LOG_INFO << "WAIT.....";
+//            LOG_INFO << "WAIT.....";
             int nReady = select(commonSerial.getSerialFd() + 1, &readSet, nullptr, nullptr, nullptr);
-            LOG_INFO << "nReady: " << nReady;
+//            LOG_INFO << "nReady: " << nReady;
             if(nReady > 0){
                 uint8_t buffer[MaxReadOneShot]{};
                 ssize_t nRead = commonSerial.readFromSerial(buffer, MaxReadOneShot);
-                LOG_INFO << "nRead: " << nRead;
+//                LOG_INFO << "nRead: " << nRead;
                 if(nRead > 0){
                     joinPackage(buffer, nRead);
                 }
@@ -162,7 +162,7 @@ void TelinkDongle::joinPackage(uint8_t *data, ssize_t length){
                 string packageString = packageEscape(packageFrame); //转义包数据
                 {
                     std::lock_guard<std::mutex> lg(recvMutex);
-                    LOG_YELLOW << "===>packageString: " << packageString;
+//                    LOG_YELLOW << "===>packageString: " << packageString;
                     recvQueue.push(packageString);
                 }
                 recvConVar.notify_one();
