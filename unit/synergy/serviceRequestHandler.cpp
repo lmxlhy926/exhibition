@@ -7,6 +7,7 @@
 #include "qlibc/QData.h"
 #include "deviceControl/contreteDeviceControl.h"
 #include "param.h"
+#include "common/httpUtil.h"
 
 static const nlohmann::json okResponse = {
         {"code", 0},
@@ -20,32 +21,73 @@ static const nlohmann::json errResponse = {
         {"response",{}}
 };
 
+qlibc::QData addSourceTag(qlibc::QData deviceList, string sourceSite){
+    Json::ArrayIndex num = deviceList.size();
+    qlibc::QData newDeviceList;
+    for(Json::ArrayIndex i = 0; i < num; ++i){
+        qlibc::QData item = deviceList.getArrayElement(i);
+        item.setString("sourceSite", sourceSite);
+        newDeviceList.append(item);
+    }
+    return newDeviceList;
+}
+
+qlibc::QData getDeviceList(){
+    qlibc::QData deviceRequest;
+    deviceRequest.setString("service_id", "get_device_list");
+    deviceRequest.setValue("request", Json::nullValue);
+
+    qlibc::QData bleDeviceRes, zigbeeDeviceRes, tvDeviceRes;
+    SiteRecord::getInstance()->sendRequest2Site(BleSiteID, deviceRequest, bleDeviceRes);
+    SiteRecord::getInstance()->sendRequest2Site(ZigbeeSiteID, deviceRequest, zigbeeDeviceRes);
+    SiteRecord::getInstance()->sendRequest2Site(TvAdapterSiteID, deviceRequest, tvDeviceRes);
+
+    qlibc::QData deviceList;
+    deviceList.append(addSourceTag(bleDeviceRes.getData("response").getData("device_list"), BleSiteID));
+    deviceList.append(addSourceTag(zigbeeDeviceRes.getData("response").getData("device_list"), ZigbeeSiteID));
+    deviceList.append(addSourceTag(tvDeviceRes.getData("response").getData("device_list"), TvAdapterSiteID));
+
+   return deviceList;
+}
+
+void classify(qlibc::QData& controlData, qlibc::QData& bleDeviceList, qlibc::QData& zigbeeDeviceList, qlibc::QData& tvAdapterList){
+    string sourceSite = controlData.getString("sourceSite");
+    if(sourceSite == BleSiteID){
+        bleDeviceList.append(controlData);
+    }else if(sourceSite == ZigbeeSiteID){
+        zigbeeDeviceList.append(controlData);
+    }else if(sourceSite == TvAdapterSiteID){
+        tvAdapterList.append(controlData);
+    }
+}
+
+bool sendCmd(qlibc::QData& bleDeviceList, qlibc::QData& zigbeeDeviceList, qlibc::QData& tvAdapterList){
+    if(bleDeviceList.size() > 0){
+
+    }
+    if(zigbeeDeviceList.size() > 0){
+
+    }
+    if(tvAdapterList.size() > 0){
+
+    }
+    return true;
+}
+
+
 
 bool controlDeviceRightNow(qlibc::QData& message){
     std::cout << "received message: " << message.toJsonString() << std::endl;
-    const DownCommandData downCommand(message);
 
-    //构造请求体，获取设备列表
-    qlibc::QData request, responseTvAdapter, responseZigbee;
-    request.setString("service_id", "get_device_list");
-    request.setValue("request", Json::nullValue);
+    qlibc::QData deviceList = getDeviceList();
 
-    bool retTvAdapter = ControlBase::sitePostRequest(RequestIp, TvAdapterSitePort,request, responseTvAdapter);
-    bool retZigbee = ControlBase::sitePostRequest(RequestIp, ZigbeeSitePort,request, responseZigbee);
+    DownCommandData downCommand(message);
+    qlibc::QData controlData = downCommand.getContorlData(deviceList);
 
-    if(retTvAdapter || retZigbee){
-        if(responseTvAdapter.getInt("code") == 0 || responseZigbee.getInt("code") == 0){
-            std::cout << "===>get deviceList successfully" << std::endl;
-            qlibc::QData deviceListTvAdapter = responseTvAdapter.getData("response").getData("device_list");
-            qlibc::QData deviceListZigbee = responseZigbee.getData("response").getData("device_list");
 
-            if(downCommand.deviceType == "light"){
-                CommonControl comCtr;
-                comCtr(downCommand, deviceListTvAdapter, TvAdapterSitePort);
-                comCtr(downCommand, deviceListZigbee, ZigbeeSitePort);
-            }
-        }
-    }
+    qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
+    classify(controlData, bleDeviceList, zigbeeDeviceList, tvAdapterList);
+
     return true;
 }
 
@@ -57,6 +99,22 @@ int device_control_service_handler(const Request& request, Response& response){
     }else{
         response.set_content(errResponse.dump(), "text/json");
     }
+    return 0;
+}
+
+
+int getDeviceList_service_handler(const Request& request, Response& response){
+    qlibc::QData deviceList = getDeviceList();
+
+    qlibc::QData res;
+    res.putData("device_list", deviceList);
+
+    qlibc::QData data;
+    data.setInt("code", 0);
+    data.setString("error", "ok");
+    data.putData("response", res);
+
+    response.set_content(data.toJsonString(), "text/json");
     return 0;
 }
 

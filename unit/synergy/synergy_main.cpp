@@ -11,6 +11,7 @@
 #include "serviceRequestHandler.h"
 #include "param.h"
 #include "msgSubscribeHandler.h"
+#include "common/httpUtil.h"
 
 using namespace std;
 using namespace servicesite;
@@ -26,7 +27,13 @@ int main(int argc, char* argv[]) {
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->setServerPort(SynergySitePort);
-    serviceSiteManager->setSiteIdSummary(SYNERGY_SITE_ID, SYNERGY_SITE_ID_NAME);
+    serviceSiteManager->setSiteIdSummary(SynergySiteID, SynergySiteName);
+
+    //站点请求管理
+    SiteRecord::getInstance()->addSite(BleSiteID, RequestIp, BleSitePort);
+    SiteRecord::getInstance()->addSite(ZigbeeSiteID, RequestIp, ZigbeeSitePort);
+    SiteRecord::getInstance()->addSite(TvAdapterSiteID, RequestIp, TvAdapterSitePort);
+
 
     // 注册 Service 请求处理 handler
     serviceSiteManager->registerServiceRequestHandler(Control_Device_Service_ID,
@@ -35,24 +42,24 @@ int main(int argc, char* argv[]) {
                                                       });
 
     //注册messageID对应的handler;
-    serviceSiteManager->registerMessageHandler(REGISTERAGAIN_MESSAGE_ID, synergy::register2QuerySite);
-
-    threadPool_.enqueue([&](){
-        while(true){
-            int code;
-            std::vector<string> messageIdList;
-            messageIdList.push_back(REGISTERAGAIN_MESSAGE_ID);
-            code = serviceSiteManager->subscribeMessage(RequestIp, QuerySitePort, messageIdList);
-
-            if (code == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage REGISTERAGAIN_MESSAGE_ID ok.\n");
-                break;
-            }
-
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-            printf("subscribed REGISTERAGAIN_MESSAGE_ID failed....., start to subscribe in 3 seconds\n");
-        }
-    });
+//    serviceSiteManager->registerMessageHandler(REGISTERAGAIN_MESSAGE_ID, synergy::register2QuerySite);
+//
+//    threadPool_.enqueue([&](){
+//        while(true){
+//            int code;
+//            std::vector<string> messageIdList;
+//            messageIdList.push_back(REGISTERAGAIN_MESSAGE_ID);
+//            code = serviceSiteManager->subscribeMessage(RequestIp, QuerySitePort, messageIdList);
+//
+//            if (code == ServiceSiteManager::RET_CODE_OK) {
+//                printf("subscribeMessage REGISTERAGAIN_MESSAGE_ID ok.\n");
+//                break;
+//            }
+//
+//            std::this_thread::sleep_for(std::chrono::seconds(3));
+//            printf("subscribed REGISTERAGAIN_MESSAGE_ID failed....., start to subscribe in 3 seconds\n");
+//        }
+//    });
 
 
     // 站点监听线程启动

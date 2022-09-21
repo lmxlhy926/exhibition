@@ -4,6 +4,24 @@
 #include "common.h"
 #include "common/httplib.h"
 
+qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
+   ssize_t num = deviceList.size();
+   for(Json::ArrayIndex i = 0; i < num; ++i){
+       qlibc::QData item = deviceList.getArrayElement(i);
+       if(match(item)){
+           qlibc::QData controlData;
+           controlData.setString("device_id", item.getString("device_id"));
+           controlData.setString("sourceSite", item.getString("sourceSite"));
+           controlData.putData("command_list", command);
+           return controlData;
+       }
+   }
+}
+
+bool DownCommandData::match(qlibc::QData &item) {
+    return true;
+}
+
 bool ControlBase::match(const DownCommandData &downCommand, qlibc::QData &deviceItem){
     return downCommand.deviceName == deviceItem.getString("nick_name") &&
            downCommand.area == deviceItem.getData("location").getString("room_no");
@@ -52,3 +70,5 @@ bool ControlBase::sitePostRequest(const string& ip, int port, qlibc::QData& requ
     }
     return false;
 }
+
+

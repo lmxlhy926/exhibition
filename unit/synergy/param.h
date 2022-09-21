@@ -7,22 +7,28 @@
 
 static const string RequestIp = "127.0.0.1";
 
+static const string BleSiteID = "ble_light";
+static const string BleSiteName = "BLE灯控";
+static const int BleSitePort = 60009;
+
+static const string ZigbeeSiteID = "zigbee_light";
+static const string ZigbeeSiteName = "ZigBee灯控";
 static const int ZigbeeSitePort = 9002;
+
+static const string TvAdapterSiteID = "tv_adapter";
+static const string TvAdapterSiteName = "智汇家adapter";
 static const int TvAdapterSitePort = 9008;
+
+static const string SynergySiteID = "collaborate";
+static const string SynergySiteName = "协同服务";
 static const int SynergySitePort = 9007;
+
+static const string QuerySiteID = "site_query";
+static const string QuerySiteName = "服务站点查询";
 static const int QuerySitePort = 9000;
-
-//站点描述
-static const string SYNERGY_SITE_ID = "collaborate";
-static const string SYNERGY_SITE_ID_NAME = "协同服务";
-
-//订阅消息
-static const string REGISTERAGAIN_MESSAGE_ID = "register2QuerySiteAgain";   //重新向南向站点注册
-
 
 //服务ID
 static const string Control_Device_Service_ID = "deviceControl";
-
 
 
 #endif //EXHIBITION_PARAM_H

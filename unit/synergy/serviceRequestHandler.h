@@ -12,4 +12,8 @@ using namespace httplib;
 int device_control_service_handler(const Request& request, Response& response);
 
 
+int getDeviceList_service_handler(const Request& request, Response& response);
+
+
+
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

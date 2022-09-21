@@ -60,7 +60,7 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
             if(transTime < 0 || transTime >= 255){
                 transTime = 0;
             }
-            
+
             qlibc::QData cmdData;
             cmdData.setString("address", address);
             cmdData.setString("command", command_id);
