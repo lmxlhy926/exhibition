@@ -42,8 +42,6 @@ void TelinkDongle::registerPkgMsgFunc(PackageMsgHandleFuncType fun) {
 }
 
 bool TelinkDongle::startReceive() {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
     if(!commonSerial.isOpened()){
         LOG_RED << commonSerial.getSerialName() << " is not opened....";
         return false;
@@ -99,8 +97,10 @@ void TelinkDongle::sendThreadFunc(){
             });
         }
 
-        if(!commonSerial.isOpened())
+        if(!commonSerial.isOpened()){
+            LOG_RED << "quit sendThreadFunc, serial closed....";
             return;
+        }
 
         string commandString = sendQueue.front();
         sendQueue.pop();
@@ -113,8 +113,6 @@ void TelinkDongle::sendThreadFunc(){
             }
             this_thread::sleep_for(std::chrono::milliseconds(800));
 
-        }else{  //串口关闭后，结束发送
-            break;
         }
     }
 }
@@ -129,18 +127,19 @@ void TelinkDongle::handleReceiveData() {
     {
         readSet = allset;
         if(commonSerial.isOpened()){
-//            LOG_INFO << "WAIT.....";
+            LOG_INFO << "WAIT.....";
             int nReady = select(commonSerial.getSerialFd() + 1, &readSet, nullptr, nullptr, nullptr);
-//            LOG_INFO << "nReady: " << nReady;
+            LOG_INFO << "nReady: " << nReady;
             if(nReady > 0){
                 uint8_t buffer[MaxReadOneShot]{};
                 ssize_t nRead = commonSerial.readFromSerial(buffer, MaxReadOneShot);
-//                LOG_INFO << "nRead: " << nRead;
+                LOG_INFO << "nRead: " << nRead;
                 if(nRead > 0){
                     joinPackage(buffer, nRead);
                 }
             }
         }else{
+            LOG_RED << "QUIT handleReceiveData....";
             break;
         }
     }
@@ -160,14 +159,15 @@ void TelinkDongle::joinPackage(uint8_t *data, ssize_t length){
             packageFrame.push_back(data[i]);
             if(data[i] == PackageEndIndex){
                 string packageString = packageEscape(packageFrame); //转义包数据
-                {
-                    std::lock_guard<std::mutex> lg(recvMutex);
-//                    LOG_YELLOW << "===>packageString: " << packageString;
-                    recvQueue.push(packageString);
-                }
-                recvConVar.notify_one();
                 packageFrame.clear();
                 parseState = HEAD;
+                {
+                    std::lock_guard<std::mutex> lg(recvMutex);
+                    LOG_YELLOW << "===>packageString: " << packageString;
+                    recvQueue.push(packageString);
+                    LOG_INFO << "remainSize: " << recvQueue.size();
+                }
+                recvConVar.notify_one();
             }
         }
     }
