@@ -36,6 +36,7 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
 
 //进行指定时间的扫描，获取可连接的设备列表
 void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& param){
+    LOG_INFO << "start to find device.....";
     qlibc::QData scanData;
     scanData.setString("command", "scan");
     DownUtility::parse2Send(scanData);
@@ -55,7 +56,7 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
             }
         }
         if(time(nullptr) - time_current > 10){
-            LOG_PURPLE << "===>SCAN END......";
+            LOG_PURPLE << "===>find device end....";
             break;
         }
     }

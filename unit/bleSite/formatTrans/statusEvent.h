@@ -99,6 +99,7 @@ public:
     Event nodeAddressAssignSuccessEvent;        //节点地址分配成功事件
     Event bindSuccessEvent;                     //单个设备绑定成功事件
     Event unbindSuccessEvent;                   //单个设备成功解绑事件
+    Event gateWayIndexEvent;                    //拟配置节点响应报告
 private:
     static EventTable* eventTable;
 
@@ -182,6 +183,15 @@ private:
         ReadBinaryString rs(sourceData);
         rs.readBytes(deviceSn, 6);
         rs.readBytes(3).readBytes(deviceUUID, 16);
+    }
+};
+
+//网关配置响应
+class GateWayIndexAck : public ReportEvent{
+public:
+    void postEvent() override{
+        LOG_GREEN << "<<==: gateWay assign operation completed.....";
+        EventTable::getInstance()->gateWayIndexEvent.notify_one();
     }
 };
 

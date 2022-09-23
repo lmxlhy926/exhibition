@@ -60,6 +60,9 @@ void RecvPackageParse::parse2Event(string& completePackageString) {
     if(hciType == "91" && subType == "88"){         //扫描结果上报
         ScanResult(rs.remainingString()).postEvent();
 
+    }else if(hciType == "91" && subType == "9A"){   //网关地址分配成功
+        GateWayIndexAck().postEvent();
+
     }else if(hciType == "91" && subType == "B2"){   //节点配置完成
         NodeAddressAssignAck(rs.remainingString()).postEvent();
 
