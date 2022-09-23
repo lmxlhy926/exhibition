@@ -5,9 +5,9 @@
 #include "serviceRequestHandler.h"
 #include "siteService/nlohmann/json.hpp"
 #include "qlibc/QData.h"
-#include "deviceControl/contreteDeviceControl.h"
 #include "param.h"
 #include "common/httpUtil.h"
+#include "deviceControl/common.h"
 
 static const nlohmann::json okResponse = {
         {"code", 0},
@@ -62,31 +62,39 @@ void classify(qlibc::QData& controlData, qlibc::QData& bleDeviceList, qlibc::QDa
 }
 
 bool sendCmd(qlibc::QData& bleDeviceList, qlibc::QData& zigbeeDeviceList, qlibc::QData& tvAdapterList){
-    if(bleDeviceList.size() > 0){
+    qlibc::QData controlData, response;
+    controlData.setString("service_id", "control_device");
 
+    if(bleDeviceList.size() > 0){
+        qlibc::QData list;
+        list.putData("device_list", bleDeviceList);
+        controlData.putData("request", list);
+        SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, response);
     }
     if(zigbeeDeviceList.size() > 0){
+        qlibc::QData list;
+        list.putData("device_list", zigbeeDeviceList);
 
+        controlData.putData("request", zigbeeDeviceList);
+        SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, response);
     }
     if(tvAdapterList.size() > 0){
-
+        controlData.putData("request", tvAdapterList);
+        SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, response);
     }
     return true;
 }
 
 
-
 bool controlDeviceRightNow(qlibc::QData& message){
     std::cout << "received message: " << message.toJsonString() << std::endl;
-
     qlibc::QData deviceList = getDeviceList();
-
     DownCommandData downCommand(message);
     qlibc::QData controlData = downCommand.getContorlData(deviceList);
 
-
     qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
     classify(controlData, bleDeviceList, zigbeeDeviceList, tvAdapterList);
+    sendCmd(bleDeviceList, zigbeeDeviceList, tvAdapterList);
 
     return true;
 }
@@ -104,10 +112,8 @@ int device_control_service_handler(const Request& request, Response& response){
 
 
 int getDeviceList_service_handler(const Request& request, Response& response){
-    qlibc::QData deviceList = getDeviceList();
-
     qlibc::QData res;
-    res.putData("device_list", deviceList);
+    res.putData("device_list", getDeviceList());
 
     qlibc::QData data;
     data.setInt("code", 0);
@@ -117,9 +123,4 @@ int getDeviceList_service_handler(const Request& request, Response& response){
     response.set_content(data.toJsonString(), "text/json");
     return 0;
 }
-
-
-
-
-
 

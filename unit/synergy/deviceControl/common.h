@@ -34,20 +34,4 @@ public:
 
 
 
-class ControlBase{
-protected:
-    //控制命令中要控制的设备是否为该设备数据项
-    virtual bool match(const DownCommandData &downCommand, qlibc::QData &deviceItem) = 0;
-
-    //构造智慧家Adapter站点的设备控制指令
-    virtual qlibc::QData constructCtrCmd(const DownCommandData &downCommand, qlibc::QData &deviceItem) = 0;
-
-    //封装命令
-    virtual qlibc::QData encapsulate(qlibc::QData& command, qlibc::QData& deviceItem);
-
-public:
-    //请求站点服务
-    static bool sitePostRequest(const string& ip, int port, qlibc::QData& request, qlibc::QData& response);
-};
-
 #endif //EXHIBITION_COMMON_H

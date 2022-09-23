@@ -10,7 +10,6 @@
 #include "qlibc/FileUtils.h"
 #include "serviceRequestHandler.h"
 #include "param.h"
-#include "msgSubscribeHandler.h"
 #include "common/httpUtil.h"
 
 using namespace std;

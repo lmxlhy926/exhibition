@@ -19,7 +19,6 @@ public:
 
 };
 
-
 class SingleSite{
 private:
     string siteIp;
