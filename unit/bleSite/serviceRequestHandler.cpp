@@ -167,6 +167,37 @@ int control_device_service_handler(const Request& request, Response& response, L
 }
 
 
+//控制所有设备
+int control_all_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    if(requestBody.type() != Json::nullValue){
+        bleConfig::getInstance()->enqueue([requestBody, &lc]{
+            qlibc::QData requestData = requestBody.getData("request");
+            string command_id = requestData.getString("command_id");
+
+            qlibc::QData cmdData;
+            cmdData.setString("command", command_id);
+            cmdData.setString("address", requestData.getString("address"));
+            cmdData.setInt("transTime", requestData.getInt("transTime"));
+            if(command_id == POWER){
+                cmdData.setString("commandPara", requestData.getString("command_para"));
+
+            }else if(command_id == LUMINANCE || command_id == COLORTEMPERATURE){
+                cmdData.setInt("commandPara", requestData.getInt("command_para"));
+            }
+
+            lc.parse(cmdData);
+        });
+
+        response.set_content(okResponse.dump(), "text/json");
+    }else{
+        response.set_content(errResponse.dump(), "text/json");
+    }
+    return 0;
+}
+
+
 //获取设备列表
 int get_device_list_service_handler(const Request& request, Response& response){
     LOG_INFO << "==>: " << qlibc::QData(request.body).toJsonString();
@@ -212,6 +243,16 @@ int get_device_state_service_handler(const Request& request, Response& response)
     postData.setString("error", "ok");
     postData.putData("response", deviceList);
     response.set_content(postData.toJsonString(), "text/json");
+    return 0;
+}
+
+//存储设备列表
+int save_deviceList_service_handler(const Request& request, Response& response){
+    qlibc::QData requestData(request.body);
+    LOG_INFO << "==>: " << requestData.toJsonString();
+    qlibc::QData deviceList = requestData.getData("request");
+    bleConfig::getInstance()->saveDeviceListData(deviceList);
+    response.set_content(okResponse.dump(), "text/json");
     return 0;
 }
 

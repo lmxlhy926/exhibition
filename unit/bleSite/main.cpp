@@ -99,12 +99,22 @@ int main(int argc, char* argv[]) {
                                                       [&lc](const Request& request, Response& response) -> int{
         return control_device_service_handler(request, response, lc);
     });
-
+    //控制所有设备
+    serviceSiteManager->registerServiceRequestHandler(Contorl_All_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return control_all_service_handler(request, response, lc);
+    });
     //获取设备列表
     serviceSiteManager->registerServiceRequestHandler(Get_DeviceList_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return get_device_list_service_handler(request, response);
     });
+    //存储设备列表
+    serviceSiteManager->registerServiceRequestHandler(Save_DeviceList_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return save_deviceList_service_handler(request, response);
+    });
+
     //获取设备状态
     serviceSiteManager->registerServiceRequestHandler(Get_DeviceState_Service_ID,
                                                       [](const Request& request, Response& response) -> int{

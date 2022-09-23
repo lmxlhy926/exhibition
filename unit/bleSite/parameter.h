@@ -23,7 +23,9 @@ static const string Scan_Device_Service_ID        = "scan_device";          //�
 static const string Add_Device_Service_ID         = "add_device";           //添加设备
 static const string Del_Device_Service_ID         = "del_device";           //删除设备
 static const string Control_Device_Service_ID     = "control_device";       //控制设备
+static const string Contorl_All_Device_Service_ID = "controlAll_device";    //控制所有设备
 static const string Get_DeviceList_Service_ID     = "get_device_list";      //获取设备列表
+static const string Save_DeviceList_Service_ID     = "save_device_list";    //存储设备列表
 static const string Get_DeviceState_Service_ID    = "get_device_state";     //获取设备状态
 
 //分组

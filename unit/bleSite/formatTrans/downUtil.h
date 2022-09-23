@@ -206,6 +206,7 @@ public:
     }
 };
 
+
 //开关
 class LightOnOff : public BuildBinaryString{
 private:
@@ -218,9 +219,15 @@ public:
     void init(qlibc::QData& data){
         address = data.getString("address");
         onOff = data.getString("commandPara");
-        stringstream ss;
-        ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
-        transTime = ss.str();
+
+        int transTimeInt = data.getInt("transTime");
+        if(0 <= transTimeInt && transTimeInt <= 255){
+            stringstream ss;
+            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
+            transTime = ss.str();
+        }else{
+            transTime = "00";
+        }
     }
 
     string getBinaryString() override{
@@ -233,7 +240,7 @@ public:
             stringCmd.append("00");
         }
         stringCmd.append("00");
-        stringCmd.append(transTime);
+        stringCmd.append("00");
         stringCmd.append("00");
         return stringCmd;
     }
@@ -258,9 +265,15 @@ public:
         }else{
             luminanceVal = 0xffff;
         }
-        stringstream ss;
-        ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
-        transTime = ss.str();
+
+        int transTimeInt = data.getInt("transTime");
+        if(0 <= transTimeInt && transTimeInt <= 255){
+            stringstream ss;
+            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
+            transTime = ss.str();
+        }else{
+            transTime = "00";
+        }
     }
 
     string getBinaryString() override{
@@ -271,7 +284,7 @@ public:
         string stringCmd;
         stringCmd.append(prefix).append(address).append("824C").append(ss.str());
         stringCmd.append("00");
-        stringCmd.append(transTime);
+        stringCmd.append("00");
         stringCmd.append("00");
 
         return stringCmd;
@@ -297,9 +310,15 @@ public:
         }else{
             ctlTemperature = 6500;
         }
-        stringstream ss;
-        ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
-        transTime = ss.str();
+
+        int transTimeInt = data.getInt("transTime");
+        if(0 <= transTimeInt && transTimeInt <= 255){
+            stringstream ss;
+            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
+            transTime = ss.str();
+        }else{
+            transTime = "00";
+        }
     }
 
     string getBinaryString() override{
@@ -313,7 +332,7 @@ public:
         stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
         stringCmd.append(deleteWhiteSpace("00 00"));
         stringCmd.append("00");
-        stringCmd.append(transTime);
+        stringCmd.append("00");
         stringCmd.append("00");
 
         return stringCmd;
