@@ -209,6 +209,31 @@ int get_device_list_service_handler(const Request& request, Response& response){
     return 0;
 }
 
+//按照指定房间获取设备列表
+int get_device_list_byRoomName_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    string room_name = requestBody.getData("request").getString("room_name");
+    qlibc::QData device_list = bleConfig::getInstance()->getDeviceListData().getData("device_list");
+    qlibc::QData deviceList2show;
+    for(Json::ArrayIndex i = 0; i < device_list.size(); ++i){
+        qlibc::QData item = device_list.getArrayElement(i);
+        if(item.getData("location").getString("room_name") == room_name){
+           deviceList2show.append(item);
+        }
+    }
+
+    qlibc::QData responseData;
+    responseData.putData("device_list", deviceList2show);
+
+    qlibc::QData postData;
+    postData.setInt("code", 0);
+    postData.setString("error", "ok");
+    postData.putData("response", responseData);
+    response.set_content(postData.toJsonString(), "text/json");
+    return 0;
+}
+
 //获取设备状态
 int get_device_state_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
@@ -303,9 +328,12 @@ int create_group_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
     string groupName = requestBody.getData("request").getString("group_name");
-    GroupAddressMap::getInstance()->createGroup(groupName);
+    bool ret = GroupAddressMap::getInstance()->createGroup(groupName);
+    if(ret){
+        response.set_content(okResponse.dump(), "text/json");
+    }else
+        response.set_content(errResponse.dump(), "text/json");
 
-    response.set_content(okResponse.dump(), "text/json");
     return 0;
 }
 
@@ -382,6 +410,46 @@ int addDevice2Group_service_handler(const Request& request, Response& response, 
 
             cmdData.setString("model_name", COLORTEMPERATURE);
             lc.parse(cmdData);
+        }
+    });
+
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
+
+int groupByRoomname_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    string room_name = requestBody.getData("request").getString("room_name");
+    string group_name = requestBody.getData("request").getString("group_name");
+    string group_id = GroupAddressMap::getInstance()->groupName2GroupAddressId(group_name);
+    if(group_id.empty()){
+        LOG_RED << "THE GROUP <" << group_name << "> IS NOT EXIST....";
+        response.set_content(errResponse.dump(), "text/json");
+        return 0;
+    }
+
+    bleConfig::getInstance()->enqueue([requestBody, room_name, group_name, group_id, &lc]{
+        //根据房间名获取设备列表
+        qlibc::QData device_list  = bleConfig::getInstance()->getDeviceListData().getData("device_list");
+        for(Json::ArrayIndex i = 0; i < device_list.size(); ++i){
+            qlibc::QData item = device_list.getArrayElement(i);
+            if(item.getData("location").getString("room_name") == room_name){
+                qlibc::QData cmdData;
+                cmdData.setString("command", "addDevice2Group");
+                cmdData.setString("group_id", group_id);
+                cmdData.setString("deviceSn", item.getString("device_id"));
+
+                cmdData.setString("model_name", POWER);
+                lc.parse(cmdData);
+
+                cmdData.setString("model_name", LUMINANCE);
+                lc.parse(cmdData);
+
+                cmdData.setString("model_name", COLORTEMPERATURE);
+                lc.parse(cmdData);
+            }
         }
     });
 

@@ -28,6 +28,9 @@ int control_all_service_handler(const Request& request, Response& response, Logi
 //获取设备列表
 int get_device_list_service_handler(const Request& request, Response& response);
 
+//按照指定房间获取设备列表
+int get_device_list_byRoomName_service_handler(const Request& request, Response& response);
+
 //获取设备状态
 int get_device_state_service_handler(const Request& request, Response& response);
 
@@ -49,6 +52,9 @@ int rename_group_service_handler(const Request& request, Response& response);
 
 //添加设备进入分组
 int addDevice2Group_service_handler(const Request& request, Response& response, LogicControl& lc);
+
+//按房间进行分组
+int groupByRoomname_service_handler(const Request& request, Response& response, LogicControl& lc);
 
 //从分组移除设备
 int removeDeviceFromGroup_service_handler(const Request& request, Response& response, LogicControl& lc);

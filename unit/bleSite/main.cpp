@@ -93,31 +93,43 @@ int main(int argc, char* argv[]) {
                                                       [&lc](const Request& request, Response& response) -> int{
         return add_device_service_handler(request, response, lc);
     });
+
     //注册设备解绑回调
     serviceSiteManager->registerServiceRequestHandler(Del_Device_Service_ID,
                                                       [&lc](const Request& request, Response& response) -> int{
         return del_device_service_handler(request, response, lc);
     });
+
     //注册设备控制回调
     serviceSiteManager->registerServiceRequestHandler(Control_Device_Service_ID,
                                                       [&lc](const Request& request, Response& response) -> int{
         return control_device_service_handler(request, response, lc);
     });
+
     //控制所有设备
     serviceSiteManager->registerServiceRequestHandler(Contorl_All_Device_Service_ID,
                                                       [&lc](const Request& request, Response& response) -> int{
         return control_all_service_handler(request, response, lc);
     });
+
     //获取设备列表
     serviceSiteManager->registerServiceRequestHandler(Get_DeviceList_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return get_device_list_service_handler(request, response);
     });
+
+    //依据房间名获取设备列表
+    serviceSiteManager->registerServiceRequestHandler(Get_DeviceList_byRoomName_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return get_device_list_byRoomName_service_handler(request, response);
+    });
+
     //存储设备列表
     serviceSiteManager->registerServiceRequestHandler(Save_DeviceList_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return save_deviceList_service_handler(request, response);
     });
+
 
     //获取设备状态
     serviceSiteManager->registerServiceRequestHandler(Get_DeviceState_Service_ID,
@@ -149,6 +161,13 @@ int main(int argc, char* argv[]) {
                                                       [&lc](const Request& request, Response& response) -> int{
         return addDevice2Group_service_handler(request, response, lc);
     });
+
+    //按照指定房间进行分组
+    serviceSiteManager->registerServiceRequestHandler(AddDevice2GroupByRoom_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return groupByRoomname_service_handler(request, response, lc);
+    });
+
 
     //从分组删除设备
     serviceSiteManager->registerServiceRequestHandler(RemoveDeviceFromGroup_Device_Service_ID,
