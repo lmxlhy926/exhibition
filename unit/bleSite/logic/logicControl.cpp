@@ -8,6 +8,7 @@
 #include "log/Logging.h"
 #include "formatTrans/downUtil.h"
 #include "formatTrans/statusEvent.h"
+#include "logic/scanListmanage.h"
 #include "bindDevice.h"
 #include <sstream>
 #include <iomanip>
@@ -61,9 +62,14 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
         }
     }
 
+    //存储到扫描列表
+    for(auto& elem : deviceMap){
+        ScanListmanage::getInstance()->appendDeviceItem(elem.first, elem.second);
+    }
+    std::map<string, Json::Value> scanedMap = ScanListmanage::getInstance()->getScanListMap();
 
     qlibc::QData scanedArray;
-    for(auto& elem : deviceMap){
+    for(auto& elem : scanedMap){
         deviceArray.append(elem.second);
 
         qlibc::QData item;

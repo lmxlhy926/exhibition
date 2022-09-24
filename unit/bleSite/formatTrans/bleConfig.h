@@ -20,6 +20,7 @@ private:
     QData groupAddressData;                     //组地址数据
     QData deviceListData;                       //蓝牙设备列表
     QData statusListData;                       //状态列表
+    QData scanListData;                         //扫描设备列表
     httplib::ThreadPool threadPool;             //线程池
     static bleConfig* instance;                 //静态对象
     std::recursive_mutex rMutex_;
@@ -75,6 +76,12 @@ public:
 
     //保存组地址列表
     void saveGroupListData(qlibc::QData& data);
+
+    //获取设备扫描列表
+    QData getScanListData();
+
+    //存储设备扫描列表
+    void saveScanListData(qlibc::QData& data);
 
     //将函数加入线程池
     void enqueue(std::function<void()> fn);

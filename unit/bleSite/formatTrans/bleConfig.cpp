@@ -214,6 +214,19 @@ void bleConfig::saveGroupListData(qlibc::QData& data){
     groupAddressData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/groupAddress.json"), true);
 }
 
+QData bleConfig::getScanListData(){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    if(scanListData.empty()){
+        scanListData.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/scanList.json"));
+    }
+    return scanListData;
+}
+
+void bleConfig::saveScanListData(qlibc::QData& data){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    scanListData.setInitData(data);
+    scanListData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/scanList.json"), true);
+}
 
 void bleConfig::enqueue(std::function<void()> fn) {
     threadPool.enqueue(std::move(fn));

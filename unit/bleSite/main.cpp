@@ -19,6 +19,7 @@
 #include "logic/logicControl.h"
 #include "common/httpUtil.h"
 #include "serial/telinkDongle.h"
+#include  "logic/scanListmanage.h"
 
 using namespace std;
 using namespace servicesite;
@@ -45,6 +46,9 @@ int main(int argc, char* argv[]) {
     //设置配置文件加载路径, 加载配置文件
     bleConfig* configPathPtr = bleConfig::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
+
+    //单例对象
+    ScanListmanage::getInstance();
 
     //注册串口上报回调函数，初始化并打开串口
     SerialParamStruct serialParam;

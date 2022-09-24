@@ -9,6 +9,7 @@
 #include "../parameter.h"
 #include "siteService/service_site_manager.h"
 #include "common/httpUtil.h"
+#include "logic/scanListmanage.h"
 
 using namespace servicesite;
 
@@ -63,23 +64,24 @@ void BindDevice::bind(QData &deviceArray) {
 
 bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     //扫描到指定设备
-    LOG_INFO << ">>: scan to find the device <" << deviceSn << ">.....";
+    LOG_INFO << ">>: scan........";
     qlibc::QData scanData;
     scanData.setString("command", "scan");
     DownUtility::parse2Send(scanData);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
 
-    time_t time_current = time(nullptr);
-    qlibc::QData retScanData;
-    while(retScanData.getString("deviceSn") != deviceSn){
-        if(EventTable::getInstance()->scanResultEvent.wait(2) == std::cv_status::no_timeout){
-            retScanData = EventTable::getInstance()->scanResultEvent.getData();
-        }
-        if(time(nullptr) - time_current > 15){
-            LOG_RED << "<<: FAILED TO SCAN THE DEVICE, QUIT TO ADD THE DEVICE <" << deviceSn << ">";
-            return false;
-        }
-    }
-    LOG_PURPLE << "<<: successed in scaning the device: <" << deviceSn << ">.......";
+//    time_t time_current = time(nullptr);
+//    qlibc::QData retScanData;
+//    while(retScanData.getString("deviceSn") != deviceSn){
+//        if(EventTable::getInstance()->scanResultEvent.wait(2) == std::cv_status::no_timeout){
+//            retScanData = EventTable::getInstance()->scanResultEvent.getData();
+//        }
+//        if(time(nullptr) - time_current > 15){
+//            LOG_RED << "<<: FAILED TO SCAN THE DEVICE, QUIT TO ADD THE DEVICE <" << deviceSn << ">";
+//            return false;
+//        }
+//    }
+//    LOG_PURPLE << "<<: successed in scaning the device: <" << deviceSn << ">.......";
 
 
     //连接设备
@@ -126,6 +128,8 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     bleConfig::getInstance()->insertDeviceItem(deviceSn, property);
     //存入设备的默认状态
     bleConfig::getInstance()->insertDefaultStatus(deviceSn);
+    //删除扫描列表中的相应设备
+    ScanListmanage::getInstance()->deleteDeviceItem(deviceSn);
 
     //发布单个设备绑定成功消息
     qlibc::QData content, publishData;
