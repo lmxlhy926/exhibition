@@ -229,15 +229,25 @@ private:
 class BindResult : public ReportEvent{
 private:
     string sourceData;
-    bool eventAck{false};
+    string dest;
 public:
     explicit BindResult(string data) : sourceData(std::move(data)){
         init();
     }
 
     void postEvent() override{
-        if(eventAck){
+        if(dest == "00"){
             LOG_GREEN << "<<===: bind operation success.....";
+            qlibc::QData data;
+            data.setBool("bind", true);
+            EventTable::getInstance()->bindSuccessEvent.putData(data);
+            EventTable::getInstance()->bindSuccessEvent.notify_one();
+
+        }else if(dest == "01"){
+            LOG_RED << "<<===: bind operation failed.....";
+            qlibc::QData data;
+            data.setBool("bind", false);
+            EventTable::getInstance()->bindSuccessEvent.putData(data);
             EventTable::getInstance()->bindSuccessEvent.notify_one();
         }
     }
@@ -245,10 +255,7 @@ public:
 private:
     void init(){
         ReadBinaryString rs(sourceData);
-        string dest;
         rs.readByte(dest);
-        if(dest == "00")
-            eventAck = true;
     }
 };
 

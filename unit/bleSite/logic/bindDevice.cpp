@@ -113,33 +113,41 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     qlibc::QData bind(BindString);
     DownUtility::parse2Send(bind);
 
-    if(EventTable::getInstance()->bindSuccessEvent.wait(30) == std::cv_status::timeout){
+    if(EventTable::getInstance()->bindSuccessEvent.wait(120) == std::cv_status::timeout){
         LOG_RED << "<<: xxxxxxxxxBIND FAILEDxxxxxxxx";
         LOG_RED << "<<: xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
         SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
         return false;
+
+    }else{
+        qlibc::QData data = EventTable::getInstance()->bindSuccessEvent.getData();
+        if(data.getBool("bind")){
+            LOG_PURPLE << "<<: ......BIND SUCCESSFULLY..... ";
+            LOG_PURPLE << "<<: .............................";
+
+            //将绑定成功设备存入列表中
+            bleConfig::getInstance()->insertDeviceItem(deviceSn, property);
+            //存入设备的默认状态
+            bleConfig::getInstance()->insertDefaultStatus(deviceSn);
+            //删除扫描列表中的相应设备
+            ScanListmanage::getInstance()->deleteDeviceItem(deviceSn);
+
+            //发布单个设备绑定成功消息
+            qlibc::QData content, publishData;
+            content.setString("device_id", deviceSn);
+            content.setString("device_type", property.getString("device_type"));
+            content.setString("device_model", property.getString("device_model"));
+            publishData.setString("message_id", SingleDeviceBindSuccessMsg);
+            publishData.putData("content", content);
+            ServiceSiteManager::getInstance()->publishMessage(SingleDeviceBindSuccessMsg, publishData.toJsonString());
+            return true;
+        }else{
+            LOG_RED << "<<: xxxxxxxxxBIND FAILEDxxxxxxxx";
+            LOG_RED << "<<: xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+            SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
+            return false;
+        }
     }
-
-    LOG_PURPLE << "<<: ......BIND SUCCESSFULLY..... ";
-    LOG_PURPLE << "<<: .............................";
-
-    //将绑定成功设备存入列表中
-    bleConfig::getInstance()->insertDeviceItem(deviceSn, property);
-    //存入设备的默认状态
-    bleConfig::getInstance()->insertDefaultStatus(deviceSn);
-    //删除扫描列表中的相应设备
-    ScanListmanage::getInstance()->deleteDeviceItem(deviceSn);
-
-    //发布单个设备绑定成功消息
-    qlibc::QData content, publishData;
-    content.setString("device_id", deviceSn);
-    content.setString("device_type", property.getString("device_type"));
-    content.setString("device_model", property.getString("device_model"));
-    publishData.setString("message_id", SingleDeviceBindSuccessMsg);
-    publishData.putData("content", content);
-    ServiceSiteManager::getInstance()->publishMessage(SingleDeviceBindSuccessMsg, publishData.toJsonString());
-
-    return true;
 }
 
 void BindDevice::updateDeviceList2ConfigSite() {

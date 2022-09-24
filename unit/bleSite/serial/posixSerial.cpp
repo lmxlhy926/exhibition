@@ -72,6 +72,7 @@ bool CommonSerial::closeSerial(){
         isSerialOpened.store(false);
         close(fd_serial);
     }
+    return true;
 }
 
 bool CommonSerial::write2Serial(const void *buff, int writeLen) {
@@ -204,6 +205,7 @@ bool CommonSerial::setSpeed(int speed) const{
             return true;
         }
     }
+    return false;
 }
 
 bool CommonSerial::setUartProperty() {
