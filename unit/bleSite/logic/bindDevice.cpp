@@ -45,6 +45,7 @@ void BindDevice::bind(QData &deviceArray) {
         qlibc::QData deviceItemProperty = deviceArray.getArrayElement(i);
         string deviceSn = deviceItemProperty.getString("deviceSn");
         addDevice(deviceSn, deviceItemProperty);
+        LOG_PURPLE << "<<: " << deviceItemProperty.getString("room_name") << "-------" << i + 1 << "/" << arraySize << "-------";
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
@@ -115,13 +116,11 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     if(EventTable::getInstance()->bindSuccessEvent.wait(30) == std::cv_status::timeout){
         LOG_RED << "<<: xxxxxxxxxBIND FAILEDxxxxxxxx";
         LOG_RED << "<<: xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-        LOG_RED << "<<: xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
         SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
         return false;
     }
 
     LOG_PURPLE << "<<: ......BIND SUCCESSFULLY..... ";
-    LOG_PURPLE << "<<: .............................";
     LOG_PURPLE << "<<: .............................";
 
     //将绑定成功设备存入列表中

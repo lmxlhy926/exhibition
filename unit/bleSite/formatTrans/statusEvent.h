@@ -13,6 +13,7 @@
 #include "qlibc/QData.h"
 #include "log/Logging.h"
 #include "logic/snAddressMap.h"
+#include "logic/groupAddressMap.h"
 #include "siteService/service_site_manager.h"
 #include "../parameter.h"
 #include "bleConfig.h"
@@ -271,6 +272,8 @@ public:
         bleConfig::getInstance()->deleteDeviceItem(deviceSn);
         //从状态列表移除该设备
         bleConfig::getInstance()->deleteStatusItem(deviceSn);
+        //从组列表中删除设备
+        GroupAddressMap::getInstance()->removeDeviceFromAnyGroup(deviceSn);
         LOG_GREEN << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
 
         //更新config白名单列表

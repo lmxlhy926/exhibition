@@ -25,7 +25,7 @@ static const nlohmann::json okResponse = {
 
 static const nlohmann::json errResponse = {
         {"code", 1},
-        {"error", "request format is not correct"},
+        {"error", "failed"},
         {"response",{}}
 };
 
@@ -360,6 +360,14 @@ int delete_group_service_handler(const Request& request, Response& response, Log
             cmdData.setString("command", "delDeviceFromGroup");
             cmdData.setString("group_id", group_id);
             cmdData.setString("deviceSn", device_list.getArrayElement(i).asValue().asString());
+
+            cmdData.setString("model_name", POWER);
+            lc.parse(cmdData);
+
+            cmdData.setString("model_name", LUMINANCE);
+            lc.parse(cmdData);
+
+            cmdData.setString("model_name", COLORTEMPERATURE);
             lc.parse(cmdData);
         }
 
@@ -377,9 +385,12 @@ int rename_group_service_handler(const Request& request, Response& response){
     LOG_INFO << "==>: " << requestBody.toJsonString();
     string groupId = requestBody.getData("request").getString("group_id");
     string groupName = requestBody.getData("request").getString("group_name");
-    GroupAddressMap::getInstance()->reNameGroup(groupId, groupName);
-
-    response.set_content(okResponse.dump(), "text/json");
+    bool ret = GroupAddressMap::getInstance()->reNameGroup(groupId, groupName);
+    if(ret){
+        response.set_content(okResponse.dump(), "text/json");
+    }else{
+        response.set_content(errResponse.dump(), "text/json");
+    }
     return 0;
 }
 
@@ -388,12 +399,14 @@ int rename_group_service_handler(const Request& request, Response& response){
 int addDevice2Group_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
-    bleConfig::getInstance()->enqueue([requestBody, &lc]{
-        string group_id = requestBody.getData("request").getString("group_id");
-        if(!GroupAddressMap::getInstance()->isGroupExist(group_id)){
-            LOG_RED  << "group " << group_id << " is not exist....";
-            return;
-        }
+    string group_id = requestBody.getData("request").getString("group_id");
+    if(!GroupAddressMap::getInstance()->isGroupExist(group_id)){
+        LOG_RED  << "group " << group_id << " is not exist....";
+        response.set_content(errResponse.dump(), "text/json");
+        return 0;
+    }
+
+    bleConfig::getInstance()->enqueue([requestBody, group_id, &lc]{
         qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
         size_t deviceListSize = deviceList.size();
         for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
@@ -462,12 +475,14 @@ int groupByRoomname_service_handler(const Request& request, Response& response, 
 int removeDeviceFromGroup_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
-    bleConfig::getInstance()->enqueue([requestBody, &lc]{
-        string group_id = requestBody.getData("request").getString("group_id");
-        if(!GroupAddressMap::getInstance()->isGroupExist(group_id)){
-            LOG_RED << "group " << group_id << " is not exist....";
-            return;
-        }
+    string group_id = requestBody.getData("request").getString("group_id");
+    if(!GroupAddressMap::getInstance()->isGroupExist(group_id)){
+        LOG_RED << "group " << group_id << " is not exist....";
+        response.set_content(errResponse.dump(), "text/json");
+        return 0;
+    }
+
+    bleConfig::getInstance()->enqueue([requestBody, group_id, &lc]{
         qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
         size_t deviceListSize = deviceList.size();
         for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){

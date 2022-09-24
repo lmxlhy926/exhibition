@@ -61,12 +61,12 @@ void GroupAddressMap::deleGroup(string &groupId) {
     map2JsonDataAndSave2File();
 }
 
-void GroupAddressMap::reNameGroup(string& groupId, string& groupName){
+bool GroupAddressMap::reNameGroup(string& groupId, string& groupName){
     std::lock_guard<recursive_mutex> lg(rMutex_);
     //如果组名已经存在则返回
     for(auto& elem : groupAddrMap){
         if(elem.second["group_name"].asString() == groupName){
-            return;
+            return false;
         }
     }
 
@@ -75,6 +75,7 @@ void GroupAddressMap::reNameGroup(string& groupId, string& groupName){
         pos->second["group_name"] = groupName;
     }
     map2JsonDataAndSave2File();
+    return true;
 }
 
 void GroupAddressMap::addDevice2Group(string& groupId, string& deviceSn){
@@ -124,6 +125,25 @@ void GroupAddressMap::removeDeviceFromGroup(string& groupId, string& deviceSn){
         }
         map2JsonDataAndSave2File();
     }
+}
+
+void GroupAddressMap::removeDeviceFromAnyGroup(string& deviceSn){
+    std::lock_guard<recursive_mutex> lg(rMutex_);
+    for(auto& elem : groupAddrMap){
+        if(elem.second["device_list"].isNull()){
+            continue;
+        }else{
+            qlibc::QData deviceList(elem.second["device_list"]);
+            size_t deviceListSize = deviceList.size();
+            for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+                if(deviceList.getArrayElement(i).asValue().asString() == deviceSn){
+                    Json::Value value;
+                    elem.second["device_list"].removeIndex(i, &value);
+                }
+            }
+        }
+    }
+    map2JsonDataAndSave2File();
 }
 
 qlibc::QData GroupAddressMap::getGroupList() {

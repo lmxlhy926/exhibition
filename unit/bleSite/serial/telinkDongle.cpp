@@ -111,7 +111,7 @@ void TelinkDongle::sendThreadFunc(){
             }else{
                 LOG_HLIGHT << "==>sendCmd<false>: " << binary2SendString(commandVec);
             }
-            this_thread::sleep_for(std::chrono::milliseconds(1000));
+            this_thread::sleep_for(std::chrono::milliseconds(800));
 
         }
     }

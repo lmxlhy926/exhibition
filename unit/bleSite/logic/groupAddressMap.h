@@ -36,13 +36,16 @@ public:
     void deleGroup(string& groupId);
 
     //分组重命名
-    void reNameGroup(string& groupId, string& groupName);
+    bool reNameGroup(string& groupId, string& groupName);
 
     //设备加入分组
     void addDevice2Group(string& groupId, string& deviceSn);
 
     //设备从分组剔除
     void removeDeviceFromGroup(string& groupId, string& deviceSn);
+
+    //将设备从所有组中移除
+    void removeDeviceFromAnyGroup(string& deviceSn);
 
     //返回分组列表
     qlibc::QData getGroupList();

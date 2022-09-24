@@ -37,6 +37,7 @@ void ScanListmanage::deleteDeviceItem(string &deviceSn) {
     saveData();
 }
 
+
 std::map<string, Json::Value> ScanListmanage::getScanListMap() {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     return list;

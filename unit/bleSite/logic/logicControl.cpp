@@ -66,7 +66,13 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
     for(auto& elem : deviceMap){
         ScanListmanage::getInstance()->appendDeviceItem(elem.first, elem.second);
     }
-    std::map<string, Json::Value> scanedMap = ScanListmanage::getInstance()->getScanListMap();
+    std::map<string, Json::Value> scanedMap;
+    bool bindFailedDevice = param.getBool("bindFailedDevice");
+    if(bindFailedDevice){
+        scanedMap = ScanListmanage::getInstance()->getScanListMap();
+    }else{
+        scanedMap = deviceMap;
+    }
 
     qlibc::QData scanedArray;
     for(auto& elem : scanedMap){

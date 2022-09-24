@@ -44,7 +44,7 @@ int BleDevice_command_test_service_handler(const Request& request, Response& res
 //创建分组
 int create_group_service_handler(const Request& request, Response& response);
 
-//删除分组
+//删除分组，删除前先将设备移除分组
 int delete_group_service_handler(const Request& request, Response& response, LogicControl& lc);
 
 //重命名分组
