@@ -13,6 +13,7 @@
 #include "logic/snAddressMap.h"
 #include "logic/groupAddressMap.h"
 #include "../parameter.h"
+#include "formatTrans/bleConfig.h"
 
 using namespace std;
 
@@ -148,6 +149,9 @@ public:
 
         //添加设备进入分组
         GroupAddressMap::getInstance()->addDevice2Group(group_id, deviceSn);
+        //分组信息加入设备列表
+        string group_name = GroupAddressMap::getInstance()->groupAddressId2GroupName(group_id);
+        bleConfig::getInstance()->insertGroupInfo(deviceSn, group_name, group_id);
 
         string stringCmd;
         stringCmd.append(prefix).append(deviceAddress).append("801B");
@@ -187,6 +191,8 @@ public:
 
         //设备从分组剔除
         GroupAddressMap::getInstance()->removeDeviceFromGroup(group_id, deviceSn);
+        //分组信息从设备列表中移除
+        bleConfig::getInstance()->deleteGroupInfo(deviceSn);
 
         string stringCmd;
         stringCmd.append(prefix).append(deviceAddress).append("801C");
@@ -240,7 +246,7 @@ public:
             stringCmd.append("00");
         }
         stringCmd.append("00");
-        stringCmd.append("00");
+        stringCmd.append(transTime);
         stringCmd.append("00");
         return stringCmd;
     }
@@ -284,7 +290,7 @@ public:
         string stringCmd;
         stringCmd.append(prefix).append(address).append("824C").append(ss.str());
         stringCmd.append("00");
-        stringCmd.append("00");
+        stringCmd.append(transTime);
         stringCmd.append("00");
 
         return stringCmd;
@@ -332,7 +338,7 @@ public:
         stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
         stringCmd.append(deleteWhiteSpace("00 00"));
         stringCmd.append("00");
-        stringCmd.append("00");
+        stringCmd.append(transTime);
         stringCmd.append("00");
 
         return stringCmd;

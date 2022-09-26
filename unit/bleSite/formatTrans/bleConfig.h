@@ -50,6 +50,12 @@ public:
     //插入新绑定的设备条目
     void insertDeviceItem(string& deviceID, qlibc::QData& property);
 
+    //插入分组信息
+    void insertGroupInfo(string& deviceID, string& groupName, string& groupAddress);
+
+    //删除分组信息
+    void deleteGroupInfo(string& deviceID);
+
     //删除解绑的设备
     void deleteDeviceItem(string& deviceID);
 

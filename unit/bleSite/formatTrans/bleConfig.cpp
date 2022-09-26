@@ -92,6 +92,55 @@ void bleConfig::insertDeviceItem(string& deviceID, qlibc::QData& property){
     saveDeviceListData(saveData);
 }
 
+
+void bleConfig::insertGroupInfo(string& deviceID, string& groupName, string& groupAddress){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData deviceListArray = getDeviceListData().getData("device_list");
+    size_t deviceListArraySize = deviceListArray.size();
+    //如果设备列表中有该条目，则先将该条目删除
+    for(size_t i = 0; i < deviceListArraySize; ++i){
+        qlibc::QData deviceItem = deviceListArray.getArrayElement(i);
+        if(deviceItem.getString("device_id") == deviceID){
+            deviceListArray.deleteArrayItem(i);
+
+            //增加组信息
+            deviceItem.setString("group_name", groupName);
+            deviceItem.setString("group_address", groupAddress);
+            deviceListArray.append(deviceItem);
+
+            //存储
+            qlibc::QData saveData;
+            saveData.putData("device_list", deviceListArray);
+            saveDeviceListData(saveData);
+            break;
+        }
+    }
+}
+
+void bleConfig::deleteGroupInfo(string& deviceID){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData deviceListArray = getDeviceListData().getData("device_list");
+    size_t deviceListArraySize = deviceListArray.size();
+    //如果设备列表中有该条目，则先将该条目删除
+    for(size_t i = 0; i < deviceListArraySize; ++i){
+        qlibc::QData deviceItem = deviceListArray.getArrayElement(i);
+        if(deviceItem.getString("device_id") == deviceID){
+            deviceListArray.deleteArrayItem(i);
+
+            //删除组信息
+            deviceItem.removeMember("group_name");
+            deviceItem.removeMember("group_address");
+            deviceListArray.append(deviceItem);
+
+            //存储
+            qlibc::QData saveData;
+            saveData.putData("device_list", deviceListArray);
+            saveDeviceListData(saveData);
+            break;
+        }
+    }
+}
+
 void bleConfig::deleteDeviceItem(string& deviceID){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     qlibc::QData device_list = getDeviceListData().getData("device_list");
