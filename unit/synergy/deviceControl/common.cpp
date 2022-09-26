@@ -11,11 +11,12 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
        if(match(item)){
            qlibc::QData controlData;
            controlData.setString("device_id", item.getString("device_id"));
-           controlData.setString("sourceSite", item.getString("sourceSite"));
            controlData.putData("command_list", item.getData("command_list"));
+           controlData.setString("sourceSite", item.getString("sourceSite"));
            return controlData;
        }
    }
+   return qlibc::QData();
 }
 
 bool DownCommandData::match(qlibc::QData &item) {
