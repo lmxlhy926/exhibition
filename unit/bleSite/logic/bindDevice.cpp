@@ -98,7 +98,7 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     LOG_INFO << ">>: start to assgin node address....";
     qlibc::QData nodeAddressAssign(SnAddressMap::getInstance()->getNodeAssignAddr(deviceSn));
     DownUtility::parse2Send(nodeAddressAssign);
-    if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(15) == std::cv_status::no_timeout){
+    if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(20) == std::cv_status::no_timeout){
         LOG_PURPLE << "<<: successed to assgin node address....";
     }else{
         SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);

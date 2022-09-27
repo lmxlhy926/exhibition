@@ -81,16 +81,17 @@ public:
     }
 };
 
-//给网关分配地址
+//给网关分配地址; 测试2A
 class LightGatewayAddressAssign : public BuildBinaryString{
 public:
     string getBinaryString() override{
-        string binaryString = "E9FF091112131415161718191A1B1C1D1E1F20000000112233440001";
-        return binaryString;
+        string network_key = "11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20";
+        string binaryString = "E9 FF 09" + network_key + "00 00" + "00" + "11 22 33 44" + "00 01";
+        return deleteWhiteSpace(binaryString);
     }
 };
 
-//给节点分配地址
+//给节点分配地址; 测试2A
 class LightNodeAddressAssign : public BuildBinaryString{
 private:
     string nodeAddress;
@@ -98,8 +99,9 @@ public:
     explicit LightNodeAddressAssign(string& nodeAddr) : nodeAddress(nodeAddr){}
 
     string getBinaryString() override{
-        string binaryString = "E9FF0A1112131415161718191A1B1C1D1E1F2000000011223344" + nodeAddress;
-        return binaryString;
+        string network_key = "11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20";
+        string binaryString = "E9 FF 0A" + network_key + "00 00" + "00" + "11 22 33 44" + nodeAddress;
+        return deleteWhiteSpace(binaryString);
     }
 };
 

@@ -5,6 +5,7 @@
 #include "qlibc/QData.h"
 #include <ctime>
 #include <sys/time.h>
+#include "formatTrans/downUtil.h"
 
 
 void allTypeTest(){
@@ -80,7 +81,7 @@ void printColor(){
 
 }
 
-int main(int argc, char* argv[]){
+void test1(){
     struct timeval tv;
     struct timezone tz;
     struct tm *t;
@@ -88,11 +89,14 @@ int main(int argc, char* argv[]){
     gettimeofday(&tv, &tz);
     t = localtime(&tv.tv_sec);
     printf("time_now: %d-%d-%d %d:%d:%d.%ld\n", 1900 + t->tm_year, 1 + t->tm_mon, t->tm_mday,
-                                                t->tm_hour, t->tm_min, t->tm_sec, tv.tv_usec);
-
-
-
+           t->tm_hour, t->tm_min, t->tm_sec, tv.tv_usec);
     printColor();
+}
+
+
+int main(int argc, char* argv[]){
+    std::cout << LightGatewayAddressAssign().getBinaryString();
+
 
     return 0;
 }

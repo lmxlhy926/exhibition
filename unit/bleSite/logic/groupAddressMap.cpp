@@ -151,9 +151,11 @@ qlibc::QData GroupAddressMap::getGroupList() {
     qlibc::QData groupList;
     for(auto& elem : groupAddrMap){
         qlibc::QData data;
-        data.setValue("group_name", elem.second["group_name"]);
+        Json::Value::Members keys = elem.second.getMemberNames();
+        for(auto& key : keys){
+            data.setValue(key, elem.second[key]);
+        }
         data.setValue("group_id", elem.first);
-        data.setValue("device_list", elem.second["device_list"]);
         groupList.append(data);
     }
 
