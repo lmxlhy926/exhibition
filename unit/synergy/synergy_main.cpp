@@ -40,19 +40,25 @@ int main(int argc, char* argv[]) {
     //设备控制
     serviceSiteManager->registerServiceRequestHandler(Control_Device_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
-        return device_control_service_handler(request, response);
+        return synergy::device_control_service_handler(request, response);
     });
 
     //场景接口
     serviceSiteManager->registerServiceRequestHandler(SceneCommand_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
-        return sceneCommand_service_handler(request, response);
+        return synergy::sceneCommand_service_handler(request, response);
     });
 
     //获取设备列表
     serviceSiteManager->registerServiceRequestHandler(GetDeviceList_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
-        return getDeviceList_service_handler(request, response);
+        return synergy::getDeviceList_service_handler(request, response);
+    });
+
+    //获取分组列表
+    serviceSiteManager->registerServiceRequestHandler(GetGroupList_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::getGroupList_service_handler(request, response);
     });
 
 

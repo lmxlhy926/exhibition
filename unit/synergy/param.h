@@ -9,7 +9,7 @@ static const string RequestIp = "127.0.0.1";
 
 static const string BleSiteID = "ble_light";
 static const string BleSiteName = "BLE灯控";
-static const int BleSitePort = 60009;
+static const int BleSitePort = 9001;
 
 static const string ZigbeeSiteID = "zigbee_light";
 static const string ZigbeeSiteName = "ZigBee灯控";
@@ -34,6 +34,7 @@ static const int QuerySitePort = 9000;
 //服务ID
 static const string Control_Device_Service_ID = "deviceControl";
 static const string GetDeviceList_Service_ID = "get_device_list";
+static const string GetGroupList_Service_ID = "get_group_list";
 static const string SceneCommand_Service_ID = "sceneCommand";
 
 
