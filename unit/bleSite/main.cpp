@@ -215,11 +215,11 @@ int main(int argc, char* argv[]) {
             //注册启动方式
 //            int code = serviceSiteManager->startByRegister();
             if(code != 0){
-                std::cout << "===>bleSite startByRegister error, code = " << code << std::endl;
-                std::cout << "===>bleSite startByRegister in 3 seconds...." << std::endl;
+                LOG_RED << "===>bleSite startByRegister error, code = " << code;
+                LOG_RED << "===>bleSite startByRegister in 3 seconds....";
                 std::this_thread::sleep_for(std::chrono::seconds(3));
             }else{
-                std::cout << "===>bleSite startByRegister successfully....." << std::endl;
+                LOG_INFO << "===>bleSite startByRegister successfully.....";
                 break;
             }
         }

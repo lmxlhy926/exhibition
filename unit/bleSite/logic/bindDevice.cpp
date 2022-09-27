@@ -94,16 +94,15 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
 
-    //给节点分配地址，大约6秒，等待返回成功，最多等待20秒
+    //给节点分配地址，大约6秒，等待返回成功，最多等待20秒。分配失败，依然进行绑定
     LOG_INFO << ">>: start to assgin node address....";
     qlibc::QData nodeAddressAssign(SnAddressMap::getInstance()->getNodeAssignAddr(deviceSn));
     DownUtility::parse2Send(nodeAddressAssign);
-    if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(20) == std::cv_status::no_timeout){
+    if(EventTable::getInstance()->nodeAddressAssignSuccessEvent.wait(15) == std::cv_status::no_timeout){
         LOG_PURPLE << "<<: successed to assgin node address....";
     }else{
         SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
-        LOG_RED << "<<: FAILED TO ASSIGN NODE ADDRESS....";
-        return false;
+        LOG_RED << "<<: FAILED TO ASSIGN NODE ADDRESS, start to bind device ....";
     }
     std::this_thread::sleep_for(std::chrono::seconds(2));
 

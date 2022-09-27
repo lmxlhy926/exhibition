@@ -227,12 +227,12 @@ public:
         onOff = data.getString("commandPara");
 
         int transTimeInt = data.getInt("transTime");
-        if(0 <= transTimeInt && transTimeInt <= 255){
+        if(0 <= transTimeInt && transTimeInt <= 62){
             stringstream ss;
-            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
+            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << transTimeInt;
             transTime = ss.str();
         }else{
-            transTime = "00";
+            transTime = "3E";
         }
     }
 
@@ -273,12 +273,12 @@ public:
         }
 
         int transTimeInt = data.getInt("transTime");
-        if(0 <= transTimeInt && transTimeInt <= 255){
+        if(0 <= transTimeInt && transTimeInt <= 62){
             stringstream ss;
-            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
+            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << transTimeInt;
             transTime = ss.str();
         }else{
-            transTime = "00";
+            transTime = "3E";
         }
     }
 
@@ -318,12 +318,12 @@ public:
         }
 
         int transTimeInt = data.getInt("transTime");
-        if(0 <= transTimeInt && transTimeInt <= 255){
+        if(0 <= transTimeInt && transTimeInt <= 62){
             stringstream ss;
-            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << data.getInt("transTime");
+            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << transTimeInt;
             transTime = ss.str();
         }else{
-            transTime = "00";
+            transTime = "3E";
         }
     }
 

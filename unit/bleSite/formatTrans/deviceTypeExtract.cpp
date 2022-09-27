@@ -67,6 +67,7 @@ void deviceTypeExtract::initDeviceTypeData() {
     lightData["12"] = "彩光灯带";
     lightData["13"] = "彩光球泡灯";
     lightData["14"] = "全彩灯带";
+
     lightData["20"] = "双色筒灯";
     lightData["21"] = "双色射灯";
     lightData["22"] = "双色球泡灯";
@@ -75,12 +76,19 @@ void deviceTypeExtract::initDeviceTypeData() {
     lightData["25"] = "双色面板灯";
     lightData["26"] = "圆形吸顶灯";
     lightData["27"] = "双色灯带";
+    lightData["28"] = "磁吸轨道泛光灯";
+    lightData["29"] = "磁吸轨道灯格栅灯";
+    lightData["2A"] = "磁吸轨道灯导航灯";
+    lightData["2B"] = "磁吸轨道转角灯";
+    lightData["2C"] = "磁吸轨道折叠灯";
+    lightData["2D"] = "磁吸轨道吊线灯";
 
     Json::Value socketData;
     socketData["device_type"] = "SOCKET";
     socketData["device_typeCode"] = "8";
     socketData["30"] = "墙壁插座";
     socketData["31"] = "移动插座";
+    socketData["32"] = "通断器";
 
     Json::Value switchData;
     switchData["device_type"]  = "SWITCH";
@@ -90,8 +98,10 @@ void deviceTypeExtract::initDeviceTypeData() {
     switchData["42"] = "移动型情景开关";
     switchData["43"] = "墙壁型情景开关";
     switchData["44"] = "墙壁型双键开关";
-    switchData["45"] = "移动型双键开关";
+    switchData["45"] = "移动版双键开关";
     switchData["46"] = "移动型单键开关";
+    switchData["47"] = "移动版四键开关";
+    switchData["48"] = "墙壁版四键开关";
 
 
     Json::Value sensorData;
@@ -105,6 +115,7 @@ void deviceTypeExtract::initDeviceTypeData() {
     sensorData["55"] = "烟雾传感器";
     sensorData["56"] = "燃气传感器";
     sensorData["57"] = "水浸传感器";
+    sensorData["58"] = "人在传感器";
 
     Json::Value curtainData;
     curtainData["device_type"] = "CURTAIN";
