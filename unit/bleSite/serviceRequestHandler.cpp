@@ -213,12 +213,12 @@ int get_device_list_service_handler(const Request& request, Response& response){
 int get_device_list_byRoomName_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
-    string room_name = requestBody.getData("request").getString("room_name");
+    string room_no = requestBody.getData("request").getString("room_no");
     qlibc::QData device_list = bleConfig::getInstance()->getDeviceListData().getData("device_list");
     qlibc::QData deviceList2show;
     for(Json::ArrayIndex i = 0; i < device_list.size(); ++i){
         qlibc::QData item = device_list.getArrayElement(i);
-        if(item.getData("location").getString("room_name") == room_name){
+        if(item.getData("location").getString("room_no") == room_no){
            deviceList2show.append(item);
         }
     }
@@ -434,7 +434,7 @@ int addDevice2Group_service_handler(const Request& request, Response& response, 
 int groupByRoomname_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
-    string room_name = requestBody.getData("request").getString("room_name");
+    string room_no = requestBody.getData("request").getString("room_no");
     string group_name = requestBody.getData("request").getString("group_name");
     string group_id = GroupAddressMap::getInstance()->groupName2GroupAddressId(group_name);
     if(group_id.empty()){
@@ -443,12 +443,12 @@ int groupByRoomname_service_handler(const Request& request, Response& response, 
         return 0;
     }
 
-    bleConfig::getInstance()->enqueue([requestBody, room_name, group_name, group_id, &lc]{
+    bleConfig::getInstance()->enqueue([requestBody, room_no, group_name, group_id, &lc]{
         //根据房间名获取设备列表
         qlibc::QData device_list  = bleConfig::getInstance()->getDeviceListData().getData("device_list");
         for(Json::ArrayIndex i = 0; i < device_list.size(); ++i){
             qlibc::QData item = device_list.getArrayElement(i);
-            if(item.getData("location").getString("room_name") == room_name){
+            if(item.getData("location").getString("room_name") == room_no){
                 qlibc::QData cmdData;
                 cmdData.setString("command", "addDevice2Group");
                 cmdData.setString("group_id", group_id);
