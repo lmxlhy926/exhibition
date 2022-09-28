@@ -40,6 +40,6 @@ static const string SceneCommand_Service_ID = "sceneCommand";
 
 //订阅消息ID
 static const string DeviceList_changed_messageID = "deviceList_changed";
-
+static const string Site_OnOffLine_MessageID = "site_onoffline";
 
 #endif //EXHIBITION_PARAM_H
