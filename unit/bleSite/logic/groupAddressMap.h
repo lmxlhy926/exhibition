@@ -30,13 +30,13 @@ public:
     }
 
     //创建分组
-    bool createGroup(string groupName);
+    bool createGroup(qlibc::QData& property);
 
     //删除分组
     void deleGroup(string& groupId);
 
     //分组重命名
-    bool reNameGroup(string& groupId, string& groupName);
+    bool reNameGroup(string& groupId, qlibc::QData& property);
 
     //设备加入分组
     void addDevice2Group(string& groupId, string& deviceSn);
@@ -70,7 +70,7 @@ private:
     string intAddr2FullAddr(unsigned int i);
 
     //插入条目
-    void insert(string& groupName, unsigned int intAddr);
+    void insert(qlibc::QData& property, unsigned int intAddr);
 };
 
 #endif //EXHIBITION_GROUPADDRESSMAP_H

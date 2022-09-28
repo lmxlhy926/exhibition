@@ -327,8 +327,8 @@ int group_device_service_handler(const Request& request, Response& response, Log
 int create_group_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
-    string groupName = requestBody.getData("request").getString("group_name");
-    bool ret = GroupAddressMap::getInstance()->createGroup(groupName);
+    qlibc::QData property = requestBody.getData("request");
+    bool ret = GroupAddressMap::getInstance()->createGroup(property);
     if(ret){
         response.set_content(okResponse.dump(), "text/json");
     }else
@@ -384,8 +384,8 @@ int rename_group_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
     string groupId = requestBody.getData("request").getString("group_id");
-    string groupName = requestBody.getData("request").getString("group_name");
-    bool ret = GroupAddressMap::getInstance()->reNameGroup(groupId, groupName);
+    qlibc::QData property = requestBody.getData("request");
+    bool ret = GroupAddressMap::getInstance()->reNameGroup(groupId, property);
     if(ret){
         response.set_content(okResponse.dump(), "text/json");
     }else{
