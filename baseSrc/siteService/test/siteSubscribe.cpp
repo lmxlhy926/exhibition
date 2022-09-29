@@ -52,21 +52,25 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setServerPort(60002);
 
     // 注册 Message 请求处理 handler
-    serviceSiteManager->registerMessageHandler("scanResultMsg", message_handler);
-    serviceSiteManager->registerMessageHandler("singleDeviceBindSuccessMsg", message_handler);
-    serviceSiteManager->registerMessageHandler("bindEndMsg", message_handler);
-    serviceSiteManager->registerMessageHandler("singleDeviceUnbindSuccessMsg", message_handler);
-    serviceSiteManager->registerMessageHandler("device_state_changed", message_handler);
+//    serviceSiteManager->registerMessageHandler("scanResultMsg", message_handler);
+//    serviceSiteManager->registerMessageHandler("singleDeviceBindSuccessMsg", message_handler);
+//    serviceSiteManager->registerMessageHandler("bindEndMsg", message_handler);
+//    serviceSiteManager->registerMessageHandler("singleDeviceUnbindSuccessMsg", message_handler);
+//    serviceSiteManager->registerMessageHandler("device_state_changed", message_handler);
+    serviceSiteManager->registerMessageHandler("site_onoffline", message_handler);
+
 
     // 订阅消息, 需要传入订阅站点的IP、端口号、消息ID列表
     int code;
     std::vector<string> messageIdList;
-    messageIdList.push_back("scanResultMsg");                   //扫描结果
-    messageIdList.push_back("singleDeviceBindSuccessMsg");      //单个绑定成功
-    messageIdList.push_back("bindEndMsg");                      //全部绑定结束
-    messageIdList.push_back("singleDeviceUnbindSuccessMsg");    //单个解绑成功
-    messageIdList.push_back("device_state_changed");            //设备状态变更
-    code = serviceSiteManager->subscribeMessage("127.0.0.1", 60009, messageIdList);
+//    messageIdList.push_back("scanResultMsg");                   //扫描结果
+//    messageIdList.push_back("singleDeviceBindSuccessMsg");      //单个绑定成功
+//    messageIdList.push_back("bindEndMsg");                      //全部绑定结束
+//    messageIdList.push_back("singleDeviceUnbindSuccessMsg");    //单个解绑成功
+//    messageIdList.push_back("device_state_changed");            //设备状态变更
+    messageIdList.push_back("site_onoffline");                  //设备上下线
+
+    code = serviceSiteManager->subscribeMessage("192.168.58.119", 9000, messageIdList);
     if (code == ServiceSiteManager::RET_CODE_OK) {
         printf("subscribeMessage ok.\n");
     }else{

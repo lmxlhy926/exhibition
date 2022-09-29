@@ -162,10 +162,12 @@ namespace synergy {
             LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
 
         } else {
+            LOG_RED << action << " is not supported.....";
             response.set_content(errResponse.dump(), "text/json");
             return 0;
         }
 
+        LOG_HLIGHT << "==>sitResponse: " << siteResponse.toJsonString();
         response.set_content(siteResponse.toJsonString(), "text/json");
         return 0;
     }

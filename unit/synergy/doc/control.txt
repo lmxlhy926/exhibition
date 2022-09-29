@@ -1,0 +1,51 @@
+
+//恒定照度开启
+{
+    "service_id": "sceneCommand",
+    "request": {
+        "delay": "0",
+        "code": "lightIntegration",
+        "inParams": {
+            "brightness": 500,
+            "colourTemperature": 2700,
+            "roomNo": "1"
+        },
+        "action": "constantBrightnessModeStart",
+        "type": "service"
+    }
+}
+
+//恒定照度控制
+{
+    "service_id": "sceneCommand",
+    "request": {
+        "delay": "0",
+        "code": "lightIntegration",
+        "inParams": {
+            "flag" : "0",
+            "roomNo": "1"
+        },
+        "action": "constantBrightnessModeFlag",
+        "type": "service"
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
