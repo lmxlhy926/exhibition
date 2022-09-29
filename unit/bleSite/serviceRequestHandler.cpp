@@ -435,20 +435,19 @@ int groupByRoomname_service_handler(const Request& request, Response& response, 
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
     string room_no = requestBody.getData("request").getString("room_no");
-    string group_name = requestBody.getData("request").getString("group_name");
-    string group_id = GroupAddressMap::getInstance()->groupName2GroupAddressId(group_name);
+    string group_id = requestBody.getData("request").getString("group_id");
     if(group_id.empty()){
-        LOG_RED << "THE GROUP <" << group_name << "> IS NOT EXIST....";
+        LOG_RED << "THE GROUP <" << group_id << "> IS NOT EXIST....";
         response.set_content(errResponse.dump(), "text/json");
         return 0;
     }
 
-    bleConfig::getInstance()->enqueue([requestBody, room_no, group_name, group_id, &lc]{
+    bleConfig::getInstance()->enqueue([requestBody, room_no, group_id, &lc]{
         //根据房间名获取设备列表
         qlibc::QData device_list  = bleConfig::getInstance()->getDeviceListData().getData("device_list");
         for(Json::ArrayIndex i = 0; i < device_list.size(); ++i){
             qlibc::QData item = device_list.getArrayElement(i);
-            if(item.getData("location").getString("room_name") == room_no){
+            if(item.getData("location").getString("room_no") == room_no){
                 qlibc::QData cmdData;
                 cmdData.setString("command", "addDevice2Group");
                 cmdData.setString("group_id", group_id);
