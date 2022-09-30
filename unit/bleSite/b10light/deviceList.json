@@ -868,6 +868,48 @@
 				"room_name" : "客厅",
 				"room_no" : "1"
 			}
+		},
+		{
+			"device_id" : "A8270F971B30",
+			"device_model" : "双色球泡灯",
+			"device_modelCode" : "22",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "05C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "餐厅",
+				"room_no" : "12"
+			}
+		},
+		{
+			"device_id" : "B1280F971B30",
+			"device_model" : "双色球泡灯",
+			"device_modelCode" : "22",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "05C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "餐厅",
+				"room_no" : "12"
+			}
+		},
+		{
+			"device_id" : "B5E955971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "厨房",
+				"room_no" : "5"
+			}
 		}
 	]
 }
