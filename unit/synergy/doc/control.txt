@@ -31,7 +31,61 @@
 }
 
 
+//温馨就餐开启
+{
+    "service_id": "sceneCommand",
+    "request": {
+        "action": "comfortableDinnerModeStart",
+        "type": "service"
+    }
+}
 
+//温馨就餐关闭
+{
+    "service_id": "sceneCommand",
+    "request": {
+        "action": "comfortableDinnerModeStop",
+        "type": "service"
+    }
+}
+
+
+//阅读模式开启
+{
+    "service_id": "sceneCommand",
+    "request": {
+        "action": "readModeStart",
+        "type": "service"
+    }
+}
+
+//烹饪模式
+{
+    "service_id": "sceneCommand",
+    "request": {
+        "action": "cookModeStart",
+        "type": "service"
+    }
+}
+
+
+//进入事件
+{
+    "service_id": "sceneCommand",
+    "request": {
+        "action": "enterHouseholdModeStart",
+        "type": "service"
+    }
+}
+
+//离开事件
+{
+    "service_id": "sceneCommand",
+    "request": {
+        "action": "enterHouseholdNoPersonModeStart",
+        "type": "service"
+    }
+}
 
 
 
