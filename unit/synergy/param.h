@@ -5,7 +5,8 @@
 #ifndef EXHIBITION_PARAM_H
 #define EXHIBITION_PARAM_H
 
-static const string RequestIp = "127.0.0.1";
+//static const string RequestIp = "127.0.0.1";
+static const string RequestIp = "192.168.58.120";
 
 static const string BleSiteID = "ble_light";
 static const string BleSiteName = "BLE灯控";

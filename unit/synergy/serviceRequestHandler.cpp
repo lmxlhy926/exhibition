@@ -57,13 +57,14 @@ namespace synergy {
         qlibc::QData controlData, response;
         controlData.setString("service_id", "control_device");
 
-        if (bleDeviceList.size() > 0) {
-            qlibc::QData list;
-            list.putData("device_list", bleDeviceList);
-            controlData.putData("request", list);
-            SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, response);
-            LOG_YELLOW << "cmd2BleSite: " << controlData.toJsonString();
-        }
+//        if (bleDeviceList.size() > 0) {
+//            qlibc::QData list;
+//            list.putData("device_list", bleDeviceList);
+//            controlData.putData("request", list);
+//            SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, response);
+//            LOG_YELLOW << "cmd2BleSite: " << controlData.toJsonString();
+//        }
+
         if (zigbeeDeviceList.size() > 0) {
             qlibc::QData list;
             list.putData("device_list", zigbeeDeviceList);
@@ -110,8 +111,9 @@ namespace synergy {
             list.append(controlData);
             groupData.setString("service_id", "control_group");
             groupData.putData("request", qlibc::QData().putData("group_list", list));
+            SiteRecord::getInstance()->sendRequest2Site(BleSiteID, groupData, siteResponse);
             LOG_YELLOW << "cmd2BleSite: " << groupData.toJsonString();
-            SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, siteResponse);
+            LOG_INFO << "siteResponse: " << siteResponse.toJsonString();
 
         }else{
             qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
