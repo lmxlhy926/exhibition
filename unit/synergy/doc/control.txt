@@ -1,7 +1,7 @@
-
+---------------------------------场景指令---------------------------------
 //恒定照度开启
 {
-    "service_id": "sceneCommand",
+    "service_id": "cloudCommand",
     "request": {
         "delay": "0",
         "code": "lightIntegration",
@@ -17,7 +17,7 @@
 
 //恒定照度控制
 {
-    "service_id": "sceneCommand",
+    "service_id": "cloudCommand",
     "request": {
         "delay": "0",
         "code": "lightIntegration",
@@ -33,7 +33,7 @@
 
 //温馨就餐开启
 {
-    "service_id": "sceneCommand",
+    "service_id": "cloudCommand",
     "request": {
         "action": "comfortableDinnerModeStart",
         "type": "service"
@@ -42,7 +42,7 @@
 
 //温馨就餐关闭
 {
-    "service_id": "sceneCommand",
+    "service_id": "cloudCommand",
     "request": {
         "action": "comfortableDinnerModeStop",
         "type": "service"
@@ -52,7 +52,7 @@
 
 //阅读模式开启
 {
-    "service_id": "sceneCommand",
+    "service_id": "cloudCommand",
     "request": {
         "action": "readModeStart",
         "type": "service"
@@ -61,7 +61,7 @@
 
 //烹饪模式
 {
-    "service_id": "sceneCommand",
+    "service_id": "cloudCommand",
     "request": {
         "action": "cookModeStart",
         "type": "service"
@@ -71,7 +71,7 @@
 
 //进入事件
 {
-    "service_id": "sceneCommand",
+    "service_id": "cloudCommand",
     "request": {
         "action": "enterHouseholdModeStart",
         "type": "service"
@@ -80,7 +80,7 @@
 
 //离开事件
 {
-    "service_id": "sceneCommand",
+    "service_id": "cloudCommand",
     "request": {
         "action": "enterHouseholdNoPersonModeStart",
         "type": "service"
@@ -89,17 +89,134 @@
 
 
 
+---------------------------------第三方设备控制指令---------------------------------
+参数描述
+Code：设备类别。例如："code": "airCleaner"；空气净化器
+Area：区域
+Action：命令
+Type：指令类别。例如："type": "device"；设备操作
+inParams：参数。参见设备详细参数
+productNickname: 该参数可以缺省，指定特定设备。
+灯、灯开关面板
+1.1开关灯
+{
+    "service_id": "cloudCommand",
+    "request": {
+       "delay": "0",
+       "code": "light",
+       "inParams": {
+           "area": "1",
+           "productNickname": "1 号灯",
+           "power": "on"
+       },
+       "action": "setPower",
+       "type": "device"
+    }
+}
 
 
+1.2设置亮度
+{
+    "service_id": "cloudCommand",
+    "request": {
+       "delay": "0",
+       "code": "light",
+       "inParams": {
+           "area": "1",
+           "productNickname": "2 号灯",
+           "luminance": "100"
+       },
+       "action": "setLuminance",
+       "type": "device"
+    }
+}
+
+1.3设置色温
+{
+    "service_id": "cloudCommand",
+    "request": {
+        "delay": "0",
+        "code": "light",
+        "inParams": {
+            "area": "1",
+            "productNickname": "3 号灯",
+            "colourTemperature": "2800"
+        },
+        "action": "setColourTemperature",
+        "type": "device"
+    }
+}
 
 
+窗帘面板
+空调
+空气净化器
+1.1开关净化器
+{
+    "service_id": "cloudCommand",
+    "request": {
+       "delay": "0",
+       "code": "airCleaner",
+       "inParams": {
+           "area": "2",
+           "productNickname": "净化器 1 号",
+           "power": "on"
+       },
+       "action": "setPower",
+       "type": "device"
+    }
+}
 
 
+1.2设置风速
+{
+    "service_id": "cloudCommand",
+    "request": {
+       "delay": "0",
+       "code": "airCleaner",
+       "inParams": {
+           "area": "2",
+           "productNickname": "净化器 2 号",
+           "velocity": "1"
+       },
+       "action": "setVelocity",
+       "type": "device"
+    }
+}
+
+加湿器
+1.1开关加湿器
+{
+    "service_id": "cloudCommand",
+    "request": {
+        "delay": "0",
+        "code": "humidifier",
+        "inParams": {
+            "area": "3",
+            "productNickname": "加湿器 1 号",
+            "power": "on"
+        },
+        "action": "setPower",
+        "type": "device"
+    }
+}
 
 
-
-
-
+1.2设置档位
+{
+    "service_id": "cloudCommand",
+    "request": {
+       "delay": "0",
+       "code": "humidifier",
+       "inParams": {
+           "area": "3",
+           "productNickname": "加湿器 2 号",
+           "level": "2"
+       },
+       "action": "setLevel",
+       "type": "device"
+    }
+}
 
 
 

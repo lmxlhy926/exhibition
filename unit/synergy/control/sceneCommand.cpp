@@ -18,7 +18,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         siteRequest.setString("service_id", "constant_illuminance");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-        LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
+        LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
 
     } else if (action == "constantBrightnessModeFlag") {    //设置恒定照度
         string flag = inParams.getString("flag");
@@ -37,7 +37,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         siteRequest.setString("service_id", "constant_illuminance");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-        LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
+        LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
 
     }else if(action == "comfortableDinnerModeStart"){   //温馨就餐开启
         req.setBool("active_switch", true);
@@ -45,7 +45,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         siteRequest.setString("service_id", "dining");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-        LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
+        LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
 
     }else if(action == "comfortableDinnerModeStop"){    //温馨就餐关闭
         req.setBool("active_switch", false);
@@ -53,7 +53,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         siteRequest.setString("service_id", "dining");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-        LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
+        LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
 
     }else if(action == "readModeStart"){    //阅读模式开启
         req.setBool("active_switch", true);
@@ -61,7 +61,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         siteRequest.setString("service_id", "reading");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-        LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
+        LOG_YELLOW << "sceneCmd " << siteRequest.toJsonString();
 
     }else if(action == "cookModeStart"){    //烹饪模式开启
         req.setBool("active_switch", true);
@@ -70,7 +70,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         siteRequest.setString("service_id", "cooking");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-        LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
+        LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
 
     }else if(action == "enterHouseholdModeStart"){  //回家模式客厅有人
         req.setBool("active_switch", true);
@@ -78,7 +78,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         siteRequest.setString("service_id", "enter_home");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-        LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
+        LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
 
     }else if(action == "enterHouseholdNoPersonModeStart"){  //回家模式无人
         req.setBool("active_switch", false);
@@ -86,7 +86,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         siteRequest.setString("service_id", "enter_home");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-        LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
+        LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
 
     } else {
         LOG_RED << action << " is not supported.....";

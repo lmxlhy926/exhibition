@@ -3,6 +3,7 @@
 //
 #include "downCommand.h"
 #include "common/httplib.h"
+#include "../param.h"
 
 /*
  * 灯控
@@ -24,10 +25,16 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
    for(Json::ArrayIndex i = 0; i < num; ++i){
        qlibc::QData item = deviceList.getArrayElement(i);
        if(match(item)){
+           string sourceSite = item.getString("sourceSite");
            qlibc::QData controlData;
-           controlData.setString("device_id", item.getString("device_id"));
            controlData.putData("command_list", buildCommandList(inParams));
-           controlData.setString("sourceSite", item.getString("sourceSite"));
+           controlData.setString("sourceSite", sourceSite);
+
+           if(sourceSite == BleSiteID){
+               controlData.setString("group_id", item.getString("group_address"));
+           }else{
+               controlData.setString("device_id", item.getString("device_id"));
+           }
            return controlData;
        }
    }
@@ -37,9 +44,23 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
 bool DownCommandData::match(qlibc::QData &item) {
     string item_room_no = item.getData("location").getString("room_no");
     string item_device_name = item.getString("device_name");
-    if(item_room_no == inParams.getString("area") && item_device_name == inParams.getString("productNickname")){
-        return true;
+    string sourceSite = item.getString("sourceSite");
+    string device_use = item.getString("device_use");
+
+    if(sourceSite == BleSiteID){    //蓝牙灯，则使用device_use字段
+        if(device_use.empty()){
+            device_use = "主灯";
+        }
+        if(item_room_no == inParams.getString("area") && device_use == inParams.getString("productNickname")){
+            return true;
+        }
+
+    }else{
+        if(item_room_no == inParams.getString("area") && item_device_name == inParams.getString("productNickname")){
+            return true;
+        }
     }
+
     return false;
 }
 

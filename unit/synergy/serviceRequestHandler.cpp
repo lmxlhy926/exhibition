@@ -62,18 +62,21 @@ namespace synergy {
             list.putData("device_list", bleDeviceList);
             controlData.putData("request", list);
             SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, response);
+            LOG_YELLOW << "cmd2BleSite: " << controlData.toJsonString();
         }
         if (zigbeeDeviceList.size() > 0) {
             qlibc::QData list;
             list.putData("device_list", zigbeeDeviceList);
             controlData.putData("request", zigbeeDeviceList);
             SiteRecord::getInstance()->sendRequest2Site(ZigbeeSiteID, controlData, response);
+            LOG_YELLOW << "cmd2ZigbeeSite: " << controlData.toJsonString();
         }
         if (tvAdapterList.size() > 0) {
             qlibc::QData list;
             list.putData("device_list", tvAdapterList);
             controlData.putData("request", tvAdapterList);
             SiteRecord::getInstance()->sendRequest2Site(TvAdapterSiteID, controlData, response);
+            LOG_YELLOW << "cmd2TvadapterSite: " << controlData.toJsonString();
         }
         return true;
     }
@@ -102,11 +105,21 @@ namespace synergy {
         qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
         qlibc::QData controlData = DownCommandData(requestData).getContorlData(deviceList);
 
-        qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
-        classify(controlData, bleDeviceList, zigbeeDeviceList, tvAdapterList);
-        sendCmd(bleDeviceList, zigbeeDeviceList, tvAdapterList);
-        response.set_content(okResponse.dump(), "text/json");
+        if(controlData.asValue().isMember("group_id")){     //灯控组控指令
+            qlibc::QData groupData, list, siteResponse;
+            list.append(controlData);
+            groupData.setString("service_id", "control_group");
+            groupData.putData("request", qlibc::QData().putData("group_list", list));
+            LOG_YELLOW << "cmd2BleSite: " << groupData.toJsonString();
+            SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, siteResponse);
 
+        }else{
+            qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
+            classify(controlData, bleDeviceList, zigbeeDeviceList, tvAdapterList);
+            sendCmd(bleDeviceList, zigbeeDeviceList, tvAdapterList);
+        }
+
+        response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
 
@@ -137,5 +150,4 @@ namespace synergy {
         response.set_content(data.toJsonString(), "text/json");
         return 0;
     }
-
 }
