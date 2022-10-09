@@ -7,12 +7,25 @@
 #include "qlibc/QData.h"
 #include "param.h"
 #include "common/httpUtil.h"
-#include "deviceControl/common.h"
+#include "control/downCommand.h"
 #include "log/Logging.h"
 #include "deviceManager.h"
 #include "groupManager.h"
+#include "control/sceneCommand.h"
+#include <vector>
 
 namespace synergy {
+
+    std::vector<string> sceneVec = {
+      "constantBrightnessModeStart",
+      "constantBrightnessModeFlag",
+      "comfortableDinnerModeStart",
+      "comfortableDinnerModeStop",
+      "readModeStart",
+      "cookModeStart",
+      "enterHouseholdModeStart",
+      "enterHouseholdNoPersonModeStart"
+    };
 
     static const nlohmann::json okResponse = {
             {"code",     0},
@@ -38,6 +51,7 @@ namespace synergy {
             tvAdapterList.append(controlData);
         }
     }
+
 
     bool sendCmd(qlibc::QData &bleDeviceList, qlibc::QData &zigbeeDeviceList, qlibc::QData &tvAdapterList) {
         qlibc::QData controlData, response;
@@ -65,30 +79,36 @@ namespace synergy {
     }
 
 
-    bool controlDeviceRightNow(qlibc::QData &message) {
-        std::cout << "received message: " << message.toJsonString() << std::endl;
+    int cloudCommand_service_handler(const Request& request, Response& response){
+        qlibc::QData requestData(request.body);
+        LOG_INFO << "cloudCommand_service_handler: " << requestData.toJsonString();
+        string action = requestData.getData("request").getString("action");
+        for(auto& elem : sceneVec){
+            if(action == elem){     //场景指令
+                qlibc::QData siteResponse;
+                SceneCommand sc(requestData);
+                bool flag = sc.sendCmd(siteResponse);
+                if(!flag){
+                    response.set_content(errResponse.dump(), "text/json");
+                }else{
+                    LOG_HLIGHT << "==>sitResponse: " << siteResponse.toJsonString();
+                    response.set_content(siteResponse.toJsonString(), "text/json");
+                }
+                return 0;
+            }
+        }
+
+        //第三方设备控制指令
         qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
-        qlibc::QData controlData = DownCommandData(message).getContorlData(deviceList);
+        qlibc::QData controlData = DownCommandData(requestData).getContorlData(deviceList);
 
         qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
         classify(controlData, bleDeviceList, zigbeeDeviceList, tvAdapterList);
         sendCmd(bleDeviceList, zigbeeDeviceList, tvAdapterList);
+        response.set_content(okResponse.dump(), "text/json");
 
-        return true;
-    }
-
-    int device_control_service_handler(const Request &request, Response &response) {
-        qlibc::QData requestBody(request.body);
-        LOG_INFO << "device_control_service_handler: " << requestBody.toJsonString();
-        if (requestBody.type() != Json::nullValue) {
-            controlDeviceRightNow(requestBody);
-            response.set_content(okResponse.dump(), "text/json");
-        } else {
-            response.set_content(errResponse.dump(), "text/json");
-        }
         return 0;
     }
-
 
     int getDeviceList_service_handler(const Request &request, Response &response) {
         LOG_INFO << "getDeviceList_service_handler";
@@ -115,108 +135,6 @@ namespace synergy {
         data.putData("response", res);
 
         response.set_content(data.toJsonString(), "text/json");
-        return 0;
-    }
-
-    int sceneCommand_service_handler(const Request &request, Response &response) {
-        qlibc::QData requestData(request.body);
-        LOG_INFO << "sceneCommand_service_handler: " << requestData.toJsonString();
-        qlibc::QData requestBody = requestData.getData("request");
-
-        string type = requestBody.getString("type");
-        string action = requestBody.getString("action");
-        string code = requestBody.getString("code");
-        string delay = requestBody.getString("delay");
-        qlibc::QData inParams = requestBody.getData("inParams");
-
-        qlibc::QData req, siteRequest, siteResponse;
-        if (action == "constantBrightnessModeStart") {  //开启恒定照度
-            req.setBool("active_switch", true);
-            req.setInt("target_illumination", inParams.getInt("brightness"));
-            req.setInt("target_temperature", inParams.getInt("colourTemperature"));
-            req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
-
-            siteRequest.setString("service_id", "constant_illuminance");
-            siteRequest.putData("request", req);
-            SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-            LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
-
-        } else if (action == "constantBrightnessModeFlag") {    //设置恒定照度
-            string flag = inParams.getString("flag");
-            bool active_switch;
-            if (flag == "0") {
-                active_switch = true;
-            } else {
-                active_switch = false;
-            }
-
-            req.setBool("active_switch", active_switch);
-            req.setInt("target_illumination", 0);
-            req.setInt("target_temperature", 0);
-            req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
-
-            siteRequest.setString("service_id", "constant_illuminance");
-            siteRequest.putData("request", req);
-            SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-            LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
-
-        }else if(action == "comfortableDinnerModeStart"){   //温馨就餐开启
-            req.setBool("active_switch", true);
-            req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
-            siteRequest.setString("service_id", "dining");
-            siteRequest.putData("request", req);
-            SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-            LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
-
-        }else if(action == "comfortableDinnerModeStop"){    //温馨就餐关闭
-            req.setBool("active_switch", false);
-            req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
-            siteRequest.setString("service_id", "dining");
-            siteRequest.putData("request", req);
-            SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-            LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
-
-        }else if(action == "readModeStart"){    //阅读模式开启
-            req.setBool("active_switch", true);
-            req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
-            siteRequest.setString("service_id", "reading");
-            siteRequest.putData("request", req);
-            SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-            LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
-
-        }else if(action == "cookModeStart"){    //烹饪模式开启
-            req.setBool("active_switch", true);
-            req.setInt("target_temperature", inParams.getInt("colourTemperature"));
-            req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
-            siteRequest.setString("service_id", "cooking");
-            siteRequest.putData("request", req);
-            SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-            LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
-
-        }else if(action == "enterHouseholdModeStart"){  //回家模式客厅有人
-            req.setBool("active_switch", true);
-            req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
-            siteRequest.setString("service_id", "enter_home");
-            siteRequest.putData("request", req);
-            SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-            LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
-
-        }else if(action == "enterHouseholdNoPersonModeStart"){  //回家模式无人
-            req.setBool("active_switch", false);
-            req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
-            siteRequest.setString("service_id", "enter_home");
-            siteRequest.putData("request", req);
-            SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
-            LOG_YELLOW << "cmd: " << siteRequest.toJsonString();
-
-        } else {
-            LOG_RED << action << " is not supported.....";
-            response.set_content(errResponse.dump(), "text/json");
-            return 0;
-        }
-
-        LOG_HLIGHT << "==>sitResponse: " << siteResponse.toJsonString();
-        response.set_content(siteResponse.toJsonString(), "text/json");
         return 0;
     }
 

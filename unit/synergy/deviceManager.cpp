@@ -41,7 +41,6 @@ qlibc::QData DeviceManager::getDeviceList(){
     qlibc::QData zigbee_list = addSourceTag(zigbeeDeviceRes.getData("response").getData("device_list"), ZigbeeSiteID);
     qlibc::QData tvAdapterList = addSourceTag(tvDeviceRes.getData("response").getData("device_list"), TvAdapterSiteID);
 
-    mergeList(ble_list, zigbee_list, tvAdapterList);
     return mergeList(ble_list, zigbee_list, tvAdapterList);
 }
 

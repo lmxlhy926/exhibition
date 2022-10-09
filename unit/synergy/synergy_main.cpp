@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
 
     //单例对象
     DeviceManager::getInstance();
+    GroupManager::getInstance();
 
     //站点请求管理
     SiteRecord::getInstance()->addSite(BleSiteID, RequestIp, BleSitePort);
@@ -38,16 +39,10 @@ int main(int argc, char* argv[]) {
     SiteRecord::getInstance()->addSite(TvAdapterSiteID, RequestIp, TvAdapterSitePort);
     SiteRecord::getInstance()->addSite(SceneSiteID, RequestIp, SceneSitePort);
 
-    //设备控制
-    serviceSiteManager->registerServiceRequestHandler(Control_Device_Service_ID,
+    //设备控制 + 场景命令
+    serviceSiteManager->registerServiceRequestHandler(Control_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
-        return synergy::device_control_service_handler(request, response);
-    });
-
-    //场景接口
-    serviceSiteManager->registerServiceRequestHandler(SceneCommand_Service_ID,
-                                                      [](const Request& request, Response& response) -> int{
-        return synergy::sceneCommand_service_handler(request, response);
+        return synergy::cloudCommand_service_handler(request, response);
     });
 
     //获取设备列表
@@ -67,10 +62,8 @@ int main(int argc, char* argv[]) {
         //每次站点上线都会触发重新获取设备列表、组列表
         qlibc::QData data(request.body);
         string offline = data.getData("content").getString("site_status");
-        if(offline == "online"){
-            DeviceManager::getInstance()->listChanged();
-            GroupManager::getInstance()->listChanged();
-        }
+        DeviceManager::getInstance()->listChanged();
+        GroupManager::getInstance()->listChanged();
     });
 
     threadPool_.enqueue([&](){
