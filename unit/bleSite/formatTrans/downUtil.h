@@ -81,7 +81,7 @@ public:
     }
 };
 
-//给网关分配地址;
+//给网关分配地址; 《b10展厅11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 2A》
 class LightGatewayAddressAssign : public BuildBinaryString{
 public:
     string getBinaryString() override{
@@ -91,7 +91,7 @@ public:
     }
 };
 
-//给节点分配地址;
+//给节点分配地址; 《b10展厅11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 2A》
 class LightNodeAddressAssign : public BuildBinaryString{
 private:
     string nodeAddress;

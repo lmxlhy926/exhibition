@@ -8,7 +8,7 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
@@ -31,7 +31,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -50,7 +50,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -69,7 +69,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -88,7 +88,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -107,7 +107,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -122,7 +122,7 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
@@ -164,7 +164,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -183,7 +183,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -198,11 +198,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -217,11 +217,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -236,11 +236,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -255,11 +255,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -274,11 +274,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -293,11 +293,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -312,11 +312,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -331,11 +331,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -350,11 +350,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -369,11 +369,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -388,11 +388,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -407,11 +407,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -426,11 +426,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -445,11 +445,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -464,11 +464,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -483,11 +483,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -502,11 +502,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -521,11 +521,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -540,11 +540,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -559,11 +559,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -578,11 +578,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -597,11 +597,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -616,11 +616,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -635,11 +635,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -654,11 +654,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -673,11 +673,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -692,11 +692,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -711,11 +711,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -730,11 +730,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -749,11 +749,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -768,11 +768,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -787,11 +787,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -806,11 +806,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -825,11 +825,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -844,11 +844,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -863,11 +863,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -882,11 +882,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -901,11 +901,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -920,11 +920,11 @@
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 50
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -943,7 +943,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -962,7 +962,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -1000,7 +1000,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -1019,7 +1019,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 255
+					"state_value" : 0
 				},
 				{
 					"state_id" : "color_temperature",
@@ -1029,6 +1029,120 @@
 		},
 		{
 			"device_id" : "D8A341971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "off"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 0
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "A8270F971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "off"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 0
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "B1280F971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "off"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 0
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "B5E955971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "off"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 255
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "043039971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "off"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 0
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "F42F39971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "off"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 0
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "14D655971B30",
 			"online_state" : "online",
 			"state_list" : 
 			[
@@ -1057,7 +1171,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -1076,7 +1190,26 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "C03039971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "off"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -1086,6 +1219,25 @@
 		},
 		{
 			"device_id" : "C0D455971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "off"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 255
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "C4E655971B30",
 			"online_state" : "online",
 			"state_list" : 
 			[
@@ -1114,7 +1266,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -1133,7 +1285,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -1152,7 +1304,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -1171,7 +1323,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 0
+					"state_value" : 255
 				},
 				{
 					"state_id" : "color_temperature",
@@ -1180,13 +1332,13 @@
 			]
 		},
 		{
-			"device_id" : "A8270F971B30",
+			"device_id" : "345639971B30",
 			"online_state" : "online",
 			"state_list" : 
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
@@ -1199,13 +1351,13 @@
 			]
 		},
 		{
-			"device_id" : "B1280F971B30",
+			"device_id" : "533E39971B30",
 			"online_state" : "online",
 			"state_list" : 
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
@@ -1218,13 +1370,32 @@
 			]
 		},
 		{
-			"device_id" : "B5E955971B30",
+			"device_id" : "6A3E39971B30",
 			"online_state" : "online",
 			"state_list" : 
 			[
 				{
 					"state_id" : "power",
-					"state_value" : "on"
+					"state_value" : "off"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 255
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "B63039971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "off"
 				},
 				{
 					"state_id" : "luminance",
