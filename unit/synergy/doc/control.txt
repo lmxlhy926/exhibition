@@ -8,7 +8,7 @@
         "inParams": {
             "brightness": 500,
             "colourTemperature": 2700,
-            "roomNo": "1"
+            "area": "1"
         },
         "action": "constantBrightnessModeStart",
         "type": "service"
@@ -23,7 +23,7 @@
         "code": "lightIntegration",
         "inParams": {
             "flag" : "0",
-            "roomNo": "1"
+            "area": "1"
         },
         "action": "constantBrightnessModeFlag",
         "type": "service"

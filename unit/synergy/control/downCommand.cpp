@@ -59,10 +59,6 @@ bool DownCommandData::match(qlibc::QData &item) {
         if(item_room_no == inParams.getString("area") && item_device_name == inParams.getString("productNickname")){
             return true;
         }
-
-//        if(item_device_name == inParams.getString("productNickname")){
-//            return true;
-//        }
     }
 
     return false;
