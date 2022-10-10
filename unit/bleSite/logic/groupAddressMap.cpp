@@ -12,13 +12,13 @@
 
 GroupAddressMap* GroupAddressMap::instance = nullptr;
 
-bool GroupAddressMap::createGroup(qlibc::QData& property) {
+string GroupAddressMap::createGroup(qlibc::QData& property) {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     //如果设备列表为空
     if(groupAddrMap.empty()){
         insert(property, 1);
         map2JsonDataAndSave2File();
-        return true;
+        return intAddr2FullAddr(1);
     }
 
     //将数字地址存入vector并排序
@@ -35,14 +35,14 @@ bool GroupAddressMap::createGroup(qlibc::QData& property) {
         if(addrVec[i] !=  i + 1){
             insert(property, i + 1);
             map2JsonDataAndSave2File();
-            return true;
+            return intAddr2FullAddr(i + 1);
         }
     }
 
     //没有空隙
     insert(property, addrVec.size() + 1);
     map2JsonDataAndSave2File();
-    return true;
+    return intAddr2FullAddr(addrVec.size() + 1);
 }
 
 void GroupAddressMap::deleGroup(string &groupId) {

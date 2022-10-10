@@ -30,7 +30,7 @@ public:
     }
 
     //创建分组
-    bool createGroup(qlibc::QData& property);
+    string createGroup(qlibc::QData& property);
 
     //删除分组
     void deleGroup(string& groupId);

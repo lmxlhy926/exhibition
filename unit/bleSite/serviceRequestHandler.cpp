@@ -328,12 +328,14 @@ int create_group_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
     qlibc::QData property = requestBody.getData("request");
-    bool ret = GroupAddressMap::getInstance()->createGroup(property);
-    if(ret){
-        response.set_content(okResponse.dump(), "text/json");
-    }else
-        response.set_content(errResponse.dump(), "text/json");
+    string groupId = GroupAddressMap::getInstance()->createGroup(property);
 
+    qlibc::QData res;
+    res.setInt("code", 0);
+    res.setString("error", "success");
+    res.putData("response", qlibc::QData().setString("group_id", groupId));
+
+    response.set_content(res.toJsonString(), "text/json");
     return 0;
 }
 
