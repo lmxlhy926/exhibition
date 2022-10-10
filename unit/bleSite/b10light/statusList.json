@@ -933,120 +933,6 @@
 			]
 		},
 		{
-			"device_id" : "83AB41971B30",
-			"online_state" : "online",
-			"state_list" : 
-			[
-				{
-					"state_id" : "power",
-					"state_value" : "off"
-				},
-				{
-					"state_id" : "luminance",
-					"state_value" : 0
-				},
-				{
-					"state_id" : "color_temperature",
-					"state_value" : 6000
-				}
-			]
-		},
-		{
-			"device_id" : "9DAB41971B30",
-			"online_state" : "online",
-			"state_list" : 
-			[
-				{
-					"state_id" : "power",
-					"state_value" : "off"
-				},
-				{
-					"state_id" : "luminance",
-					"state_value" : 0
-				},
-				{
-					"state_id" : "color_temperature",
-					"state_value" : 6000
-				}
-			]
-		},
-		{
-			"device_id" : "C1D455971B30",
-			"online_state" : "online",
-			"state_list" : 
-			[
-				{
-					"state_id" : "power",
-					"state_value" : "off"
-				},
-				{
-					"state_id" : "luminance",
-					"state_value" : 0
-				},
-				{
-					"state_id" : "color_temperature",
-					"state_value" : 6000
-				}
-			]
-		},
-		{
-			"device_id" : "C8A941971B30",
-			"online_state" : "online",
-			"state_list" : 
-			[
-				{
-					"state_id" : "power",
-					"state_value" : "off"
-				},
-				{
-					"state_id" : "luminance",
-					"state_value" : 0
-				},
-				{
-					"state_id" : "color_temperature",
-					"state_value" : 6000
-				}
-			]
-		},
-		{
-			"device_id" : "CDEF55971B30",
-			"online_state" : "online",
-			"state_list" : 
-			[
-				{
-					"state_id" : "power",
-					"state_value" : "off"
-				},
-				{
-					"state_id" : "luminance",
-					"state_value" : 0
-				},
-				{
-					"state_id" : "color_temperature",
-					"state_value" : 6000
-				}
-			]
-		},
-		{
-			"device_id" : "D8A341971B30",
-			"online_state" : "online",
-			"state_list" : 
-			[
-				{
-					"state_id" : "power",
-					"state_value" : "off"
-				},
-				{
-					"state_id" : "luminance",
-					"state_value" : 0
-				},
-				{
-					"state_id" : "color_temperature",
-					"state_value" : 6000
-				}
-			]
-		},
-		{
 			"device_id" : "A8270F971B30",
 			"online_state" : "online",
 			"state_list" : 
@@ -1396,6 +1282,120 @@
 				{
 					"state_id" : "power",
 					"state_value" : "off"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 255
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "83AB41971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "on"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 255
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "9DAB41971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "on"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 255
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "C1D455971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "on"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 255
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "C8A941971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "on"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 255
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "CDEF55971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "on"
+				},
+				{
+					"state_id" : "luminance",
+					"state_value" : 255
+				},
+				{
+					"state_id" : "color_temperature",
+					"state_value" : 6000
+				}
+			]
+		},
+		{
+			"device_id" : "D8A341971B30",
+			"online_state" : "online",
+			"state_list" : 
+			[
+				{
+					"state_id" : "power",
+					"state_value" : "on"
 				},
 				{
 					"state_id" : "luminance",
