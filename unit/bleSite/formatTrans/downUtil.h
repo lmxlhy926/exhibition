@@ -348,4 +348,56 @@ public:
 };
 
 
+//亮度、色温联合控制
+class LightLuminanceColor : public BuildBinaryString{
+private:
+    string address;
+    int luminanceVal = 0;
+    int ctlTemperature;
+    string transTime;
+
+public:
+    explicit LightLuminanceColor(qlibc::QData& data){ init(data); }
+
+    void init(qlibc::QData& data){
+        address = data.getString("address");
+        int tempCtlTemperature = data.getInt("commandPara");
+        if(2700 <= tempCtlTemperature && tempCtlTemperature <= 6500){
+            ctlTemperature = tempCtlTemperature;
+        }else{
+            ctlTemperature = 6500;
+        }
+
+
+
+        int transTimeInt = data.getInt("transTime");
+        if(0 <= transTimeInt && transTimeInt <= 62){
+            stringstream ss;
+            ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << transTimeInt;
+            transTime = ss.str();
+        }else{
+            transTime = "3E";
+        }
+    }
+
+    string getBinaryString() override{
+        string prefix = getCommandPrefix();
+        stringstream ss;
+        ss << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
+        string ctlTemperatureStr = ss.str();
+
+        string stringCmd;
+        stringCmd.append(prefix).append(address).append("8264");
+        stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
+        stringCmd.append(deleteWhiteSpace("00 00"));
+        stringCmd.append("00");
+        stringCmd.append(transTime);
+        stringCmd.append("00");
+
+        return stringCmd;
+    }
+};
+
+
+
 #endif //EXHIBITION_DOWNUTIL_H
