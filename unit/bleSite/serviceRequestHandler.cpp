@@ -57,9 +57,6 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
             qlibc::QData commandItem = command_list.getArrayElement(j);
             string command_id = commandItem.getString("command_id");
             int transTime = commandItem.getInt("transTime");
-            if(transTime < 0 || transTime >= 255){
-                transTime = 0;
-            }
 
             qlibc::QData cmdData;
             cmdData.setString("address", address);
@@ -71,6 +68,10 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
 
             }else if(command_id == LUMINANCE || command_id == COLORTEMPERATURE){
                 cmdData.setInt("commandPara", commandItem.getInt("command_para"));
+
+            }else if(command_id == LUMINANCECOLORTEMPERATURE){
+                cmdData.setInt("commandParaLuminance", commandItem.getInt("command_para_luminance"));
+                cmdData.setInt("commandParaColorTemperature", commandItem.getInt("command_para_color_temperature"));
             }
 
             lc.parse(cmdData);
@@ -185,6 +186,10 @@ int control_all_service_handler(const Request& request, Response& response, Logi
 
             }else if(command_id == LUMINANCE || command_id == COLORTEMPERATURE){
                 cmdData.setInt("commandPara", requestData.getInt("command_para"));
+
+            }else if(command_id == LUMINANCECOLORTEMPERATURE){
+                cmdData.setInt("commandParaLuminance", requestData.getInt("command_para_luminance"));
+                cmdData.setInt("commandParaColorTemperature", requestData.getInt("command_para_color_temperature"));
             }
 
             lc.parse(cmdData);

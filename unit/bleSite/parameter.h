@@ -71,7 +71,7 @@ static const string WhiteList_Changed =   "whiteListModifiedByAppMsg";
 #define POWER                       "power"
 #define LUMINANCE                   "luminance"
 #define COLORTEMPERATURE            "color_temperature"
-
+#define LUMINANCECOLORTEMPERATURE   "luminance_color_temperature"
 
 
 #endif //EXHIBITION_PARAMETER_H

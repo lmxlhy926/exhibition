@@ -68,7 +68,11 @@ string DownUtility::cmdData2BinaryCommandString(QData &cmdData) {
 
     }else if(command == COLORTEMPERATURE){  //色温
         return LightColorTem(cmdData).getBinaryString();
+
+    }else if(command == LUMINANCECOLORTEMPERATURE){ //亮度、色温联合控制
+        return LightLuminanceColor(cmdData).getBinaryString();
     }
+
 
     return string();
 }

@@ -67,6 +67,14 @@
 	"address" : "xxxx",
 }
 
+//同时控制亮度和色温
+{
+	"command" : "luminance_color_temperature",
+	"commandParaLuminance" : 255,
+	"commandParaColorTemperature" : 2700;
+	"address" : "xxxx",
+}
+
 
 //将设备添加进分组
 {

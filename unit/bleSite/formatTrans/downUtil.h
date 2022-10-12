@@ -268,10 +268,10 @@ public:
     void init(qlibc::QData& data){
         address = data.getString("address");
         int tempLuminanceVal = data.getInt("commandPara");
-        if(0 <= tempLuminanceVal && tempLuminanceVal <= 0xffff){
+        if(0 <= tempLuminanceVal && tempLuminanceVal <= 0xff){
             luminanceVal = tempLuminanceVal;
         }else{
-            luminanceVal = 0xffff;
+            luminanceVal = 0xff;
         }
 
         int transTimeInt = data.getInt("transTime");
@@ -287,7 +287,7 @@ public:
     string getBinaryString() override{
         string prefix = getCommandPrefix();
         stringstream ss;
-        ss << std::hex << std::uppercase << std::setw(4) << luminanceVal;
+        ss << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << luminanceVal;
 
         string stringCmd;
         stringCmd.append(prefix).append(address).append("824C").append(ss.str());
@@ -361,14 +361,20 @@ public:
 
     void init(qlibc::QData& data){
         address = data.getString("address");
-        int tempCtlTemperature = data.getInt("commandPara");
+
+        int tempLuminanceVal = data.getInt("commandParaLuminance");
+        if(0 <= tempLuminanceVal && tempLuminanceVal <= 0xff){
+            luminanceVal = tempLuminanceVal;
+        }else{
+            luminanceVal = 0xff;
+        }
+
+        int tempCtlTemperature = data.getInt("commandParaColorTemperature");
         if(2700 <= tempCtlTemperature && tempCtlTemperature <= 6500){
             ctlTemperature = tempCtlTemperature;
         }else{
             ctlTemperature = 6500;
         }
-
-
 
         int transTimeInt = data.getInt("transTime");
         if(0 <= transTimeInt && transTimeInt <= 62){
@@ -382,12 +388,15 @@ public:
 
     string getBinaryString() override{
         string prefix = getCommandPrefix();
-        stringstream ss;
-        ss << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
-        string ctlTemperatureStr = ss.str();
+        stringstream sscCtlTemperature, ssLuminanceVal;
+        sscCtlTemperature << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
+        ssLuminanceVal << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << luminanceVal;
+        string ctlTemperatureStr = sscCtlTemperature.str();
+        string LuminanceValStr = ssLuminanceVal.str();
 
         string stringCmd;
-        stringCmd.append(prefix).append(address).append("8264");
+        stringCmd.append(prefix).append(address).append("825E");
+        stringCmd.append(LuminanceValStr);
         stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
         stringCmd.append(deleteWhiteSpace("00 00"));
         stringCmd.append("00");
