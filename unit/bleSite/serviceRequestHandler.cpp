@@ -430,6 +430,9 @@ int addDevice2Group_service_handler(const Request& request, Response& response, 
 
             cmdData.setString("model_name", COLORTEMPERATURE);
             lc.parse(cmdData);
+
+            cmdData.setString("model_name", LUMINANCECOLORTEMPERATURE);
+            lc.parse(cmdData);
         }
     });
 

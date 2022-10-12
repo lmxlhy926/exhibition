@@ -39,7 +39,7 @@ void BindDevice::bind(QData &deviceArray) {
             DownUtility::parse2Send(scanEndData);
             return;
         }
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::this_thread::sleep_for(std::chrono::seconds(3));
     }
     for(Json::ArrayIndex i = 0; i < arraySize; i++){
         qlibc::QData deviceItemProperty = deviceArray.getArrayElement(i);
