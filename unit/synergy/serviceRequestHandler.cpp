@@ -24,7 +24,8 @@ namespace synergy {
       "readModeStart",
       "cookModeStart",
       "enterHouseholdModeStart",
-      "enterHouseholdNoPersonModeStart"
+      "enterHouseholdNoPersonModeStart",
+      "viewingSceneStart"
     };
 
     static const nlohmann::json okResponse = {
