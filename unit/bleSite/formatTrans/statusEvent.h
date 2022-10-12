@@ -475,4 +475,52 @@ private:
     }
 };
 
+
+class LightBrightColorTemperature : ReportEvent{
+private:
+    string sourceData;
+    string unicast_address;
+    string group_address;
+    string opcode;
+    string lightness;
+    string color_temperatrue;
+public:
+    explicit LightBrightColorTemperature(string data) : sourceData(std::move(data)){
+        init();
+    }
+
+    void postEvent() override{
+        string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
+        if(device_id.empty()){
+            return;
+        }
+
+        qlibc::QData brightnessStatus, colorTemperatureStatus;
+        brightnessStatus.setString("device_id", device_id);
+        brightnessStatus.setString("state_id", "luminance");
+        brightnessStatus.setInt("state_value", stoi(lightness, nullptr, 16));
+        LOG_GREEN << "LightBrightColorTemperature: " << brightnessStatus.toJsonString();
+        bleConfig::getInstance()->updateStatusListData(brightnessStatus);
+
+        string realColorTemperature;
+        realColorTemperature.append(color_temperatrue.substr(2, 2)).append(color_temperatrue.substr(0, 2));
+        colorTemperatureStatus.setString("device_id", device_id);
+        colorTemperatureStatus.setString("state_id", "color_temperature");
+        colorTemperatureStatus.setInt("state_value", stoi(realColorTemperature, nullptr, 16));
+        LOG_GREEN << "LightBrightColorTemperature: " << colorTemperatureStatus.toJsonString();
+        bleConfig::getInstance()->updateStatusListData(colorTemperatureStatus);
+    }
+
+private:
+    void init(){
+        LOG_GREEN << "LightBrightColorTemperature: " << spaceIntervalFormat(sourceData);
+        ReadBinaryString rs(sourceData);
+        rs.read2Byte(unicast_address);
+        rs.read2Byte(group_address);
+        rs.read2Byte(opcode);
+        rs.read2Byte(lightness);
+        rs.read2Byte(color_temperatrue);
+    }
+};
+
 #endif //EXHIBITION_STATUSEVENT_H
