@@ -61,9 +61,11 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageHandler(Site_OnOffLine_MessageID, [](const Request& request){
         //每次站点上线都会触发重新获取设备列表、组列表
         qlibc::QData data(request.body);
-        string offline = data.getData("content").getString("site_status");
-        DeviceManager::getInstance()->listChanged();
-        GroupManager::getInstance()->listChanged();
+        string site_status = data.getData("content").getString("site_status");
+        if(site_status == "online"){    //站点上线时，重新获取列表
+            DeviceManager::getInstance()->listChanged();
+            GroupManager::getInstance()->listChanged();
+        }
     });
 
     threadPool_.enqueue([&](){
