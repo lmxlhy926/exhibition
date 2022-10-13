@@ -57,7 +57,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
 
     }else if(action == "readModeStart"){    //阅读模式开启
         req.setBool("active_switch", true);
-        req.setInt("areaCode", 3);
+        req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
         siteRequest.setString("service_id", "reading");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
@@ -66,7 +66,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
     }else if(action == "cookModeStart"){    //烹饪模式开启
         req.setBool("active_switch", true);
         req.setInt("target_temperature", inParams.getInt("colourTemperature"));
-        req.setInt("areaCode", 5);
+        req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
         siteRequest.setString("service_id", "cooking");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
@@ -90,7 +90,7 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
 
     }else if(action == "viewingSceneStart"){  //观影场景
         req.setBool("active_switch", true);
-        req.setInt("areaCode", 1);
+        req.setInt("areaCode",atoi(inParams.getString("area").c_str()));
         siteRequest.setString("service_id", "movieTime");
         siteRequest.putData("request", req);
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
