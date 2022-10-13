@@ -39,12 +39,12 @@ bool CommonSerial::openSerial(SerialParamStruct aStruct){
         return false;
     }
 
-    if(isatty(STDIN_FILENO)==0)
-    {
-        LOG_RED << "input is not a terminal devices";
-        close(fd_serial);
-        return false;
-    }
+//    if(isatty(STDIN_FILENO)==0)
+//    {
+//        LOG_RED << "input is not a terminal devices";
+//        close(fd_serial);
+//        return false;
+//    }
 
 //    if(!setProperty(aStruct.databits, aStruct.stopbits, aStruct.parity, aStruct.baudrate))
 //    {
