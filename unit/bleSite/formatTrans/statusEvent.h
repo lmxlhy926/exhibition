@@ -346,11 +346,8 @@ public:
             }
 
             LOG_GREEN << "==>LightOnOffStatus: " << status.toJsonString();
-
-            //更新状态列表
+            //更新状态列表，发布状态变更消息
             bleConfig::getInstance()->updateStatusListData(status);
-
-            //发布状态变更消息
             publishState(device_id, "power", state_value);
     }
 
@@ -395,25 +392,19 @@ public:
         status.setString("state_id", "luminance");
         status.setValue("state_value", state_value);
         LOG_GREEN << "LightBrightStatus: " << status.toJsonString();
-
-        //更新状态列表
         bleConfig::getInstance()->updateStatusListData(status);
+        publishState(device_id, "luminance", state_value);
+
         if(state_value.asInt() > 0){
             status.setString("state_id", "power");
             status.setValue("state_value", "on");
             bleConfig::getInstance()->updateStatusListData(status);
+            publishState(device_id, "power", "on");
 
         }else if(state_value.asInt() == 0){
             status.setString("state_id", "power");
             status.setValue("state_value", "off");
             bleConfig::getInstance()->updateStatusListData(status);
-        }
-
-        //发布状态变更消息
-        publishState(device_id, "luminance", state_value);
-        if(state_value.asInt() > 0){
-            publishState(device_id, "power", "on");
-        }else if(state_value.asInt() == 0){
             publishState(device_id, "power", "off");
         }
     }
@@ -495,20 +486,41 @@ public:
             return;
         }
 
-        qlibc::QData brightnessStatus, colorTemperatureStatus;
+        //处理亮度信息
+        qlibc::QData brightnessStatus;
+        Json::Value state_value = stoi(lightness, nullptr, 16);
         brightnessStatus.setString("device_id", device_id);
         brightnessStatus.setString("state_id", "luminance");
-        brightnessStatus.setInt("state_value", stoi(lightness, nullptr, 16));
+        brightnessStatus.setValue("state_value", state_value);
         LOG_GREEN << "LightBrightColorTemperature: " << brightnessStatus.toJsonString();
         bleConfig::getInstance()->updateStatusListData(brightnessStatus);
+        publishState(device_id, "luminance", state_value);
 
+        if(state_value.asInt() > 0){
+            brightnessStatus.setString("state_id", "power");
+            brightnessStatus.setValue("state_value", "on");
+            bleConfig::getInstance()->updateStatusListData(brightnessStatus);
+            publishState(device_id, "power", "on");
+
+        }else if(state_value.asInt() == 0){
+            brightnessStatus.setString("state_id", "power");
+            brightnessStatus.setValue("state_value", "off");
+            bleConfig::getInstance()->updateStatusListData(brightnessStatus);
+            publishState(device_id, "power", "off");
+        }
+
+        //处理色温消息
+        qlibc::QData  colorTemperatureStatus;
         string realColorTemperature;
         realColorTemperature.append(color_temperatrue.substr(2, 2)).append(color_temperatrue.substr(0, 2));
+        int colorTemperatureInt = stoi(realColorTemperature, nullptr, 16);
+
         colorTemperatureStatus.setString("device_id", device_id);
         colorTemperatureStatus.setString("state_id", "color_temperature");
-        colorTemperatureStatus.setInt("state_value", stoi(realColorTemperature, nullptr, 16));
+        colorTemperatureStatus.setInt("state_value", colorTemperatureInt);
         LOG_GREEN << "LightBrightColorTemperature: " << colorTemperatureStatus.toJsonString();
         bleConfig::getInstance()->updateStatusListData(colorTemperatureStatus);
+        publishState(device_id, "color_temperature", colorTemperatureInt);
     }
 
 private:
