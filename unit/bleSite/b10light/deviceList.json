@@ -870,90 +870,6 @@
 			}
 		},
 		{
-			"device_id" : "83AB41971B30",
-			"device_model" : "磁吸轨道灯格栅灯",
-			"device_modelCode" : "29",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "02C0",
-			"group_name" : "主灯",
-			"location" : 
-			{
-				"room_name" : "卫生间",
-				"room_no" : "4"
-			}
-		},
-		{
-			"device_id" : "9DAB41971B30",
-			"device_model" : "磁吸轨道灯格栅灯",
-			"device_modelCode" : "29",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "02C0",
-			"group_name" : "主灯",
-			"location" : 
-			{
-				"room_name" : "卫生间",
-				"room_no" : "4"
-			}
-		},
-		{
-			"device_id" : "C1D455971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "02C0",
-			"group_name" : "主灯",
-			"location" : 
-			{
-				"room_name" : "卫生间",
-				"room_no" : "4"
-			}
-		},
-		{
-			"device_id" : "C8A941971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "02C0",
-			"group_name" : "主灯",
-			"location" : 
-			{
-				"room_name" : "卫生间",
-				"room_no" : "4"
-			}
-		},
-		{
-			"device_id" : "CDEF55971B30",
-			"device_model" : "磁吸轨道灯格栅灯",
-			"device_modelCode" : "29",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "02C0",
-			"group_name" : "主灯",
-			"location" : 
-			{
-				"room_name" : "卫生间",
-				"room_no" : "4"
-			}
-		},
-		{
-			"device_id" : "D8A341971B30",
-			"device_model" : "磁吸轨道泛光灯",
-			"device_modelCode" : "28",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "02C0",
-			"group_name" : "主灯",
-			"location" : 
-			{
-				"room_name" : "卫生间",
-				"room_no" : "4"
-			}
-		},
-		{
 			"device_id" : "B1280F971B30",
 			"device_model" : "双色球泡灯",
 			"device_modelCode" : "22",
@@ -1027,6 +943,146 @@
 			{
 				"room_name" : "厨房",
 				"room_no" : "5"
+			}
+		},
+		{
+			"device_id" : "593E39971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
+			}
+		},
+		{
+			"device_id" : "723039971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
+			}
+		},
+		{
+			"device_id" : "83AB41971B30",
+			"device_model" : "磁吸轨道灯格栅灯",
+			"device_modelCode" : "29",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
+			}
+		},
+		{
+			"device_id" : "924439971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
+			}
+		},
+		{
+			"device_id" : "9DAB41971B30",
+			"device_model" : "磁吸轨道灯格栅灯",
+			"device_modelCode" : "29",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
+			}
+		},
+		{
+			"device_id" : "C8A941971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
+			}
+		},
+		{
+			"device_id" : "CDEF55971B30",
+			"device_model" : "磁吸轨道灯格栅灯",
+			"device_modelCode" : "29",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
+			}
+		},
+		{
+			"device_id" : "D8A341971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
+			}
+		},
+		{
+			"device_id" : "E43039971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
+			}
+		},
+		{
+			"device_id" : "C1D455971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0AC0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
 			}
 		}
 	]
