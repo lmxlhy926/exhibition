@@ -12,6 +12,7 @@
 #include <vector>
 #include <mutex>
 #include <condition_variable>
+#include <list>
 
 #define MaxReadOneShot (1024)
 
@@ -27,7 +28,7 @@ private:
     std::mutex recvMutex;
     std::condition_variable recvConVar;
 
-    std::queue<string> sendQueue;     //发送队列
+    std::list<string> sendList;     //发送队列
     std::mutex sendMutex;
     std::condition_variable sendConVar;
 
@@ -79,6 +80,8 @@ private:
     string binary2SendString(std::vector<uint8_t>& sendVec);    //打印待发送的数据
 
     void sendThreadFunc();  //发送数据指令线程例程
+
+    void queueHandle();
 
     void handleReceiveData();    //从串口读取数据，截取到数据包后，存入队列
 

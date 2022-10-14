@@ -7,6 +7,8 @@
 #include <log/Logging.h>
 #include <iomanip>
 #include <sstream>
+#include "formatTrans/bleConfig.h"
+#include "formatTrans/statusEvent.h"
 
 TelinkDongle* TelinkDongle::instance = nullptr;
 
@@ -31,7 +33,7 @@ void TelinkDongle::closeSerial() {
 bool TelinkDongle::write2Seria(std::string& commandString) {
     {
         std::lock_guard<std::mutex> lg(sendMutex);
-        sendQueue.push(commandString);
+        sendList.push_back(commandString);
     }
     sendConVar.notify_one();
     return true;
@@ -91,9 +93,9 @@ string TelinkDongle::binary2SendString(std::vector<uint8_t>& sendVec) {
 void TelinkDongle::sendThreadFunc(){
     while(true){
         std::unique_lock<std::mutex> ul(sendMutex);
-        if(sendQueue.empty()){  //如果发送列表没有数据则等待
+        if(sendList.empty()){  //如果发送列表没有数据则等待
             sendConVar.wait(ul, [this](){
-                return !sendQueue.empty() || !commonSerial.isOpened();
+                return !sendList.empty() || !commonSerial.isOpened();
             });
         }
 
@@ -102,8 +104,10 @@ void TelinkDongle::sendThreadFunc(){
             return;
         }
 
-        string commandString = sendQueue.front();
-        sendQueue.pop();
+
+
+        string commandString = sendList.front();
+        sendList.pop_back();
         if(commonSerial.isOpened()){
             std::vector<uint8_t> commandVec = commandString2BinaryByte(commandString);
             if(commonSerial.write2Serial(commandVec.data(), static_cast<int>(commandVec.size()))){
@@ -111,12 +115,54 @@ void TelinkDongle::sendThreadFunc(){
             }else{
                 LOG_HLIGHT << "==>sendCmd<false>: " << binary2SendString(commandVec);
             }
-            this_thread::sleep_for(std::chrono::milliseconds(2000));
+            this_thread::sleep_for(std::chrono::milliseconds(1500));
 
         }
     }
 }
 
+
+void TelinkDongle::queueHandle(){
+    //获取组列表, 循环遍历，删除后面的指令
+    qlibc::QData groupData = bleConfig::getInstance()->getGroupListData();
+    Json::Value::Members groupVec = groupData.getMemberNames();
+    for(auto& elem : groupVec){
+        auto rbegin = sendList.rbegin();
+        for(auto pos = rbegin; pos != sendList.rend();){
+            string cmdString = *pos;
+            ReadBinaryString rs(cmdString);
+            string groupAddress, opCode;
+            rs.readBytes(8).read2Byte(groupAddress).read2Byte(opCode);
+            if(opCode == "825E"){
+                //从当前位置到尾部，遍历
+               if(++pos != sendList.rend()){
+                   for(const auto subPos = pos; subPos != sendList.crend();){
+                       string cmdStringAfter = *subPos;
+                       ReadBinaryString rsAfter(cmdStringAfter);
+                       string groupAddressAfter, opCodeAfter;
+                       rs.readBytes(8).read2Byte(groupAddressAfter).read2Byte(opCodeAfter);
+                       if(opCodeAfter == "825E"){
+                           sendList.erase(subPos);
+                       }
+
+                   }
+
+               }
+
+            }
+
+
+        }
+    }
+
+
+
+
+
+    //将主卧、书房的控制指令移动到列表最前面
+
+
+}
 
 void TelinkDongle::handleReceiveData() {
     fd_set readSet, allset;
@@ -127,13 +173,13 @@ void TelinkDongle::handleReceiveData() {
     {
         readSet = allset;
         if(commonSerial.isOpened()){
-            LOG_INFO << "WAIT.....";
+//            LOG_INFO << "WAIT.....";
             int nReady = select(commonSerial.getSerialFd() + 1, &readSet, nullptr, nullptr, nullptr);
-            LOG_INFO << "nReady: " << nReady;
+//            LOG_INFO << "nReady: " << nReady;
             if(nReady > 0){
                 uint8_t buffer[MaxReadOneShot]{};
                 ssize_t nRead = commonSerial.readFromSerial(buffer, MaxReadOneShot);
-                LOG_INFO << "nRead: " << nRead;
+//                LOG_INFO << "nRead: " << nRead;
                 if(nRead > 0){
                     joinPackage(buffer, nRead);
                 }
