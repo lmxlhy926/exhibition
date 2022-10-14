@@ -12,6 +12,9 @@
 #include "common/httplib.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
+#include "log/Logging.h"
+#include "qlibc/QData.h"
+
 
 using namespace std;
 using namespace servicesite;
@@ -20,8 +23,15 @@ using json = nlohmann::json;
 // test_message_id_1 消息处理函数
 void message_handler(const Request& request) {
     // 消息的json字符串位于request.body
-    auto message_json = json::parse(request.body);
-    printf("received message:\n%s\n\n", message_json.dump(4).c_str());
+    qlibc::QData data(request.body);
+    string message_id = data.getString("message_id");
+    if(message_id != "reportTracingTargets"){
+        LOG_INFO << data.toJsonString();
+    }
+}
+
+void message_handler1(const Request& request) {
+    LOG_INFO << "hello";
 }
 
 
@@ -59,14 +69,18 @@ int main(int argc, char* argv[]) {
 //    serviceSiteManager->registerMessageHandler("device_state_changed", message_handler);
 //    serviceSiteManager->registerMessageHandler("site_onoffline", message_handler);
 
-//    serviceSiteManager->registerMessageHandler("eventEnterArea", message_handler);
-//    serviceSiteManager->registerMessageHandler("eventLeaveArea", message_handler);
+    serviceSiteManager->registerMessageHandler("eventEnterArea", message_handler);
+    serviceSiteManager->registerMessageHandler("eventLeaveArea", message_handler);
+    serviceSiteManager->registerMessageHandler("reportTracingTargets", message_handler);
+
+
+
 //    serviceSiteManager->registerMessageHandler("eventDining", message_handler);
 //    serviceSiteManager->registerMessageHandler("eventCooking", message_handler);
 //    serviceSiteManager->registerMessageHandler("eventSitAtDesk", message_handler);
 //    serviceSiteManager->registerMessageHandler("eventSitAtSofa", message_handler);
-
-    serviceSiteManager->registerMessageHandler("eventFallDown", message_handler);
+//
+//    serviceSiteManager->registerMessageHandler("eventFallDown", message_handler);
 
 
 
@@ -82,19 +96,17 @@ int main(int argc, char* argv[]) {
 //    messageIdList.push_back("site_onoffline");                  //设备上下线
 
 
-//    messageIdList.push_back("eventEnterArea");
-//    messageIdList.push_back("eventLeaveArea");
+    messageIdList.push_back("eventEnterArea");
+    messageIdList.push_back("eventLeaveArea");
+    messageIdList.push_back("reportTracingTargets");
 //    messageIdList.push_back("eventDining");
 //    messageIdList.push_back("eventCooking");
 //    messageIdList.push_back("eventSitAtDesk");
 //    messageIdList.push_back("eventSitAtSofa");
 
-    messageIdList.push_back("eventFallDown");
+//    messageIdList.push_back("eventFallDown");
 
-
-
-
-    code = serviceSiteManager->subscribeMessage("192.168.58.120", 9003, messageIdList);
+    code = serviceSiteManager->subscribeMessage("192.168.58.119", 9003, messageIdList);
     if (code == ServiceSiteManager::RET_CODE_OK) {
         printf("subscribeMessage ok.\n");
     }else{
