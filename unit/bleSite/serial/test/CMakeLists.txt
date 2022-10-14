@@ -1,2 +1,3 @@
-add_executable(serialTest serialtest.cpp)
-target_link_libraries(serialTest PRIVATE serial)
+add_executable(serialTest listhandle.cpp)
+target_link_libraries(serialTest PUBLIC qlibc)
+target_link_libraries(serialTest PUBLIC format)

@@ -18,11 +18,7 @@ target_link_libraries(send PRIVATE common)
 target_link_libraries(send PRIVATE qlibc)
 
 
-add_executable(receive receive.cpp)
-target_link_libraries(receive PRIVATE siteService)
-target_link_libraries(receive PRIVATE log)
-target_link_libraries(receive PRIVATE common)
-target_link_libraries(receive PRIVATE qlibc)
+
 
 
 

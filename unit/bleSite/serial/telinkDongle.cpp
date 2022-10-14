@@ -104,9 +104,9 @@ void TelinkDongle::sendThreadFunc(){
             return;
         }
 
+        sendListHandle();
 
-
-        string commandString = sendList.front();
+        string commandString = sendList.back();
         sendList.pop_back();
         if(commonSerial.isOpened()){
             std::vector<uint8_t> commandVec = commandString2BinaryByte(commandString);
@@ -122,46 +122,51 @@ void TelinkDongle::sendThreadFunc(){
 }
 
 
-void TelinkDongle::queueHandle(){
-    //获取组列表, 循环遍历，删除后面的指令
+void TelinkDongle::sendListHandle(){
+    //获取组名列表
     qlibc::QData groupData = bleConfig::getInstance()->getGroupListData();
-    Json::Value::Members groupVec = groupData.getMemberNames();
-    for(auto& elem : groupVec){
-        auto rbegin = sendList.rbegin();
-        for(auto pos = rbegin; pos != sendList.rend();){
-            string cmdString = *pos;
+    Json::Value::Members groupIdVec = groupData.getMemberNames();
+
+    //针对每个组名，只保留最近的一条指令
+    for(auto& groupId : groupIdVec) {
+        std::vector<string> sameCmdVec;
+        for (auto & cmdString : sendList) {
             ReadBinaryString rs(cmdString);
-            string groupAddress, opCode;
-            rs.readBytes(8).read2Byte(groupAddress).read2Byte(opCode);
-            if(opCode == "825E"){
-                //从当前位置到尾部，遍历
-               if(++pos != sendList.rend()){
-                   for(const auto subPos = pos; subPos != sendList.crend();){
-                       string cmdStringAfter = *subPos;
-                       ReadBinaryString rsAfter(cmdStringAfter);
-                       string groupAddressAfter, opCodeAfter;
-                       rs.readBytes(8).read2Byte(groupAddressAfter).read2Byte(opCodeAfter);
-                       if(opCodeAfter == "825E"){
-                           sendList.erase(subPos);
-                       }
-
-                   }
-
-               }
-
+            string groupIdExtract, opCodeExtract;
+            rs.readBytes(8).read2Byte(groupIdExtract).read2Byte(opCodeExtract);
+            if (groupIdExtract == groupId && opCodeExtract == "825E") {
+                sameCmdVec.push_back(cmdString);
             }
-
-
+        }
+        if(sameCmdVec.size() > 1){
+            for(int i = 0; i < sameCmdVec.size() -1; ++i){
+                sendList.remove(sameCmdVec[i]);
+            }
         }
     }
 
-
-
-
-
-    //将主卧、书房的控制指令移动到列表最前面
-
-
+    //书房、卧室的指令提前
+    std::vector<string> specialGroup{"01C0", "04C0"};
+    std::vector<string> priorityGroupCmd;
+    for(auto & pos : sendList){
+        ReadBinaryString rs(pos);
+        string groupIdExtract, opCodeExtract;
+        rs.readBytes(8).read2Byte(groupIdExtract).read2Byte(opCodeExtract);
+        if(opCodeExtract == "825E"){
+            for(auto& groupElem : specialGroup){
+                if(groupIdExtract == groupElem){
+                    priorityGroupCmd.push_back(pos);
+                    break;
+                }
+            }
+        }
+    }
+    for(auto & priorityElem : priorityGroupCmd){
+        sendList.remove(priorityElem);
+    }
+    for(auto & priorityElem : priorityGroupCmd){
+        sendList.push_back(priorityElem);
+    }
 }
 
 void TelinkDongle::handleReceiveData() {
