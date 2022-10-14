@@ -212,7 +212,11 @@ public:
 
         }else if(model_name == COLORTEMPERATURE){
             stringCmd.append(deleteWhiteSpace("06 13"));
+
+        }else if(model_name == LUMINANCECOLORTEMPERATURE){
+            stringCmd.append(deleteWhiteSpace("03 13"));
         }
+
         return stringCmd;
     }
 };

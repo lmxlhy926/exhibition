@@ -471,6 +471,9 @@ int groupByRoomname_service_handler(const Request& request, Response& response, 
 
                 cmdData.setString("model_name", COLORTEMPERATURE);
                 lc.parse(cmdData);
+
+                cmdData.setString("model_name", LUMINANCECOLORTEMPERATURE);
+                lc.parse(cmdData);
             }
         }
     });
@@ -507,6 +510,9 @@ int removeDeviceFromGroup_service_handler(const Request& request, Response& resp
             lc.parse(cmdData);
 
             cmdData.setString("model_name", COLORTEMPERATURE);
+            lc.parse(cmdData);
+
+            cmdData.setString("model_name", LUMINANCECOLORTEMPERATURE);
             lc.parse(cmdData);
         }
     });
