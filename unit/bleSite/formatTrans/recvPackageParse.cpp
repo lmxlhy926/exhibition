@@ -27,6 +27,7 @@ string RecvPackageParse::packageString;
 std::mutex RecvPackageParse::mutex_;
 
 bool RecvPackageParse::handlePackageString(string& subPackageString) {
+#if 0
     std::lock_guard<std::mutex> lg(mutex_);
     string hciType, subType, packageIndex;
     ReadBinaryString rs(subPackageString);
@@ -47,7 +48,7 @@ bool RecvPackageParse::handlePackageString(string& subPackageString) {
         parse2Event(packageString);
         packageString.clear();
     }
-
+#endif
     return true;
 }
 

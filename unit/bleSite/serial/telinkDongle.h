@@ -81,8 +81,7 @@ private:
 
     void sendThreadFunc();  //发送数据指令线程例程
 
-    //组控指令去重、排序
-    void sendListHandle();
+    void sendListStoreHandle(std::string& commandString);
 
     void handleReceiveData();    //从串口读取数据，截取到数据包后，存入队列
 

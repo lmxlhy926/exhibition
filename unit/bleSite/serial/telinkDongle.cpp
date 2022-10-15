@@ -33,7 +33,7 @@ void TelinkDongle::closeSerial() {
 bool TelinkDongle::write2Seria(std::string& commandString) {
     {
         std::lock_guard<std::mutex> lg(sendMutex);
-        sendList.push_back(commandString);
+        sendListStoreHandle(commandString);
     }
     sendConVar.notify_one();
     return true;
@@ -104,16 +104,16 @@ void TelinkDongle::sendThreadFunc(){
             return;
         }
 
-        sendListHandle();
-
-        string commandString = sendList.back();
-        sendList.pop_back();
+        string commandString = sendList.front();
+        sendList.pop_front();
         if(commonSerial.isOpened()){
             std::vector<uint8_t> commandVec = commandString2BinaryByte(commandString);
             if(commonSerial.write2Serial(commandVec.data(), static_cast<int>(commandVec.size()))){
                 LOG_HLIGHT << "==>sendCmd<true>: " << binary2SendString(commandVec);
+                LOG_PURPLE << "sendList.size(): " << sendList.size();
             }else{
                 LOG_HLIGHT << "==>sendCmd<false>: " << binary2SendString(commandVec);
+                LOG_RED << "sendList.size(): " << sendList.size();
             }
             this_thread::sleep_for(std::chrono::milliseconds(1500));
 
@@ -122,52 +122,31 @@ void TelinkDongle::sendThreadFunc(){
 }
 
 
-void TelinkDongle::sendListHandle(){
-    //获取组名列表
-    qlibc::QData groupData = bleConfig::getInstance()->getGroupListData();
-    Json::Value::Members groupIdVec = groupData.getMemberNames();
-
-    //针对每个组名，只保留最近的一条指令
-    for(auto& groupId : groupIdVec) {
-        std::vector<string> sameCmdVec;
-        for (auto & cmdString : sendList) {
-            ReadBinaryString rs(cmdString);
-            string groupIdExtract, opCodeExtract;
-            rs.readBytes(8).read2Byte(groupIdExtract).read2Byte(opCodeExtract);
-            if (groupIdExtract == groupId && opCodeExtract == "825E") {
-                sameCmdVec.push_back(cmdString);
-            }
-        }
-        if(sameCmdVec.size() > 1){
-            for(int i = 0; i < sameCmdVec.size() -1; ++i){
-                sendList.remove(sameCmdVec[i]);
+void TelinkDongle::sendListStoreHandle(std::string& commandString){
+    //如果是组控指令，删除之前有的相同指令
+    ReadBinaryString rs(commandString);
+    string groupIdExtract, opCodeExtract;
+    rs.readBytes(8).read2Byte(groupIdExtract).read2Byte(opCodeExtract);
+    if (opCodeExtract == "825E") {      //删除重复组控指令
+        for(auto pos = sendList.begin(); pos != sendList.end();){
+            ReadBinaryString elemRs(*pos);
+            string elemGroup, elemOpcode;
+            elemRs.readBytes(8).read2Byte(elemGroup).read2Byte(elemOpcode);
+            if(elemOpcode == "825E" && elemGroup == groupIdExtract){
+                pos = sendList.erase(pos);
+            }else{
+                pos++;
             }
         }
     }
 
-    //书房、卧室的指令提前
-    std::vector<string> specialGroup{"01C0", "04C0"};
-    std::vector<string> priorityGroupCmd;
-    for(auto & pos : sendList){
-        ReadBinaryString rs(pos);
-        string groupIdExtract, opCodeExtract;
-        rs.readBytes(8).read2Byte(groupIdExtract).read2Byte(opCodeExtract);
-        if(opCodeExtract == "825E"){
-            for(auto& groupElem : specialGroup){
-                if(groupIdExtract == groupElem){
-                    priorityGroupCmd.push_back(pos);
-                    break;
-                }
-            }
-        }
-    }
-    for(auto & priorityElem : priorityGroupCmd){
-        sendList.remove(priorityElem);
-    }
-    for(auto & priorityElem : priorityGroupCmd){
-        sendList.push_back(priorityElem);
+    if(groupIdExtract == "01C0" || groupIdExtract == "04C0"){
+        sendList.push_front(commandString);
+    }else{
+        sendList.push_back(commandString);
     }
 }
+
 
 void TelinkDongle::handleReceiveData() {
     fd_set readSet, allset;
@@ -214,9 +193,9 @@ void TelinkDongle::joinPackage(uint8_t *data, ssize_t length){
                 parseState = HEAD;
                 {
                     std::lock_guard<std::mutex> lg(recvMutex);
-                    LOG_YELLOW << "===>packageString: " << packageString;
+//                    LOG_YELLOW << "===>packageString: " << packageString;
                     recvQueue.push(packageString);
-                    LOG_INFO << "remainSize: " << recvQueue.size();
+//                    LOG_INFO << "remainSize: " << recvQueue.size();
                 }
                 recvConVar.notify_one();
             }
