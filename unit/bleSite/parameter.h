@@ -16,7 +16,7 @@ static const int ConfigPort = 9006;
 //站点描述
 static const string BLE_SITE_ID = "ble_light";
 static const string BLE_SITE_ID_NAME = "BLE灯控";
-static const int BLE_SITE_PORT = 9001;
+static const int BLE_SITE_PORT = 60009;
 
 //服务ID
 static const string Scan_Device_Service_ID        = "scan_device";                                      //扫描设备结果
