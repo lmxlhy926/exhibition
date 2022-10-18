@@ -24,7 +24,7 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
    ssize_t num = deviceList.size();
    for(Json::ArrayIndex i = 0; i < num; ++i){
        qlibc::QData item = deviceList.getArrayElement(i);
-       if(match(item)){
+       if(match(item)){     //找到匹配项，则根据匹配项构造控制指令
            string sourceSite = item.getString("sourceSite");
            qlibc::QData controlData;
            controlData.putData("command_list", buildCommandList(inParams));
@@ -56,6 +56,7 @@ bool DownCommandData::match(qlibc::QData &item) {
         }
 
     }else{
+        //用区域和设备名字来判定设备
         if(item_room_no == inParams.getString("area") && item_device_name == inParams.getString("productNickname")){
             return true;
         }
@@ -78,6 +79,7 @@ qlibc::QData DownCommandData::buildCommandList(qlibc::QData& data){
     return commandList;
 }
 
+//包含在设备控制命令列表
 bool DownCommandData::commandMatch(string &key) {
     for(auto& command: commandMembers){
         if(command == key){

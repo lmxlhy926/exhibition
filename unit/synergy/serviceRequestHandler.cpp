@@ -18,13 +18,21 @@ namespace synergy {
 
     std::vector<string> sceneVec = {
       "constantBrightnessModeStart",
+      "constantBrightnessModeStop",
       "constantBrightnessModeFlag",
+
       "comfortableDinnerModeStart",
       "comfortableDinnerModeStop",
+
       "readModeStart",
+      "readModeStop",
+
       "cookModeStart",
+      "cookModeStop",
+
       "enterHouseholdModeStart",
       "enterHouseholdNoPersonModeStart",
+
       "viewingSceneStart"
     };
 
@@ -103,7 +111,7 @@ namespace synergy {
             }
         }
 
-        //第三方设备控制指令
+        //构造控制命令
         qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
         qlibc::QData controlData = DownCommandData(requestData).getContorlData(deviceList);
 
@@ -116,7 +124,7 @@ namespace synergy {
             LOG_YELLOW << "cmd2BleSite: " << groupData.toJsonString();
             LOG_INFO << "siteResponse: " << siteResponse.toJsonString();
 
-        }else{
+        }else{  //第三方设备控制命令
             qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
             classify(controlData, bleDeviceList, zigbeeDeviceList, tvAdapterList);
             sendCmd(bleDeviceList, zigbeeDeviceList, tvAdapterList);

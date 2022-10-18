@@ -20,7 +20,18 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
         LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
 
-    } else if (action == "constantBrightnessModeFlag") {    //设置恒定照度
+    } else if(action == "constantBrightnessModeStop"){  //关闭恒定照度
+        req.setBool("active_switch", false);
+        req.setInt("target_illumination", 0);
+        req.setInt("target_temperature", 0);
+        req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
+
+        siteRequest.setString("service_id", "constant_illuminance");
+        siteRequest.putData("request", req);
+        SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
+        LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
+
+    }else if (action == "constantBrightnessModeFlag") {    //设置恒定照度
         string flag = inParams.getString("flag");
         bool active_switch;
         if (flag == "0") {
@@ -63,8 +74,25 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
         LOG_YELLOW << "sceneCmd " << siteRequest.toJsonString();
 
+    }else if(action == "readModeStop"){     //阅读模式关闭
+        req.setBool("active_switch", false);
+        req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
+        siteRequest.setString("service_id", "reading");
+        siteRequest.putData("request", req);
+        SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
+        LOG_YELLOW << "sceneCmd " << siteRequest.toJsonString();
+
     }else if(action == "cookModeStart"){    //烹饪模式开启
         req.setBool("active_switch", true);
+        req.setInt("target_temperature", inParams.getInt("colourTemperature"));
+        req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
+        siteRequest.setString("service_id", "cooking");
+        siteRequest.putData("request", req);
+        SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
+        LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
+
+    }else if(action == "cookModeStop"){     //烹饪模式关闭
+        req.setBool("active_switch", false);
         req.setInt("target_temperature", inParams.getInt("colourTemperature"));
         req.setInt("areaCode", atoi(inParams.getString("area").c_str()));
         siteRequest.setString("service_id", "cooking");
