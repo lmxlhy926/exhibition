@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.14)
 project(exhibition)
 set(CMAKE_CXX_STANDARD 14)
 
@@ -20,7 +20,6 @@ add_subdirectory(unit)
 #install
 install(TARGETS config_site             DESTINATION bin)
 install(TARGETS synergy_site            DESTINATION bin)
-install(TARGETS whiteList_site          DESTINATION bin)
 install(TARGETS whiteListPublish        DESTINATION bin)
 install(TARGETS whiteListScribe         DESTINATION bin)
 install(TARGETS mdns_test               DESTINATION bin)
