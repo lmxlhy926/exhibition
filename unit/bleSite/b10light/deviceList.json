@@ -380,20 +380,6 @@
 			}
 		},
 		{
-			"device_id" : "8EA341971B30",
-			"device_model" : "磁吸轨道泛光灯",
-			"device_modelCode" : "28",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "07C0",
-			"group_name" : "主灯",
-			"location" : 
-			{
-				"room_name" : "客厅",
-				"room_no" : "1"
-			}
-		},
-		{
 			"device_id" : "EDCD55971B30",
 			"device_model" : "磁吸轨道灯导航灯",
 			"device_modelCode" : "2A",
@@ -1078,6 +1064,34 @@
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
 			"group_address" : "01C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "75D555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "主灯",
+			"location" : 
+			{
+				"room_name" : "玄关",
+				"room_no" : "6"
+			}
+		},
+		{
+			"device_id" : "8EA341971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "06C0",
 			"group_name" : "主灯",
 			"location" : 
 			{
