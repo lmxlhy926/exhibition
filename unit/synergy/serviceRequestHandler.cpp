@@ -65,26 +65,17 @@ namespace synergy {
     bool sendCmd(qlibc::QData &bleDeviceList, qlibc::QData &zigbeeDeviceList, qlibc::QData &tvAdapterList) {
         qlibc::QData controlData, response;
         controlData.setString("service_id", "control_device");
-
-//        if (bleDeviceList.size() > 0) {
-//            qlibc::QData list;
-//            list.putData("device_list", bleDeviceList);
-//            controlData.putData("request", list);
-//            SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, response);
-//            LOG_YELLOW << "cmd2BleSite: " << controlData.toJsonString();
-//        }
-
         if (zigbeeDeviceList.size() > 0) {
             qlibc::QData list;
             list.putData("device_list", zigbeeDeviceList);
-            controlData.putData("request", zigbeeDeviceList);
+            controlData.putData("request", list);
             SiteRecord::getInstance()->sendRequest2Site(ZigbeeSiteID, controlData, response);
             LOG_YELLOW << "cmd2ZigbeeSite: " << controlData.toJsonString();
         }
         if (tvAdapterList.size() > 0) {
             qlibc::QData list;
             list.putData("device_list", tvAdapterList);
-            controlData.putData("request", tvAdapterList);
+            controlData.putData("request", list);
             SiteRecord::getInstance()->sendRequest2Site(TvAdapterSiteID, controlData, response);
             LOG_YELLOW << "cmd2TvadapterSite: " << controlData.toJsonString();
         }
@@ -96,6 +87,8 @@ namespace synergy {
         qlibc::QData requestData(request.body);
         LOG_INFO << "cloudCommand_service_handler: " << requestData.toJsonString();
         string action = requestData.getData("request").getString("action");
+
+        //场景指令
         for(auto& elem : sceneVec){
             if(action == elem){     //场景指令
                 qlibc::QData siteResponse;
@@ -111,24 +104,12 @@ namespace synergy {
             }
         }
 
-        //构造控制命令
+        //第三方设备控制命令
+        qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
         qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
         qlibc::QData controlData = DownCommandData(requestData).getContorlData(deviceList);
-
-        if(controlData.asValue().isMember("group_id")){     //灯控组控指令
-            qlibc::QData groupData, list, siteResponse;
-            list.append(controlData);
-            groupData.setString("service_id", "control_group");
-            groupData.putData("request", qlibc::QData().putData("group_list", list));
-            SiteRecord::getInstance()->sendRequest2Site(BleSiteID, groupData, siteResponse);
-            LOG_YELLOW << "cmd2BleSite: " << groupData.toJsonString();
-            LOG_INFO << "siteResponse: " << siteResponse.toJsonString();
-
-        }else{  //第三方设备控制命令
-            qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
-            classify(controlData, bleDeviceList, zigbeeDeviceList, tvAdapterList);
-            sendCmd(bleDeviceList, zigbeeDeviceList, tvAdapterList);
-        }
+        classify(controlData, bleDeviceList, zigbeeDeviceList, tvAdapterList);
+        sendCmd(bleDeviceList, zigbeeDeviceList, tvAdapterList);
 
         response.set_content(okResponse.dump(), "text/json");
         return 0;

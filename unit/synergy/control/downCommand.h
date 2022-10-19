@@ -7,6 +7,7 @@
 
 #include <string>
 #include <iostream>
+#include "log/Logging.h"
 #include "qlibc/QData.h"
 
 using namespace std;
@@ -24,9 +25,10 @@ public:
         qlibc::QData request = data.getData("request");
         type = request.getString("type");
         action = request.getString("action");
-        code = request.getString("code");
+        code = toUpper(hump2Underline(request.getString("code")));
         delay = request.getString("delay");
         inParams = request.getData("inParams");
+        LOG_PURPLE << "code: " << code << "---" << "area: " << inParams.getString("area");
     }
 
     qlibc::QData getContorlData(qlibc::QData& deviceList);
@@ -36,6 +38,10 @@ public:
     qlibc::QData buildCommandList(qlibc::QData& data);
 
     bool commandMatch(string& key);
+
+    static string hump2Underline(string in);
+
+    static string toUpper(string in);
 };
 
 

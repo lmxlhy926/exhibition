@@ -45,13 +45,13 @@ int main(int argc, char* argv[]) {
         return synergy::cloudCommand_service_handler(request, response);
     });
 
-    //获取设备列表
+    //获取设备列表：蓝牙，zigbee, tv_adapter
     serviceSiteManager->registerServiceRequestHandler(GetDeviceList_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return synergy::getDeviceList_service_handler(request, response);
     });
 
-    //获取分组列表
+    //获取分组列表: 蓝牙，zigbee, tv_adapter
     serviceSiteManager->registerServiceRequestHandler(GetGroupList_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return synergy::getGroupList_service_handler(request, response);
