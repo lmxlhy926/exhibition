@@ -193,7 +193,7 @@ void TelinkDongle::joinPackage(uint8_t *data, ssize_t length){
                 parseState = HEAD;
                 {
                     std::lock_guard<std::mutex> lg(recvMutex);
-//                    LOG_YELLOW << "===>packageString: " << packageString;
+                    LOG_YELLOW << "===>packageString: " << packageString;
                     recvQueue.push(packageString);
 //                    LOG_INFO << "remainSize: " << recvQueue.size();
                 }

@@ -25,33 +25,37 @@ void printBinaryString(string &str) {
 
 string RecvPackageParse::packageString;
 std::mutex RecvPackageParse::mutex_;
+bool RecvPackageParse::enable = true;
 
 bool RecvPackageParse::handlePackageString(string& subPackageString) {
-#if 1
-    std::lock_guard<std::mutex> lg(mutex_);
-    string hciType, subType, packageIndex;
-    ReadBinaryString rs(subPackageString);
-    rs.read2Byte().readByte(hciType).readByte(subType).readByte(packageIndex);
+    if(enable){
+        std::lock_guard<std::mutex> lg(mutex_);
+        string hciType, subType, packageIndex;
+        ReadBinaryString rs(subPackageString);
+        rs.read2Byte().readByte(hciType).readByte(subType).readByte(packageIndex);
 
-    if(packageIndex == "00"){   //整包
-        parse2Event(subPackageString);
+        if(packageIndex == "00"){   //整包
+            parse2Event(subPackageString);
 
-    }else if(packageIndex == "01"){
-        packageString.clear();
-        packageString.append(subPackageString);
+        }else if(packageIndex == "01"){
+            packageString.clear();
+            packageString.append(subPackageString);
 
-    }else if(packageIndex == "02"){
-        packageString.append(rs.remainingString());
+        }else if(packageIndex == "02"){
+            packageString.append(rs.remainingString());
 
-    }else if(packageIndex == "03"){
-        packageString.append(rs.remainingString());
-        parse2Event(packageString);
-        packageString.clear();
+        }else if(packageIndex == "03"){
+            packageString.append(rs.remainingString());
+            parse2Event(packageString);
+            packageString.clear();
+        }
     }
-#endif
     return true;
 }
 
+void RecvPackageParse::disableUpload() {
+    enable = false;
+}
 
 void RecvPackageParse::parse2Event(string& completePackageString) {
     string hciType, subType, packageIndex;
@@ -91,4 +95,5 @@ void RecvPackageParse::parse2Event(string& completePackageString) {
         }
     }
 }
+
 

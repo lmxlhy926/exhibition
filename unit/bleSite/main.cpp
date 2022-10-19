@@ -47,6 +47,11 @@ int main(int argc, char* argv[]) {
     bleConfig* configPathPtr = bleConfig::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
+    if(argc >= 3 && string(argv[2]) == "unable"){
+        LOG_PURPLE << "disableUpload...........";
+        RecvPackageParse::disableUpload();
+    }
+
     //单例对象
     ScanListmanage::getInstance();
 
