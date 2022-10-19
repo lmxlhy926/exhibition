@@ -1,9 +1,12 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
+#include <vector>
+
+
 using namespace std;
 
-int main() {
-    string in = "airCleanMachine";
+string hump2Underline(string in) {
     string out;
     for(int i = 0; i < in.size(); ++i)
     {
@@ -18,6 +21,22 @@ int main() {
             out.push_back(in[i]);
         }
     }
-    cout << out << endl;
+    return out;
+}
 
+string toUpper(string in) {
+    transform(in.begin(), in.end(), in.begin(), ::toupper);
+    return in;
+}
+
+int main() {
+    std::vector<string> vec{
+        "airCleaner",
+        "humidifier"
+    };
+    for(auto& elem : vec){
+        std::cout << toUpper(hump2Underline(elem)) << std::endl;
+    }
+
+    return 0;
 }
