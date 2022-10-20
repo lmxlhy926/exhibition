@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     configPathPtr->setConfigPath(string(argv[1]));
 
     if(argc >= 3 && string(argv[2]) == "unable"){
-        LOG_PURPLE << "disableUpload...........";
+        LOG_INFO << "disableUpload...........";
         RecvPackageParse::disableUpload();
     }
 
