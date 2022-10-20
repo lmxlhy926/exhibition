@@ -24,6 +24,7 @@ qlibc::QData DeviceManager::getAllDeviceList() {
         deviceList = getDeviceList();
     }
     changed.store(false);
+
     return deviceList;
 }
 

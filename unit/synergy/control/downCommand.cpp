@@ -45,7 +45,7 @@ bool DownCommandData::match(qlibc::QData &item) {
     string device_use = item.getString("device_use");
 
     //用区域和设备名字来判定设备
-    if(item_room_no == inParams.getString("area") && item_device_type == code){
+    if(item_room_no == inParams.getString("area") && item_device_type == code && item_device_name == inParams.getString("productNickname")){
         return true;
     }
 
