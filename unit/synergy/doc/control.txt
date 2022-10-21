@@ -218,7 +218,19 @@ productNickname: 该参数可以缺省，指定特定设备。
     }
 }
 
+//窗帘
+{
+    "service_id": "cloudCommand",
+    "request": {
+        "delay": "0",
+        "code": "windowCoveringSwitch",
+        "inParams": {
+            "area": "1",
+            "productNickname": "右窗帘",
+            "open": "close"
+        },
+        "action": "setPower",
+        "type": "device"
+    }
+}
 
-
-
-//软服统一使用驼峰格式

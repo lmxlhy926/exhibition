@@ -116,8 +116,16 @@ bool SceneCommand::sendCmd(qlibc::QData& siteResponse){
         SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
         LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
 
-    }else if(action == "viewingSceneStart"){  //观影场景
+    }else if(action == "viewingSceneStart"){  //开启观影场景
         req.setBool("active_switch", true);
+        req.setInt("areaCode",atoi(inParams.getString("area").c_str()));
+        siteRequest.setString("service_id", "movieTime");
+        siteRequest.putData("request", req);
+        SiteRecord::getInstance()->sendRequest2Site(SceneSiteID, siteRequest, siteResponse);
+        LOG_YELLOW << "sceneCmd: " << siteRequest.toJsonString();
+
+    }else if(action == "viewingSceneStop"){
+        req.setBool("active_switch", false);
         req.setInt("areaCode",atoi(inParams.getString("area").c_str()));
         siteRequest.setString("service_id", "movieTime");
         siteRequest.putData("request", req);

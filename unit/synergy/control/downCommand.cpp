@@ -22,6 +22,7 @@ std::vector<string> commandMembers = {
 };
 
 qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
+   qlibc::QData controlList;
    ssize_t num = deviceList.size();
    for(Json::ArrayIndex i = 0; i < num; ++i){
        qlibc::QData item = deviceList.getArrayElement(i);
@@ -31,10 +32,10 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
            controlData.setString("device_id", item.getString("device_id"));
            controlData.putData("command_list", buildCommandList(inParams));
            controlData.setString("sourceSite", sourceSite);
-           return controlData;
+           controlList.append(controlData);
        }
    }
-   return qlibc::QData();
+   return controlList;
 }
 
 bool DownCommandData::match(qlibc::QData &item) {
@@ -42,10 +43,9 @@ bool DownCommandData::match(qlibc::QData &item) {
     string item_device_name = item.getString("device_name");
     string item_device_type = item.getString("device_type");
     string sourceSite = item.getString("sourceSite");
-    string device_use = item.getString("device_use");
 
     //用区域和设备名字来判定设备
-    if(item_room_no == inParams.getString("area") && item_device_type == code && item_device_name == inParams.getString("productNickname")){
+    if(item_room_no == inParams.getString("area") && item_device_type == code){
         return true;
     }
 
