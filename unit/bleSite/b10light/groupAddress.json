@@ -15,12 +15,15 @@
 			"533E39971B30",
 			"BFAB41971B30"
 		],
-		"group_name" : "主灯",
+		"group_name" : "主卧完整组",
 		"group_use" : "light_move_site",
+		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "主卧室",
-			"room_no" : "8"
+			"room_no" : "8",
+			"group_order" : 1,
+			"close" : true
 		}
 	},
 	"02C0" : 
@@ -37,12 +40,15 @@
 			"E43039971B30",
 			"76AB41971B30"
 		],
-		"group_name" : "主灯",
+		"group_name" : "卫生间完整组",
 		"group_use" : "light_move_site",
+		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "卫生间",
-			"room_no" : "4"
+			"room_no" : "4",
+			"group_order" : 1,
+			"close" : true
 		}
 	},
 	"03C0" : 
@@ -71,8 +77,9 @@
 			"85AB41971B30",
 			"6FE955971B30"
 		],
-		"group_name" : "主灯",
+		"group_name" : "书房完整组",
 		"group_use" : "light_move_site",
+		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "书房",
@@ -166,12 +173,15 @@
 			"F42F39971B30",
 			"75D555971B30"
 		],
-		"group_name" : "主灯",
+		"group_name" : "玄关完整组",
 		"group_use" : "light_move_sit",
+		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "玄关",
-			"room_no" : "6"
+			"room_no" : "6",
+			"group_order" : 1,
+			"close" : true
 		}
 	},
 	"09C0" : 
@@ -197,12 +207,15 @@
 			"B63039971B30",
 			"C1D455971B30"
 		],
-		"group_name" : "主灯",
+		"group_name" : "过道完整组",
 		"group_use" : "light_move_site",
+		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "过道",
-			"room_no" : "2"
+			"room_no" : "2",
+			"group_order" : 1,
+			"close" : true
 		}
 	},
 	"0BC0" : 
@@ -234,7 +247,8 @@
 		{
 			"group_order" : 2,
 			"room_name" : "厨房",
-			"room_no" : "5"
+			"room_no" : "5",
+			"room_no_slaves" : "101"
 		}
 	},
 	"0DC0" : 
@@ -249,7 +263,8 @@
 		{
 			"group_order" : 1,
 			"room_name" : "厨房",
-			"room_no" : "5"
+			"room_no" : "5",
+			"room_no_slaves" : "101"
 		}
 	},
 	"0EC0" : 
@@ -265,7 +280,8 @@
 		{
 			"group_order" : 3,
 			"room_name" : "厨房",
-			"room_no" : "5"
+			"room_no" : "5",
+			"room_no_slaves" : "101"
 		}
 	},
 	"0FC0" : 
@@ -279,7 +295,8 @@
 		{
 			"group_order" : 4,
 			"room_name" : "厨房",
-			"room_no" : "5"
+			"room_no" : "5",
+			"room_no_slaves" : "101"
 		}
 	},
 	"10C0" : 
@@ -359,7 +376,9 @@
 		{
 			"group_order" : 1,
 			"room_name" : "书房",
-			"room_no" : "3"
+			"room_no" : "3",
+			"room_no_slaves" : "102",
+			"close" : true
 		}
 	},
 	"15C0" : 
@@ -373,7 +392,8 @@
 		{
 			"group_order" : 2,
 			"room_name" : "书房",
-			"room_no" : "3"
+			"room_no" : "3",
+			"room_no_slaves" : "102"
 		}
 	},
 	"16C0" : 
@@ -391,7 +411,8 @@
 		{
 			"group_order" : 4,
 			"room_name" : "客厅",
-			"room_no" : "1"
+			"room_no" : "1",
+			"room_no_slaves" : "100"
 		}
 	},
 	"17C0" : 
@@ -409,7 +430,8 @@
 		{
 			"group_order" : 1,
 			"room_name" : "客厅",
-			"room_no" : "1"
+			"room_no" : "1",
+			"room_no_slaves" : "100"
 		}
 	},
 	"18C0" : 
@@ -432,7 +454,8 @@
 		{
 			"group_order" : 2,
 			"room_name" : "客厅",
-			"room_no" : "1"
+			"room_no" : "1",
+			"room_no_slaves" : "100"
 		}
 	},
 	"19C0" : 
@@ -464,7 +487,8 @@
 		{
 			"group_order" : 3,
 			"room_name" : "客厅",
-			"room_no" : "1"
+			"room_no" : "1",
+			"room_no_slaves" : "100"
 		}
 	},
 	"1BC0" : 

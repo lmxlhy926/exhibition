@@ -1,3 +1,3 @@
 {
-  "serial" : "/dev/ttyS2"
+  "serial" : "/dev/ttyUSB0"
 }
