@@ -137,6 +137,7 @@ namespace synergy {
                     string group_id = item.getString("group_id");
                     string commandValue = requestData.getData("request").getData("inParams").getString("power");
                     qlibc::QData controlData = buildControlCmd(group_id, "power", commandValue);
+                    LOG_YELLOW << controlData.toJsonString();
                     qlibc::QData resData;
                     SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, resData);
                     break;
