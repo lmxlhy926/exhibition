@@ -536,8 +536,6 @@ int removeDeviceFromGroup_service_handler(const Request& request, Response& resp
 //控制分组
 int control_group_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
-    LOG_INFO << "==>: port: " << request.remote_port << ":>>" << requestBody.toJsonString();
-
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData groupList = requestBody.getData("request").getData("group_list");

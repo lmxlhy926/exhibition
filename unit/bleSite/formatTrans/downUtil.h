@@ -402,7 +402,7 @@ public:
         string LuminanceValStr = ssLuminanceVal.str();
 
         string stringCmd;
-        stringCmd.append(prefix).append(address).append("825E");
+        stringCmd.append(prefix).append(address).append("825F");
         stringCmd.append(LuminanceValStr);
         stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
         stringCmd.append(deleteWhiteSpace("00 00"));

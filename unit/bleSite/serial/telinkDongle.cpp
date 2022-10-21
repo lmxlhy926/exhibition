@@ -92,20 +92,24 @@ string TelinkDongle::binary2SendString(std::vector<uint8_t>& sendVec) {
 
 void TelinkDongle::sendThreadFunc(){
     while(true){
-        std::unique_lock<std::mutex> ul(sendMutex);
-        if(sendList.empty()){  //如果发送列表没有数据则等待
-            sendConVar.wait(ul, [this](){
-                return !sendList.empty() || !commonSerial.isOpened();
-            });
+        string commandString;
+        {
+            std::unique_lock<std::mutex> ul(sendMutex);
+            if(sendList.empty()){  //如果发送列表没有数据则等待
+                sendConVar.wait(ul, [this](){
+                    return !sendList.empty() || !commonSerial.isOpened();
+                });
+            }
+
+            if(!commonSerial.isOpened()){
+                LOG_RED << "quit sendThreadFunc, serial closed....";
+                return;
+            }
+
+            commandString = sendList.front();
+            sendList.pop_front();
         }
 
-        if(!commonSerial.isOpened()){
-            LOG_RED << "quit sendThreadFunc, serial closed....";
-            return;
-        }
-
-        string commandString = sendList.front();
-        sendList.pop_front();
         if(commonSerial.isOpened()){
             std::vector<uint8_t> commandVec = commandString2BinaryByte(commandString);
             if(commonSerial.write2Serial(commandVec.data(), static_cast<int>(commandVec.size()))){
@@ -115,7 +119,7 @@ void TelinkDongle::sendThreadFunc(){
                 LOG_HLIGHT << "==>sendCmd<false>: " << binary2SendString(commandVec);
                 LOG_RED << "sendList.size(): " << sendList.size();
             }
-            this_thread::sleep_for(std::chrono::milliseconds(4000));
+            this_thread::sleep_for(std::chrono::milliseconds(500));
 
         }
     }
@@ -124,27 +128,29 @@ void TelinkDongle::sendThreadFunc(){
 
 void TelinkDongle::sendListStoreHandle(std::string& commandString){
     //如果是组控指令，删除之前有的相同指令
-    ReadBinaryString rs(commandString);
-    string groupIdExtract, opCodeExtract;
-    rs.readBytes(8).read2Byte(groupIdExtract).read2Byte(opCodeExtract);
-    if (opCodeExtract == "825E") {      //删除重复组控指令
-        for(auto pos = sendList.begin(); pos != sendList.end();){
-            ReadBinaryString elemRs(*pos);
-            string elemGroup, elemOpcode;
-            elemRs.readBytes(8).read2Byte(elemGroup).read2Byte(elemOpcode);
-            if(elemOpcode == "825E" && elemGroup == groupIdExtract){
-                pos = sendList.erase(pos);
-            }else{
-                pos++;
-            }
-        }
-    }
+//    ReadBinaryString rs(commandString);
+//    string groupIdExtract, opCodeExtract;
+//    rs.readBytes(8).read2Byte(groupIdExtract).read2Byte(opCodeExtract);
+//    if (opCodeExtract == "825F") {      //删除重复组控指令
+//        for(auto pos = sendList.begin(); pos != sendList.end();){
+//            ReadBinaryString elemRs(*pos);
+//            string elemGroup, elemOpcode;
+//            elemRs.readBytes(8).read2Byte(elemGroup).read2Byte(elemOpcode);
+//            if(elemOpcode == "825F" && elemGroup == groupIdExtract){
+//                pos = sendList.erase(pos);
+//            }else{
+//                pos++;
+//            }
+//        }
+//    }
+//
+//    if(groupIdExtract == "01C0" || groupIdExtract == "04C0"){
+//        sendList.push_front(commandString);
+//    }else{
+//        sendList.push_back(commandString);
+//    }
 
-    if(groupIdExtract == "01C0" || groupIdExtract == "04C0"){
-        sendList.push_front(commandString);
-    }else{
-        sendList.push_back(commandString);
-    }
+    sendList.push_back(commandString);
 }
 
 
