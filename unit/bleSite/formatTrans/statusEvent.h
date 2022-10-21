@@ -386,7 +386,9 @@ public:
             return;
         }
 
-        Json::Value state_value =  stoi(present_lightness, nullptr, 16);
+        string realLightness;
+        realLightness.append(present_lightness.substr(2, 2));
+        Json::Value state_value =  stoi(realLightness, nullptr, 16);
         qlibc::QData status;
         status.setString("device_id", device_id);
         status.setString("state_id", "luminance");
@@ -488,7 +490,9 @@ public:
 
         //处理亮度信息
         qlibc::QData brightnessStatus;
-        Json::Value state_value = stoi(lightness, nullptr, 16);
+        string realLightness;
+        realLightness.append(lightness.substr(2, 2));
+        Json::Value state_value = stoi(realLightness, nullptr, 16);
         brightnessStatus.setString("device_id", device_id);
         brightnessStatus.setString("state_id", "luminance");
         brightnessStatus.setValue("state_value", state_value);

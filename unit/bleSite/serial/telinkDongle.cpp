@@ -115,7 +115,7 @@ void TelinkDongle::sendThreadFunc(){
                 LOG_HLIGHT << "==>sendCmd<false>: " << binary2SendString(commandVec);
                 LOG_RED << "sendList.size(): " << sendList.size();
             }
-            this_thread::sleep_for(std::chrono::milliseconds(1500));
+            this_thread::sleep_for(std::chrono::milliseconds(4000));
 
         }
     }
@@ -193,7 +193,7 @@ void TelinkDongle::joinPackage(uint8_t *data, ssize_t length){
                 parseState = HEAD;
                 {
                     std::lock_guard<std::mutex> lg(recvMutex);
-                    LOG_YELLOW << "===>packageString: " << packageString;
+//                    LOG_YELLOW << "===>packageString: " << packageString;
                     recvQueue.push(packageString);
 //                    LOG_INFO << "remainSize: " << recvQueue.size();
                 }

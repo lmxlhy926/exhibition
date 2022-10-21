@@ -72,6 +72,18 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
             }else if(command_id == LUMINANCECOLORTEMPERATURE){
                 cmdData.setInt("commandParaLuminance", commandItem.getInt("command_para_luminance"));
                 cmdData.setInt("commandParaColorTemperature", commandItem.getInt("command_para_color_temperature"));
+
+                //打印控制信息
+                qlibc::QData groupList = bleConfig::getInstance()->getGroupListData();
+                Json::Value::Members groupAddressVec = groupList.getMemberNames();
+                for(auto& key: groupAddressVec){
+                    if(key == address){
+                        string groupName = groupList.getData(key).getString("group_name");
+                        LOG_YELLOW << "===>" << groupName << ": " << commandItem.getInt("command_para_luminance") << ", "
+                        << commandItem.getInt("command_para_color_temperature");
+                        break;
+                    }
+                }
             }
 
             lc.parse(cmdData);
@@ -153,7 +165,6 @@ int del_device_service_handler(const Request& request, Response& response, Logic
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
-    LOG_INFO << "==>port: " << request.remote_port << ">>" << requestBody.toJsonString();
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
