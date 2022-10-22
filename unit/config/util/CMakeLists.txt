@@ -8,5 +8,6 @@ target_link_libraries(configUtil PUBLIC common)
 target_link_libraries(configUtil PUBLIC mqttclient)
 target_link_libraries(configUtil PUBLIC siteService)
 target_link_libraries(configUtil PUBLIC log)
+target_include_directories(configUtil PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 
