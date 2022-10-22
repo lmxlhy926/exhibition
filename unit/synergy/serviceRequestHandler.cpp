@@ -83,10 +83,11 @@ namespace synergy {
         return true;
     }
 
-    qlibc::QData buildControlCmd(string device_id, string cmd, string value){
+    qlibc::QData buildControlCmd(string device_id){
         qlibc::QData command, commandList, deviceItem, deviceList;
-        command.setString("command_id", cmd);
-        command.setString("command_para", value);
+        command.setString("command_id", "luminance_color_temperature");
+        command.setInt("command_para_luminance", 0);
+        command.setInt("command_para_color_temperature", 6500);
         command.setInt("transTime", 0);
         commandList.append(command);
 
@@ -126,6 +127,14 @@ namespace synergy {
 
         //通过code判断是否是灯控
         if(code == "light"){
+            if(area == "all"){      //关闭所有灯
+                qlibc::QData controlData = buildControlCmd("FFFF");
+                LOG_YELLOW << controlData.toJsonString();
+                qlibc::QData resData;
+                SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, resData);
+                return 0;
+            }
+
             //获取组列表
             qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
             Json::ArrayIndex groupListSize = groupList.size();
@@ -136,7 +145,7 @@ namespace synergy {
                    //构造灯控指令
                     string group_id = item.getString("group_id");
                     string commandValue = requestData.getData("request").getData("inParams").getString("power");
-                    qlibc::QData controlData = buildControlCmd(group_id, "power", commandValue);
+                    qlibc::QData controlData = buildControlCmd(group_id);
                     LOG_YELLOW << controlData.toJsonString();
                     qlibc::QData resData;
                     SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, resData);
