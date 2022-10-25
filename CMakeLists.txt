@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 project(exhibition)
 set(CMAKE_CXX_STANDARD 14)
 
-if(CYGWIN)
-    message("====>CYGWIN.....")
-elseif(ANDROID)
+if(ANDROID)
     message("====>ANDROID.....")
 else()
     message("====>LINUX.....")
@@ -20,12 +18,9 @@ add_subdirectory(unit)
 #install
 install(TARGETS config_site             DESTINATION bin)
 install(TARGETS synergy_site            DESTINATION bin)
-install(TARGETS whiteListPublish        DESTINATION bin)
-install(TARGETS whiteListScribe         DESTINATION bin)
-install(TARGETS mdns_test               DESTINATION bin)
 install(TARGETS query_site              DESTINATION bin)
-install(TARGETS httpClient              DESTINATION bin)
 install(TARGETS ble_site                DESTINATION bin)
+install(TARGETS mdns_test               DESTINATION bin)
 
 
 

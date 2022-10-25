@@ -1,6 +1,7 @@
 {
 	"01C0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"25CC55971B30",
@@ -17,17 +18,17 @@
 		],
 		"group_name" : "主卧完整组",
 		"group_use" : "light_move_site",
-		"areaFullGroup" : true,
 		"location" : 
 		{
-			"room_name" : "主卧室",
-			"room_no" : "8",
+			"close" : true,
 			"group_order" : 1,
-			"close" : true
+			"room_name" : "主卧室",
+			"room_no" : "8"
 		}
 	},
 	"02C0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"593E39971B30",
@@ -42,13 +43,12 @@
 		],
 		"group_name" : "卫生间完整组",
 		"group_use" : "light_move_site",
-		"areaFullGroup" : true,
 		"location" : 
 		{
-			"room_name" : "卫生间",
-			"room_no" : "4",
+			"close" : true,
 			"group_order" : 1,
-			"close" : true
+			"room_name" : "卫生间",
+			"room_no" : "4"
 		}
 	},
 	"03C0" : 
@@ -70,6 +70,7 @@
 	},
 	"04C0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"4F1046971B30",
@@ -79,7 +80,6 @@
 		],
 		"group_name" : "书房完整组",
 		"group_use" : "light_move_site",
-		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "书房",
@@ -167,6 +167,7 @@
 	},
 	"08C0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"043039971B30",
@@ -175,13 +176,12 @@
 		],
 		"group_name" : "玄关完整组",
 		"group_use" : "light_move_sit",
-		"areaFullGroup" : true,
 		"location" : 
 		{
-			"room_name" : "玄关",
-			"room_no" : "6",
+			"close" : true,
 			"group_order" : 1,
-			"close" : true
+			"room_name" : "玄关",
+			"room_no" : "6"
 		}
 	},
 	"09C0" : 
@@ -201,6 +201,7 @@
 	},
 	"0AC0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"6A3E39971B30",
@@ -209,13 +210,12 @@
 		],
 		"group_name" : "过道完整组",
 		"group_use" : "light_move_site",
-		"areaFullGroup" : true,
 		"location" : 
 		{
-			"room_name" : "过道",
-			"room_no" : "2",
+			"close" : true,
 			"group_order" : 1,
-			"close" : true
+			"room_name" : "过道",
+			"room_no" : "2"
 		}
 	},
 	"0BC0" : 
@@ -374,11 +374,11 @@
 		"group_name" : "书房栅格灯",
 		"location" : 
 		{
+			"close" : true,
 			"group_order" : 1,
 			"room_name" : "书房",
 			"room_no" : "3",
-			"room_no_slaves" : "102",
-			"close" : true
+			"room_no_slaves" : "102"
 		}
 	},
 	"15C0" : 
@@ -503,9 +503,9 @@
 		"group_name" : "厨房关闭组",
 		"location" : 
 		{
+			"close" : true,
 			"room_name" : "厨房",
-			"room_no" : "5",
-			"close" : true
+			"room_no" : "5"
 		}
 	},
 	"1CC0" : 
@@ -525,9 +525,9 @@
 		"group_name" : "餐厅关闭组",
 		"location" : 
 		{
+			"close" : true,
 			"room_name" : "餐厅",
-			"room_no" : "12",
-			"close" : true
+			"room_no" : "12"
 		}
 	},
 	"1DC0" : 
@@ -555,9 +555,96 @@
 		"group_name" : "客厅关闭组",
 		"location" : 
 		{
+			"close" : true,
 			"room_name" : "客厅",
-			"room_no" : "1",
-			"close" : true
+			"room_no" : "1"
+		}
+	},
+	"1EC0" : 
+	{
+		"device_list" : 
+		[
+			"24D755971B30",
+			"2DD755971B30",
+			"81AB41971B30",
+			"FEAB41971B30",
+			"01E755971B30",
+			"66E055971B30",
+			"7CE055971B30",
+			"B5E955971B30"
+		],
+		"group_name" : "厨房完整组",
+		"areaFullGroup" : true,
+		"location" : 
+		{
+			"room_name" : "厨房",
+			"room_no" : "5"
+		}
+	},
+	"1FC0" : 
+	{
+		"device_list" : 
+		[
+			"8CAB41971B30",
+			"B9E955971B30",
+			"C2E655971B30",
+			"0BCC55971B30",
+			"69DE55971B30",
+			"8CD755971B30",
+			"D8A341971B30",
+			"8AD755971B30",
+			"DDE055971B30",
+			"DCAB41971B30",
+			"F9A241971B30",
+			"14D655971B30",
+			"B1280F971B30",
+			"A8270F971B30"
+		],
+		"group_name" : "餐厅完整组",
+		"areaFullGroup" : true,
+		"location" : 
+		{
+			"room_name" : "餐厅",
+			"room_no" : "12"
+		}
+	},
+	"20C0" : 
+	{
+		"device_list" : 
+		[
+			"1CAC41971B30",
+			"20AA41971B30",
+			"EDCD55971B30",
+			"F0A241971B30",
+			"45D355971B30",
+			"F9AB41971B30",
+			"97AB41971B30",
+			"A1AB41971B30",
+			"80AB41971B30",
+			"A0AB41971B30",
+			"91D755971B30",
+			"D3DD55971B30",
+			"FCCB55971B30",
+			"FDCB55971B30",
+			"01CC55971B30",
+			"86E055971B30",
+			"DBE055971B30",
+			"65DE55971B30",
+			"8DD755971B30",
+			"8EA341971B30",
+			"C2AB41971B30",
+			"7BAB41971B30",
+			"FDAB41971B30",
+			"DAA941971B30",
+			"610F46971B30",
+			"1CCC55971B30"
+		],
+		"group_name" : "客厅完整组",
+		"areaFullGroup" : true,
+		"location" : 
+		{
+			"room_name" : "客厅",
+			"room_no" : "1"
 		}
 	}
 }

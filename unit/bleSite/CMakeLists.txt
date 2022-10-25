@@ -14,4 +14,4 @@ target_link_libraries(ble_site PRIVATE serial)
 target_link_libraries(ble_site PRIVATE log)
 target_link_libraries(ble_site PRIVATE bleLogic)
 
-add_subdirectory(test)
+#add_subdirectory(test)
