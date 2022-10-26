@@ -1,7 +1,6 @@
 FILE(GLOB src "*.cpp")
 
 add_subdirectory(serial)
-add_subdirectory(commonSerial)
 add_subdirectory(formatTrans)
 add_subdirectory(logic)
 

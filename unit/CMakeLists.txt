@@ -1,9 +1,9 @@
-add_subdirectory(config)
-add_subdirectory(synergy)
+
 add_subdirectory(bleSite)
-add_subdirectory(mdns)
+add_subdirectory(config)
+#add_subdirectory(mdm)
 add_subdirectory(query)
-add_subdirectory(mdm)
-#add_subdirectory(bleTest)
-#add_subdirectory(testSite)
+add_subdirectory(synergy)
+
+
 

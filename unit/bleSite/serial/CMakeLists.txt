@@ -5,5 +5,3 @@ add_library(serial ${SOURCE})
 target_include_directories(serial PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(serial PUBLIC common)
 target_link_libraries(serial PUBLIC format)
-
-add_subdirectory(test)
