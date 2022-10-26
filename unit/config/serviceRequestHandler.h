@@ -6,9 +6,8 @@
 #define EXHIBITION_SERVICEREQUESTHANDLER_H
 
 #include <string>
-#include <common/httplib.h>
+#include <http/httplib.h>
 #include "siteService/nlohmann/json.hpp"
-#include "socket/socketServer.h"
 #include "util/cloudUtil.h"
 #include "util/configParamUtil.h"
 

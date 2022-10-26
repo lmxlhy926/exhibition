@@ -6,7 +6,7 @@
 #define EXHIBITION_HTTPUTIL_H
 
 #include <string>
-#include "httplib.h"
+#include "http/httplib.h"
 #include "qlibc/QData.h"
 #include <vector>
 

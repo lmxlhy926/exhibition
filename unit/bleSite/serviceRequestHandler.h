@@ -6,7 +6,7 @@
 #define EXHIBITION_SERVICEREQUESTHANDLER_H
 
 #include <string>
-#include "common/httplib.h"
+#include "http/httplib.h"
 #include "logic/logicControl.h"
 using namespace httplib;
 

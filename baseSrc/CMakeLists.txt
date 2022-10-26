@@ -1,6 +1,6 @@
 
 add_subdirectory(aes)
-add_subdirectory(tsl)
+add_subdirectory(http)
 add_subdirectory(qlibc)
 add_subdirectory(encrypt)
 add_subdirectory(log)

@@ -7,7 +7,7 @@
 
 #include <string>
 #include "qlibc/jsoncpp/json.h"
-#include "common/httplib.h"
+#include "http/httplib.h"
 
 int site_register(const httplib::Request &request, httplib::Response &response);
 int site_query(const httplib::Request &request, httplib::Response &response);
