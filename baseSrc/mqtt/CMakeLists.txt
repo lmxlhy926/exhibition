@@ -11,5 +11,3 @@ else()
 endif()
 
 target_link_libraries(mqttclient PRIVATE qlibc)
-
-add_subdirectory(test)

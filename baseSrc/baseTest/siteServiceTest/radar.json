@@ -1,0 +1,48 @@
+{
+  "message_id": "test",
+  "content": {
+    "funcName": "reportTracingTargets",
+    "areaList": [
+      {
+        "areaNo": "1",
+        "targetNum": 2,
+        "targetList": [
+          {
+            "targetNo": 27525377,
+            "device_id": "102D41D659B0",
+            "x": 6.380935,
+            "y": 6.799358,
+            "identity": 1,
+            "speed": 0,
+            "heartBeat": 0,
+            "breath": 0,
+            "fallDown": 0,
+            "frameid": 87595
+          },
+          {
+            "targetNo": 27525378,
+            "device_id": "102D41D659B0",
+            "x": 4.079455,
+            "y": 4.823582,
+            "identity": 2,
+            "speed": 0,
+            "heartBeat": 0,
+            "breath": 0,
+            "fallDown": 0,
+            "frameid": 87595
+          }
+        ]
+      },
+      {
+        "areaNo": "2",
+        "targetNum": 0,
+        "targetList": []
+      },
+      {
+        "areaNo": "8",
+        "targetNum": 0,
+        "targetList": []
+      }
+    ]
+  }
+}
