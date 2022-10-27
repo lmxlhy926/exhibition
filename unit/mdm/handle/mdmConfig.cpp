@@ -24,6 +24,10 @@ string mdmConfig::getconfigPath() {
     return dataDirPath;
 }
 
+string mdmConfig::getCaPath(){
+    return FileUtils::contactFileName(dataDirPath, "data/ca-bundle.crt");
+}
+
 QData mdmConfig::getMqttConfigData() {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     if(mqttConfigData.empty()){
@@ -51,6 +55,6 @@ QData mdmConfig::getAuthInfoData() {
 void mdmConfig::saveAuthInfoData(qlibc::QData& data) {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     authInfoData.setInitData(data);
-    authInfoData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/snAddress.json"), true);
+    authInfoData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/authInfo.json"), true);
 
 }

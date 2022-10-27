@@ -9,7 +9,6 @@
 #include <mutex>
 #include "qlibc/QData.h"
 
-
 using namespace std;
 using namespace qlibc;
 
@@ -31,6 +30,9 @@ public:
 
     //获取配置路径
     string getconfigPath();
+
+    //获取证书文件路径
+    string getCaPath();
 
     //获取mqtt配置参数
     QData getMqttConfigData();

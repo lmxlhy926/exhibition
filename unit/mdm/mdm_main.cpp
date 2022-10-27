@@ -4,7 +4,6 @@
 
 #include <thread>
 #include <atomic>
-
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 #include "log/Logging.h"
@@ -14,6 +13,7 @@
 #include "handle/mqttHandle.h"
 #include "handle/mdmConfig.h"
 #include "mdmParam.hpp"
+//#include "ssl/sslUtil.h"
 
 using namespace std;
 using namespace servicesite;
@@ -45,6 +45,12 @@ int main(int argc, char* argv[]) {
     mdmConfig* configPathPtr = mdmConfig::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
+    //添加ssl访问服务
+//    string host = "open.ys7.com";
+//    string authHost = "openauth.ys7.com";
+//    string caPath = mdmConfig::getInstance()->getCaPath();
+//    sslUtil::getInstance()->addCloudSite(EZVIZ, host, caPath);
+//    sslUtil::getInstance()->addCloudSite(EZVIZAUTH, authHost, caPath);
 
     //. 获取mqtt配置参数
     QData mqttConfigData = mdmConfig::getInstance()->getMqttConfigData();

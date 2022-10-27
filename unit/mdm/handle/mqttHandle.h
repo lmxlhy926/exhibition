@@ -13,5 +13,4 @@ public:
     static bool handle(const string& topic, char* payloadReceive, int len);
 };
 
-
 #endif //EXHIBITION_MQTTHANDLE_H
