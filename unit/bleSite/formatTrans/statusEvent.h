@@ -387,7 +387,7 @@ public:
         }
 
         string realLightness;
-        realLightness.append(present_lightness.substr(2, 2));
+        realLightness.append(present_lightness.substr(2, 2)).append(present_lightness.substr(0, 2));
         Json::Value state_value =  stoi(realLightness, nullptr, 16);
         qlibc::QData status;
         status.setString("device_id", device_id);
