@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <atomic>
 #include <stdio.h>
-#include "common/httplib.h"
+#include "http/httplib.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 #include "log/Logging.h"
@@ -69,21 +69,6 @@ int main(int argc, char* argv[]) {
 //    serviceSiteManager->registerMessageHandler("device_state_changed", message_handler);
 //    serviceSiteManager->registerMessageHandler("site_onoffline", message_handler);
 
-    serviceSiteManager->registerMessageHandler("eventEnterArea", message_handler);
-    serviceSiteManager->registerMessageHandler("eventLeaveArea", message_handler);
-    serviceSiteManager->registerMessageHandler("reportTracingTargets", message_handler);
-
-
-
-//    serviceSiteManager->registerMessageHandler("eventDining", message_handler);
-//    serviceSiteManager->registerMessageHandler("eventCooking", message_handler);
-//    serviceSiteManager->registerMessageHandler("eventSitAtDesk", message_handler);
-//    serviceSiteManager->registerMessageHandler("eventSitAtSofa", message_handler);
-//
-//    serviceSiteManager->registerMessageHandler("eventFallDown", message_handler);
-
-
-
 
     // 订阅消息, 需要传入订阅站点的IP、端口号、消息ID列表
     int code;
@@ -95,16 +80,6 @@ int main(int argc, char* argv[]) {
 //    messageIdList.push_back("device_state_changed");            //设备状态变更
 //    messageIdList.push_back("site_onoffline");                  //设备上下线
 
-
-    messageIdList.push_back("eventEnterArea");
-    messageIdList.push_back("eventLeaveArea");
-    messageIdList.push_back("reportTracingTargets");
-//    messageIdList.push_back("eventDining");
-//    messageIdList.push_back("eventCooking");
-//    messageIdList.push_back("eventSitAtDesk");
-//    messageIdList.push_back("eventSitAtSofa");
-
-//    messageIdList.push_back("eventFallDown");
 
     code = serviceSiteManager->subscribeMessage("192.168.58.119", 9003, messageIdList);
     if (code == ServiceSiteManager::RET_CODE_OK) {

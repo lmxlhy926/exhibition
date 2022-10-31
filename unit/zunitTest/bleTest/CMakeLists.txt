@@ -1,6 +1,7 @@
-FILE(GLOB src "*.cpp")
 
-add_executable(bleTest ${src})
-target_link_libraries(bleTest PRIVATE qlibc)
-target_link_libraries(bleTest PRIVATE common)
-target_link_libraries(bleTest PRIVATE log)
+add_executable(ble_test main.cpp)
+target_link_libraries(ble_test PRIVATE qlibc)
+target_link_libraries(ble_test PRIVATE common)
+target_link_libraries(ble_test PRIVATE log)
+
+

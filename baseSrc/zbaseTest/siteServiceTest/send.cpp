@@ -1,10 +1,7 @@
-
-
-#include "common/httpUtil.h"
-#include "siteService/service_site_manager.h"
 #include "log/Logging.h"
 #include "log/TimeStamp.h"
 #include "qlibc/QData.h"
+#include "siteService/service_site_manager.h"
 using namespace servicesite;
 using namespace httplib;
 using namespace std::placeholders;
@@ -44,11 +41,7 @@ int main(int argc, char* argv[]){
     this_thread::sleep_for(std::chrono::seconds(2));
 
     qlibc::QData data;
-//    data.setString("message_id", "test");
-//    data.putData("content", qlibc::QData().setString("key", "world"));
     data.loadFromFile(R"(D:\bywg\project\exhibition\baseSrc\siteService\test\radar.json)");
-
-
     std::vector<string> vec;
     for(int i = 0; i < 10000; ++i){
         serviceSiteManager->publishMessage("test", data.toJsonString());
@@ -57,12 +50,6 @@ int main(int argc, char* argv[]){
         }
     }
 
-//    qlibc::QData saveData;
-//    for(auto& elem : vec){
-//        saveData.append(elem);
-//    }
-//    saveData.saveToFile("D:\\bywg\\project\\exhibition\\baseSrc\\siteService\\test\\sendSave.json", true);
-//    LOG_RED << "FINISH.........";
 
     while(true){
         this_thread::sleep_for(std::chrono::seconds(10));

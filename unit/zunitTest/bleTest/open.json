@@ -1,0 +1,44 @@
+[
+  {
+    "service_id": "control_group",
+    "request": {
+      "group_list": [{
+        "group_id": "01C0",
+        "command_list": [{
+          "command_id": "luminance_color_temperature",
+          "command_para_luminance": 255,
+          "command_para_color_temperature": 6500,
+          "transTime": 0
+        }]
+      }]
+    }
+  },
+  {
+    "service_id": "control_group",
+    "request": {
+      "group_list": [{
+        "group_id": "14C0",
+        "command_list": [{
+          "command_id": "luminance_color_temperature",
+          "command_para_luminance": 255,
+          "command_para_color_temperature": 6500,
+          "transTime": 0
+        }]
+      }]
+    }
+  },
+  {
+    "service_id": "control_group",
+    "request": {
+      "group_list": [{
+        "group_id": "15C0",
+        "command_list": [{
+          "command_id": "luminance_color_temperature",
+          "command_para_luminance": 255,
+          "command_para_color_temperature": 6500,
+          "transTime": 0
+        }]
+      }]
+    }
+  }
+]
