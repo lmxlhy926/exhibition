@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <mutex>
+#include <atomic>
 #include <functional>
 #include "mqtt/include/MQTTAsync.h"
 #include "mqttMessageHandler.h"
@@ -28,6 +29,7 @@ private:
     std::string mPassWd;
     std::map<string, int> topicMap;     //<topic, qos>
     std::recursive_mutex mutex_;
+    std::atomic<bool> isConnec{false};
 
     MqttDataHooker hooker;      //接收到数据后做的预处理动作
     mqttMessageHandler messageHandler;
@@ -52,6 +54,8 @@ public:
 
     bool addDataHooker(MqttDataHooker dataHooker);
 
+    bool isConnected();     //是否处于连接状态
+
 private:
     static int onMsgArrvd(void *context, char *topicName, int topicLen, MQTTAsync_message *message);
 
@@ -64,10 +68,13 @@ private:
 private:
     void onMsgArrvd_member(char *topicName, int topicLen, void *payload, int payloadLen);
 
+    //断线重连
     void connlost_member(void *context, char *cause);
 
+    //连接成功
     void onConnect_member(void* context, MQTTAsync_successData* response);
 
+    //连接失败
     void onConnectFailure_member(void* context, MQTTAsync_failureData* response);
 };
 

@@ -28,7 +28,7 @@ private:
     string serverIp;                                //云端http服务器Ip
     int serverPort;                                 //云端http服务器端口号
     string dataDirPath;                             //配置文件路径
-    std::unique_ptr<httplib::Client> client_;       //连接云端客户端
+//    std::unique_ptr<httplib::Client> client_;       //连接云端客户端
     static cloudUtil* instance;
 
 private:

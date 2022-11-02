@@ -17,16 +17,17 @@ using json = nlohmann::json;
 
 
 //获取情景列表<内部>
-int sceneListRequest_service_request_handler(const Request& request, Response& response);
+int sceneListRequest_service_request_handler(const Request& request, Response& response, bool isConnec);
 
 //子设备注册<内部>
-int subDeviceRegister_service_request_handler(const Request& request, Response& response);
+int subDeviceRegister_service_request_handler(const Request& request, Response& response, bool isConnec);
 
 //获取家庭域<内部>
-int domainIdRequest_service_request_handler(const Request& request, Response& response);
+int domainIdRequest_service_request_handler(const Request& request, Response& response, bool isConnec);
 
 //安装app发送请求，传递安装师傅信息<安装app>
 int engineer_service_request_handler(mqttClient& mc, const Request& request, Response& response);
+
 
 //获取白名单列表
 int whiteList_service_request_handler(const Request& request, Response& response);
@@ -40,7 +41,7 @@ int whiteList_update_service_request_handler(const Request& request, Response& r
 //蓝牙站点解绑设备时，删除相应的条目
 int whiteList_delete_service_request_handler(const Request& request, Response& response);
 
-//获取灯控设备设备列表
+//获取设备列表，返回给智慧安装app
 int getAllDeviceList_service_request_handler(const Request& request, Response& response);
 
 //电视发声

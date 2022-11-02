@@ -48,8 +48,18 @@ void extractFromWhiteList(qlibc::QData& deviceList){
 }
 
 
-int sceneListRequest_service_request_handler(const Request& request, Response& response) {
+int sceneListRequest_service_request_handler(const Request& request, Response& response, bool isConnec) {
     LOG_INFO << "===>sceneListRequest_service_request_handler: " << request.body;
+    if (!isConnec){
+        LOG_RED << "===>cant access internet......";
+        qlibc::QData errData;
+        errData.setInt("code", 1);
+        errData.setString("error", "cant access internet");
+        errData.putData("response", qlibc::QData());
+        response.set_content(errData.toJsonString(), "text/json");
+        return 0;
+    }
+
     qlibc::QData sceneListRequest, sceneListResponse;
     qlibc::QData param;
     param.setString("familyCode", "did:chisid:0x88508ea0601591e2afc95b662a9b279e75ef3f95");  //TODO 待定
@@ -71,10 +81,19 @@ int sceneListRequest_service_request_handler(const Request& request, Response& r
     return 0;
 }
 
-int subDeviceRegister_service_request_handler(const Request& request, Response& response) {
+int subDeviceRegister_service_request_handler(const Request& request, Response& response, bool isConnec) {
     LOG_INFO << "===>subDeviceRegister_service_request_handler: " << request.body;
-    qlibc::QData requestData(request.body);
+    if (!isConnec){
+        LOG_RED << "===>cant access internet......";
+        qlibc::QData errData;
+        errData.setInt("code", 1);
+        errData.setString("error", "cant access internet");
+        errData.putData("response", qlibc::QData());
+        response.set_content(errData.toJsonString(), "text/json");
+        return 0;
+    }
 
+    qlibc::QData requestData(request.body);
     qlibc::QData registerRequest, registerResponse;
     qlibc::QData param = requestData.getData("request");
     param.setString("domainID", configParamUtil::getInstance()->getBaseInfo().getString("domainID"));
@@ -96,7 +115,7 @@ int subDeviceRegister_service_request_handler(const Request& request, Response& 
     return 0;
 }
 
-int domainIdRequest_service_request_handler(const Request& request, Response& response) {
+int domainIdRequest_service_request_handler(const Request& request, Response& response, bool isConnec) {
     LOG_INFO << "===>domainIdRequest_service_request_handler: " << request.body;
 
     string domainId = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
@@ -119,6 +138,15 @@ int domainIdRequest_service_request_handler(const Request& request, Response& re
 
 int engineer_service_request_handler(mqttClient& mc, const Request& request, Response& response) {
     LOG_INFO << "===>engineer_service_request_handler: " << request.body;
+    if (!mc.isConnected()){
+        LOG_RED << "===>cant access internet......";
+        qlibc::QData errData;
+        errData.setInt("code", 1);
+        errData.setString("error", "cant access internet");
+        errData.putData("response", qlibc::QData());
+        response.set_content(errData.toJsonString(), "text/json");
+        return 0;
+    }
 
     qlibc::QData requestData = qlibc::QData(request.body).getData("request");
     qlibc::QData registerRes;

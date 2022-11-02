@@ -33,11 +33,11 @@ void cloudUtil::init(const string&  ip, int port, const string& dataDirectoryPat
     serverPort = port;
     dataDirPath = dataDirectoryPath;
 
-    client_ = std::make_unique<httplib::Client>(serverIp, serverPort);
-    client_->set_keep_alive(true);
-    client_->set_connection_timeout(5);
-    client_->set_read_timeout(10);
-    client_->set_write_timeout(5);
+//    client_ = std::make_unique<httplib::Client>(serverIp, serverPort);
+//    client_->set_keep_alive(true);
+//    client_->set_connection_timeout(5);
+//    client_->set_read_timeout(10);
+//    client_->set_write_timeout(5);
 
     LOG_PURPLE << "cloudUtil init: httpServerIp<" << serverIp << ">---httpServerPort<" << serverPort
               << ">---dataDirPath<" << dataDirPath << ">";
@@ -49,7 +49,7 @@ bool cloudUtil::getTvInfo(string& tvMac, string& tvName, string& tvModel){
     tvName = baseInfoData.getString("tv_name");
     tvModel = baseInfoData.getString("tv_model");
 
-    if(tvMac.empty() || tvName.empty() || tvModel.empty()){
+    if(tvMac.empty() || tvName.empty() || tvModel.empty()){     //如果TV信息为空，则重新向tv_adapter进行获取
         qlibc::QData tvRequest, tvResponse;
         tvRequest.setString("service_id", "get_tv_mac");
         tvRequest.putData("request", qlibc::QData());
@@ -81,7 +81,7 @@ bool cloudUtil::joinTvWhite() {
     qlibc::QData recordData = configParamUtil::getInstance()->getRecordData();
     bool tvWhite = recordData.getBool("tvWhite");
 
-    if(!tvWhite){
+    if(!tvWhite){   //未加入大白名单，则获取到tv信息后，加入白名单
         //获取电视信息
         string tvMac, tvName, tvModel;
         while(true){
@@ -187,6 +187,12 @@ bool cloudUtil::tvRegister(mqttClient& mc, qlibc::QData& engineerInfo, qlibc::QD
 }
 
 bool cloudUtil::ecb_httppost(const string &uri, const qlibc::QData &request, qlibc::QData &response) {
+    httplib::Client postClient(serverIp, serverPort);
+//    postClient.set_connection_timeout(0);
+//    postClient.set_read_timeout(0);
+//    postClient.set_write_timeout(0);
+//    postClient.set_keep_alive(false);
+//    postClient.set_tcp_nodelay(true);
 
     httplib::Headers header;
     Json::Value &root = request.asValue();
@@ -208,16 +214,17 @@ bool cloudUtil::ecb_httppost(const string &uri, const qlibc::QData &request, qli
     string out;
     lhytemp::secretUtil::ecb_encrypt_withPadding(body, out, reinterpret_cast<const uint8_t *>(key));
 
-    auto http_res = client_->Post(uri.c_str(), header, out, "application/json");
-
+    auto http_res = postClient.Post(uri.c_str(), header, out, "application/json");
     if (http_res != nullptr) {
         string decryptOut;
-        lhytemp::secretUtil::ecb_decrypt_withPadding(http_res->body.c_str(), decryptOut,
-                                                 reinterpret_cast<const uint8_t *>(key));
+        lhytemp::secretUtil::ecb_decrypt_withPadding(http_res->body.c_str(), decryptOut,reinterpret_cast<const uint8_t *>(key));
         response = qlibc::QData(decryptOut);
         LOG_YELLOW << "===>httpResponse: " << response.toJsonString();
         return true;
+    }else{
+        LOG_YELLOW << "===>httpResponse: " << "nullptr";
     }
+
     return false;
 }
 

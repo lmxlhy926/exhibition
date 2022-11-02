@@ -93,17 +93,25 @@ int main(int argc, char* argv[]) {
 
 
     //注册请求场景列表处理函数
-    serviceSiteManager->registerServiceRequestHandler(SCENELIST_REQUEST_SERVICE_ID,sceneListRequest_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(SCENELIST_REQUEST_SERVICE_ID,[&](const Request& request, Response& response)->int{
+        return sceneListRequest_service_request_handler(request, response, mc.isConnected());
+    });
+
     //注册子设备注册处理函数
-    serviceSiteManager->registerServiceRequestHandler(SUBDEVICE_REGISTER_SERVICE_ID, subDeviceRegister_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(SUBDEVICE_REGISTER_SERVICE_ID, [&](const Request& request, Response& response)->int{
+        return subDeviceRegister_service_request_handler(request, response, mc.isConnected());
+    });
+
     //注册获取家庭域Id处理函数
-    serviceSiteManager->registerServiceRequestHandler(DOMAINID_REQUEST_SERVICE_ID, domainIdRequest_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(DOMAINID_REQUEST_SERVICE_ID, [&](const Request& request, Response& response)->int{
+        return domainIdRequest_service_request_handler(request, response, mc.isConnected());
+    });
 
     //注册安装师傅信息上传请求函数
-    serviceSiteManager->registerServiceRequestHandler(ENGINEER_REQUEST_SERVICE_ID,
-                                                      [&](const Request& request, Response& response) -> int{
+    serviceSiteManager->registerServiceRequestHandler(ENGINEER_REQUEST_SERVICE_ID,[&](const Request& request, Response& response) -> int{
         return engineer_service_request_handler(mc, request, response);
     });
+
 
     //获取白名单列表
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID,whiteList_service_request_handler);

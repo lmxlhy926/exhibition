@@ -104,6 +104,10 @@ bool mqttClient::addDataHooker(MqttDataHooker dataHooker){
     return true;
 }
 
+bool mqttClient::isConnected(){
+    return isConnec.load();
+}
+
 int mqttClient::onMsgArrvd(void *context, char *topicName, int topicLen, MQTTAsync_message *message) {
     std::cout << "onMsgArrvd: <" << topicName << ">---payloadLen<" << message->payloadlen << ">..." << std::endl;
     auto client = (mqttClient *)(context);
@@ -144,6 +148,7 @@ void mqttClient::onMsgArrvd_member(char *topicName, int topicLen, void *payload,
 
 void mqttClient::connlost_member(void *context, char *cause) {
     std::cout << "-----connlost, start to connect aggain----" << std::endl;
+    isConnec.store(false);
     connect();
 }
 
@@ -152,6 +157,7 @@ void mqttClient::onConnect_member(void *context, MQTTAsync_successData *response
     for(auto& elem : topicMap){
         subscribe(elem.first, elem.second);
     }
+    isConnec.store(true);
 }
 
 void mqttClient::onConnectFailure_member(void *context, MQTTAsync_failureData *response) {
