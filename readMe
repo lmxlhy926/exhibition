@@ -1,0 +1,1 @@
+-DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=/home/lhy/installbag/android-ndk-r25b/build/cmake/android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=24 -DANDROID_ABI=armeabi-v7a
