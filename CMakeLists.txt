@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 if(ANDROID)
     message("====>ANDROID.....")
+elseif(CYGWIN)
+    message("====>CYGWIN.....")
 else()
     message("====>LINUX.....")
 endif()
