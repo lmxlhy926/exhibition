@@ -24,14 +24,7 @@ using json = nlohmann::json;
 void message_handler(const Request& request) {
     // 消息的json字符串位于request.body
     qlibc::QData data(request.body);
-    string message_id = data.getString("message_id");
-    if(message_id != "reportTracingTargets"){
-        LOG_INFO << data.toJsonString();
-    }
-}
-
-void message_handler1(const Request& request) {
-    LOG_INFO << "hello";
+    LOG_INFO << data.toJsonString();
 }
 
 
@@ -68,6 +61,7 @@ int main(int argc, char* argv[]) {
 //    serviceSiteManager->registerMessageHandler("singleDeviceUnbindSuccessMsg", message_handler);
 //    serviceSiteManager->registerMessageHandler("device_state_changed", message_handler);
 //    serviceSiteManager->registerMessageHandler("site_onoffline", message_handler);
+    serviceSiteManager->registerMessageHandler("register2QuerySiteAgain", message_handler);
 
 
     // 订阅消息, 需要传入订阅站点的IP、端口号、消息ID列表
@@ -79,9 +73,10 @@ int main(int argc, char* argv[]) {
 //    messageIdList.push_back("singleDeviceUnbindSuccessMsg");    //单个解绑成功
 //    messageIdList.push_back("device_state_changed");            //设备状态变更
 //    messageIdList.push_back("site_onoffline");                  //设备上下线
+    messageIdList.push_back("register2QuerySiteAgain");
 
 
-    code = serviceSiteManager->subscribeMessage("192.168.58.119", 9003, messageIdList);
+    code = serviceSiteManager->subscribeMessage("127.0.0.1", 9000, messageIdList);
     if (code == ServiceSiteManager::RET_CODE_OK) {
         printf("subscribeMessage ok.\n");
     }else{
