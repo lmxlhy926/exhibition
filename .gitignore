@@ -10,4 +10,5 @@
 /linux/
 /unit/bleSite/data
 /cmake-build-debug
-/cmake-build-debug_cygwin
+/cmake-build-cygwin_debug
+/cmake-build-wsl_debug
