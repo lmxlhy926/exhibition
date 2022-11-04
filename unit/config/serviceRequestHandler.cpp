@@ -169,7 +169,7 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 
 int whiteList_service_request_handler(const Request& request, Response& response){
     LOG_INFO << "===>whiteList_service_request_handler: " << request.body;
-
+#if 0
 //    string domainID = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
 //
 //    qlibc::QData whiteListRequest, whiteListResponse;
@@ -195,7 +195,7 @@ int whiteList_service_request_handler(const Request& request, Response& response
 //        data.setString("error", whiteListResponse.getString("msg"));
 //        data.putData("response", qlibc::QData());
 //    }
-
+#endif
 
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
     qlibc::QData data;

@@ -49,7 +49,6 @@ namespace synergy {
             {"response", {}}
     };
 
-
     void classify(qlibc::QData &controlData, qlibc::QData &bleDeviceList, qlibc::QData &zigbeeDeviceList,
                   qlibc::QData &tvAdapterList) {
         string sourceSite = controlData.getString("sourceSite");
@@ -101,13 +100,48 @@ namespace synergy {
         return requestData;
     }
 
+    bool isSiteOnline(const std::string& siteId){
+        qlibc::QData data, responseData;
+        data.setString("service_id", "get_message_list");
+        data.putData("request", qlibc::QData());
+        return SiteRecord::getInstance()->sendRequest2Site(siteId, data, responseData);
+    }
+
+    //使用蓝牙站点
+    void lightControlBleSite(const string& area, const qlibc::QData& requestData){
+        if(area == "all"){      //关闭所有灯
+            qlibc::QData controlData = buildControlCmd("FFFF");
+            LOG_YELLOW << controlData.toJsonString();
+            qlibc::QData resData;
+            SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, resData);
+            return;
+        }
+
+        //获取组列表
+        qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
+        Json::ArrayIndex groupListSize = groupList.size();
+        for(Json::ArrayIndex i = 0; i < groupListSize; ++i){
+            qlibc::QData item = groupList.getArrayElement(i);
+            string room_no = item.getData("location").getString("room_no");
+            if(item.getBool("areaFullGroup") && area == room_no){
+                //构造灯控指令
+                string group_id = item.getString("group_id");
+                string commandValue = requestData.getData("request").getData("inParams").getString("power");
+                qlibc::QData controlData = buildControlCmd(group_id);
+                LOG_YELLOW << controlData.toJsonString();
+                qlibc::QData resData;
+                SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, resData);
+                break;
+            }
+        }
+    }
+
     int cloudCommand_service_handler(const Request& request, Response& response){
         qlibc::QData requestData(request.body);
         LOG_INFO << "cloudCommand_service_handler: " << requestData.toJsonString();
         string action = requestData.getData("request").getString("action");
         string code = requestData.getData("request").getString("code");
         string area = requestData.getData("request").getData("inParams").getString("area");
-
 
         //场景指令
         for(auto& elem : sceneVec){     //通过action判断是否是场景指令
@@ -125,34 +159,12 @@ namespace synergy {
             }
         }
 
-        //通过code判断是否是灯控
+        //使用蓝牙站点
         if(code == "light"){
-            if(area == "all"){      //关闭所有灯
-                qlibc::QData controlData = buildControlCmd("FFFF");
-                LOG_YELLOW << controlData.toJsonString();
-                qlibc::QData resData;
-                SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, resData);
+            if(isSiteOnline(BleSiteID)){
+                lightControlBleSite(area, requestData);
                 return 0;
             }
-
-            //获取组列表
-            qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
-            Json::ArrayIndex groupListSize = groupList.size();
-            for(Json::ArrayIndex i = 0; i < groupListSize; ++i){
-                qlibc::QData item = groupList.getArrayElement(i);
-                string room_no = item.getData("location").getString("room_no");
-                if(item.getBool("areaFullGroup") && area == room_no){
-                   //构造灯控指令
-                    string group_id = item.getString("group_id");
-                    string commandValue = requestData.getData("request").getData("inParams").getString("power");
-                    qlibc::QData controlData = buildControlCmd(group_id);
-                    LOG_YELLOW << controlData.toJsonString();
-                    qlibc::QData resData;
-                    SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, resData);
-                    break;
-                }
-            }
-            return 0;
         }
 
         //否则，则为第三方设备控制命令

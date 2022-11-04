@@ -38,11 +38,25 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
    return controlList;
 }
 
-bool DownCommandData::match(qlibc::QData &item) {
+bool DownCommandData::match(qlibc::QData& item) {
     string item_room_no = item.getData("location").getString("room_no");
     string item_device_name = item.getString("device_name");
     string item_device_type = item.getString("device_type");
-    string sourceSite = item.getString("sourceSite");
+    string item_sourceSite = item.getString("sourceSite");
+
+    string area = inParams.getString("area");   //区域
+    string kind = inParams.getString("kind");   //zd, fd, all
+
+    //如果是灯设备
+    if(code == item_device_type && code == "LIGHT"){
+        if(area == "all"){
+            return true;
+        }else if(area == item_room_no && (kind.empty() || kind == item_device_name)){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     //用区域和设备名字来判定设备
     if(item_room_no == inParams.getString("area") && item_device_type == code){

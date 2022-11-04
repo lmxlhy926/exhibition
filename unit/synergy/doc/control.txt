@@ -124,6 +124,7 @@ productNickname: 该参数可以缺省，指定特定设备。
        "inParams": {
            "area": "1",
            "productNickname": "2 号灯",
+           "kind" : "zd"
            "luminance": "100"
        },
        "action": "setLuminance",

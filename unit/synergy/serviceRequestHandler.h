@@ -10,6 +10,9 @@
 using namespace httplib;
 
 namespace synergy{
+//判断站点是否在线（通过请求站点）
+    bool isSiteOnline(const std::string& siteId);
+
 //设备控制
     int cloudCommand_service_handler(const Request& request, Response& response);
 
