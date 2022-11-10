@@ -566,40 +566,41 @@ open_client_sockets(int* sockets, int max_sockets, int port) {
 	struct ifaddrs* ifaddr = 0;
 	struct ifaddrs* ifa = 0;
 
+    //获取所有网卡的网卡地址
 	if (getifaddrs(&ifaddr) < 0)
 		printf("Unable to get interface addresses\n");
 
 	int first_ipv4 = 1;
 	int first_ipv6 = 1;
 	for (ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
-		if (!ifa->ifa_addr)
+		if (!ifa->ifa_addr)  //网卡地址存在
 			continue;
-		if (!(ifa->ifa_flags & IFF_UP) || !(ifa->ifa_flags & IFF_MULTICAST))
+		if (!(ifa->ifa_flags & IFF_UP) || !(ifa->ifa_flags & IFF_MULTICAST))    //接口启用、支持组播
 			continue;
-		if ((ifa->ifa_flags & IFF_LOOPBACK) || (ifa->ifa_flags & IFF_POINTOPOINT))
+		if ((ifa->ifa_flags & IFF_LOOPBACK) || (ifa->ifa_flags & IFF_POINTOPOINT))  //不是回环口地址、不是点对点网络
 			continue;
 
 		if (ifa->ifa_addr->sa_family == AF_INET) {
 			struct sockaddr_in* saddr = (struct sockaddr_in*)ifa->ifa_addr;
-			if (saddr->sin_addr.s_addr != htonl(INADDR_LOOPBACK)) {
+			if (saddr->sin_addr.s_addr != htonl(INADDR_LOOPBACK)) {  //不是回环口地址
 				int log_addr = 0;
-				if (first_ipv4) {
+				if (first_ipv4) {   //记录第一个ipv4地址
 					service_address_ipv4 = *saddr;
 					first_ipv4 = 0;
 					log_addr = 1;
 				}
-				has_ipv4 = 1;
+				has_ipv4 = 1;       //网卡拥有ipv4地址
 				if (num_sockets < max_sockets) {
-					saddr->sin_port = htons(port);
-					int sock = mdns_socket_open_ipv4(saddr);
+					saddr->sin_port = htons(port);      //分配端口号
+					int sock = mdns_socket_open_ipv4(saddr);     //创建socket, 绑定该地址
 					if (sock >= 0) {
-						sockets[num_sockets++] = sock;
+						sockets[num_sockets++] = sock;  //保存创建的socket
 						log_addr = 1;
 					} else {
 						log_addr = 0;
 					}
 				}
-				if (log_addr) {
+				if (log_addr) {     //打印查询到的每个ipv4地址
 					char buffer[128];
 					mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer), saddr,
 					                                            sizeof(struct sockaddr_in));
@@ -656,6 +657,7 @@ static int
 open_service_sockets(int* sockets, int max_sockets) {
 	// When recieving, each socket can recieve data from all network interfaces
 	// Thus we only need to open one socket for each address family
+    // ipv4一个，ipv6一个
 	int num_sockets = 0;
 
 	// Call the client socket function to enumerate and get local addresses,

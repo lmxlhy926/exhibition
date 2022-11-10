@@ -392,6 +392,7 @@ mdns_htonl(void* data, uint32_t val) {
 
 static inline int
 mdns_socket_open_ipv4(const struct sockaddr_in* saddr) {
+    //ipv4、数据报、UDP
     int sock = (int)socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sock < 0)
         return -1;
@@ -416,6 +417,7 @@ mdns_socket_setup_ipv4(int sock, const struct sockaddr_in* saddr) {
     setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, (const char*)&ttl, sizeof(ttl));
     setsockopt(sock, IPPROTO_IP, IP_MULTICAST_LOOP, (const char*)&loopback, sizeof(loopback));
 
+    //加入组播组
     memset(&req, 0, sizeof(req));
     req.imr_multiaddr.s_addr = htonl((((uint32_t)224U) << 24U) | ((uint32_t)251U));
     if (saddr)
@@ -822,6 +824,8 @@ mdns_unicast_send(int sock, const void* address, size_t address_size, const void
     return 0;
 }
 
+
+//将消息发送到224.0.0.251:5353
 static inline int
 mdns_multicast_send(int sock, const void* buffer, size_t size) {
     struct sockaddr_storage addr_storage;
@@ -855,6 +859,7 @@ mdns_multicast_send(int sock, const void* buffer, size_t size) {
         saddrlen = sizeof(addr);
     }
 
+    //发送组播消息
     if (sendto(sock, (const char*)buffer, (mdns_size_t)size, 0, saddr, saddrlen) < 0)
         return -1;
     return 0;
@@ -1091,8 +1096,8 @@ mdns_multiquery_send(int sock, const mdns_query_t* query, size_t count, void* bu
     socklen_t saddrlen = sizeof(addr_storage);
     if (getsockname(sock, saddr, &saddrlen) == 0) {
         if ((saddr->sa_family == AF_INET) &&
-            (ntohs(((struct sockaddr_in*)saddr)->sin_port) == MDNS_PORT))
-            rclass &= ~MDNS_UNICAST_RESPONSE;
+            (ntohs(((struct sockaddr_in*)saddr)->sin_port) == MDNS_PORT))   //如果是组播端口
+            rclass &= ~MDNS_UNICAST_RESPONSE;   //组播回复
         else if ((saddr->sa_family == AF_INET6) &&
                  (ntohs(((struct sockaddr_in6*)saddr)->sin6_port) == MDNS_PORT))
             rclass &= ~MDNS_UNICAST_RESPONSE;

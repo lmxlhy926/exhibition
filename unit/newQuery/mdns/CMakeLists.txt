@@ -1,2 +1,2 @@
-add_library(mdns INTERFACE mdns.h)
-target_include_directories(mdns INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+add_library(mdnsBasic INTERFACE mdns.h)
+target_include_directories(mdnsBasic INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
