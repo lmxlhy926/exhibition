@@ -22,9 +22,9 @@ std::vector<string> commandMembers = {
 };
 
 qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
-   qlibc::QData controlList;
-   ssize_t num = deviceList.size();
-   for(Json::ArrayIndex i = 0; i < num; ++i){
+    qlibc::QData controlList;
+    ssize_t num = deviceList.size();
+    for(Json::ArrayIndex i = 0; i < num; ++i){
        qlibc::QData item = deviceList.getArrayElement(i);
        if(match(item)){     //找到匹配项，则根据匹配项构造控制指令
            string sourceSite = item.getString("sourceSite");
@@ -34,13 +34,14 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
            controlData.setString("sourceSite", sourceSite);
            controlList.append(controlData);
        }
-   }
-   return controlList;
+    }
+    return controlList;
 }
 
 bool DownCommandData::match(qlibc::QData& item) {
     string item_room_no = item.getData("location").getString("room_no");
     string item_device_name = item.getString("device_name");
+    string item_nick_name = item.getString("nick_name");
     string item_device_type = item.getString("device_type");
     string item_sourceSite = item.getString("sourceSite");
 
@@ -48,10 +49,10 @@ bool DownCommandData::match(qlibc::QData& item) {
     string kind = inParams.getString("kind");   //zd, fd, all
 
     //如果是灯设备
-    if(code == item_device_type && code == "LIGHT"){
+    if((item_device_type == "LIGHT_SWITCH" || item_device_type == "LIGHT") && code == "LIGHT"){
         if(area == "all"){
             return true;
-        }else if(area == item_room_no && (kind.empty() || kind == item_device_name)){
+        }else if(area == item_room_no && (kind.empty() || kind == item_nick_name)){
             return true;
         }else{
             return false;

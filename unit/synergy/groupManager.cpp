@@ -20,10 +20,12 @@ void GroupManager::listChanged() {
 }
 
 qlibc::QData GroupManager::getAllGroupList() {
-    if(changed.load()){
-        groupList = getGroupList();
-    }
-    changed.store(false);
+//    if(changed.load()){
+//        groupList = getGroupList();
+//    }
+//    changed.store(false);
+
+    groupList = getGroupList();
     return groupList;
 }
 

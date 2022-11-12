@@ -20,11 +20,12 @@ void DeviceManager::listChanged() {
 }
 
 qlibc::QData DeviceManager::getAllDeviceList() {
-    if(changed.load()){
-        deviceList = getDeviceList();
-    }
-    changed.store(false);
+//    if(changed.load()){
+//        deviceList = getDeviceList();
+//    }
+//    changed.store(false);
 
+    deviceList = getDeviceList();
     return deviceList;
 }
 
