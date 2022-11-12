@@ -784,7 +784,7 @@ int send_mdns_query(const char* service) {
 }
 
 int start_service_mdns(){
-    std::thread mdns_service(service_mdns);
+    std::thread mdns_service(service_mdns_control);
     mdns_service.detach();
 
     return 0;
@@ -845,6 +845,16 @@ int service_mdns() {
         mdns_socket_close(sockets[isock]);
     printf("Closed socket%s\n", num_sockets ? "s" : "");
 
+    return 0;
+}
+
+int service_mdns_control(){
+    while(true){
+        if(service_mdns() == -1){
+           printf("====>failed start mdns service, start again in 3 seconds\n");
+           std::this_thread::sleep_for(std::chrono::seconds(3));
+        }
+    }
     return 0;
 }
 

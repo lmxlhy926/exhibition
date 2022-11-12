@@ -44,6 +44,8 @@
 int start_service_mdns();
 int service_mdns();
 
+int service_mdns_control();
+
 int send_mdns_query(const char* service);
 int get_mdns_query_result(std::unordered_set<std::string> &site_set);
 
