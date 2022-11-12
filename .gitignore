@@ -12,3 +12,4 @@
 /cmake-build-debug
 /cmake-build-cygwin_debug
 /cmake-build-wsl_debug
+/cmake-build-minsizerel_android_armeabi-v7a

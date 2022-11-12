@@ -349,7 +349,7 @@ ServiceSiteManager::ServiceSiteManager() {
 
 void ServiceSiteManager::rawHttpRequestHandler(const Request& request, Response& response) {
     // 线程锁, 对象析构时解锁
-    std::lock_guard<std::mutex> lockGuard(http_request_mutex);
+//    std::lock_guard<std::mutex> lockGuard(http_request_mutex);
 
     // SERV_LIB_LOG("%s\n", request.body.c_str());
 
