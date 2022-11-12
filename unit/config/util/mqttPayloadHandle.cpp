@@ -36,8 +36,15 @@ qlibc::QData mqttPayloadHandle::transform(const char* payloadReceive, int len){
         dataObject.setString("category_code", ithData.getString("categoryCode"));
         long device_id;
         try{
-            device_id = stol(ithData.getString("deviceId"), nullptr, 10);
-            device_id %= 65536;
+            string deviceIdStr = ithData.getString("deviceId");
+            int start;
+            if(deviceIdStr.size() - 8 >= 0)
+                start = deviceIdStr.size() - 8;
+            else
+                start = 0;
+            device_id = stol(deviceIdStr.substr(start), nullptr, 10);
+            device_id %= 65535;
+
         }catch(const exception& e){
             device_id = 0;
         }
@@ -93,7 +100,10 @@ qlibc::QData mqttPayloadHandle::transform(const char* payloadReceive, int len){
     string timeStr = std::to_string(time(nullptr));
     payload.setString("timeStamp", timeStr);
 
+    LOG_YELLOW << payload.toJsonString(true);
+
     return payload;
+
 }
 
 

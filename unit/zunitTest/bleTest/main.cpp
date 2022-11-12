@@ -1,8 +1,9 @@
 
 #include <iostream>
 #include "common/httpUtil.h"
+#include "qlibc/QData.h"
 
-int main(int argc, char* argv[]){
+void test(){
     string bleSiteName = "ble_light";
     string LocalIp = "192.168.58.116";
     int bleSitePort = 9001;
@@ -36,6 +37,10 @@ int main(int argc, char* argv[]){
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(10));
     }
+}
+
+int main(int argc, char* argv[]){
+    test();
 
     return 0;
 }
