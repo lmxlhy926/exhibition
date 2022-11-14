@@ -10,6 +10,6 @@ target_include_directories(http PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 #target_link_libraries(http PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/tsl/libssl.so.1.1)
 
 
-if(NOT ANDROID)
+if(LINUX_X86_64 OR LINUX_ARM64)
     target_link_libraries(http PRIVATE pthread)
 endif()
