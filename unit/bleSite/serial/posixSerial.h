@@ -65,17 +65,15 @@ public:
     }
 
 private:
-    bool setProperty(int databits,int stopbits,int parity, int speed);   //设置串口数据位、停止位、奇偶位
-
-    bool setSpeed(int speed) const;   //设置波特率
-
     bool setUartProperty();
-
-    bool setUartProperty_try();
 
     void checkCflag(struct termios options);
 
     void checkIflag(struct termios options);
+
+    bool setProperty(int databits,int stopbits,int parity, int speed);   //设置串口数据位、停止位、奇偶位
+
+    bool setSpeed(int speed) const;   //设置波特率
 };
 
 #endif //EXHIBITION_POSIXSERIAL_H
