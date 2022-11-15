@@ -75,5 +75,6 @@ static const string WhiteList_Changed =   "whiteListModifiedByAppMsg";
 #define LUMINANCECOLORTEMPERATURE   "luminance_color_temperature"
 #define LUMINANCERELATIVE           "luminance_relative"
 #define COLORTEMPERATURERELATIVE    "color_temperature_relative"
+#define MODECONFIG                  "mode_config"
 
 #endif //EXHIBITION_PARAMETER_H

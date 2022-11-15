@@ -494,4 +494,34 @@ public:
 };
 
 
+//节点模式设置
+class LightModeConfig : public BuildBinaryString{
+private:
+    string address;
+    int modeConfig = 0;
+
+public:
+    explicit LightModeConfig(qlibc::QData& data){ init(data); }
+
+    void init(qlibc::QData& data){
+        address = data.getString("address");
+        modeConfig = data.getInt("commandPara");
+
+    }
+
+    string getBinaryString() override{
+        string prefix = getCommandPrefix();
+        stringstream ss;
+        ss << std::setfill('0') << std::hex << std::uppercase << std::setw(2) << modeConfig;
+
+        string stringCmd;
+        stringCmd.append(prefix).append(address).append("C3").append("11020002");
+        stringCmd.append(ss.str());
+        stringCmd.append("00");
+
+        return stringCmd;
+    }
+};
+
+
 #endif //EXHIBITION_DOWNUTIL_H

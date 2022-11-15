@@ -66,7 +66,8 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
             if(command_id == POWER){
                 cmdData.setString("commandPara", commandItem.getString("command_para"));
 
-            }else if(command_id == LUMINANCE || command_id == COLORTEMPERATURE || LUMINANCERELATIVE || COLORTEMPERATURERELATIVE){
+            }else if(command_id == LUMINANCE || command_id == COLORTEMPERATURE || command_id == LUMINANCERELATIVE ||
+                     command_id == COLORTEMPERATURERELATIVE || command_id == MODECONFIG){
                 cmdData.setInt("commandPara", commandItem.getInt("command_para"));
 
             }else if(command_id == LUMINANCECOLORTEMPERATURE){

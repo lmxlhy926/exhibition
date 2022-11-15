@@ -77,8 +77,10 @@ string DownUtility::cmdData2BinaryCommandString(QData &cmdData) {
 
     }else if(command == COLORTEMPERATURERELATIVE){  //色温相对控制
         return LightColorTem_relative(cmdData).getBinaryString();
-    }
 
+    }else if(command == MODECONFIG){
+        return LightModeConfig(cmdData).getBinaryString();
+    }
 
     return string();
 }

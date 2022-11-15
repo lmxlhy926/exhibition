@@ -90,6 +90,12 @@
 	"address" : "xxxx",
 }
 
+//模式相对控制
+{
+	"command" : "mode_config",
+	"commandPara" : 10,
+	"address" : "xxxx",
+}
 
 //将设备添加进分组
 {
