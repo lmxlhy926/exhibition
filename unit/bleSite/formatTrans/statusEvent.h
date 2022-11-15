@@ -337,12 +337,22 @@ public:
             qlibc::QData status;
             status.setString("device_id", device_id);
             status.setString("state_id", "power");
-            if(present_onOff == "00"){
-                status.setString("state_value", "off");
-                state_value = "off";
+            if(target_onOff.empty()){
+                if(present_onOff == "00"){
+                    status.setString("state_value", "off");
+                    state_value = "off";
+                }else{
+                    status.setString("state_value", "on");
+                    state_value = "on";
+                }
             }else{
-                status.setString("state_value", "on");
-                state_value = "on";
+                if(target_onOff == "00"){
+                    status.setString("state_value", "off");
+                    state_value = "off";
+                }else{
+                    status.setString("state_value", "on");
+                    state_value = "on";
+                }
             }
 
             LOG_GREEN << "==>LightOnOffStatus: " << status.toJsonString();

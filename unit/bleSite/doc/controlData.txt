@@ -76,6 +76,21 @@
 }
 
 
+//亮度相对控制
+{
+	"command" : "luminance_relative",
+	"commandPara" : 10,
+	"address" : "xxxx",
+}
+
+//色温相对控制
+{
+	"command" : "color_temperature_relative",
+	"commandPara" : 10,
+	"address" : "xxxx",
+}
+
+
 //将设备添加进分组
 {
     "command" : "addDevice2Group",

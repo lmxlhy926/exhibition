@@ -117,6 +117,12 @@ int main(int argc, char* argv[]) {
         return control_all_service_handler(request, response, lc);
     });
 
+    //修改设备信息
+    serviceSiteManager->registerServiceRequestHandler(Config_Device_Property_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return device_config_service_handler(request, response);
+    });
+
     //获取设备列表
     serviceSiteManager->registerServiceRequestHandler(Get_DeviceList_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
@@ -216,9 +222,9 @@ int main(int argc, char* argv[]) {
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-//            int code = serviceSiteManager->start();
+            int code = serviceSiteManager->start();
             //注册启动方式
-            int code = serviceSiteManager->startByRegister();
+//            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 LOG_RED << "===>bleSite startByRegister error, code = " << code;
                 LOG_RED << "===>bleSite startByRegister in 3 seconds....";

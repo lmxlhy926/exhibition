@@ -25,6 +25,9 @@ int control_device_service_handler(const Request& request, Response& response, L
 //控制所有设备
 int control_all_service_handler(const Request& request, Response& response, LogicControl& lc);
 
+//修改设备信息
+int device_config_service_handler(const Request& request, Response& response);
+
 //获取设备列表
 int get_device_list_service_handler(const Request& request, Response& response);
 

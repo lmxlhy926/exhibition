@@ -241,7 +241,7 @@ public:
             ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << transTimeInt;
             transTime = ss.str();
         }else{
-            transTime = "3E";
+            transTime = "00";
         }
     }
 
@@ -287,7 +287,7 @@ public:
             ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << transTimeInt;
             transTime = ss.str();
         }else{
-            transTime = "3E";
+            transTime = "00";
         }
     }
 
@@ -332,7 +332,7 @@ public:
             ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << transTimeInt;
             transTime = ss.str();
         }else{
-            transTime = "3E";
+            transTime = "00";
         }
     }
 
@@ -389,7 +389,7 @@ public:
             ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << transTimeInt;
             transTime = ss.str();
         }else{
-            transTime = "3E";
+            transTime = "00";
         }
     }
 
@@ -414,6 +414,84 @@ public:
     }
 };
 
+
+
+//亮度相对控制
+class LightLuminance_relative : public BuildBinaryString{
+private:
+    string address;
+    int ratio = 0;
+
+public:
+    explicit LightLuminance_relative(qlibc::QData& data){ init(data); }
+
+    void init(qlibc::QData& data){
+        address = data.getString("address");
+        int tempRatio = data.getInt("commandPara");
+        bool positive = tempRatio > 0 ? true : false;
+
+        if(0 <= abs(tempRatio) && abs(tempRatio) <= 100){
+            if(positive)
+                ratio = (abs(tempRatio) << 1) + 1;
+            else
+                ratio = (abs(tempRatio) << 1) + 0;
+        }else{
+            ratio = 0;
+        }
+    }
+
+    string getBinaryString() override{
+        string prefix = getCommandPrefix();
+        stringstream ss;
+        ss << std::setfill('0') << std::hex << std::uppercase << std::setw(2) << ratio;
+
+        string stringCmd;
+        stringCmd.append(prefix).append(address).append("C9").append("11020002");
+        stringCmd.append(ss.str());
+        stringCmd.append("00");
+
+        return stringCmd;
+    }
+};
+
+
+//色温相对控制
+class LightColorTem_relative : public BuildBinaryString{
+private:
+    string address;
+    int ratio = 0;
+
+public:
+    explicit LightColorTem_relative(qlibc::QData& data){ init(data); }
+
+    void init(qlibc::QData& data){
+        address = data.getString("address");
+        int tempRatio = data.getInt("commandPara");
+        bool positive = tempRatio > 0 ? true : false;
+
+        if(0 <= abs(tempRatio) && abs(tempRatio) <= 100){
+            if(positive)
+                ratio = (abs(tempRatio) << 1) + 1;
+            else
+                ratio = (abs(tempRatio) << 1) + 0;
+        }else{
+            ratio = 0;
+        }
+    }
+
+    string getBinaryString() override{
+        string prefix = getCommandPrefix();
+        stringstream ss;
+        ss << std::setfill('0') << std::hex << std::uppercase << std::setw(2) << ratio;
+
+        string stringCmd;
+        stringCmd.append(prefix).append(address).append("CA").append("11020002");
+        stringCmd.append(ss.str());
+        stringCmd.append("00");
+
+        return stringCmd;
+    }
+};
 
 
 #endif //EXHIBITION_DOWNUTIL_H
