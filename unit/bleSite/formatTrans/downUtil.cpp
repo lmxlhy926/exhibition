@@ -10,7 +10,7 @@
 
 string BuildBinaryString::commandPrefix = "E8 FF 00 00 00 00 02 03";
 
-
+//构造控制字符串指令，发送到串口缓存列表
 bool DownUtility::parse2Send(qlibc::QData &cmdData){
     string binaryString = cmdData2BinaryCommandString(cmdData);
     string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
@@ -20,6 +20,7 @@ bool DownUtility::parse2Send(qlibc::QData &cmdData){
 }
 
 
+//解析cmdData, 构造字符串控制命令
 string DownUtility::cmdData2BinaryCommandString(QData &cmdData) {
     LOG_INFO << "cmdData: " << cmdData.toJsonString();
     string command  = cmdData.getString("command");

@@ -12,10 +12,10 @@ using namespace std;
 
 /**
  * 功能：
- *      1. 为sn自动分配地址，保证地址唯一对应，自动增加条目
- *      2. 返回分配的地址字符串
- *      3. 返回绑定的设备列表
- *      4. 删除设备条目
+ *      1. 为sn自动分配地址
+ *      2. 删除sn对应的地址条目
+ *      3. sn--->address
+ *      4. address--->sn
  */
 class SnAddressMap {
 private:
@@ -42,7 +42,7 @@ public:
     //删除对应的条目并更新存储文件
     void deleteDeviceSn(string& deviceSn);
 
-    //获取设备列表
+    //获取设备地址列表
     qlibc::QData getAddrList();
 
     //deviceSn--->unicastAddress

@@ -23,8 +23,8 @@ void SnAddressMap::deleteDeviceSn(string& deviceSn) {
     auto pos = snAddrMap.find(deviceSn);
     if(pos != snAddrMap.end()){
         snAddrMap.erase(pos->first);
+        map2JsonDataAndSave2File();
     }
-    map2JsonDataAndSave2File();
 }
 
 qlibc::QData SnAddressMap::getAddrList() {

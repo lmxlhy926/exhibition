@@ -19,14 +19,18 @@ private:
 public:
     static ScanListmanage* getInstance();
 
+    //增加扫描列表条目
     void appendDeviceItem(string deviceSn, Json::Value property);
 
+    //删除扫描列表条目
     void deleteDeviceItem(string& deviceSn);
 
     std::map<string, Json::Value> getScanListMap();
 
+    //加载扫描列表数据
     void loadData();
 
+    //存储扫描列表数据
     void saveData();
 };
 
