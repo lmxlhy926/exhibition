@@ -39,6 +39,8 @@ int main(int argc, char* argv[]) {
     SiteRecord::getInstance()->addSite(TvAdapterSiteID, RequestIp, TvAdapterSitePort);
     SiteRecord::getInstance()->addSite(SceneSiteID, RequestIp, SceneSitePort);
 
+    serviceSiteManager->registerMessageId(Scene_Msg_MessageID);   //场景指令消息
+
     //设备控制 + 场景命令
     serviceSiteManager->registerServiceRequestHandler(Control_Service_ID,
                                                       [](const Request& request, Response& response) -> int{

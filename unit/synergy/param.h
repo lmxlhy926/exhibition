@@ -41,4 +41,7 @@ static const string GetGroupList_Service_ID = "get_group_list";
 static const string DeviceList_changed_messageID = "deviceList_changed";
 static const string Site_OnOffLine_MessageID = "site_onoffline";
 
+//发布消息ID
+static const string Scene_Msg_MessageID = "sceneMsg";
+
 #endif //EXHIBITION_PARAM_H

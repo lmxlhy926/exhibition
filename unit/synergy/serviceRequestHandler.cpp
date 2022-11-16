@@ -4,6 +4,7 @@
 
 #include "serviceRequestHandler.h"
 #include "siteService/nlohmann/json.hpp"
+#include "siteService/service_site_manager.h"
 #include "qlibc/QData.h"
 #include "param.h"
 #include "common/httpUtil.h"
@@ -13,6 +14,8 @@
 #include "groupManager.h"
 #include "control/sceneCommand.h"
 #include <vector>
+
+using namespace servicesite;
 
 namespace synergy {
 
@@ -146,6 +149,13 @@ namespace synergy {
         //场景指令
         for(auto& elem : sceneVec){     //通过action判断是否是场景指令
             if(action == elem){     //场景指令
+                //发布场景指令消息
+                qlibc::QData publishData;
+                publishData.setString("message_id", Scene_Msg_MessageID);
+                publishData.putData("content", requestData.getData("request"));
+                ServiceSiteManager::getInstance()->publishMessage(Scene_Msg_MessageID, publishData.toJsonString());
+
+                //进行格式转换，请求场景站点接口
                 qlibc::QData siteResponse;
                 SceneCommand sc(requestData);
                 bool flag = sc.sendCmd(siteResponse);
