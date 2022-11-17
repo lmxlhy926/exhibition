@@ -3,6 +3,8 @@
 //
 
 #include "mdnsUtil.h"
+#include "siteManage/siteManageUtil.h"
+#include <regex>
 
 
 static char addrbuffer[64];
@@ -94,6 +96,7 @@ query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry
                MDNS_STRING_FORMAT(namestr), rclass, ttl, (int)record_length);
 
         printf("---------------\n");
+        mdnsResponseMatch(string(entrystr.str, entrystr.length), string(fromaddrstr.str, fromaddrstr.length));
 
     } else if (rtype == MDNS_RECORDTYPE_SRV) {
         mdns_record_srv_t srv = mdns_record_parse_srv(data, size, record_offset, record_length,
@@ -172,6 +175,65 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
         return 0;
     printf("Query %s %.*s\n", record_name, MDNS_STRING_FORMAT(name));
 
+
+    //判断请求的是否是注册的站点
+    string reqDomainName = string(name.str, name.length);
+    smatch sm;
+    bool ret = regex_match(reqDomainName, sm, regex(R"(_edgeai.(.*)._tcp.local.)"));
+    if(ret) {
+        string siteId = sm[1].str();
+        if (SiteTree::getInstance()->isSiteExist(siteId)) {
+            if ((rtype == MDNS_RECORDTYPE_PTR) || (rtype == MDNS_RECORDTYPE_ANY)) {
+                // The PTR query was for our service (usually "<_service-name._tcp.local"), answer a PTR
+                // record reverse mapping the queried service name to our service instance name
+                // (typically on the "<hostname>.<_service-name>._tcp.local." format), and add
+                // additional records containing the SRV record mapping the service instance name to our
+                // qualified hostname (typically "<hostname>.local.") and port, as well as any IPv4/IPv6
+                // address for the hostname as A/AAAA records, and two test TXT records
+
+                // Answer PTR record reverse mapping "<_service-name>._tcp.local." to
+                // "<hostname>.<_service-name>._tcp.local."
+
+                //提取站点注册信息
+                qlibc::QData siteData = SiteTree::getInstance()->extractSiteInfo(siteId);
+
+                //构造"<hostname>.<_service-name>._tcp.local."
+                char service_instance_buffer[256] = {0};
+                snprintf(service_instance_buffer, sizeof(service_instance_buffer) - 1, "%.*s.%.*s",
+                         MDNS_STRING_FORMAT(service->hostname), MDNS_STRING_FORMAT(name));
+                mdns_string_t service_instance_string =
+                        (mdns_string_t){service_instance_buffer, strlen(service_instance_buffer)};
+
+                mdns_record_t answer = service->record_ptr;
+                answer.name = name;
+                answer.data.ptr.name = service_instance_string;
+
+
+                mdns_record_t additional[5] = {0};
+                size_t additional_count = 0;
+
+                // Send the answer, unicast or multicast depending on flag in query
+                uint16_t unicast = (rclass & MDNS_UNICAST_RESPONSE);
+                printf("  --> answer %.*s (%s)\n",
+                       MDNS_STRING_FORMAT(service->record_ptr.data.ptr.name),
+                       (unicast ? "unicast" : "multicast"));
+
+                if (unicast) {
+                    mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
+                                              query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
+                                              additional, additional_count);
+                } else {
+                    mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
+                                                additional, additional_count);
+                }
+            }
+
+        }
+    }
+
+
+#if 0
+
     if ((name.length == (sizeof(dns_sd) - 1)) &&
         (strncmp(name.str, dns_sd, sizeof(dns_sd) - 1) == 0)) {
         if ((rtype == MDNS_RECORDTYPE_PTR) || (rtype == MDNS_RECORDTYPE_ANY)) {
@@ -247,6 +309,8 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                                             additional, additional_count);
             }
         }
+
+
     } else if ((name.length == service->service_instance.length) &&
                (strncmp(name.str, service->service_instance.str, name.length) == 0)) {
         if ((rtype == MDNS_RECORDTYPE_SRV) || (rtype == MDNS_RECORDTYPE_ANY)) {
@@ -289,6 +353,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                                             additional, additional_count);
             }
         }
+
     } else if ((name.length == service->hostname_qualified.length) &&
                (strncmp(name.str, service->hostname_qualified.str, name.length) == 0)) {
         if (((rtype == MDNS_RECORDTYPE_A) || (rtype == MDNS_RECORDTYPE_ANY)) &&
@@ -369,6 +434,9 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
             }
         }
     }
+
+#endif
+
     return 0;
 }
 
