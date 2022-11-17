@@ -208,7 +208,6 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                 answer.name = name;
                 answer.data.ptr.name = service_instance_string;
 
-
                 mdns_record_t additional[5] = {0};
                 size_t additional_count = 0;
 

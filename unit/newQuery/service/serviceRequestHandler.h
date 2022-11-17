@@ -12,7 +12,16 @@ using namespace httplib;
 //开启mdns服务
 void mdnsServiceStart();
 
-//主动查询服务
+//站点注册
+int site_register_service_handler(const Request& request, Response& response);
+
+//站点注销
+int site_unRegister_service_handler(const Request& request, Response& response);
+
+//站点查询
+int site_query_service_handler(const Request& request, Response& response);
+
+//站点发现
 int site_discovery_service_handler(const Request& request, Response& response);
 
 

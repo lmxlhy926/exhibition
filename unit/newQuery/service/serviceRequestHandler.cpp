@@ -10,6 +10,7 @@
 #include "mdns/mdnsUtil.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
+#include "siteManage/siteManageUtil.h"
 
 
 static const nlohmann::json okResponse = {
@@ -34,6 +35,50 @@ void mdnsServiceStart(){
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 }
+
+//站点注册
+int site_register_service_handler(const Request& request, Response& response){
+    qlibc::QData reqData(request.body);
+    LOG_INFO << "site_register_service_handler: " << reqData.toJsonString();
+
+    string site_id = reqData.getData("request").getString("site_id");
+    int port = reqData.getData("request").getInt("port");
+    string summary = reqData.getData("request").getString("summary");
+
+    qlibc::QData registerData;
+    registerData.setString("site_id", site_id);
+    registerData.setInt("port", port);
+    registerData.setString("summary", summary);
+    registerData.setString("site_status", "online");
+
+    SiteTree::getInstance()->siteRegister(site_id, registerData.asValue());
+
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
+
+//站点注销
+int site_unRegister_service_handler(const Request& request, Response& response){
+    qlibc::QData reqData(request.body);
+    LOG_INFO << "site_unRegister_service_handler: " << reqData.toJsonString();
+    string site_id = reqData.getData("request").getString("site_id");
+    SiteTree::getInstance()->siteDelete(site_id);
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
+
+//站点查询
+int site_query_service_handler(const Request& request, Response& response){
+    qlibc::QData reqData(request.body);
+    LOG_INFO << "site_query_service_handler: " << reqData.toJsonString();
+    string site_id = reqData.getData("request").getString("site_id");
+    qlibc::QData siteInfo = SiteTree::getInstance()->siteQuery(site_id);
+    response.set_content(siteInfo.toJsonString(), "text/json");
+    return 0;
+}
+
 
 int site_discovery_service_handler(const Request& request, Response& response){
 
