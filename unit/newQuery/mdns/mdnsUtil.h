@@ -35,6 +35,9 @@
 #undef recvfrom
 #endif
 
+#ifdef __cplusplus
+//extern "C" {
+#endif
 
 
 // Data for our service including the mDNS records
@@ -118,6 +121,8 @@ BOOL console_handler(DWORD signal);
 void signal_handler(int signal);
 #endif
 
-
+#ifdef __cplusplus
+//}
+#endif
 
 #endif //EXHIBITION_MDNSUTIL_H

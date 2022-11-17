@@ -92,6 +92,9 @@ query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry
         printf("%.*s : %s %.*s PTR %.*s rclass 0x%x ttl %u length %d\n",
                MDNS_STRING_FORMAT(fromaddrstr), entrytype, MDNS_STRING_FORMAT(entrystr),
                MDNS_STRING_FORMAT(namestr), rclass, ttl, (int)record_length);
+
+        printf("---------------\n");
+
     } else if (rtype == MDNS_RECORDTYPE_SRV) {
         mdns_record_srv_t srv = mdns_record_parse_srv(data, size, record_offset, record_length,
                                                       namebuffer, sizeof(namebuffer));
@@ -177,8 +180,11 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
 
             // Answer PTR record reverse mapping "<_service-name>._tcp.local." to
             // "<hostname>.<_service-name>._tcp.local."
-            mdns_record_t answer = {
-                    .name = name, .type = MDNS_RECORDTYPE_PTR, .data.ptr.name = service->service};
+            mdns_record_t answer;
+            answer.name = name;
+            answer.type = MDNS_RECORDTYPE_PTR;
+            answer.data.ptr.name = service->service;
+
 
             // Send the answer, unicast or multicast depending on flag in query
             uint16_t unicast = (rclass & MDNS_UNICAST_RESPONSE);
@@ -187,7 +193,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
 
             if (unicast) {
                 mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
-                                          query_id, rtype, name.str, name.length, answer, 0, 0, 0,
+                                          query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0, 0,
                                           0);
             } else {
                 mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0, 0,
@@ -234,7 +240,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
 
             if (unicast) {
                 mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
-                                          query_id, rtype, name.str, name.length, answer, 0, 0,
+                                          query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
                                           additional, additional_count);
             } else {
                 mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
@@ -276,7 +282,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
 
             if (unicast) {
                 mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
-                                          query_id, rtype, name.str, name.length, answer, 0, 0,
+                                          query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
                                           additional, additional_count);
             } else {
                 mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
@@ -316,7 +322,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
 
             if (unicast) {
                 mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
-                                          query_id, rtype, name.str, name.length, answer, 0, 0,
+                                          query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
                                           additional, additional_count);
             } else {
                 mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
@@ -355,7 +361,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
 
             if (unicast) {
                 mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
-                                          query_id, rtype, name.str, name.length, answer, 0, 0,
+                                          query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
                                           additional, additional_count);
             } else {
                 mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
@@ -816,7 +822,7 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
         return -1;
     }
 
-    char* service_name_buffer = malloc(service_name_length + 2);
+    char* service_name_buffer = static_cast<char*>(malloc(service_name_length + 2));
     memcpy(service_name_buffer, service_name, service_name_length);
     if (service_name_buffer[service_name_length - 1] != '.')
         service_name_buffer[service_name_length++] = '.';
@@ -859,50 +865,59 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
 
     // PTR record reverse mapping "<_service-name>._tcp.local." to
     // "<hostname>.<_service-name>._tcp.local."
-    service.record_ptr = (mdns_record_t){.name = service.service,
-            .type = MDNS_RECORDTYPE_PTR,
-            .data.ptr.name = service.service_instance,
-            .rclass = 0,
-            .ttl = 0};
+    service.record_ptr.name = service.service;
+    service.record_ptr.type = MDNS_RECORDTYPE_PTR;
+    service.record_ptr.data.ptr.name = service.service_instance;
+    service.record_ptr.rclass = 0;
+    service.record_ptr.ttl = 0;
 
     // SRV record mapping "<hostname>.<_service-name>._tcp.local." to
     // "<hostname>.local." with port. Set weight & priority to 0.
-    service.record_srv = (mdns_record_t){.name = service.service_instance,
-            .type = MDNS_RECORDTYPE_SRV,
-            .data.srv.name = service.hostname_qualified,
-            .data.srv.port = service.port,
-            .data.srv.priority = 0,
-            .data.srv.weight = 0,
-            .rclass = 0,
-            .ttl = 0};
+    service.record_srv.name = service.service_instance;
+    service.record_srv.type = MDNS_RECORDTYPE_SRV;
+    service.record_srv.data.srv.name = service.hostname_qualified;
+    service.record_srv.data.srv.port = static_cast<uint16_t>(service.port);
+    service.record_srv.data.srv.priority = 0;
+    service.record_srv.data.srv.weight = 0;
+    service.record_srv.rclass = 0;
+    service.record_srv.ttl = 0;
 
     // A/AAAA records mapping "<hostname>.local." to IPv4/IPv6 addresses
     service.record_a = (mdns_record_t){.name = service.hostname_qualified,
             .type = MDNS_RECORDTYPE_A,
-            .data.a.addr = service.address_ipv4,
+//            .data.a.addr = service.address_ipv4,
             .rclass = 0,
             .ttl = 0};
+    service.record_a.data.a.addr = service.address_ipv4;
+
 
     service.record_aaaa = (mdns_record_t){.name = service.hostname_qualified,
             .type = MDNS_RECORDTYPE_AAAA,
-            .data.aaaa.addr = service.address_ipv6,
+//            .data.aaaa.addr = service.address_ipv6,
             .rclass = 0,
             .ttl = 0};
+    service.record_aaaa.data.aaaa.addr = service.address_ipv6;
+
 
     // Add two test TXT records for our service instance name, will be coalesced into
     // one record with both key-value pair strings by the library
     service.txt_record[0] = (mdns_record_t){.name = service.service_instance,
             .type = MDNS_RECORDTYPE_TXT,
-            .data.txt.key = {MDNS_STRING_CONST("test")},
-            .data.txt.value = {MDNS_STRING_CONST("1")},
+//            .data.txt.key = {MDNS_STRING_CONST("test")},
+//            .data.txt.value = {MDNS_STRING_CONST("1")},
             .rclass = 0,
             .ttl = 0};
+    service.txt_record[0].data.txt.key = {MDNS_STRING_CONST("test")};
+    service.txt_record[0].data.txt.value = {MDNS_STRING_CONST("1")};
+
     service.txt_record[1] = (mdns_record_t){.name = service.service_instance,
             .type = MDNS_RECORDTYPE_TXT,
-            .data.txt.key = {MDNS_STRING_CONST("other")},
-            .data.txt.value = {MDNS_STRING_CONST("value")},
+//            .data.txt.key = {MDNS_STRING_CONST("other")},
+//            .data.txt.value = {MDNS_STRING_CONST("value")},
             .rclass = 0,
             .ttl = 0};
+    service.txt_record[1].data.txt.key = {MDNS_STRING_CONST("other")};
+    service.txt_record[1].data.txt.value = {MDNS_STRING_CONST("value")};
 
     // Send an announcement on startup of service
     {
@@ -933,7 +948,7 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
             FD_SET(sockets[isock], &readfs);
         }
 
-        struct timeval timeout;
+        struct timeval timeout{};
         timeout.tv_sec = 0;
         timeout.tv_usec = 100000;
 
@@ -1004,7 +1019,7 @@ dump_mdns(void) {
             FD_SET(sockets[isock], &readfs);
         }
 
-        struct timeval timeout;
+        struct timeval timeout{};
         timeout.tv_sec = 0;
         timeout.tv_usec = 100000;
 
