@@ -2,6 +2,8 @@
 #include <iostream>
 #include "common/httpUtil.h"
 #include "qlibc/QData.h"
+#include <regex>
+
 
 void test(){
     string bleSiteName = "ble_light";
@@ -40,7 +42,14 @@ void test(){
 }
 
 int main(int argc, char* argv[]){
-    test();
+    string str = "changhong._edgeai.config._tcp.local.";
+    smatch sm;
+    bool ret = regex_match(str, sm, regex("(.*)[.](.*)[.](.*)[.](.*)[.](.*)[.]"));
+    if(ret){
+        std::cout << "size: " << sm.size() << std::endl;
+        std::cout << sm.str(3) << std::endl;
+    }
+
 
     return 0;
 }

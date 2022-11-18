@@ -25,7 +25,7 @@ install(TARGETS ble_site                DESTINATION bin)
 install(TARGETS config_site             DESTINATION bin)
 install(TARGETS query_site              DESTINATION bin)
 install(TARGETS synergy_site            DESTINATION bin)
-#install(TARGETS newQuery_site           DESTINATION bin)
+install(TARGETS newQuery_site           DESTINATION bin)
 install(TARGETS mdns_test               DESTINATION bin)
 
 

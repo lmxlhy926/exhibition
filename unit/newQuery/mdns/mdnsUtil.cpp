@@ -94,16 +94,18 @@ query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry
         printf("%.*s : %s %.*s PTR %.*s rclass 0x%x ttl %u length %d\n",
                MDNS_STRING_FORMAT(fromaddrstr), entrytype, MDNS_STRING_FORMAT(entrystr),
                MDNS_STRING_FORMAT(namestr), rclass, ttl, (int)record_length);
-
-        printf("---------------\n");
-        mdnsResponseMatch(string(entrystr.str, entrystr.length), string(fromaddrstr.str, fromaddrstr.length));
-
     } else if (rtype == MDNS_RECORDTYPE_SRV) {
         mdns_record_srv_t srv = mdns_record_parse_srv(data, size, record_offset, record_length,
                                                       namebuffer, sizeof(namebuffer));
         printf("%.*s : %s %.*s SRV %.*s priority %d weight %d port %d\n",
                MDNS_STRING_FORMAT(fromaddrstr), entrytype, MDNS_STRING_FORMAT(entrystr),
                MDNS_STRING_FORMAT(srv.name), srv.priority, srv.weight, srv.port);
+
+        //处理返回的mdns请求
+        mdnsResponseHandle(string(entrystr.str, entrystr.length),
+                                    string(fromaddrstr.str, fromaddrstr.length),
+                                    srv.port);
+
     } else if (rtype == MDNS_RECORDTYPE_A) {
         struct sockaddr_in addr;
         mdns_record_parse_a(data, size, record_offset, record_length, &addr);
@@ -195,7 +197,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                 // "<hostname>.<_service-name>._tcp.local."
 
                 //提取站点注册信息
-                qlibc::QData siteData = SiteTree::getInstance()->extractSiteInfo(siteId);
+                qlibc::QData siteData = SiteTree::getInstance()->getSiteInfo(siteId);
 
                 //构造"<hostname>.<_service-name>._tcp.local."
                 char service_instance_buffer[256] = {0};
@@ -204,12 +206,27 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                 mdns_string_t service_instance_string =
                         (mdns_string_t){service_instance_buffer, strlen(service_instance_buffer)};
 
+                // Build the "<hostname>.local." string
+                char qualified_hostname_buffer[256] = {0};
+                snprintf(qualified_hostname_buffer, sizeof(qualified_hostname_buffer) - 1, "%.*s.local.",
+                         MDNS_STRING_FORMAT(service->hostname));
+                mdns_string_t hostname_qualified_string =
+                        (mdns_string_t){qualified_hostname_buffer, strlen(qualified_hostname_buffer)};
+
+
                 mdns_record_t answer = service->record_ptr;
                 answer.name = name;
                 answer.data.ptr.name = service_instance_string;
 
-                mdns_record_t additional[5] = {0};
+                mdns_record_t additional[5] = {nullptr};
                 size_t additional_count = 0;
+
+                mdns_record_t recordSrv = service->record_srv;
+                recordSrv.name = service_instance_string;
+                recordSrv.data.srv.name = hostname_qualified_string;
+                recordSrv.data.srv.port = siteData.getInt("port");
+                additional[additional_count++] = recordSrv;
+
 
                 // Send the answer, unicast or multicast depending on flag in query
                 uint16_t unicast = (rclass & MDNS_UNICAST_RESPONSE);
@@ -232,7 +249,6 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
 
 
 #if 0
-
     if ((name.length == (sizeof(dns_sd) - 1)) &&
         (strncmp(name.str, dns_sd, sizeof(dns_sd) - 1) == 0)) {
         if ((rtype == MDNS_RECORDTYPE_PTR) || (rtype == MDNS_RECORDTYPE_ANY)) {
@@ -433,7 +449,6 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
             }
         }
     }
-
 #endif
 
     return 0;
