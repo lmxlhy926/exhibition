@@ -19,7 +19,7 @@ int site_register_service_handler(const Request& request, Response& response);
 int site_unRegister_service_handler(const Request& request, Response& response);
 
 //站点查询
-int site_query_service_handler(const Request& request, Response& response);
+int site_query_service_handler(const Request& request, Response& response, httplib::ThreadPool& threadPool);
 
 //站点心跳
 int site_ping_service_handler(const Request& request, Response& response);

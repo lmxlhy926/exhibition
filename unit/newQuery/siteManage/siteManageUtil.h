@@ -18,10 +18,10 @@ using namespace std;
 
 class SiteTree{
 private:
-    std::unordered_map<string, Json::Value> siteMap;
-    std::unordered_map<string, int> sitePingCountMap;
+    std::unordered_map<string, Json::Value> siteMap;      //保存在线站点以及离线站点
+    std::unordered_map<string, int> sitePingCountMap;     //在线站点的ping计数，<=-3,自动清除
     std::thread* pingThread;
-    int pingInterval = 10;
+    int pingInterval = 1000;
     std::recursive_mutex siteMutex;
 
     std::string localIp = "127.0.0.1";

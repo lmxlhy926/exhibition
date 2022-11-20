@@ -5,6 +5,7 @@
 #include "mdnsUtil.h"
 #include "siteManage/siteManageUtil.h"
 #include <regex>
+#include "log/Logging.h"
 
 
 static char addrbuffer[64];
@@ -175,7 +176,8 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
         record_name = "ANY";
     else
         return 0;
-    printf("Query %s %.*s\n", record_name, MDNS_STRING_FORMAT(name));
+//    printf("Query %s %.*s\n", record_name, MDNS_STRING_FORMAT(name));
+    LOG_BLUE << "Query: " << record_name << " " << string(name.str, name.length);
 
 
     //判断请求的是否是注册的站点
@@ -230,9 +232,11 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
 
                 // Send the answer, unicast or multicast depending on flag in query
                 uint16_t unicast = (rclass & MDNS_UNICAST_RESPONSE);
-                printf("  --> answer %.*s (%s)\n",
-                       MDNS_STRING_FORMAT(service->record_ptr.data.ptr.name),
-                       (unicast ? "unicast" : "multicast"));
+//                printf("  --> answer %.*s (%s)\n",
+//                       MDNS_STRING_FORMAT(service->record_ptr.data.ptr.name),
+//                       (unicast ? "unicast" : "multicast"));
+                LOG_BLUE << "  --> answer " << string(service->record_ptr.data.ptr.name.str, service->record_ptr.data.ptr.name.length)
+                        << " " << (unicast ? "unicast" : "multicast");
 
                 if (unicast) {
                     mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
@@ -818,6 +822,7 @@ send_mdns_query(mdns_query_t* query, size_t count) {
         return -1;
     }
     printf("Opened %d socket%s for mDNS query\n", num_sockets, num_sockets ? "s" : "");
+    LOG_GREEN << "Opened " << num_sockets << " socket" << (num_sockets ? "s" : "") <<  " for mDNS query";
 
     size_t capacity = 2048;
     void* buffer = malloc(capacity);
@@ -876,13 +881,15 @@ send_mdns_query(mdns_query_t* query, size_t count) {
         }
     } while (res > 0);
 
-    printf("Read %d records\n", records);
+//    printf("Read %d records\n", records);
+    LOG_GREEN << "Read " << records << " records";
 
     free(buffer);
 
     for (int isock = 0; isock < num_sockets; ++isock)
         mdns_socket_close(sockets[isock]);
-    printf("Closed socket%s\n", num_sockets ? "s" : "");
+//    printf("Closed socket%s\n", num_sockets ? "s" : "");
+    LOG_GREEN << "Closed socket" << (num_sockets ? "s" : "");
 
     return 0;
 }
@@ -896,7 +903,8 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
         printf("Failed to open any client sockets\n");
         return -1;
     }
-    printf("Opened %d socket%s for mDNS service\n", num_sockets, num_sockets ? "s" : "");
+//    printf("Opened %d socket%s for mDNS service\n", num_sockets, num_sockets ? "s" : "");
+    LOG_BLUE << "Opened " << num_sockets << " socket" << (num_sockets ? "s" : "") << " for mDNS service";
 
     size_t service_name_length = strlen(service_name);
     if (!service_name_length) {
@@ -911,8 +919,11 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
     service_name_buffer[service_name_length] = 0;
     service_name = service_name_buffer;
 
-    printf("Service mDNS: %s:%d\n", service_name, service_port);
-    printf("Hostname: %s\n", hostname);
+//    printf("Service mDNS: %s:%d\n", service_name, service_port);
+//    printf("Hostname: %s\n", hostname);
+    LOG_BLUE << "Service mDNS: " << service_name << ":" << service_port;
+    LOG_BLUE << "Hostname: " << hostname;
+
 
     size_t capacity = 2048;
     void* buffer = malloc(capacity);
@@ -1003,7 +1014,8 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
 
     // Send an announcement on startup of service
     {
-        printf("Sending announce\n");
+//        printf("Sending announce\n");
+        LOG_BLUE << "Sending announce";
         mdns_record_t additional[5] = {0};
         size_t additional_count = 0;
         additional[additional_count++] = service.record_srv;

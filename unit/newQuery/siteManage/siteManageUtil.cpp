@@ -20,12 +20,19 @@ SiteTree *SiteTree::getInstance() {
    return Instance;
 }
 
+//站点注册：更新siteMap, sitePingCountMap
 void SiteTree::siteRegister(string& siteId, Json::Value &value) {
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
+    //插入sieMap
     auto pos = siteMap.find(siteId);
     if(pos != siteMap.end())
         siteMap.erase(pos);
     siteMap.insert(std::make_pair(siteId, value));
+
+    //出入sitePingCountMap
+    auto pos1 = sitePingCountMap.find(siteId);
+    if(pos1 != sitePingCountMap.end())
+        sitePingCountMap.erase(pos1);
     sitePingCountMap.insert(std::make_pair(siteId, 1));
 
     //发布站点上线消息
@@ -35,6 +42,7 @@ void SiteTree::siteRegister(string& siteId, Json::Value &value) {
     ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
 }
 
+//站点注销：站点变为离线，移除站点计数
 void SiteTree::siteUnregister(string& siteId) {
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     auto pos = siteMap.find(siteId);
@@ -128,6 +136,7 @@ void SiteTree::insertQuerySiteInfo() {
     sitePingCountMap.insert(std::make_pair("site-query", 1));
 }
 
+//站点计数-1，移除离线站点计数、发布站点离线消息
 void SiteTree::pingCountDown(){
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     for(auto& elem : sitePingCountMap){
@@ -147,6 +156,8 @@ void SiteTree::pingCountDown(){
                 siteOnOffData.setValue("content", elemPos->second);
                 ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
             }
+
+            //移除离线站点的计数
             pos = sitePingCountMap.erase(pos);
         }
     }

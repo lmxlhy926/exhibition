@@ -23,7 +23,7 @@ using namespace servicesite;
 
 
 int main(int argc, char* argv[]){
-    httplib::ThreadPool threadPool_(5);
+    httplib::ThreadPool threadPool_(20);
     std::atomic<bool> http_server_thread_end(false);
 
     // 创建 serviceSiteManager 对象, 单例
@@ -54,8 +54,8 @@ int main(int argc, char* argv[]){
 
     //站点查询服务
     serviceSiteManager->registerServiceRequestHandler(Site_Query_Service_ID,
-                                                      [](const Request& request, Response& response) -> int{
-        return site_query_service_handler(request, response);
+                                                      [&threadPool_](const Request& request, Response& response) -> int{
+        return site_query_service_handler(request, response, threadPool_);
     });
 
 

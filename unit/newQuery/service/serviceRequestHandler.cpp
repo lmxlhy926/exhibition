@@ -35,7 +35,7 @@ void mdnsServiceStart(){
         hostname = hostname_buffer;
 
     string service = "edgeai.site-query._tcp.local.";
-    int service_port = 45544;
+    int service_port = 9000;
     while(service_mdns(hostname.c_str(), service.c_str(), service_port) == -1){
         LOG_RED << "failed to start mdnsService, start again in 3 seconds.....";
         std::this_thread::sleep_for(std::chrono::seconds(3));
@@ -77,12 +77,12 @@ int site_unRegister_service_handler(const Request& request, Response& response){
 
 
 //站点查询
-int site_query_service_handler(const Request& request, Response& response){
+int site_query_service_handler(const Request& request, Response& response, httplib::ThreadPool& threadPool){
     qlibc::QData reqData(request.body);
     LOG_INFO << "site_query_service_handler: " << reqData.toJsonString();
     string site_id = reqData.getData("request").getString("site_id");
 
-    //如果本机存在，则发布
+    //发布本机站点
     if(SiteTree::getInstance()->isSiteExist(site_id)){
         qlibc::QData siteInfo = SiteTree::getInstance()->getSiteInfo(site_id);
         qlibc::QData content, publishData;
@@ -95,12 +95,14 @@ int site_query_service_handler(const Request& request, Response& response){
     }
 
     //查询其它面板站点消息
-    string siteMdnsName = "_edgeai." + site_id + "._tcp." + "local.";
-    mdns_query_t query[1];
-    query[0].name = siteMdnsName.c_str();
-    query[0].length = strlen(query[0].name);
-    query[0].type = MDNS_RECORDTYPE_PTR;
-    send_mdns_query(query, 1);
+    threadPool.enqueue([site_id]{
+        string siteMdnsName = "_edgeai." + site_id + "._tcp." + "local.";
+        mdns_query_t query[1];
+        query[0].name = siteMdnsName.c_str();
+        query[0].length = strlen(query[0].name);
+        query[0].type = MDNS_RECORDTYPE_PTR;
+        send_mdns_query(query, 1);
+    });
 
     response.set_content(okResponse.dump(), "text/json");
     return 0;

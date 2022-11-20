@@ -56,27 +56,20 @@ int main(int argc, char* argv[]) {
 
     // 注册 Message 请求处理 handler
 //    serviceSiteManager->registerMessageHandler("scanResultMsg", message_handler);
-//    serviceSiteManager->registerMessageHandler("singleDeviceBindSuccessMsg", message_handler);
-//    serviceSiteManager->registerMessageHandler("bindEndMsg", message_handler);
-//    serviceSiteManager->registerMessageHandler("singleDeviceUnbindSuccessMsg", message_handler);
-//    serviceSiteManager->registerMessageHandler("device_state_changed", message_handler);
-//    serviceSiteManager->registerMessageHandler("site_onoffline", message_handler);
-    serviceSiteManager->registerMessageHandler("sceneMsg", message_handler);
+    serviceSiteManager->registerMessageHandler("site_onoffline", message_handler);
+    serviceSiteManager->registerMessageHandler("register2QuerySiteAgain", message_handler);
+    serviceSiteManager->registerMessageHandler("site_query_result", message_handler);
 
 
     // 订阅消息, 需要传入订阅站点的IP、端口号、消息ID列表
     int code;
     std::vector<string> messageIdList;
-//    messageIdList.push_back("scanResultMsg");                   //扫描结果
-//    messageIdList.push_back("singleDeviceBindSuccessMsg");      //单个绑定成功
-//    messageIdList.push_back("bindEndMsg");                      //全部绑定结束
-//    messageIdList.push_back("singleDeviceUnbindSuccessMsg");    //单个解绑成功
-//    messageIdList.push_back("device_state_changed");            //设备状态变更
-//    messageIdList.push_back("site_onoffline");                  //设备上下线
-    messageIdList.push_back("sceneMsg");
+    messageIdList.push_back("site_onoffline");
+    messageIdList.push_back("register2QuerySiteAgain");
+    messageIdList.push_back("site_query_result");
 
 
-    code = serviceSiteManager->subscribeMessage("127.0.0.1", 9007, messageIdList);
+    code = serviceSiteManager->subscribeMessage("127.0.0.1", 9000, messageIdList);
     if (code == ServiceSiteManager::RET_CODE_OK) {
         printf("subscribeMessage ok.\n");
     }else{

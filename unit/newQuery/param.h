@@ -30,19 +30,19 @@ static const int SceneSitePort = 9011;
 
 static const string QuerySiteID = "site_query";
 static const string QuerySiteName = "服务站点查询";
-static const int QuerySitePort = 9999;
+static const int QuerySitePort = 9000;
 
 
 //服务ID
-static const string Site_Register_Service_ID = "site_register";
-static const string Site_UnRegister_Service_ID = "site_unregister";
-static const string Site_Query_Service_ID = "site_query";
-static const string Site_Ping_Service_ID = "site_ping";
+static const string Site_Register_Service_ID = "site_register";         //站点注册
+static const string Site_UnRegister_Service_ID = "site_unregister";     //站点注销
+static const string Site_Query_Service_ID = "site_query";               //站点查询
+static const string Site_Ping_Service_ID = "site_ping";                 //站点ping
 
 //订阅消息ID
-static const string Site_OnOffLine_MessageID = "site_onoffline";
-static const string Site_RegisterAgain_MessageID = "register2QuerySiteAgain";
-static const string Site_Requery_Result_MessageID = "site_query_result";
+static const string Site_OnOffLine_MessageID = "site_onoffline";                 //站点上下线
+static const string Site_RegisterAgain_MessageID = "register2QuerySiteAgain";    //站点重新注册
+static const string Site_Requery_Result_MessageID = "site_query_result";         //站点查询结果
 
 
 #endif //EXHIBITION_PARAM_H
