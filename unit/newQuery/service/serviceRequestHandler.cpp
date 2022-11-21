@@ -82,18 +82,6 @@ int site_query_service_handler(const Request& request, Response& response, httpl
     LOG_INFO << "site_query_service_handler: " << reqData.toJsonString();
     string site_id = reqData.getData("request").getString("site_id");
 
-    //发布本机站点
-    if(SiteTree::getInstance()->isSiteExist(site_id)){
-        qlibc::QData siteInfo = SiteTree::getInstance()->getSiteInfo(site_id);
-        qlibc::QData content, publishData;
-        content.setString("site_id", site_id);
-        content.setString("ip", siteInfo.getString("ip"));
-        content.setInt("port", siteInfo.getInt("port"));
-        publishData.setString("message_id", "site_query_result");
-        publishData.putData("content", content);
-        ServiceSiteManager::getInstance()->publishMessage(Site_Requery_Result_MessageID, publishData.toJsonString());
-    }
-
     //查询其它面板站点消息
     threadPool.enqueue([site_id]{
         string siteMdnsName = "_edgeai." + site_id + "._tcp." + "local.";

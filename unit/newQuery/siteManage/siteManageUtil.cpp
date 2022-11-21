@@ -179,7 +179,6 @@ void mdnsResponseHandle(string service_instance_string, string ipString, int sit
             content.setInt("port", sitePort);
             publishData.setString("message_id", "site_query_result");
             publishData.putData("content", content);
-            LOG_INFO << publishData.toJsonString();
             ServiceSiteManager::getInstance()->publishMessage(Site_Requery_Result_MessageID, publishData.toJsonString());
         }
     }

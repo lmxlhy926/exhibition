@@ -92,22 +92,31 @@ query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry
     if (rtype == MDNS_RECORDTYPE_PTR) {
         mdns_string_t namestr = mdns_record_parse_ptr(data, size, record_offset, record_length,
                                                       namebuffer, sizeof(namebuffer));
-        printf("%.*s : %s %.*s PTR %.*s rclass 0x%x ttl %u length %d\n",
-               MDNS_STRING_FORMAT(fromaddrstr), entrytype, MDNS_STRING_FORMAT(entrystr),
-               MDNS_STRING_FORMAT(namestr), rclass, ttl, (int)record_length);
+//        printf("%.*s : %s %.*s PTR %.*s rclass 0x%x ttl %u length %d\n",
+//               MDNS_STRING_FORMAT(fromaddrstr), entrytype, MDNS_STRING_FORMAT(entrystr),
+//               MDNS_STRING_FORMAT(namestr), rclass, ttl, (int)record_length);
+        LOG_GREEN << string(fromaddrstr.str, fromaddrstr.length) << " : " << entrytype << " " << string(entrystr.str, entrystr.length)
+                  << " PTR " << string(namestr.str, namestr.length) << " rclass " << rclass << " ttl " << ttl << " length " << record_length;
+
     } else if (rtype == MDNS_RECORDTYPE_SRV) {
         mdns_record_srv_t srv = mdns_record_parse_srv(data, size, record_offset, record_length,
                                                       namebuffer, sizeof(namebuffer));
-        printf("%.*s : %s %.*s SRV %.*s priority %d weight %d port %d\n",
-               MDNS_STRING_FORMAT(fromaddrstr), entrytype, MDNS_STRING_FORMAT(entrystr),
-               MDNS_STRING_FORMAT(srv.name), srv.priority, srv.weight, srv.port);
+//        printf("%.*s : %s %.*s SRV %.*s priority %d weight %d port %d\n",
+//               MDNS_STRING_FORMAT(fromaddrstr), entrytype, MDNS_STRING_FORMAT(entrystr),
+//               MDNS_STRING_FORMAT(srv.name), srv.priority, srv.weight, srv.port);
+
+        LOG_GREEN << string(fromaddrstr.str, fromaddrstr.length) << " : " << entrytype << " " << string(entrystr.str, entrystr.length)
+                  << " SRV " << string(srv.name.str, srv.name.length) << " priority " << srv.priority << " weight " << srv.weight << " port " << srv.port;
+
 
         //处理返回的mdns请求
         mdnsResponseHandle(string(entrystr.str, entrystr.length),
                                     string(fromaddrstr.str, fromaddrstr.length),
                                     srv.port);
+    }
 
-    } else if (rtype == MDNS_RECORDTYPE_A) {
+#if 0
+    else if (rtype == MDNS_RECORDTYPE_A) {
         struct sockaddr_in addr;
         mdns_record_parse_a(data, size, record_offset, record_length, &addr);
         mdns_string_t addrstr =
@@ -140,6 +149,8 @@ query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry
                MDNS_STRING_FORMAT(fromaddrstr), entrytype, MDNS_STRING_FORMAT(entrystr), rtype,
                rclass, ttl, (int)record_length);
     }
+#endif
+
     return 0;
 }
 
@@ -821,14 +832,15 @@ send_mdns_query(mdns_query_t* query, size_t count) {
         printf("Failed to open any client sockets\n");
         return -1;
     }
-    printf("Opened %d socket%s for mDNS query\n", num_sockets, num_sockets ? "s" : "");
+//    printf("Opened %d socket%s for mDNS query\n", num_sockets, num_sockets ? "s" : "");
     LOG_GREEN << "Opened " << num_sockets << " socket" << (num_sockets ? "s" : "") <<  " for mDNS query";
 
     size_t capacity = 2048;
     void* buffer = malloc(capacity);
     void* user_data = 0;
 
-    printf("Sending mDNS query");
+//    printf("Sending mDNS query");
+    LOG_GREEN << "Sending mDNS query";
     for (size_t iq = 0; iq < count; ++iq) {
         const char* record_name = "PTR";
         if (query[iq].type == MDNS_RECORDTYPE_SRV)
@@ -839,9 +851,10 @@ send_mdns_query(mdns_query_t* query, size_t count) {
             record_name = "AAAA";
         else
             query[iq].type = MDNS_RECORDTYPE_PTR;
-        printf(" : %s %s", query[iq].name, record_name);
+//        printf(" : %s %s", query[iq].name, record_name);
+        LOG_GREEN << "                  :" << query[iq].name << " " << record_name;
     }
-    printf("\n");
+//    printf("\n");
     for (int isock = 0; isock < num_sockets; ++isock) {
         query_id[isock] =
                 mdns_multiquery_send(sockets[isock], query, count, buffer, capacity, 0);
@@ -851,7 +864,8 @@ send_mdns_query(mdns_query_t* query, size_t count) {
 
     // This is a simple implementation that loops for 5 seconds or as long as we get replies
     int res;
-    printf("Reading mDNS query replies\n");
+//    printf("Reading mDNS query replies\n");
+    LOG_GREEN << "Reading mDNS query replies";
     int records = 0;
     do {
         struct timeval timeout;
