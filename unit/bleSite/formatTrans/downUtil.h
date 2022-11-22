@@ -248,7 +248,7 @@ public:
     string getBinaryString() override{
         string prefix = getCommandPrefix();
         string stringCmd;
-        stringCmd.append(prefix).append(address).append("8202");
+        stringCmd.append(prefix).append(address).append("8203");
         if(onOff == "on"){
             stringCmd.append("01");
         }else if(onOff == "off"){
@@ -297,7 +297,7 @@ public:
         ss << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << luminanceVal;
 
         string stringCmd;
-        stringCmd.append(prefix).append(address).append("824C").append(ss.str());
+        stringCmd.append(prefix).append(address).append("824D").append(ss.str());
         stringCmd.append("00");
         stringCmd.append(transTime);
         stringCmd.append("00");
@@ -343,7 +343,7 @@ public:
         string ctlTemperatureStr = ss.str();
 
         string stringCmd;
-        stringCmd.append(prefix).append(address).append("8264");
+        stringCmd.append(prefix).append(address).append("8265");
         stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
         stringCmd.append(deleteWhiteSpace("00 00"));
         stringCmd.append("00");
