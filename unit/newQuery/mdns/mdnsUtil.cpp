@@ -188,7 +188,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
     else
         return 0;
 //    printf("Query %s %.*s\n", record_name, MDNS_STRING_FORMAT(name));
-    LOG_BLUE << "Query: " << record_name << " " << string(name.str, name.length);
+
 
 
     //判断请求的是否是注册的站点
@@ -196,6 +196,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
     smatch sm;
     bool ret = regex_match(reqDomainName, sm, regex(R"(_edgeai.(.*)._tcp.local.)"));
     if(ret) {
+        LOG_BLUE << "Query: " << record_name << " " << string(name.str, name.length);
         string siteId = sm[1].str();
         if (SiteTree::getInstance()->isSiteExist(siteId)) {
             if ((rtype == MDNS_RECORDTYPE_PTR) || (rtype == MDNS_RECORDTYPE_ANY)) {

@@ -22,18 +22,20 @@ SiteTree *SiteTree::getInstance() {
 
 //站点注册：更新siteMap, sitePingCountMap
 void SiteTree::siteRegister(string& siteId, Json::Value &value) {
-    std::lock_guard<std::recursive_mutex> lg(siteMutex);
-    //插入sieMap
-    auto pos = siteMap.find(siteId);
-    if(pos != siteMap.end())
-        siteMap.erase(pos);
-    siteMap.insert(std::make_pair(siteId, value));
+    {
+        std::lock_guard<std::recursive_mutex> lg(siteMutex);
+        //插入sieMap
+        auto pos = localSiteMap.find(siteId);
+        if(pos != localSiteMap.end())
+            localSiteMap.erase(pos);
+        localSiteMap.insert(std::make_pair(siteId, value));
 
-    //出入sitePingCountMap
-    auto pos1 = sitePingCountMap.find(siteId);
-    if(pos1 != sitePingCountMap.end())
-        sitePingCountMap.erase(pos1);
-    sitePingCountMap.insert(std::make_pair(siteId, 1));
+        //出入sitePingCountMap
+        auto pos1 = sitePingCountMap.find(siteId);
+        if(pos1 != sitePingCountMap.end())
+            sitePingCountMap.erase(pos1);
+        sitePingCountMap.insert(std::make_pair(siteId, 1));
+    }
 
     //发布站点上线消息
     qlibc::QData siteOnOffData;
@@ -44,24 +46,32 @@ void SiteTree::siteRegister(string& siteId, Json::Value &value) {
 
 //站点注销：站点变为离线，移除站点计数
 void SiteTree::siteUnregister(string& siteId) {
-    std::lock_guard<std::recursive_mutex> lg(siteMutex);
-    auto pos = siteMap.find(siteId);
-    if(pos != siteMap.end()){
-        pos->second["site_status"] = "offline";
-        sitePingCountMap.erase(siteId);
+    bool flag = false;
+    Json::Value value;
+    {
+        std::lock_guard<std::recursive_mutex> lg(siteMutex);
+        auto pos = localSiteMap.find(siteId);
+        if(pos != localSiteMap.end()){
+            pos->second["site_status"] = "offline";
+            sitePingCountMap.erase(siteId);
+            flag = true;
+            value = pos->second;
+        }
+    }
 
+    if(flag){
         //发布站点下线消息
         qlibc::QData siteOnOffData;
         siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
-        siteOnOffData.setValue("content", pos->second);
+        siteOnOffData.setValue("content", value);
         ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
     }
 }
 
 qlibc::QData SiteTree::getSiteInfo(string &siteId) {
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
-    auto pos = siteMap.find(siteId);
-    if(pos != siteMap.end()){
+    auto pos = localSiteMap.find(siteId);
+    if(pos != localSiteMap.end()){
         return qlibc::QData(pos->second);
     }
     return qlibc::QData();
@@ -69,8 +79,8 @@ qlibc::QData SiteTree::getSiteInfo(string &siteId) {
 
 bool SiteTree::isSiteExist(string &siteId) {
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
-    auto pos = siteMap.find(siteId);
-    if(pos != siteMap.end()){
+    auto pos = localSiteMap.find(siteId);
+    if(pos != localSiteMap.end()){
         if(pos->second["site_status"] == "online")
             return true;
         else
@@ -91,6 +101,26 @@ string SiteTree::getLocalIpAddress() {
    return localIp;
 }
 
+void SiteTree::updateFindSite(string& ip) {
+    {
+        std::lock_guard<std::recursive_mutex> lg(siteMutex);
+        auto pos = allMachineSite.find(ip);
+        if(pos == allMachineSite.end()){   //不存在此站点
+            allMachineSite.insert(ip);
+        }
+    }
+
+    //不是本机站点，则订阅该站点的上下线消息
+    if(ip != localIp){
+        std::vector<string> messageIdList;
+        messageIdList.push_back(Site_OnOffLine_MessageID);
+        ServiceSiteManager::subscribeMessage(ip, 9000, messageIdList);
+    }
+}
+
+qlibc::QData SiteTree::getAllLocalAreaSite() {
+    return qlibc::QData();
+}
 
 void SiteTree::initLocalIp() {
     struct ifaddrs* ifaddr = nullptr;
@@ -132,36 +162,55 @@ void SiteTree::insertQuerySiteInfo() {
     querySiteInfo["site_id"] = "site_query";
     querySiteInfo["site_status"] = "online";
     querySiteInfo["summary"] = "服务站点查询";
-    siteMap.insert(std::make_pair("site-query", querySiteInfo));
+    localSiteMap.insert(std::make_pair("site-query", querySiteInfo));
     sitePingCountMap.insert(std::make_pair("site-query", 1));
 }
 
 //站点计数-1，移除离线站点计数、发布站点离线消息
 void SiteTree::pingCountDown(){
-    std::lock_guard<std::recursive_mutex> lg(siteMutex);
-    for(auto& elem : sitePingCountMap){
-        if(elem.first != "site_query"){
-            elem.second += -1;
+    qlibc::QData offlineList;
+    {
+        std::lock_guard<std::recursive_mutex> lg(siteMutex);
+        for(auto& elem : sitePingCountMap){
+            if(elem.first != "site_query"){
+                elem.second += -1;
+            }
+        }
+
+        for(auto pos = sitePingCountMap.begin(); pos != sitePingCountMap.end();){
+            if(pos->second <= -3){
+                auto elemPos = localSiteMap.find(pos->first);
+                if(elemPos != localSiteMap.end()){
+                    elemPos->second["site_status"] = "offline";
+                    offlineList.append(elemPos->second);
+                }
+                //移除离线站点的计数
+                pos = sitePingCountMap.erase(pos);
+            }
         }
     }
 
-    for(auto pos = sitePingCountMap.begin(); pos != sitePingCountMap.end();){
-        if(pos->second <= -3){
-            auto elemPos = siteMap.find(pos->first);
-            if(elemPos != siteMap.end()){
-                elemPos->second["site_status"] = "offline";
-                //发布站点下线消息
-                qlibc::QData siteOnOffData;
-                siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
-                siteOnOffData.setValue("content", elemPos->second);
-                ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
-            }
-
-            //移除离线站点的计数
-            pos = sitePingCountMap.erase(pos);
-        }
+    //发布离线消息
+    Json::ArrayIndex size = offlineList.size();
+    for(int i = 0; i < size; ++i){
+        qlibc::QData ithData = offlineList.getArrayElement(i);
+        //发布站点下线消息
+        qlibc::QData siteOnOffData;
+        siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
+        siteOnOffData.setValue("content", ithData.asValue());
+        ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
     }
 }
+
+void SiteTree::site_query() {
+    string querySiteName = "_edgeai.site-query._tcp.local.";
+    mdns_query_t query[1];
+    query[0].name = querySiteName.c_str();
+    query[0].length = strlen(query[0].name);
+    query[0].type = MDNS_RECORDTYPE_PTR;
+    send_mdns_query(query, 1);
+}
+
 
 //处理mdns请求返回，发布站点信息
 void mdnsResponseHandle(string service_instance_string, string ipString, int sitePort){
@@ -171,6 +220,9 @@ void mdnsResponseHandle(string service_instance_string, string ipString, int sit
         string site_id = sm.str(3);
         if(regex_match(ipString, sm, regex(R"((.*):(.*))"))){
             string ip = sm.str(1);
+
+            //更新局域网发现的站点
+            SiteTree::getInstance()->updateFindSite(ipString);
 
             //构造发布消息
             qlibc::QData content, publishData;
