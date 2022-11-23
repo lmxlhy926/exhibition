@@ -20,28 +20,33 @@ using namespace std;
 
 class SiteTree{
 private:
-    std::unordered_map<string, Json::Value> localSiteMap;       //与本站点在同一主机的在线站点以及离线站点
-    std::unordered_map<string, int> sitePingCountMap;           //在线站点的ping计数，<=-3,自动清除
-    std::unordered_set<string>  allMachineSite;                 //所有站点ip
-    std::thread* pingThread;                //ping线程
-    std::thread* findMachineSiteThread;     //局域网其它站点发现线程
-    int pingInterval = 1000;
-    std::recursive_mutex siteMutex;
+    std::unordered_map<string, Json::Value> localSiteMap;           //本机站点记录
+    std::unordered_map<string, int> localSitePingCountMap;          //本机在线站点的ping计数，<=-3,自动清除
+    std::thread* localPingThread;                                   //ping线程
+    int localPingInterval = 1000;
 
+    std::unordered_set<string>  discoveredSite;                     //局域网发现的节点
+    std::unordered_map<string, Json::Value>  discoveredSiteMap;     //发现的其它站点
+    std::unordered_map<string, int> discoveredPingCountMap;         //发现站点ping计数，<=-3,自动清除
+    std::thread* discoverThread;                                    //查询局域网其它节点线程
+    int discoverPingInterval = 1000;
+
+    std::recursive_mutex siteMutex;
     std::string localIp = "127.0.0.1";
     static SiteTree* Instance;
+
     SiteTree(){
         initLocalIp();          //获取本机ip
-        insertQuerySiteInfo();  //注册查询站点
+        insertLocalQuerySiteInfo();  //注册查询站点
         //开启ping计数
-        pingThread = new thread([this]{
-            std::this_thread::sleep_for(std::chrono::seconds(pingInterval));
-            pingCountDown();
+        localPingThread = new thread([this]{
+            std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
+            localSitePingCountDown();
         });
         //开启站点查找
-        findMachineSiteThread = new thread([this]{
+        discoverThread = new thread([this]{
             site_query();
-            std::this_thread::sleep_for(std::chrono::seconds(30));
+            std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
         });
     }
 
@@ -58,11 +63,11 @@ public:
     //提取站点消息
     qlibc::QData getSiteInfo(string& siteId);
 
-    //是否存在
-    bool isSiteExist(string& siteId);
+    //判断本地站点是否存在
+    bool isLocalSiteExist(string& siteId);
 
-    //更新站点计数
-    void updateSitePingCounter(string& siteId);
+    //更新本机站点计数
+    void updateLocalSitePingCounter(string& siteId);
 
     //获取本机ip地址，如果获取网卡地址失败，则为回环口地址
     string getLocalIpAddress();
@@ -76,11 +81,11 @@ private:
     //初始化本机IP地址
      void initLocalIp();
 
-    //插入查询站点消息
-    void insertQuerySiteInfo();
+    //插入本机查询站点消息
+    void insertLocalQuerySiteInfo();
 
-    //ping计数递减
-    void pingCountDown();
+    //本机站点ping计数递减
+    void localSitePingCountDown();
 
     //查找局域网其它站点
     void site_query();

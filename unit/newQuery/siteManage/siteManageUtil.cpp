@@ -24,17 +24,17 @@ SiteTree *SiteTree::getInstance() {
 void SiteTree::siteRegister(string& siteId, Json::Value &value) {
     {
         std::lock_guard<std::recursive_mutex> lg(siteMutex);
-        //插入sieMap
+        //更新在线站点信息
         auto pos = localSiteMap.find(siteId);
         if(pos != localSiteMap.end())
             localSiteMap.erase(pos);
         localSiteMap.insert(std::make_pair(siteId, value));
 
-        //出入sitePingCountMap
-        auto pos1 = sitePingCountMap.find(siteId);
-        if(pos1 != sitePingCountMap.end())
-            sitePingCountMap.erase(pos1);
-        sitePingCountMap.insert(std::make_pair(siteId, 1));
+        //更新在线站点计数
+        auto pos1 = localSitePingCountMap.find(siteId);
+        if(pos1 != localSitePingCountMap.end())
+            localSitePingCountMap.erase(pos1);
+        localSitePingCountMap.insert(std::make_pair(siteId, 1));
     }
 
     //发布站点上线消息
@@ -44,7 +44,7 @@ void SiteTree::siteRegister(string& siteId, Json::Value &value) {
     ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
 }
 
-//站点注销：站点变为离线，移除站点计数
+//站点注销：移除离线站点、发布站点离线消息
 void SiteTree::siteUnregister(string& siteId) {
     bool flag = false;
     Json::Value value;
@@ -53,9 +53,10 @@ void SiteTree::siteUnregister(string& siteId) {
         auto pos = localSiteMap.find(siteId);
         if(pos != localSiteMap.end()){
             pos->second["site_status"] = "offline";
-            sitePingCountMap.erase(siteId);
             flag = true;
             value = pos->second;
+            localSiteMap.erase(siteId);
+            localSitePingCountMap.erase(siteId);
         }
     }
 
@@ -68,6 +69,7 @@ void SiteTree::siteUnregister(string& siteId) {
     }
 }
 
+//提取在线站点注册消息
 qlibc::QData SiteTree::getSiteInfo(string &siteId) {
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     auto pos = localSiteMap.find(siteId);
@@ -77,22 +79,22 @@ qlibc::QData SiteTree::getSiteInfo(string &siteId) {
     return qlibc::QData();
 }
 
-bool SiteTree::isSiteExist(string &siteId) {
+
+//判断本地站点是否为在线站点
+bool SiteTree::isLocalSiteExist(string &siteId) {
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     auto pos = localSiteMap.find(siteId);
     if(pos != localSiteMap.end()){
-        if(pos->second["site_status"] == "online")
-            return true;
-        else
-            return false;
+        return true;
     }
     return false;
 }
 
-void SiteTree::updateSitePingCounter(string& siteId){
+//更新本机站点计数
+void SiteTree::updateLocalSitePingCounter(string& siteId){
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
-    auto pos = sitePingCountMap.find(siteId);
-    if(pos != sitePingCountMap.end()){
+    auto pos = localSitePingCountMap.find(siteId);
+    if(pos != localSitePingCountMap.end()){
         pos->second = 1;
     }
 }
@@ -101,12 +103,15 @@ string SiteTree::getLocalIpAddress() {
    return localIp;
 }
 
+
 void SiteTree::updateFindSite(string& ip) {
     {
         std::lock_guard<std::recursive_mutex> lg(siteMutex);
-        auto pos = allMachineSite.find(ip);
-        if(pos == allMachineSite.end()){   //不存在此站点
-            allMachineSite.insert(ip);
+        auto pos = discoveredSite.find(ip);
+        if(pos == discoveredSite.end()){   //插入新发现的节点
+            if(ip != localIp){
+                discoveredSite.insert(ip);
+            }
         }
     }
 
@@ -154,7 +159,7 @@ void SiteTree::initLocalIp() {
     freeifaddrs(ifaddr);
 }
 
-void SiteTree::insertQuerySiteInfo() {
+void SiteTree::insertLocalQuerySiteInfo() {
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     Json::Value querySiteInfo;
     querySiteInfo["ip"] = localIp;
@@ -163,34 +168,35 @@ void SiteTree::insertQuerySiteInfo() {
     querySiteInfo["site_status"] = "online";
     querySiteInfo["summary"] = "服务站点查询";
     localSiteMap.insert(std::make_pair("site-query", querySiteInfo));
-    sitePingCountMap.insert(std::make_pair("site-query", 1));
+    localSitePingCountMap.insert(std::make_pair("site-query", 1));
 }
 
 //站点计数-1，移除离线站点计数、发布站点离线消息
-void SiteTree::pingCountDown(){
+void SiteTree::localSitePingCountDown(){
     qlibc::QData offlineList;
     {
         std::lock_guard<std::recursive_mutex> lg(siteMutex);
-        for(auto& elem : sitePingCountMap){
+        for(auto& elem : localSitePingCountMap){
             if(elem.first != "site_query"){
                 elem.second += -1;
             }
         }
 
-        for(auto pos = sitePingCountMap.begin(); pos != sitePingCountMap.end();){
+        for(auto pos = localSitePingCountMap.begin(); pos != localSitePingCountMap.end();){
             if(pos->second <= -3){
                 auto elemPos = localSiteMap.find(pos->first);
                 if(elemPos != localSiteMap.end()){
                     elemPos->second["site_status"] = "offline";
                     offlineList.append(elemPos->second);
+                    localSiteMap.erase(elemPos);
                 }
                 //移除离线站点的计数
-                pos = sitePingCountMap.erase(pos);
+                pos = localSitePingCountMap.erase(pos);
             }
         }
     }
 
-    //发布离线消息
+    //发布离线站点消息
     Json::ArrayIndex size = offlineList.size();
     for(int i = 0; i < size; ++i){
         qlibc::QData ithData = offlineList.getArrayElement(i);
@@ -220,9 +226,11 @@ void mdnsResponseHandle(string service_instance_string, string ipString, int sit
         string site_id = sm.str(3);
         if(regex_match(ipString, sm, regex(R"((.*):(.*))"))){
             string ip = sm.str(1);
-
-            //更新局域网发现的站点
-            SiteTree::getInstance()->updateFindSite(ipString);
+            string siteName = sm.str(3);
+            if(siteName == "site_query"){
+                //更新局域网发现的站点
+                SiteTree::getInstance()->updateFindSite(ipString);
+            }
 
             //构造发布消息
             qlibc::QData content, publishData;

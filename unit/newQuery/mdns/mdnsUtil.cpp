@@ -198,7 +198,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
     if(ret) {
         LOG_BLUE << "Query: " << record_name << " " << string(name.str, name.length);
         string siteId = sm[1].str();
-        if (SiteTree::getInstance()->isSiteExist(siteId)) {
+        if (SiteTree::getInstance()->isLocalSiteExist(siteId)) {
             if ((rtype == MDNS_RECORDTYPE_PTR) || (rtype == MDNS_RECORDTYPE_ANY)) {
                 // The PTR query was for our service (usually "<_service-name._tcp.local"), answer a PTR
                 // record reverse mapping the queried service name to our service instance name
