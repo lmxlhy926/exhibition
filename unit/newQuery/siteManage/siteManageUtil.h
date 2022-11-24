@@ -20,14 +20,17 @@ using namespace std;
 
 class SiteTree{
 private:
-    std::unordered_map<string, Json::Value> localSiteMap;           //本机站点记录
+    //<siteId, Json::Value>
+    std::unordered_map<string, Json::Value> localSiteMap;           //本机站点全记录
+    //<siteId, int>
     std::unordered_map<string, int> localSitePingCountMap;          //本机在线站点的ping计数，<=-3,自动清除
     std::thread* localPingThread;                                   //ping线程
     int localPingInterval = 1000;
 
-    std::unordered_set<string>  discoveredSite;                     //局域网发现的节点
-    std::unordered_map<string, Json::Value>  discoveredSiteMap;     //发现的其它站点
-    std::unordered_map<string, int> discoveredPingCountMap;         //发现站点ping计数，<=-3,自动清除
+    //<ip, []>
+    std::unordered_map<string, Json::Value>  discoveredSiteMap;     //局域网内发现的其它站点
+    //<ip, int>
+    std::unordered_map<string, int> discoveredPingCountMap;         //局域网内发现的站点ping计数，<=-3,自动清除
     std::thread* discoverThread;                                    //查询局域网其它节点线程
     int discoverPingInterval = 1000;
 
@@ -36,8 +39,8 @@ private:
     static SiteTree* Instance;
 
     SiteTree(){
-        initLocalIp();          //获取本机ip
-        insertLocalQuerySiteInfo();  //注册查询站点
+        initLocalIp();                  //获取本机ip
+        insertLocalQuerySiteInfo();     //注册查询站点
         //开启ping计数
         localPingThread = new thread([this]{
             std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
@@ -60,8 +63,11 @@ public:
     //站点注销
     void siteUnregister(string& siteId);
 
-    //提取站点消息
-    qlibc::QData getSiteInfo(string& siteId);
+    //提取本机指定站点消息
+    qlibc::QData getLocalSiteInfo(string& siteId);
+
+    //获取本机所有站点信息
+    qlibc::QData getAllLocalSiteInfo();
 
     //判断本地站点是否存在
     bool isLocalSiteExist(string& siteId);
@@ -73,10 +79,14 @@ public:
     string getLocalIpAddress();
 
     //更新局域网节点、订阅节点的上下线消息
-    void updateFindSite(string& ip);
+    void addNewFindSite(string& ip);
 
-    //获取局域网发现的所有站点
-    qlibc::QData getAllLocalAreaSite();
+    //更新发现节点相关站点的上下线消息
+    void updateFindSite(qlibc::QData& siteInfo);
+
+    //获取局域网内所有站点信息
+    qlibc::QData getAllNetSiteInfo();
+
 private:
     //初始化本机IP地址
      void initLocalIp();
@@ -86,6 +96,9 @@ private:
 
     //本机站点ping计数递减
     void localSitePingCountDown();
+
+    //发现站点Ping计数递减
+    void discoveredSitePingCountDown();
 
     //查找局域网其它站点
     void site_query();

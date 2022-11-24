@@ -211,7 +211,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                 // "<hostname>.<_service-name>._tcp.local."
 
                 //提取站点注册信息
-                qlibc::QData siteData = SiteTree::getInstance()->getSiteInfo(siteId);
+                qlibc::QData siteData = SiteTree::getInstance()->getLocalSiteInfo(siteId);
 
                 //构造"<hostname>.<_service-name>._tcp.local."
                 char service_instance_buffer[256] = {0};

@@ -36,6 +36,7 @@ int main(int argc, char* argv[]){
     SiteTree::getInstance();
 
     //注册本站点发布的消息
+    serviceSiteManager->registerMessageId(Node2Node_MessageID);             //节点消息通道
     serviceSiteManager->registerMessageId(Site_OnOffLine_MessageID);        //上下线消息
     serviceSiteManager->registerMessageId(Site_RegisterAgain_MessageID);    //重新注册消息
     serviceSiteManager->registerMessageId(Site_Requery_Result_MessageID);   //站点查询结果消息
@@ -58,11 +59,16 @@ int main(int argc, char* argv[]){
         return site_query_service_handler(request, response, threadPool_);
     });
 
-
     //站点心跳服务
     serviceSiteManager->registerServiceRequestHandler(Site_Ping_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return site_ping_service_handler(request, response);
+    });
+
+    //获取本面板所有站点信息
+    serviceSiteManager->registerServiceRequestHandler(Site_localAllSite_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return site_getAllLocalSiteInfo_service_handler(request, response);
     });
 
 

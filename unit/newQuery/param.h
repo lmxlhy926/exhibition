@@ -34,15 +34,16 @@ static const int QuerySitePort = 9000;
 
 
 //服务ID
-static const string Site_Register_Service_ID = "site_register";         //站点注册
-static const string Site_UnRegister_Service_ID = "site_unregister";     //站点注销
-static const string Site_Query_Service_ID = "site_query";               //站点查询
-static const string Site_Ping_Service_ID = "site_ping";                 //站点ping
+static const string Site_Register_Service_ID = "site_register";             //站点注册
+static const string Site_UnRegister_Service_ID = "site_unregister";         //站点注销
+static const string Site_Query_Service_ID = "site_query";                   //站点查询
+static const string Site_Ping_Service_ID = "site_ping";                     //站点ping
+static const string Site_localAllSite_Service_ID = "site_localAllSite";     //获取本机所有站点信息
 
 //订阅消息ID
+static const string Node2Node_MessageID = "node2node";                           //节点消息通道
 static const string Site_OnOffLine_MessageID = "site_onoffline";                 //站点上下线
 static const string Site_RegisterAgain_MessageID = "register2QuerySiteAgain";    //站点重新注册
 static const string Site_Requery_Result_MessageID = "site_query_result";         //站点查询结果
-
 
 #endif //EXHIBITION_PARAM_H

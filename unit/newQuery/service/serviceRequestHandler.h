@@ -25,7 +25,7 @@ int site_query_service_handler(const Request& request, Response& response, httpl
 int site_ping_service_handler(const Request& request, Response& response);
 
 //获取节点站点信息
-int site_getInfo_service_handler(const Request& request, Response& response);
+int site_getAllLocalSiteInfo_service_handler(const Request& request, Response& response);
 
 
 
