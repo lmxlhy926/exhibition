@@ -41,6 +41,9 @@ int main(int argc, char* argv[]){
     serviceSiteManager->registerMessageId(Site_RegisterAgain_MessageID);    //重新注册消息
     serviceSiteManager->registerMessageId(Site_Requery_Result_MessageID);   //站点查询结果消息
 
+    //注册其它查询节点发布消息处理函数
+    serviceSiteManager->registerMessageHandler( Node2Node_MessageID, site_query_node2node_message_handler);
+
     //站点注册服务
     serviceSiteManager->registerServiceRequestHandler(Site_Register_Service_ID,
                                                       [](const Request& request, Response& response) -> int{

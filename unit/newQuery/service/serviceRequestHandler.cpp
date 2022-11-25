@@ -42,6 +42,14 @@ void mdnsServiceStart(){
     }
 }
 
+void site_query_node2node_message_handler(const Request& request){
+    qlibc::QData reqData(request.body);
+    //更新发现站点列表
+    SiteTree::getInstance()->updateFindSite(reqData);
+    //发布消息
+    ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, reqData.toJsonString());
+}
+
 //站点注册
 int site_register_service_handler(const Request& request, Response& response){
     qlibc::QData reqData(request.body);

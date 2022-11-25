@@ -153,14 +153,41 @@ void SiteTree::addNewFindSite(string& ip) {
 
 //更新发现站点的信息
 void SiteTree::updateFindSite(qlibc::QData& siteInfo){
-
     //判断属于哪个节点
+    string site_id = siteInfo.getString("site_id");
+    string siteIp = siteInfo.getString("ip");
+    string onoffline = siteInfo.getString("site_status");
 
+    //找到信息所属的节点
+    auto pos = discoveredSiteMap.find(siteIp);
+    if(pos != discoveredSiteMap.end()){
+        Json::Value list = pos->second;
+        Json::ArrayIndex size = list.size();
+        Json::ArrayIndex deleIndex = -1;
+        for(Json::ArrayIndex i = 0; i < size; ++i){
+            if(onoffline =="offline" && list[i]["site_id"] == site_id){
+                deleIndex = i;
+                break;
+            }
 
-    //增加上线站点
+            //已有上线站点不处理
+            if(onoffline =="online" && list[i]["site_id"] == site_id){
+                return;
+            }
 
+            //增加上线站点
+            if(onoffline == "online" && i == size -1){
+                pos->second.append(siteInfo.asValue());
+                return;
+            }
+        }
 
-    //删除离线站点
+        //删除离线站点
+        if(deleIndex != -1){
+            Json::Value removeValue;
+            pos->second.removeIndex(deleIndex, &removeValue);
+        }
+    }
 }
 
 

@@ -12,6 +12,9 @@ using namespace httplib;
 //开启mdns服务
 void mdnsServiceStart();
 
+//查询节点之间的消息处理函数
+void site_query_node2node_message_handler(const Request& request);
+
 //站点注册
 int site_register_service_handler(const Request& request, Response& response);
 
@@ -26,7 +29,6 @@ int site_ping_service_handler(const Request& request, Response& response);
 
 //获取节点站点信息
 int site_getAllLocalSiteInfo_service_handler(const Request& request, Response& response);
-
 
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H
