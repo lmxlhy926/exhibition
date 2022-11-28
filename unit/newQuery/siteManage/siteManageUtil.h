@@ -9,6 +9,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <unordered_set>
+#include <atomic>
 #include "qlibc/QData.h"
 #include <ifaddrs.h>
 #include <net/if.h>
@@ -27,7 +28,7 @@ private:
     std::thread* localPingThread;                                   //ping线程
     int localPingInterval = 1000;
 
-    //<ip, []>
+    //<节点ip, [所有节点包含的站点信息]>
     std::unordered_map<string, Json::Value>  discoveredSiteMap;     //局域网内发现的其它站点
     //<ip, int>
     std::unordered_map<string, int> discoveredPingCountMap;         //局域网内发现的站点ping计数，<=-3,自动清除
@@ -35,12 +36,21 @@ private:
     int discoverPingInterval = 1000;
 
     std::recursive_mutex siteMutex;
+    std::atomic<bool> ipConfirm{false};
     std::string localIp = "127.0.0.1";
+    std::unordered_set<string> ipSet;
+
     static SiteTree* Instance;
 
-    SiteTree(){
-        initLocalIp();                  //获取本机ip
-        insertLocalQuerySiteInfo();     //注册查询站点
+public:
+    //获取单例对象
+    static SiteTree* getInstance();
+
+    void init(){
+        initLocalIp();     //获取本机所有IP
+        site_query();      //通过返回确定本机有效IP
+        insertLocalQuerySiteInfo();     //确定有效IP后，注册查询站点
+
         //开启ping计数
         localPingThread = new thread([this]{
             std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
@@ -48,14 +58,11 @@ private:
         });
         //开启站点查找
         discoverThread = new thread([this]{
-            site_query();
             std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
+            site_query();
         });
-    }
 
-public:
-    //获取单例对象
-    static SiteTree* getInstance();
+    }
 
     //站点注册
     void siteRegister(string& siteId, Json::Value& value);
@@ -67,13 +74,16 @@ public:
     qlibc::QData getLocalSiteInfo(string& siteId);
 
     //获取本机所有站点信息
-    qlibc::QData getAllLocalSiteInfo();
+    qlibc::QData getLocalSiteInfo();
 
     //判断本地站点是否存在
     bool isLocalSiteExist(string& siteId);
 
     //更新本机站点计数
     void updateLocalSitePingCounter(string& siteId);
+
+    //确定本机使用的IP地址
+    void confirmIp(string& ip);
 
     //获取本机ip地址，如果获取网卡地址失败，则为回环口地址
     string getLocalIpAddress();
@@ -85,7 +95,7 @@ public:
     void updateFindSite(qlibc::QData& siteInfo);
 
     //获取局域网内所有站点信息
-    qlibc::QData getAllNetSiteInfo();
+    qlibc::QData getLocalAreaSite();
 
 private:
     //初始化本机IP地址

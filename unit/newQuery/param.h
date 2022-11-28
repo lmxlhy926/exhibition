@@ -38,7 +38,9 @@ static const string Site_Register_Service_ID = "site_register";             //�
 static const string Site_UnRegister_Service_ID = "site_unregister";         //站点注销
 static const string Site_Query_Service_ID = "site_query";                   //站点查询
 static const string Site_Ping_Service_ID = "site_ping";                     //站点ping
-static const string Site_localAllSite_Service_ID = "site_localAllSite";     //获取本机所有站点信息
+static const string Site_localSite_Service_ID = "site_localSite";           //获取本机站点
+static const string Site_localAreaSite_Service_ID = "site_localAreaNetworkSite";   //获取局域网发现的所有站点
+
 
 //订阅消息ID
 static const string Node2Node_MessageID = "node2node";                           //节点消息通道

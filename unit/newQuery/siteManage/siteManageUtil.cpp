@@ -88,11 +88,11 @@ qlibc::QData SiteTree::getLocalSiteInfo(string &siteId) {
     return qlibc::QData();
 }
 
-qlibc::QData SiteTree::getAllLocalSiteInfo() {
+qlibc::QData SiteTree::getLocalSiteInfo() {
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     qlibc::QData data;
     for(auto& elem : localSiteMap){
-        data.append(qlibc::QData().append(elem.second));
+        data.append(elem.second);
     }
     return data;
 }
@@ -116,16 +116,40 @@ void SiteTree::updateLocalSitePingCounter(string& siteId){
     }
 }
 
+
+//取本机IP中有回复的作为本机IP
+void SiteTree::confirmIp(string& ip){
+    if(!ipConfirm.load()){
+        std::lock_guard<std::recursive_mutex> lg(siteMutex);
+        auto pos = ipSet.find(ip);
+        if(pos != ipSet.end()){
+            localIp = ip;
+            LOG_PURPLE << "localIp: " << ip;
+            ipConfirm.store(true);
+        }
+    }
+}
+
 string SiteTree::getLocalIpAddress() {
    return localIp;
 }
 
 
 void SiteTree::addNewFindSite(string& ip) {
-    if(ip != localIp){
-        //获取发现节点的站点信息
+    bool flag;
+    {
+        std::lock_guard<std::recursive_mutex> lg(siteMutex);
+        auto pos = ipSet.find(ip);
+        if(pos == ipSet.end()){
+            flag = true;
+        }
+    }
+
+    //只处理非本机IP地址的节点
+    if(flag){
+        //有则更新，无则添加
         qlibc::QData request, response;
-        request.setString("service_id", Site_localAllSite_Service_ID);
+        request.setString("service_id", Site_localSite_Service_ID);
         request.putData("request", qlibc::QData());
         if(httpUtil::sitePostRequest(ip, 9000, request, response)){
             {
@@ -143,7 +167,7 @@ void SiteTree::addNewFindSite(string& ip) {
                 discoveredPingCountMap.insert(std::make_pair(ip, 1));
             }
 
-            //订阅节点消息通道
+            //订阅节点消息通道，重复订阅也没有关系
             std::vector<string> messageIdList;
             messageIdList.push_back(Node2Node_MessageID);
             ServiceSiteManager::subscribeMessage(ip, 9000, messageIdList);
@@ -151,7 +175,12 @@ void SiteTree::addNewFindSite(string& ip) {
     }
 }
 
-//更新发现站点的信息
+/*
+ * 更新站点节点下挂的站点信息
+ *      1. 删除下线站点
+ *      2. 忽略本来在线的站点
+ *      3. 增加新上线的站点
+ */
 void SiteTree::updateFindSite(qlibc::QData& siteInfo){
     //判断属于哪个节点
     string site_id = siteInfo.getString("site_id");
@@ -164,6 +193,7 @@ void SiteTree::updateFindSite(qlibc::QData& siteInfo){
         Json::Value list = pos->second;
         Json::ArrayIndex size = list.size();
         Json::ArrayIndex deleIndex = -1;
+
         for(Json::ArrayIndex i = 0; i < size; ++i){
             if(onoffline =="offline" && list[i]["site_id"] == site_id){
                 deleIndex = i;
@@ -191,25 +221,40 @@ void SiteTree::updateFindSite(qlibc::QData& siteInfo){
 }
 
 
-qlibc::QData SiteTree::getAllNetSiteInfo() {
-   return qlibc::QData();
+qlibc::QData SiteTree::getLocalAreaSite() {
+    std::lock_guard<std::recursive_mutex> lg(siteMutex);
+    qlibc::QData retData;
+
+    qlibc::QData localData;
+    for(auto& elem : localSiteMap){
+        localData.append(elem.second);
+    }
+    retData.putData(localIp, localData);
+
+    for(auto& elem : discoveredSiteMap){
+        retData.setValue(elem.first, elem.second);
+    }
+
+   return retData;
 }
 
 void SiteTree::initLocalIp() {
+    int sockets[32];
+    int max_sockets = sizeof(sockets) / sizeof(sockets[0]);
+    int num_sockets = 0;
+
     struct ifaddrs* ifaddr = nullptr;
     struct ifaddrs* ifa = nullptr;
-
-    //获取本机所有网卡的网卡地址
+    //获取所有网卡的网卡地址
     if (getifaddrs(&ifaddr) < 0){
-        printf("Unable to get interface addresses, return loopback address...\n");
+        LOG_RED << "Unable to get interface addresses...";
         return;
     }
 
-    char buffer[128];
     for (ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
         if (!ifa->ifa_addr)  //网卡地址存在
             continue;
-        if (!(ifa->ifa_flags & IFF_UP))  //网口有效
+        if (!(ifa->ifa_flags & IFF_UP) || !(ifa->ifa_flags & IFF_MULTICAST))        //接口启用、支持组播
             continue;
         if ((ifa->ifa_flags & IFF_LOOPBACK) || (ifa->ifa_flags & IFF_POINTOPOINT))  //不是回环口地址、不是点对点网络
             continue;
@@ -217,13 +262,29 @@ void SiteTree::initLocalIp() {
         if (ifa->ifa_addr->sa_family == AF_INET) {
             struct sockaddr_in* saddr = (struct sockaddr_in*)ifa->ifa_addr;
             if (saddr->sin_addr.s_addr != htonl(INADDR_LOOPBACK)) {  //不是回环口地址
-                mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer),
-                                                            saddr,sizeof(struct sockaddr_in));
-                localIp = string(addr.str, addr.length);
-                break;
+                int log_addr = 0;
+                if (num_sockets < max_sockets) {
+                    saddr->sin_port = htons(0);      //分配端口号
+                    int sock = mdns_socket_open_ipv4(saddr);     //创建socket, 绑定该地址
+                    if (sock >= 0) {
+                        num_sockets++;
+                        mdns_socket_close(sock);
+                        log_addr = 1;
+                    } else {
+                        log_addr = 0;
+                    }
+                }
+                if (log_addr) {     //打印查询到的每个ipv4地址
+                    char buffer[128];
+                    mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer), saddr,
+                                                                sizeof(struct sockaddr_in));
+                    LOG_INFO << "initLocalIp Finded Local IPv4 address: " << string(addr.str);
+                    ipSet.insert(string(addr.str));
+                }
             }
         }
     }
+
     freeifaddrs(ifaddr);
 }
 
@@ -235,11 +296,11 @@ void SiteTree::insertLocalQuerySiteInfo() {
     querySiteInfo["site_id"] = "site_query";
     querySiteInfo["site_status"] = "online";
     querySiteInfo["summary"] = "服务站点查询";
-    localSiteMap.insert(std::make_pair("site-query", querySiteInfo));
-    localSitePingCountMap.insert(std::make_pair("site-query", 1));
+    localSiteMap.insert(std::make_pair("site_query", querySiteInfo));
+    localSitePingCountMap.insert(std::make_pair("site_query", 1));
 }
 
-//站点计数-1，移除离线站点计数、发布站点离线消息
+//站点计数-1，移除离线站点计数、发布站点离线消息，通过节点通道发送该消息
 void SiteTree::localSitePingCountDown(){
     qlibc::QData offlineList;
     {
@@ -260,6 +321,8 @@ void SiteTree::localSitePingCountDown(){
                 }
                 //移除离线站点的计数
                 pos = localSitePingCountMap.erase(pos);
+            }else{
+                pos++;
             }
         }
     }
@@ -281,7 +344,9 @@ void SiteTree::localSitePingCountDown(){
     }
 }
 
-
+/*
+ *  先前发现的站点连续3次都没有发现
+ */
 void SiteTree::discoveredSitePingCountDown(){
     qlibc::QData offLineData;
     {
@@ -299,6 +364,8 @@ void SiteTree::discoveredSitePingCountDown(){
                 }
                 //移除离线站点的计数
                 pos = discoveredPingCountMap.erase(pos);
+            }else{
+                pos++;
             }
         }
     }
@@ -322,7 +389,7 @@ void SiteTree::discoveredSitePingCountDown(){
 
 
 void SiteTree::site_query() {
-    string querySiteName = "_edgeai.site-query._tcp.local.";
+    string querySiteName = "_edgeai.site_query._tcp.local.";
     mdns_query_t query[1];
     query[0].name = querySiteName.c_str();
     query[0].length = strlen(query[0].name);
@@ -338,12 +405,14 @@ void mdnsResponseHandle(string service_instance_string, string ipString, int sit
     bool matchRet = regex_match(service_instance_string, sm, regex("(.*)[.](.*)[.](.*)[.](.*)[.](.*)[.]"));
     if(matchRet){
         string site_id = sm.str(3);
-        if(regex_match(ipString, sm, regex(R"((.*):(.*))"))){
-            string ip = sm.str(1);
-            string siteName = sm.str(3);
-            if(siteName == "site_query"){
+        smatch ipSm;
+        if(regex_match(ipString, ipSm, regex("(.*):(.*)"))){
+            string ip = ipSm.str(1);
+            if(site_id == "site_query"){
+                //确定本机有效的IP地址
+                SiteTree::getInstance()->confirmIp(ip);
                 //更新局域网发现的站点
-                SiteTree::getInstance()->addNewFindSite(ipString);
+                SiteTree::getInstance()->addNewFindSite(ip);
             }
 
             //构造发布消息

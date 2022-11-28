@@ -167,6 +167,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
     const char dns_sd[] = "_services._dns-sd._udp.local.";
     const service_t* service = (const service_t*)user_data;
 
+    //不回复本机自己的请求
     mdns_string_t fromaddrstr = ip_address_to_string(addrbuffer, sizeof(addrbuffer), from, addrlen);
 
     size_t offset = name_offset;
@@ -189,8 +190,6 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
         return 0;
 //    printf("Query %s %.*s\n", record_name, MDNS_STRING_FORMAT(name));
 
-
-
     //判断请求的是否是注册的站点
     string reqDomainName = string(name.str, name.length);
     smatch sm;
@@ -198,7 +197,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
     if(ret) {
         LOG_BLUE << "Query: " << record_name << " " << string(name.str, name.length);
         string siteId = sm[1].str();
-        if (SiteTree::getInstance()->isLocalSiteExist(siteId)) {
+        if (siteId == "site_query" || SiteTree::getInstance()->isLocalSiteExist(siteId)) {
             if ((rtype == MDNS_RECORDTYPE_PTR) || (rtype == MDNS_RECORDTYPE_ANY)) {
                 // The PTR query was for our service (usually "<_service-name._tcp.local"), answer a PTR
                 // record reverse mapping the queried service name to our service instance name
@@ -668,7 +667,8 @@ open_client_sockets(int* sockets, int max_sockets, int port) {
                     char buffer[128];
                     mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer), saddr,
                                                                 sizeof(struct sockaddr_in));
-                    printf("Local IPv4 address: %.*s\n", MDNS_STRING_FORMAT(addr));
+//                    printf("...Local IPv4 address: %.*s\n", MDNS_STRING_FORMAT(addr));
+                    LOG_INFO << "......Local IPv4 address: " << string(addr.str);
                 }
             }
         } else if (ifa->ifa_addr->sa_family == AF_INET6) {
@@ -870,7 +870,7 @@ send_mdns_query(mdns_query_t* query, size_t count) {
     int records = 0;
     do {
         struct timeval timeout;
-        timeout.tv_sec = 5;
+        timeout.tv_sec = 2;
         timeout.tv_usec = 0;
 
         int nfds = 0;

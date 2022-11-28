@@ -31,9 +31,14 @@ int main(int argc, char* argv[]){
     serviceSiteManager->setServerPort(QuerySitePort);
     serviceSiteManager->setSiteIdSummary(QuerySiteID, QuerySiteName);
 
+    //开启mdns服务器，接受查询
+    threadPool_.enqueue([]{
+        mdnsServiceStart();
+    });
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     //获取单例对象
-    SiteTree::getInstance();
+    SiteTree::getInstance()->init();
 
     //注册本站点发布的消息
     serviceSiteManager->registerMessageId(Node2Node_MessageID);             //节点消息通道
@@ -68,16 +73,16 @@ int main(int argc, char* argv[]){
         return site_ping_service_handler(request, response);
     });
 
-    //获取本面板所有站点信息
-    serviceSiteManager->registerServiceRequestHandler(Site_localAllSite_Service_ID,
+    //获取本地站点信息
+    serviceSiteManager->registerServiceRequestHandler(Site_localSite_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
-        return site_getAllLocalSiteInfo_service_handler(request, response);
+        return site_getLocalSiteInfo_service_handler(request, response);
     });
 
-
-    //开启mdns服务器，接受查询
-    threadPool_.enqueue([]{
-        mdnsServiceStart();
+    //获取局域网内所有节点信息
+    serviceSiteManager->registerServiceRequestHandler(Site_localAreaSite_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return site_getLocalAreaNetworkSiteInfo_service_handler(request, response);
     });
 
 

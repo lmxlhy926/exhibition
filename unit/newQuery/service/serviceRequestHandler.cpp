@@ -34,7 +34,7 @@ void mdnsServiceStart(){
     if (gethostname(hostname_buffer, hostname_size) == 0)
         hostname = hostname_buffer;
 
-    string service = "edgeai.site-query._tcp.local.";
+    string service = "edgeai.site_query._tcp.local.";
     int service_port = 9000;
     while(service_mdns(hostname.c_str(), service.c_str(), service_port) == -1){
         LOG_RED << "failed to start mdnsService, start again in 3 seconds.....";
@@ -44,10 +44,13 @@ void mdnsServiceStart(){
 
 void site_query_node2node_message_handler(const Request& request){
     qlibc::QData reqData(request.body);
+    LOG_INFO << "==>node2node_message: " << reqData.toJsonString();
+
+    qlibc::QData content = reqData.getData("content");
     //更新发现站点列表
-    SiteTree::getInstance()->updateFindSite(reqData);
+    SiteTree::getInstance()->updateFindSite(content);
     //发布消息
-    ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, reqData.toJsonString());
+    ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, content.toJsonString());
 }
 
 //站点注册
@@ -113,9 +116,16 @@ int site_ping_service_handler(const Request& request, Response& response){
     return 0;
 }
 
-int site_getAllLocalSiteInfo_service_handler(const Request& request, Response& response){
+int site_getLocalSiteInfo_service_handler(const Request& request, Response& response){
     qlibc::QData reqData(request.body);
     LOG_INFO  << "site_getInfo_service_handler: " << reqData.toJsonString();
-    response.set_content(SiteTree::getInstance()->getAllLocalSiteInfo().toJsonString(), "text/json");
+    response.set_content(SiteTree::getInstance()->getLocalSiteInfo().toJsonString(), "text/json");
+    return 0;
+}
+
+int site_getLocalAreaNetworkSiteInfo_service_handler(const Request& request, Response& response){
+    qlibc::QData reqData(request.body);
+    LOG_INFO  << "site_getLocalAreaNetworkSiteInfo_service_handler: " << reqData.toJsonString();
+    response.set_content(SiteTree::getInstance()->getLocalAreaSite().toJsonString(), "text/json");
     return 0;
 }
