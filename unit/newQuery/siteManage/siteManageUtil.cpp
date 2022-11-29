@@ -145,7 +145,7 @@ void SiteTree::addNewFindSite(string& ip) {
     }
 
     //只处理非本机IP地址的节点
-    if(flag){
+    if(flag && initComplete.load()){
         //有则更新，无则添加
         qlibc::QData request, response;
         request.setString("service_id", Site_localSite_Service_ID);
@@ -156,6 +156,9 @@ void SiteTree::addNewFindSite(string& ip) {
                 auto pos = discoveredSiteMap.find(ip);
                 if(pos != discoveredSiteMap.end()){
                     discoveredSiteMap.erase(ip);
+                }else{  //为新增节点，要发布节点上线消息
+                    qlibc::QData siteList = response.getData("response").getData("siteList");
+                    publishOnOffLineMessage(siteList, "online", false);
                 }
                 discoveredSiteMap.insert(std::make_pair(ip, response.getData("response").getData("siteList").asValue()));
 
@@ -336,7 +339,6 @@ void SiteTree::localSitePingCountDown(){
             if(pos->second <= -3){
                 auto elemPos = localSiteMap.find(pos->first);
                 if(elemPos != localSiteMap.end()){
-                    elemPos->second["site_status"] = "offline";
                     offlineList.append(elemPos->second);
                     localSiteMap.erase(elemPos);
                 }
@@ -349,19 +351,7 @@ void SiteTree::localSitePingCountDown(){
     }
 
     //发布离线站点消息
-    Json::ArrayIndex size = offlineList.size();
-    for(int i = 0; i < size; ++i){
-        qlibc::QData ithData = offlineList.getArrayElement(i);
-        //发布站点下线消息
-        qlibc::QData siteOnOffData;
-        siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
-        siteOnOffData.setValue("content", ithData.asValue());
-        ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
-
-        //向节点传送站点下线消息
-        siteOnOffData.setString("message_id", Node2Node_MessageID);
-        ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
-    }
+    publishOnOffLineMessage(offlineList, "offline", true);
 }
 
 /*
@@ -394,16 +384,7 @@ void SiteTree::discoveredSitePingCountDown(){
     Json::Value::Members keys = offLineData.getMemberNames();
     for(auto& key : keys){
         qlibc::QData offList = offLineData.getData(key);
-        Json::ArrayIndex offListSize = offList.size();
-        for(int i = 0; i < offListSize; i++){
-            qlibc::QData ithData = offList.getArrayElement(i);
-            ithData.setString("site_status", "offline");
-            //发布站点下线消息
-            qlibc::QData siteOnOffData;
-            siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
-            siteOnOffData.setValue("content", ithData.asValue());
-            ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
-        }
+        publishOnOffLineMessage(offList, "offline", false);
     }
 }
 
@@ -415,6 +396,24 @@ void SiteTree::site_query() {
     query[0].length = strlen(query[0].name);
     query[0].type = MDNS_RECORDTYPE_PTR;
     send_mdns_query(query, 1);
+}
+
+void SiteTree::publishOnOffLineMessage(qlibc::QData& siteList, string onOffLine, bool is2Node){
+    Json::ArrayIndex offListSize = siteList.size();
+    for(int i = 0; i < offListSize; i++){
+        qlibc::QData ithData = siteList.getArrayElement(i);
+        ithData.setString("site_status", onOffLine);
+        qlibc::QData siteOnOffData;
+        siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
+        siteOnOffData.setValue("content", ithData.asValue());
+        ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
+        LOG_RED << "onoff: " << siteOnOffData.toJsonString();
+
+        if(is2Node){
+            siteOnOffData.setString("message_id", Node2Node_MessageID);
+            ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
+        }
+    }
 }
 
 

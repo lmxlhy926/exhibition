@@ -53,11 +53,12 @@ void mdnsServiceStart(){
 void site_query_node2node_message_handler(const Request& request){
     qlibc::QData reqData(request.body);
     LOG_INFO << "==>node2node_message: " << reqData.toJsonString();
+    reqData.setString("message_id", Site_OnOffLine_MessageID);
     qlibc::QData content = reqData.getData("content");
     //更新发现节点下挂的站点信息
     SiteTree::getInstance()->updateFindSite(content);
     //发布其它节点站点的上下线消息
-    ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, content.toJsonString());
+    ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, reqData.toJsonString());
 }
 
 //站点注册
@@ -125,7 +126,7 @@ int site_ping_service_handler(const Request& request, Response& response){
 
 int site_getLocalSiteInfo_service_handler(const Request& request, Response& response){
     qlibc::QData reqData(request.body);
-    LOG_INFO  << "site_getInfo_service_handler: " << reqData.toJsonString();
+    LOG_INFO  << "site_getLocalSiteInfo_service_handler: " << reqData.toJsonString();
     string site_id = reqData.getData("request").getString("site_id");
     qlibc::QData siteList;
     siteList.putData("siteList", SiteTree::getInstance()->getLocalSiteInfo(site_id));

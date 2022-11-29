@@ -33,7 +33,7 @@ private:
     //<siteId, int>
     std::unordered_map<string, int> localSitePingCountMap;          // 本机在线站点的ping计数，<=-3,自动清除
     std::thread* localPingThread;                                   // ping线程
-    int localPingInterval = 1000;
+    int localPingInterval = 5;
 
 //被发现的节点的维护
     //<节点ip, [所有节点包含的站点信息]>
@@ -42,12 +42,13 @@ private:
     std::unordered_map<string, int> discoveredPingCountMap;         // 局域网内发现的节点ping计数，<=-3,自动清除
     std::thread* discoverThread;                                    // 查询局域网其它节点线程
     std::thread* discoveredPingThread;                              // 发现节点ping线程
-    int discoverPingInterval = 1000;
+    int discoverPingInterval = 5;
 
-    std::recursive_mutex siteMutex;          // 保护数据结构并发操作
-    std::atomic<bool> ipConfirm{false};    // 本机有效IP地址确认标志
-    std::string localIp = "127.0.0.1";       // 默认IP地址
-    std::unordered_set<string> ipSet;        // 本机可用的ip地址集
+    std::recursive_mutex siteMutex;                // 保护数据结构并发操作
+    std::atomic<bool> ipConfirm{false};         // 本机有效IP地址确认标志
+    std::atomic<bool> initComplete{false};      //初始化完成
+    std::string localIp = "127.0.0.1";            // 默认IP地址
+    std::unordered_set<string> ipSet;             // 本机可用的ip地址集
 
     static SiteTree* Instance;
 
@@ -62,21 +63,29 @@ public:
 
         //本机站点ping计数
         localPingThread = new thread([this]{
-            std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
-            localSitePingCountDown();
+            while(true){
+                std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
+                localSitePingCountDown();
+            }
         });
 
         //开启站点查找
         discoverThread = new thread([this]{
-            std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
-            site_query();
+            while(true){
+                std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
+                site_query();
+            }
         });
 
         //发现节点ping计数
         discoveredPingThread = new thread([this]{
-            std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
-            discoveredSitePingCountDown();
+            while(true){
+                std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
+                discoveredSitePingCountDown();
+            }
         });
+
+        initComplete.store(true);
     }
 
     //站点注册
@@ -119,11 +128,14 @@ private:
     //本机站点ping计数递减
     void localSitePingCountDown();
 
-    //发现站点Ping计数递减
+    //发现站点Ping计数递减, 检测维护的节点是否下线
     void discoveredSitePingCountDown();
 
     //查找局域网其它站点
     void site_query();
+
+    //发布列表里站点的上下线消息
+    void publishOnOffLineMessage(qlibc::QData& siteList, string onOffLine, bool is2Node);
 };
 
 
