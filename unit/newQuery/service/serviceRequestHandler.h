@@ -33,5 +33,4 @@ int site_getLocalSiteInfo_service_handler(const Request& request, Response& resp
 //获取局域网内所有节点信息
 int site_getLocalAreaNetworkSiteInfo_service_handler(const Request& request, Response& response);
 
-
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

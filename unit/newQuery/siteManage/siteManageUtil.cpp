@@ -79,23 +79,22 @@ void SiteTree::siteUnregister(string& siteId) {
 }
 
 //提取在线站点注册消息
-qlibc::QData SiteTree::getLocalSiteInfo(string &siteId) {
+qlibc::QData SiteTree::getLocalSiteInfo(string& siteId) {
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
-    auto pos = localSiteMap.find(siteId);
-    if(pos != localSiteMap.end()){
-        return qlibc::QData(pos->second);
-    }
-    return qlibc::QData();
-}
-
-qlibc::QData SiteTree::getLocalSiteInfo() {
-    std::lock_guard<std::recursive_mutex> lg(siteMutex);
-    qlibc::QData data;
-    for(auto& elem : localSiteMap){
-        data.append(elem.second);
+    qlibc::QData data(Json::arrayValue);
+    if(siteId.empty()){
+        for(auto& elem : localSiteMap){
+            data.append(elem.second);
+        }
+    }else{
+        auto pos = localSiteMap.find(siteId);
+        if(pos != localSiteMap.end()){
+            data.append(pos->second);
+        }
     }
     return data;
 }
+
 
 //判断本地站点是否为在线站点
 bool SiteTree::isLocalSiteExist(string &siteId) {
@@ -158,7 +157,7 @@ void SiteTree::addNewFindSite(string& ip) {
                 if(pos != discoveredSiteMap.end()){
                     discoveredSiteMap.erase(ip);
                 }
-                discoveredSiteMap.insert(std::make_pair(ip, response.asValue()));
+                discoveredSiteMap.insert(std::make_pair(ip, response.getData("response").getData("siteList").asValue()));
 
                 auto pos1 = discoveredPingCountMap.find(ip);
                 if(pos1 != discoveredPingCountMap.end()){
@@ -221,22 +220,44 @@ void SiteTree::updateFindSite(qlibc::QData& siteInfo){
 }
 
 
-qlibc::QData SiteTree::getLocalAreaSite() {
+qlibc::QData SiteTree::getLocalAreaSite(string& siteId){
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     qlibc::QData retData;
+    if(!siteId.empty()){
+        qlibc::QData localData;
+        for(auto& elem : localSiteMap){
+            if(elem.first == siteId){
+                localData.append(elem.second);
+                retData.putData(localIp, localData);
+                break;
+            }
+        }
 
-    qlibc::QData localData;
-    for(auto& elem : localSiteMap){
-        localData.append(elem.second);
+        for(auto& elem : discoveredSiteMap){
+            Json::ArrayIndex size = elem.second.size();
+            for(Json::ArrayIndex i = 0; i < size; ++i){
+                if(elem.second[i]["site_id"] == siteId){
+                    retData.setValue(elem.first, Json::Value(qlibc::QData().append(elem.second[i]).asValue()));
+                    break;
+                }
+            }
+        }
+
+    }else{
+        qlibc::QData localData;
+        for(auto& elem : localSiteMap){
+            localData.append(elem.second);
+        }
+        retData.putData(localIp, localData);
+
+        for(auto& elem : discoveredSiteMap){
+            retData.setValue(elem.first, elem.second);
+        }
     }
-    retData.putData(localIp, localData);
 
-    for(auto& elem : discoveredSiteMap){
-        retData.setValue(elem.first, elem.second);
-    }
-
-   return retData;
+    return retData;
 }
+
 
 void SiteTree::initLocalIp() {
     int sockets[32];
@@ -339,7 +360,6 @@ void SiteTree::localSitePingCountDown(){
 
         //向节点传送站点下线消息
         siteOnOffData.setString("message_id", Node2Node_MessageID);
-        siteOnOffData.setValue("content", ithData.asValue());
         ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
     }
 }
@@ -370,7 +390,7 @@ void SiteTree::discoveredSitePingCountDown(){
         }
     }
 
-    //发布离线站点消息
+    //监测到节点掉线后，发布节点下挂的站点的离线消息
     Json::Value::Members keys = offLineData.getMemberNames();
     for(auto& key : keys){
         qlibc::QData offList = offLineData.getData(key);
@@ -398,16 +418,16 @@ void SiteTree::site_query() {
 }
 
 
-
 //处理mdns请求返回，发布站点信息
 void mdnsResponseHandle(string service_instance_string, string ipString, int sitePort){
-    smatch sm;
+    smatch sm, ipSm;
     bool matchRet = regex_match(service_instance_string, sm, regex("(.*)[.](.*)[.](.*)[.](.*)[.](.*)[.]"));
     if(matchRet){
         string site_id = sm.str(3);
-        smatch ipSm;
         if(regex_match(ipString, ipSm, regex("(.*):(.*)"))){
             string ip = ipSm.str(1);
+
+            //依据节点的查询站点回复来更新节点信息
             if(site_id == "site_query"){
                 //确定本机有效的IP地址
                 SiteTree::getInstance()->confirmIp(ip);
@@ -415,7 +435,7 @@ void mdnsResponseHandle(string service_instance_string, string ipString, int sit
                 SiteTree::getInstance()->addNewFindSite(ip);
             }
 
-            //构造发布消息
+            //发布站点发布消息
             qlibc::QData content, publishData;
             content.setString("site_id", site_id);
             content.setString("ip", ip);

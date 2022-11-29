@@ -26,6 +26,13 @@ static const nlohmann::json errResponse = {
         {"response", {}}
 };
 
+qlibc::QData successResponse(qlibc::QData& resData){
+    qlibc::QData data;
+    data.setInt("code", 0);
+    data.setString("error", "ok");
+    data.putData("response", resData);
+    return data;
+}
 
 void mdnsServiceStart(){
     string hostname = "smartHome";
@@ -34,6 +41,7 @@ void mdnsServiceStart(){
     if (gethostname(hostname_buffer, hostname_size) == 0)
         hostname = hostname_buffer;
 
+    //mdns服务器监听5353端口号，此处指定请求服务名以及返回的端口号
     string service = "edgeai.site_query._tcp.local.";
     int service_port = 9000;
     while(service_mdns(hostname.c_str(), service.c_str(), service_port) == -1){
@@ -45,11 +53,10 @@ void mdnsServiceStart(){
 void site_query_node2node_message_handler(const Request& request){
     qlibc::QData reqData(request.body);
     LOG_INFO << "==>node2node_message: " << reqData.toJsonString();
-
     qlibc::QData content = reqData.getData("content");
-    //更新发现站点列表
+    //更新发现节点下挂的站点信息
     SiteTree::getInstance()->updateFindSite(content);
-    //发布消息
+    //发布其它节点站点的上下线消息
     ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, content.toJsonString());
 }
 
@@ -87,7 +94,7 @@ int site_unRegister_service_handler(const Request& request, Response& response){
 }
 
 
-//站点查询
+//进行一次节点发现扫描
 int site_query_service_handler(const Request& request, Response& response, httplib::ThreadPool& threadPool){
     qlibc::QData reqData(request.body);
     LOG_INFO << "site_query_service_handler: " << reqData.toJsonString();
@@ -119,13 +126,18 @@ int site_ping_service_handler(const Request& request, Response& response){
 int site_getLocalSiteInfo_service_handler(const Request& request, Response& response){
     qlibc::QData reqData(request.body);
     LOG_INFO  << "site_getInfo_service_handler: " << reqData.toJsonString();
-    response.set_content(SiteTree::getInstance()->getLocalSiteInfo().toJsonString(), "text/json");
+    string site_id = reqData.getData("request").getString("site_id");
+    qlibc::QData siteList;
+    siteList.putData("siteList", SiteTree::getInstance()->getLocalSiteInfo(site_id));
+    response.set_content(successResponse(siteList).toJsonString(), "text/json");
     return 0;
 }
 
 int site_getLocalAreaNetworkSiteInfo_service_handler(const Request& request, Response& response){
     qlibc::QData reqData(request.body);
     LOG_INFO  << "site_getLocalAreaNetworkSiteInfo_service_handler: " << reqData.toJsonString();
-    response.set_content(SiteTree::getInstance()->getLocalAreaSite().toJsonString(), "text/json");
+    string site_id = reqData.getData("request").getString("site_id");
+    qlibc::QData siteList = SiteTree::getInstance()->getLocalAreaSite(site_id);
+    response.set_content(successResponse(siteList).toJsonString(), "text/json");
     return 0;
 }
