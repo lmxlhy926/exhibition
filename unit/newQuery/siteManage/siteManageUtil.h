@@ -24,6 +24,8 @@ using namespace std;
  *  维护网络中发现的其它节点
  *  供应用查询
  *  多线程调用，需要为线程安全函数
+ *  锁保护中不含耗时操作
+ *
  */
 class SiteTree{
 private:

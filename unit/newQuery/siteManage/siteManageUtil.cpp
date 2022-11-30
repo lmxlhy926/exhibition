@@ -43,10 +43,12 @@ void SiteTree::siteRegister(string& siteId, Json::Value &value) {
     siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
     siteOnOffData.setValue("content", value);
     ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
+    LOG_INFO << "Publish onoffline: " << siteOnOffData.toJsonString();
 
     //向节点传送站点上线消息
     siteOnOffData.setString("message_id", Node2Node_MessageID);
     ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
+    LOG_INFO << "Publish node2node: " << siteOnOffData.toJsonString();
 }
 
 //站点注销：移除离线站点、发布站点离线消息
@@ -71,10 +73,12 @@ void SiteTree::siteUnregister(string& siteId) {
         siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
         siteOnOffData.setValue("content", value);
         ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
+        LOG_INFO << "Publish onoffline: " << siteOnOffData.toJsonString();
 
         //向节点传送站点下线消息
         siteOnOffData.setString("message_id", Node2Node_MessageID);
         ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
+        LOG_INFO << "Publish node2node: " << siteOnOffData.toJsonString();
     }
 }
 
@@ -135,7 +139,7 @@ string SiteTree::getLocalIpAddress() {
 
 
 void SiteTree::addNewFindSite(string& ip) {
-    bool flag;
+    bool flag = false;
     {
         std::lock_guard<std::recursive_mutex> lg(siteMutex);
         auto pos = ipSet.find(ip);
@@ -151,14 +155,14 @@ void SiteTree::addNewFindSite(string& ip) {
         request.setString("service_id", Site_localSite_Service_ID);
         request.putData("request", qlibc::QData());
         if(httpUtil::sitePostRequest(ip, 9000, request, response)){
+            bool isNewNode = false;
             {
                 std::lock_guard<std::recursive_mutex> lg(siteMutex);
                 auto pos = discoveredSiteMap.find(ip);
                 if(pos != discoveredSiteMap.end()){
                     discoveredSiteMap.erase(ip);
                 }else{  //为新增节点，要发布节点上线消息
-                    qlibc::QData siteList = response.getData("response").getData("siteList");
-                    publishOnOffLineMessage(siteList, "online", false);
+                    isNewNode = true;
                 }
                 discoveredSiteMap.insert(std::make_pair(ip, response.getData("response").getData("siteList").asValue()));
 
@@ -167,6 +171,11 @@ void SiteTree::addNewFindSite(string& ip) {
                     discoveredPingCountMap.erase(pos1);
                 }
                 discoveredPingCountMap.insert(std::make_pair(ip, 1));
+            }
+            //如果是新增节点则发布上线消息
+            if(isNewNode){
+                qlibc::QData siteList = response.getData("response").getData("siteList");
+                publishOnOffLineMessage(siteList, "online", false);
             }
 
             //订阅节点消息通道，重复订阅也没有关系
@@ -184,40 +193,47 @@ void SiteTree::addNewFindSite(string& ip) {
  *      3. 增加新上线的站点
  */
 void SiteTree::updateFindSite(qlibc::QData& siteInfo){
+    LOG_INFO << "updateFindSite: " << siteInfo.toJsonString();
     //判断属于哪个节点
     string site_id = siteInfo.getString("site_id");
     string siteIp = siteInfo.getString("ip");
     string onoffline = siteInfo.getString("site_status");
 
     //找到信息所属的节点
-    auto pos = discoveredSiteMap.find(siteIp);
-    if(pos != discoveredSiteMap.end()){
-        Json::Value list = pos->second;
-        Json::ArrayIndex size = list.size();
-        Json::ArrayIndex deleIndex = -1;
+    {
+        std::lock_guard<std::recursive_mutex> lg(siteMutex);
+        auto pos = discoveredSiteMap.find(siteIp);
+        if(pos != discoveredSiteMap.end()){
+            Json::Value list = pos->second;
+            Json::ArrayIndex size = list.size();
+            Json::ArrayIndex deleIndex = -1;
 
-        for(Json::ArrayIndex i = 0; i < size; ++i){
-            if(onoffline =="offline" && list[i]["site_id"] == site_id){
-                deleIndex = i;
-                break;
+            for(Json::ArrayIndex i = 0; i < size; ++i){
+                if(onoffline =="offline" && list[i]["site_id"] == site_id){
+                    deleIndex = i;
+                    break;
+                }
+
+                //已有上线站点不处理
+                if(onoffline =="online" && list[i]["site_id"] == site_id){
+                    LOG_PURPLE << "IGNORE SITE....";
+                    return;
+                }
+
+                //增加上线站点
+                if(onoffline == "online" && i == size -1){
+                    pos->second.append(siteInfo.asValue());
+                    LOG_PURPLE << "ADD SITE: <" << siteIp << ":" << site_id << ">";
+                    return;
+                }
             }
 
-            //已有上线站点不处理
-            if(onoffline =="online" && list[i]["site_id"] == site_id){
-                return;
+            //删除离线站点
+            if(deleIndex != -1){
+                Json::Value removeValue;
+                pos->second.removeIndex(deleIndex, &removeValue);
+                LOG_PURPLE << "DEL SITE: <" << siteIp << ":" << site_id << ">";
             }
-
-            //增加上线站点
-            if(onoffline == "online" && i == size -1){
-                pos->second.append(siteInfo.asValue());
-                return;
-            }
-        }
-
-        //删除离线站点
-        if(deleIndex != -1){
-            Json::Value removeValue;
-            pos->second.removeIndex(deleIndex, &removeValue);
         }
     }
 }
@@ -326,7 +342,7 @@ void SiteTree::insertLocalQuerySiteInfo() {
 
 //站点计数-1，移除离线站点计数、发布站点离线消息，通过节点通道发送该消息
 void SiteTree::localSitePingCountDown(){
-    qlibc::QData offlineList;
+    qlibc::QData offlineList(Json::arrayValue);
     {
         std::lock_guard<std::recursive_mutex> lg(siteMutex);
         for(auto& elem : localSitePingCountMap){
@@ -407,11 +423,12 @@ void SiteTree::publishOnOffLineMessage(qlibc::QData& siteList, string onOffLine,
         siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
         siteOnOffData.setValue("content", ithData.asValue());
         ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
-        LOG_RED << "onoff: " << siteOnOffData.toJsonString();
+        LOG_INFO << "Publish onoffline: " << siteOnOffData.toJsonString();
 
         if(is2Node){
             siteOnOffData.setString("message_id", Node2Node_MessageID);
             ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
+            LOG_INFO << "Publish node2node: " << siteOnOffData.toJsonString();
         }
     }
 }

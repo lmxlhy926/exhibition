@@ -52,13 +52,14 @@ void mdnsServiceStart(){
 
 void site_query_node2node_message_handler(const Request& request){
     qlibc::QData reqData(request.body);
-    LOG_INFO << "==>node2node_message: " << reqData.toJsonString();
+    LOG_INFO << "Received node2node_message: " << reqData.toJsonString();
     reqData.setString("message_id", Site_OnOffLine_MessageID);
     qlibc::QData content = reqData.getData("content");
     //更新发现节点下挂的站点信息
     SiteTree::getInstance()->updateFindSite(content);
     //发布其它节点站点的上下线消息
     ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, reqData.toJsonString());
+    LOG_INFO << "Publish onoffline: " << reqData.toJsonString();
 }
 
 //站点注册
