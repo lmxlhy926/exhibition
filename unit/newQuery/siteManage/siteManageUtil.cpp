@@ -148,7 +148,10 @@ void SiteTree::addNewFindSite(string& ip) {
         }
     }
 
-    //只处理非本机IP地址的节点
+    /*
+     * 不处理第一次因确认本机IP接收到的返回，因此此时站点服务器尚未开启
+     * 只处理非本机IP地址的节点
+     */
     if(flag && initComplete.load()){
         //有则更新，无则添加
         qlibc::QData request, response;

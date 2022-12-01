@@ -161,14 +161,22 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                  size_t size, size_t name_offset, size_t name_length, size_t record_offset,
                  size_t record_length, void* user_data) {
     (void)sizeof(ttl);
+
     if (entry != MDNS_ENTRYTYPE_QUESTION)
         return 0;
+
+//    if (!(entry == MDNS_ENTRYTYPE_QUESTION || entry == MDNS_ENTRYTYPE_ANSWER))
+//        return 0;
 
     const char dns_sd[] = "_services._dns-sd._udp.local.";
     const service_t* service = (const service_t*)user_data;
 
-    //不回复本机自己的请求
     mdns_string_t fromaddrstr = ip_address_to_string(addrbuffer, sizeof(addrbuffer), from, addrlen);
+    string addressPortString(fromaddrstr.str, fromaddrstr.length), ipAddress;
+    smatch matchResult;
+    if(regex_match(addressPortString, matchResult, regex("(.*):(.*)"))){
+        ipAddress = matchResult.str(1);
+    }
 
     size_t offset = name_offset;
     mdns_string_t name = mdns_string_extract(data, size, &offset, namebuffer, sizeof(namebuffer));
@@ -195,8 +203,16 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
     smatch sm;
     bool ret = regex_match(reqDomainName, sm, regex(R"(_edgeai.(.*)._tcp.local.)"));
     if(ret) {
-        LOG_BLUE << "Query: " << record_name << " " << string(name.str, name.length);
         string siteId = sm[1].str();
+
+//        if(entry == MDNS_ENTRYTYPE_ANSWER && siteId == "site_query"){
+//            LOG_PURPLE << "Answer: " << record_name << " " << string(name.str, name.length);
+//            if(!ipAddress.empty())
+//                SiteTree::getInstance()->addNewFindSite(ipAddress);
+//            return 0;
+//        }
+
+        LOG_BLUE << "Query: " << record_name << " " << string(name.str, name.length);
         if (siteId == "site_query" || SiteTree::getInstance()->isLocalSiteExist(siteId)) {
             if ((rtype == MDNS_RECORDTYPE_PTR) || (rtype == MDNS_RECORDTYPE_ANY)) {
                 // The PTR query was for our service (usually "<_service-name._tcp.local"), answer a PTR
@@ -237,7 +253,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                 mdns_record_t recordSrv = service->record_srv;
                 recordSrv.name = service_instance_string;
                 recordSrv.data.srv.name = hostname_qualified_string;
-                recordSrv.data.srv.port = siteData.getInt("port");
+                recordSrv.data.srv.port = siteData.getArrayElement(0).getInt("port");
                 additional[additional_count++] = recordSrv;
 
 
@@ -1027,6 +1043,7 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
     service.txt_record[1].data.txt.key = {MDNS_STRING_CONST("other")};
     service.txt_record[1].data.txt.value = {MDNS_STRING_CONST("value")};
 
+#if 1
     // Send an announcement on startup of service
     {
 //        printf("Sending announce\n");
@@ -1045,6 +1062,7 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
             mdns_announce_multicast(sockets[isock], buffer, capacity, service.record_ptr, 0, 0,
                                     additional, additional_count);
     }
+#endif
 
     // This is a crude implementation that checks for incoming queries
     while (running) {
