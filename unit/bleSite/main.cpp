@@ -1,53 +1,38 @@
 
 #include <thread>
-#include <unistd.h>
-#include <atomic>
-#include <cstdio>
-#include <functional>
-#include <sstream>
-
-#include "siteService/nlohmann/json.hpp"
-#include "siteService/service_site_manager.h"
-
-#include "qlibc/FileUtils.h"
-#include "serviceRequestHandler.h"
 #include "parameter.h"
-#include "formatTrans/statusEvent.h"
-#include "formatTrans/bleConfig.h"
-#include "formatTrans/recvPackageParse.h"
-#include "formatTrans/downUtil.h"
-#include "logic/logicControl.h"
+#include "service/serviceRequestHandler.h"
 #include "common/httpUtil.h"
 #include "serial/telinkDongle.h"
-#include  "logic/scanListmanage.h"
+#include "formatTrans/bleConfig.h"
+#include "formatTrans/recvPackageParse.h"
+#include "formatTrans/statusEvent.h"
+#include "logic/scanListmanage.h"
+#include "logic/logicControl.h"
+#include "siteService/nlohmann/json.hpp"
+#include "siteService/service_site_manager.h"
 
 using namespace std;
 using namespace servicesite;
 using namespace httplib;
-using namespace std::placeholders;
 using json = nlohmann::json;
-
-static const string SYNERGY_SITE_ID = "BLE";
-static const string SYNERGY_SITE_ID_NAME = "BLE";
 
 int main(int argc, char* argv[]) {
 
     httplib::ThreadPool threadPool_(10);
-    std::atomic<bool> http_server_thread_end(false);
-
     //站点请求管理
     SiteRecord::getInstance()->addSite(ConfigSiteName, LocalIp, ConfigPort);
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->setServerPort(BLE_SITE_PORT);
-    serviceSiteManager->setSiteIdSummary(BLE_SITE_ID, BLE_SITE_ID_NAME);
+    ServiceSiteManager::setSiteIdSummary(BLE_SITE_ID, BLE_SITE_ID_NAME);
 
     //设置配置文件加载路径, 加载配置文件
     bleConfig* configPathPtr = bleConfig::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
-    if(argc >= 3 && string(argv[2]) == "unable"){
+    if(argc >= 3 && string(argv[2]) == "disableUpload"){
         LOG_INFO << "disableUpload...........";
         RecvPackageParse::disableUpload();
     }
@@ -62,13 +47,14 @@ int main(int argc, char* argv[]) {
     serialParam.parity = 'N';
     serialParam.baudrate = 115200;
 
+    //获取串口号、注册回调函数、循环直到打开串口
     string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
     TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
     telinkDonglePtr->registerPkgMsgFunc(RecvPackageParse::handlePackageString);
     while(true){
         if(telinkDonglePtr->openSerial(serialParam)){
             telinkDonglePtr->startReceive();
-            LOG_INFO << "===>startDongle successfully, serialName <" << serialName << ">.......";
+            LOG_PURPLE << "===>startDongle successfully, serialName <" << serialName << ">.......";
             break;
         }else{
             LOG_RED << "==>failed to open the serial<" << serialName << ">....";
@@ -230,7 +216,7 @@ int main(int argc, char* argv[]) {
                 LOG_RED << "===>bleSite startByRegister in 3 seconds....";
                 std::this_thread::sleep_for(std::chrono::seconds(3));
             }else{
-                LOG_INFO << "===>bleSite startByRegister successfully.....";
+                LOG_PURPLE << "===>bleSite startByRegister successfully.....";
                 break;
             }
         }

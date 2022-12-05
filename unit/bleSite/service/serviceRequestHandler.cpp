@@ -2,19 +2,17 @@
 // Created by 78472 on 2022/5/15.
 //
 
-#include "serviceRequestHandler.h"
-#include "siteService/nlohmann/json.hpp"
+#include "parameter.h"
 #include "qlibc/QData.h"
-#include "formatTrans/downUtil.h"
-#include "formatTrans/bleConfig.h"
-#include <regex>
-#include "log/Logging.h"
-#include "logic/logicControl.h"
+#include "common/httpUtil.h"
+#include "serial/telinkDongle.h"
 #include "logic/snAddressMap.h"
 #include "logic/groupAddressMap.h"
-#include "common/httpUtil.h"
-#include "parameter.h"
-#include "serial/telinkDongle.h"
+#include "logic/logicControl.h"
+#include "log/Logging.h"
+#include "formatTrans/bleConfig.h"
+#include "serviceRequestHandler.h"
+#include "siteService/nlohmann/json.hpp"
 
 
 static const nlohmann::json okResponse = {
@@ -31,6 +29,7 @@ static const nlohmann::json errResponse = {
 
 
 /*
+ * 单个设备控制和组设备控制，控制指令是相同的，区分是地址是设备地址还是组地址
  * 如果是单个设备控制：则需将设备mac转换为设备地址
  * 如果是组控制：因为组id就是组地址，所以无需转换
  */
@@ -99,7 +98,7 @@ int scan_device_service_handler(const Request& request, Response& response, Logi
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
     if(requestBody.type() != Json::nullValue){
-        //获取扫描结果
+        //发送扫描指令，获取扫描结果
         qlibc::QData scanDeviceArray;
         qlibc::QData emptyParam;
         lc.getScanedDevices(scanDeviceArray, emptyParam);
@@ -113,9 +112,9 @@ int scan_device_service_handler(const Request& request, Response& response, Logi
         response.set_content(retData.toJsonString(), "text/json");
 
         //结束扫描
-        qlibc::QData scanEnd;
-        scanEnd.setString("command", "scanEnd");
-        lc.parse(scanEnd);
+        qlibc::QData scanEndCmd;
+        scanEndCmd.setString("command", "scanEnd");
+        lc.parse(scanEndCmd);
     }else{
         response.set_content(errResponse.dump(), "text/json");
     }
@@ -142,6 +141,7 @@ int add_device_service_handler(const Request& request, Response& response, Logic
     return 0;
 }
 
+
 //删除设备
 int del_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
@@ -164,6 +164,7 @@ int del_device_service_handler(const Request& request, Response& response, Logic
     return 0;
 }
 
+
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
@@ -181,40 +182,6 @@ int control_device_service_handler(const Request& request, Response& response, L
     return 0;
 }
 
-
-//控制所有设备
-int control_all_service_handler(const Request& request, Response& response, LogicControl& lc){
-    qlibc::QData requestBody(request.body);
-    LOG_INFO << "==>: port: " << request.remote_port << ">>" << requestBody.toJsonString();
-    if(requestBody.type() != Json::nullValue){
-        bleConfig::getInstance()->enqueue([requestBody, &lc]{
-            qlibc::QData requestData = requestBody.getData("request");
-            string command_id = requestData.getString("command_id");
-
-            qlibc::QData cmdData;
-            cmdData.setString("command", command_id);
-            cmdData.setString("address", requestData.getString("address"));
-            cmdData.setInt("transTime", requestData.getInt("transTime"));
-            if(command_id == POWER){
-                cmdData.setString("commandPara", requestData.getString("command_para"));
-
-            }else if(command_id == LUMINANCE || command_id == COLORTEMPERATURE){
-                cmdData.setInt("commandPara", requestData.getInt("command_para"));
-
-            }else if(command_id == LUMINANCECOLORTEMPERATURE){
-                cmdData.setInt("commandParaLuminance", requestData.getInt("command_para_luminance"));
-                cmdData.setInt("commandParaColorTemperature", requestData.getInt("command_para_color_temperature"));
-            }
-
-            lc.parse(cmdData);
-        });
-
-        response.set_content(okResponse.dump(), "text/json");
-    }else{
-        response.set_content(errResponse.dump(), "text/json");
-    }
-    return 0;
-}
 
 //修改设备信息
 int device_config_service_handler(const Request& request, Response& response){
@@ -249,6 +216,7 @@ int device_config_service_handler(const Request& request, Response& response){
     return 0;
 }
 
+
 //获取设备列表
 int get_device_list_service_handler(const Request& request, Response& response){
     LOG_INFO << "==>: " << qlibc::QData(request.body).toJsonString();
@@ -259,6 +227,7 @@ int get_device_list_service_handler(const Request& request, Response& response){
     response.set_content(postData.toJsonString(), "text/json");
     return 0;
 }
+
 
 //按照指定房间获取设备列表
 int get_device_list_byRoomName_service_handler(const Request& request, Response& response){
@@ -284,6 +253,7 @@ int get_device_list_byRoomName_service_handler(const Request& request, Response&
     response.set_content(postData.toJsonString(), "text/json");
     return 0;
 }
+
 
 //获取设备状态
 int get_device_state_service_handler(const Request& request, Response& response){
@@ -321,6 +291,7 @@ int get_device_state_service_handler(const Request& request, Response& response)
     response.set_content(postData.toJsonString(), "text/json");
     return 0;
 }
+
 
 //存储设备列表
 int save_deviceList_service_handler(const Request& request, Response& response){

@@ -1,0 +1,8 @@
+add_library(bleService STATIC serviceRequestHandler.cpp)
+target_include_directories(bleService PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_link_libraries(bleService PRIVATE qlibc)
+target_link_libraries(bleService PRIVATE siteService)
+target_link_libraries(bleService PRIVATE common)
+target_link_libraries(bleService PRIVATE format)
+target_link_libraries(bleService PRIVATE log)
+target_link_libraries(bleService PRIVATE bleLogic)

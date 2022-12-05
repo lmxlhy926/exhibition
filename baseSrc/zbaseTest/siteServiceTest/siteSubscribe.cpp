@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
 
     // 注册 Message 请求处理 handler
 //    serviceSiteManager->registerMessageHandler("scanResultMsg", message_handler);
-    serviceSiteManager->registerMessageHandler("site_onoffline", message_handler);
+    serviceSiteManager->registerMessageHandler("site_query_result", message_handler);
 //    serviceSiteManager->registerMessageHandler("register2QuerySiteAgain", message_handler);
 //    serviceSiteManager->registerMessageHandler("site_query_result", message_handler);
 
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
     // 订阅消息, 需要传入订阅站点的IP、端口号、消息ID列表
     int code;
     std::vector<string> messageIdList;
-    messageIdList.push_back("site_onoffline");
+    messageIdList.push_back("site_query_result");
 //    messageIdList.push_back("register2QuerySiteAgain");
 //    messageIdList.push_back("site_query_result");
 

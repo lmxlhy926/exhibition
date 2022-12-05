@@ -22,16 +22,13 @@ int del_device_service_handler(const Request& request, Response& response, Logic
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 
-//控制所有设备
-int control_all_service_handler(const Request& request, Response& response, LogicControl& lc);
-
 //修改设备信息
 int device_config_service_handler(const Request& request, Response& response);
 
 //获取设备列表
 int get_device_list_service_handler(const Request& request, Response& response);
 
-//按照指定房间获取设备列表
+//获取指定房间的设备列表
 int get_device_list_byRoomName_service_handler(const Request& request, Response& response);
 
 //获取设备状态
