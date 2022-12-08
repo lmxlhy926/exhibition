@@ -96,13 +96,7 @@ int main(int argc, char* argv[]) {
                                                       [&lc](const Request& request, Response& response) -> int{
         return control_device_service_handler(request, response, lc);
     });
-
-    //控制所有设备
-    serviceSiteManager->registerServiceRequestHandler(Contorl_All_Device_Service_ID,
-                                                      [&lc](const Request& request, Response& response) -> int{
-        return control_all_service_handler(request, response, lc);
-    });
-
+    
     //修改设备信息
     serviceSiteManager->registerServiceRequestHandler(Config_Device_Property_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
