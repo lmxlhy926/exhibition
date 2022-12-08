@@ -265,16 +265,23 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                 LOG_BLUE << "  --> answer " << string(service->record_ptr.data.ptr.name.str, service->record_ptr.data.ptr.name.length)
                         << " " << (unicast ? "unicast" : "multicast");
 
-                if (unicast) {
-                    mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
-                                              query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
-                                              additional, additional_count);
-                } else {
-                    mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
-                                                additional, additional_count);
-                }
-            }
+//                if (unicast) {
+//                    mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
+//                                              query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
+//                                              additional, additional_count);
+//                } else {
+//                    mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
+//                                                additional, additional_count);
+//                }
 
+                mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
+                                          query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
+                                          additional, additional_count);
+                LOG_BLUE << "unicast------";
+                mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
+                                            additional, additional_count);
+                LOG_BLUE << "multicast------";
+            }
         }
     }
 

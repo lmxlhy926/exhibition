@@ -35,7 +35,7 @@ private:
     //<siteId, int>
     std::unordered_map<string, int> localSitePingCountMap;          // 本机在线站点的ping计数，<=-3,自动清除
     std::thread* localPingThread;                                   // ping线程
-    int localPingInterval = 1000;
+    int localPingInterval = 10;
 
 //被发现的节点的维护
     //<节点ip, [所有节点包含的站点信息]>
@@ -44,7 +44,7 @@ private:
     std::unordered_map<string, int> discoveredPingCountMap;         // 局域网内发现的节点ping计数，<=-3,自动清除
     std::thread* discoverThread;                                    // 查询局域网其它节点线程
     std::thread* discoveredPingThread;                              // 发现节点ping线程
-    int discoverPingInterval = 1000;
+    int discoverPingInterval = 10;
 
     std::recursive_mutex siteMutex;                // 保护数据结构并发操作
     std::atomic<bool> ipConfirm{false};         // 本机有效IP地址确认标志
