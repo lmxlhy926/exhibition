@@ -21,10 +21,16 @@ using json = nlohmann::json;
 
 int main(int argc, char* argv[]) {
 
-    if(argc != 2){
+    if(argc != 2 && argc !=3 ){
         LOG_RED << "Usage Error.....";
-        LOG_PURPLE << "Try again with the format: config <DirPath>";
+        LOG_PURPLE << "Try again with the format: [config <DirPath>], [config <DirPath> <--RK3308>]";
         return 0;
+    }
+
+    bool ISRK3308 = false;
+    if(argc == 3 && string(argv[2]) == "--RK3308"){
+        ISRK3308 = true;
+        LOG_PURPLE << "RK3308.........";
     }
 
     //. 设置线程池
@@ -41,77 +47,76 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageId(RECEIVED_WHITELIST_ID);
     serviceSiteManager->registerMessageId(WHITELIST_MODIFIED_MESSAGE_ID);
 
-
    //. 设置配置文件加载路径
     configParamUtil* configPathPtr = configParamUtil::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
-
 
     //. 初始化cloudUtil, 加载http服务器配置信息
     QData httpConfigData = configPathPtr->getCloudServerData();
     const string dataDirPath = configPathPtr->getconfigPath();
     cloudUtil::getInstance()->init(httpConfigData.getString("ip"), httpConfigData.getInt("port"), dataDirPath);
 
-    //. 开启线程，阻塞进行电视加入大白名单
-    threadPool_.enqueue([](){
-        cloudUtil::getInstance()->joinTvWhite();
-    });
-
-
-    //. 获取mqtt配置参数
-    QData mqttConfigData = configParamUtil::getInstance()->getMqttConfigData();
-    std::string mqttServer = mqttConfigData.getString("server");
-    int mqttPort = mqttConfigData.getInt("port");
-    std::string mqttUsername = mqttConfigData.getString("username");
-    std::string mqttPassword = mqttConfigData.getString("password");
-
-    //加载基础参数信息
-    QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
-    string domainID = baseInfoData.getString("domainID");
-    string clientID = domainID.empty() ?
-            "config" + std::to_string(time(nullptr)) : "config" + domainID + std::to_string(time(nullptr));
-
-    //配置mqtt客户端、设置处理回调、设置预处理回调、订阅主题
     mqttClient mc;
-    mc.paramConfig(mqttServer, mqttPort, mqttUsername, mqttPassword, clientID);
-    if(!domainID.empty()){
-        mc.subscribe("edge/" + domainID + "/device/domainWhite");
+    if(!ISRK3308){
+        //. 开启线程，阻塞进行电视加入大白名单
+        threadPool_.enqueue([](){
+            cloudUtil::getInstance()->joinTvWhite();
+        });
+
+        //. 获取mqtt配置参数
+        QData mqttConfigData = configParamUtil::getInstance()->getMqttConfigData();
+        std::string mqttServer = mqttConfigData.getString("server");
+        int mqttPort = mqttConfigData.getInt("port");
+        std::string mqttUsername = mqttConfigData.getString("username");
+        std::string mqttPassword = mqttConfigData.getString("password");
+
+        //加载基础参数信息
+        QData baseInfoData = configParamUtil::getInstance()->getBaseInfo();
+        string domainID = baseInfoData.getString("domainID");
+        string clientID = domainID.empty() ?
+                          "config" + std::to_string(time(nullptr)) : "config" + domainID + std::to_string(time(nullptr));
+
+        //配置mqtt客户端、设置处理回调、设置预处理回调、订阅主题
+        mc.paramConfig(mqttServer, mqttPort, mqttUsername, mqttPassword, clientID);
+        if(!domainID.empty()){
+            mc.subscribe("edge/" + domainID + "/device/domainWhite");
+        }
+        mc.setDefaultHandler(mqttPayloadHandle::handle);
+        mc.addDataHooker([](const std::string& topic, void *payload, int payloadLen, char* buffer, int* len)->bool{
+            const string in = string(reinterpret_cast<char *>(payload), 0, payloadLen);
+            string out;
+            const uint8_t key[] = "123456asdfgh1234";
+            lhytemp::secretUtil::ecb_decrypt_withPadding(in, out, key);
+
+            strcpy(buffer, out.data());
+            *len = static_cast<int>(out.size());
+
+            return true;
+        });
+        mc.connect();
     }
-    mc.setDefaultHandler(mqttPayloadHandle::handle);
-    mc.addDataHooker([](const std::string& topic, void *payload, int payloadLen, char* buffer, int* len)->bool{
-        const string in = string(reinterpret_cast<char *>(payload), 0, payloadLen);
-        string out;
-        const uint8_t key[] = "123456asdfgh1234";
-        lhytemp::secretUtil::ecb_decrypt_withPadding(in, out, key);
 
-        strcpy(buffer, out.data());
-        *len = static_cast<int>(out.size());
+    if(!ISRK3308){
+        //注册请求场景列表处理函数
+        serviceSiteManager->registerServiceRequestHandler(SCENELIST_REQUEST_SERVICE_ID,[&](const Request& request, Response& response)->int{
+            return sceneListRequest_service_request_handler(request, response, mc.isConnected());
+        });
 
-        return true;
-    });
-    mc.connect();
+        //注册子设备注册处理函数
+        serviceSiteManager->registerServiceRequestHandler(SUBDEVICE_REGISTER_SERVICE_ID, [&](const Request& request, Response& response)->int{
+            return subDeviceRegister_service_request_handler(request, response, mc.isConnected());
+        });
 
+        //注册获取家庭域Id处理函数
+        serviceSiteManager->registerServiceRequestHandler(DOMAINID_REQUEST_SERVICE_ID, [&](const Request& request, Response& response)->int{
+            return domainIdRequest_service_request_handler(request, response, mc.isConnected());
+        });
 
-    //注册请求场景列表处理函数
-    serviceSiteManager->registerServiceRequestHandler(SCENELIST_REQUEST_SERVICE_ID,[&](const Request& request, Response& response)->int{
-        return sceneListRequest_service_request_handler(request, response, mc.isConnected());
-    });
-
-    //注册子设备注册处理函数
-    serviceSiteManager->registerServiceRequestHandler(SUBDEVICE_REGISTER_SERVICE_ID, [&](const Request& request, Response& response)->int{
-        return subDeviceRegister_service_request_handler(request, response, mc.isConnected());
-    });
-
-    //注册获取家庭域Id处理函数
-    serviceSiteManager->registerServiceRequestHandler(DOMAINID_REQUEST_SERVICE_ID, [&](const Request& request, Response& response)->int{
-        return domainIdRequest_service_request_handler(request, response, mc.isConnected());
-    });
-
-    //注册安装师傅信息上传请求函数
-    serviceSiteManager->registerServiceRequestHandler(ENGINEER_REQUEST_SERVICE_ID,[&](const Request& request, Response& response) -> int{
-        return engineer_service_request_handler(mc, request, response);
-    });
-
+        //注册安装师傅信息上传请求函数
+        serviceSiteManager->registerServiceRequestHandler(ENGINEER_REQUEST_SERVICE_ID,[&](const Request& request, Response& response) -> int{
+            return engineer_service_request_handler(mc, request, response);
+        });
+    }
 
     //获取白名单列表
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID,whiteList_service_request_handler);

@@ -336,11 +336,11 @@ void SiteTree::insertLocalQuerySiteInfo() {
     Json::Value querySiteInfo;
     querySiteInfo["ip"] = localIp;
     querySiteInfo["port"] = 9000;
-    querySiteInfo["site_id"] = "site_query";
+    querySiteInfo["site_id"] = "site-query";
     querySiteInfo["site_status"] = "online";
     querySiteInfo["summary"] = "服务站点查询";
-    localSiteMap.insert(std::make_pair("site_query", querySiteInfo));
-    localSitePingCountMap.insert(std::make_pair("site_query", 1));
+    localSiteMap.insert(std::make_pair("site-query", querySiteInfo));
+    localSitePingCountMap.insert(std::make_pair("site-query", 1));
 }
 
 //站点计数-1，移除离线站点计数、发布站点离线消息，通过节点通道发送该消息
@@ -349,7 +349,7 @@ void SiteTree::localSitePingCountDown(){
     {
         std::lock_guard<std::recursive_mutex> lg(siteMutex);
         for(auto& elem : localSitePingCountMap){
-            if(elem.first != "site_query"){
+            if(elem.first != "site-query"){
                 elem.second += -1;
             }
         }
@@ -409,7 +409,7 @@ void SiteTree::discoveredSitePingCountDown(){
 
 
 void SiteTree::site_query() {
-    string querySiteName = "_edgeai.site_query._tcp.local.";
+    string querySiteName = "_edgeai.site-query._tcp.local.";
     mdns_query_t query[1];
     query[0].name = querySiteName.c_str();
     query[0].length = strlen(query[0].name);
@@ -447,7 +447,7 @@ void mdnsResponseHandle(string service_instance_string, string ipString, int sit
             string ip = ipSm.str(1);
 
             //依据节点的查询站点回复来更新节点信息
-            if(site_id == "site_query"){
+            if(site_id == "site-query"){
                 //确定本机有效的IP地址
                 SiteTree::getInstance()->confirmIp(ip);
                 //更新局域网发现的站点

@@ -42,7 +42,7 @@ void mdnsServiceStart(){
         hostname = hostname_buffer;
 
     //mdns服务器监听5353端口号，此处指定请求服务名以及返回的端口号
-    string service = "edgeai.site_query._tcp.local.";
+    string service = "edgeai.site-query._tcp.local.";
     int service_port = 9000;
     while(service_mdns(hostname.c_str(), service.c_str(), service_port) == -1){
         LOG_RED << "failed to start mdnsService, start again in 3 seconds.....";
