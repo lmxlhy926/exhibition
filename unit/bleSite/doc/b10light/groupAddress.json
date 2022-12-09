@@ -14,7 +14,10 @@
 			"FCA341971B30",
 			"345639971B30",
 			"533E39971B30",
-			"BFAB41971B30"
+			"BFAB41971B30",
+			"6A3E39971B30",
+			"B63039971B30",
+			"C1D455971B30"
 		],
 		"group_name" : "主卧完整组",
 		"group_use" : "light_move_site",
@@ -202,12 +205,7 @@
 	"0AC0" : 
 	{
 		"areaFullGroup" : true,
-		"device_list" : 
-		[
-			"6A3E39971B30",
-			"B63039971B30",
-			"C1D455971B30"
-		],
+		"device_list" : [],
 		"group_name" : "过道完整组",
 		"group_use" : "light_move_site",
 		"location" : 
@@ -562,6 +560,7 @@
 	},
 	"1EC0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"24D755971B30",
@@ -574,7 +573,6 @@
 			"B5E955971B30"
 		],
 		"group_name" : "厨房完整组",
-		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "厨房",
@@ -583,6 +581,7 @@
 	},
 	"1FC0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"8CAB41971B30",
@@ -601,7 +600,6 @@
 			"A8270F971B30"
 		],
 		"group_name" : "餐厅完整组",
-		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "餐厅",
@@ -610,6 +608,7 @@
 	},
 	"20C0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"1CAC41971B30",
@@ -640,7 +639,6 @@
 			"1CCC55971B30"
 		],
 		"group_name" : "客厅完整组",
-		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "客厅",

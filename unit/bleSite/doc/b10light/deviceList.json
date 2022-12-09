@@ -184,34 +184,6 @@
 			}
 		},
 		{
-			"device_id" : "6A3E39971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0AC0",
-			"group_name" : "主灯",
-			"location" : 
-			{
-				"room_name" : "过道",
-				"room_no" : "2"
-			}
-		},
-		{
-			"device_id" : "B63039971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0AC0",
-			"group_name" : "主灯",
-			"location" : 
-			{
-				"room_name" : "过道",
-				"room_no" : "2"
-			}
-		},
-		{
 			"device_id" : "593E39971B30",
 			"device_model" : "双色筒灯",
 			"device_modelCode" : "20",
@@ -316,20 +288,6 @@
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
 			"group_address" : "02C0",
-			"group_name" : "主灯",
-			"location" : 
-			{
-				"room_name" : "卫生间",
-				"room_no" : "4"
-			}
-		},
-		{
-			"device_id" : "C1D455971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0AC0",
 			"group_name" : "主灯",
 			"location" : 
 			{
@@ -1105,6 +1063,48 @@
 			{
 				"room_name" : "客厅",
 				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "6A3E39971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "主卧完整组",
+			"location" : 
+			{
+				"room_name" : "过道",
+				"room_no" : "2"
+			}
+		},
+		{
+			"device_id" : "B63039971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "主卧完整组",
+			"location" : 
+			{
+				"room_name" : "过道",
+				"room_no" : "2"
+			}
+		},
+		{
+			"device_id" : "C1D455971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "主卧完整组",
+			"location" : 
+			{
+				"room_name" : "卫生间",
+				"room_no" : "4"
 			}
 		}
 	]
