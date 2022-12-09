@@ -11,7 +11,7 @@
 static char addrbuffer[64];
 static char entrybuffer[256];
 static char namebuffer[256];
-static char sendbuffer[1024];
+static char sendbuffer[1024];   //安全
 static mdns_record_txt_t txtbuffer[128];
 
 static struct sockaddr_in service_address_ipv4;
@@ -113,17 +113,20 @@ query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry
         mdnsResponseHandle(string(entrystr.str, entrystr.length),
                                     string(fromaddrstr.str, fromaddrstr.length),
                                     srv.port);
-    }
-
-#if 0
-    else if (rtype == MDNS_RECORDTYPE_A) {
+    }else if (rtype == MDNS_RECORDTYPE_A) {
         struct sockaddr_in addr;
         mdns_record_parse_a(data, size, record_offset, record_length, &addr);
         mdns_string_t addrstr =
                 ipv4_address_to_string(namebuffer, sizeof(namebuffer), &addr, sizeof(addr));
         printf("%.*s : %s %.*s A %.*s\n", MDNS_STRING_FORMAT(fromaddrstr), entrytype,
                MDNS_STRING_FORMAT(entrystr), MDNS_STRING_FORMAT(addrstr));
-    } else if (rtype == MDNS_RECORDTYPE_AAAA) {
+        LOG_GREEN << string(fromaddrstr.str, fromaddrstr.length) << " : " << entrytype << " " << string(entrystr.str, entrystr.length)
+                  << " A " << string(addrstr.str, addrstr.length);
+    }
+
+
+#if 0
+    else if (rtype == MDNS_RECORDTYPE_AAAA) {
         struct sockaddr_in6 addr;
         mdns_record_parse_aaaa(data, size, record_offset, record_length, &addr);
         mdns_string_t addrstr =
@@ -256,6 +259,11 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                 recordSrv.data.srv.port = siteData.getArrayElement(0).getInt("port");
                 additional[additional_count++] = recordSrv;
 
+                // A/AAAA records mapping "<hostname>.local." to IPv4/IPv6 addresses
+                if (service->address_ipv4.sin_family == AF_INET){
+                    additional[additional_count++] = service->record_a;
+                }
+
 
                 // Send the answer, unicast or multicast depending on flag in query
                 uint16_t unicast = (rclass & MDNS_UNICAST_RESPONSE);
@@ -265,22 +273,16 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                 LOG_BLUE << "  --> answer " << string(service->record_ptr.data.ptr.name.str, service->record_ptr.data.ptr.name.length)
                         << " " << (unicast ? "unicast" : "multicast");
 
-//                if (unicast) {
-//                    mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
-//                                              query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
-//                                              additional, additional_count);
-//                } else {
-//                    mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
-//                                                additional, additional_count);
-//                }
-
-                mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
-                                          query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
-                                          additional, additional_count);
-                LOG_BLUE << "unicast------";
-                mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
-                                            additional, additional_count);
-                LOG_BLUE << "multicast------";
+                if (unicast) {
+                    LOG_BLUE << "unicast------";
+                    mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
+                                              query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
+                                              additional, additional_count);
+                } else {
+                    LOG_BLUE << "multicast------";
+                    mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
+                                                additional, additional_count);
+                }
             }
         }
     }
