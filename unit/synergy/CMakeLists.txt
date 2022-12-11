@@ -1,3 +1,6 @@
+
+add_subdirectory(voiceControl)
+
 FILE(GLOB mainSrc "*.cpp")
 FILE(GLOB subSrc "control/*.cpp")
 set(src ${mainSrc} ${subSrc})

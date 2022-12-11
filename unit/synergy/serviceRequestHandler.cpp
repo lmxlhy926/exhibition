@@ -52,6 +52,14 @@ namespace synergy {
             {"response", {}}
     };
 
+
+    //开关灯
+    regex voice_expr_power_on("(.*)(灯)(.*)(开)(.*)");
+    regex voice_expr_power_on_1("(.*)(开)(.*)(灯)(.*)");
+    regex voice_expr_power_off("(.*)(灯)(.*)(关)(.*)");
+    regex voice_expr_power_off_1("(.*)(关)(.*)(灯)(.*)");
+
+
     void classify(qlibc::QData &controlData, qlibc::QData &bleDeviceList, qlibc::QData &zigbeeDeviceList,
                   qlibc::QData &tvAdapterList) {
         string sourceSite = controlData.getString("sourceSite");
@@ -217,6 +225,18 @@ namespace synergy {
         data.putData("response", res);
 
         response.set_content(data.toJsonString(), "text/json");
+        return 0;
+    }
+
+
+    int voiceControl_service_handler(const Request& request, Response& response){
+        LOG_INFO << "voiceControl_service_handler";
+        qlibc::QData requestData(request.body);
+        string voiceControlString = requestData.getData("request").getString("controlString");
+
+        //定位设备，控制设备
+
+        response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
 }

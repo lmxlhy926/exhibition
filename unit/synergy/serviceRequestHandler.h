@@ -21,6 +21,10 @@ namespace synergy{
 
 //获取分组列表
     int getGroupList_service_handler(const Request& request, Response& response);
+
+//语音控制设备入口
+    int voiceControl_service_handler(const Request& request, Response& response);
+
 }
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H
