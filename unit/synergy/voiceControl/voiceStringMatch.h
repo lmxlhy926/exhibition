@@ -18,6 +18,8 @@ struct MatchItem{
     string id;
     string command_id;
     string command_para;
+    string sourceSite;
+    string siteIp;
 };
 
 class voiceStringMatchControl {
@@ -27,25 +29,27 @@ public:
     explicit voiceStringMatchControl(string& ctrlStr) : controlString(ctrlStr){}
 
     //匹配字符串，控制设备
-    void controlDevice();
+    void parseAndControl();
 
 private:
-    //
-
     //获取设备名称相匹配的设备ID
-    bool getSpecificDeviceId(string parseStr, string& deviceId);
+    bool getSpecificDeviceId(string parseStr, string& deviceId, string& sourceSite, string& siteIp);
 
     //获取组名称相匹配的组ID
-    bool getSpecificGroupId(string parseStr, string& groupId);
+    bool getSpecificGroupId(string parseStr, string& groupId, string& sourceSite, string& siteIp);
 
     //获取房间的默认组ID
-    bool getGroupIdFromRoomName(string parseStr, string& groupId);
+    bool getGroupIdFromRoomName(string parseStr, string& groupId, string& sourceSite, string& siteIp);
 
     //所有设备
-    bool getFullGroupId(string parseStr, string& groupId);
+    bool getFullGroupId(string parseStr, string& groupId, string& sourceSite, string& siteIp);
 
-    //控制对应的设备或者组
-    void controlDeviceOrGroup(MatchItem& matchItem);
+    //解析字符串--> MatchItem
+    bool parse2MatchItem(MatchItem& matchItem);
+
+    //依据MatchItem，控制设备
+    void controlDeviceOrGroupByMatchItem(MatchItem& matchItem);
+
 };
 
 

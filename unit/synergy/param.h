@@ -36,6 +36,7 @@ static const int QuerySitePort = 9000;
 static const string Control_Service_ID = "cloudCommand";
 static const string GetDeviceList_Service_ID = "get_device_list";
 static const string GetGroupList_Service_ID = "get_group_list";
+static const string VoiceControl_Service_ID = "voiceControl";
 
 //订阅消息ID
 static const string DeviceList_changed_messageID = "deviceList_changed";

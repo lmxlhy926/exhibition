@@ -13,6 +13,7 @@
 #include "deviceManager.h"
 #include "groupManager.h"
 #include "control/sceneCommand.h"
+#include "voiceControl/voiceStringMatch.h"
 #include <vector>
 
 using namespace servicesite;
@@ -228,14 +229,12 @@ namespace synergy {
         return 0;
     }
 
-
     int voiceControl_service_handler(const Request& request, Response& response){
         LOG_INFO << "voiceControl_service_handler";
         qlibc::QData requestData(request.body);
         string voiceControlString = requestData.getData("request").getString("controlString");
-
-        //定位设备，控制设备
-
+        voiceStringMatchControl voiceCtrl(voiceControlString);
+        voiceCtrl.parseAndControl();
         response.set_content(okResponse.dump(), "text/json");
         return 0;
     }

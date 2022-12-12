@@ -59,6 +59,13 @@ int main(int argc, char* argv[]) {
         return synergy::getGroupList_service_handler(request, response);
     });
 
+    //语音控制指令
+    serviceSiteManager->registerServiceRequestHandler(VoiceControl_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::voiceControl_service_handler(request, response);
+    });
+
+
 
     serviceSiteManager->registerMessageHandler(Site_OnOffLine_MessageID, [](const Request& request){
         //每次站点上线都会触发重新获取设备列表、组列表
