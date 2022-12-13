@@ -7,7 +7,7 @@
 
 #include <string>
 #include "qlibc/QData.h"
-#include "bleConfig.h"
+#include "sourceManage/bleConfig.h"
 
 using namespace std;
 

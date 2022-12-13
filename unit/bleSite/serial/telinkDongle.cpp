@@ -7,8 +7,8 @@
 #include <log/Logging.h>
 #include <iomanip>
 #include <sstream>
-#include "formatTrans/bleConfig.h"
-#include "formatTrans/statusEvent.h"
+#include "sourceManage/bleConfig.h"
+#include "upStatus/statusEvent.h"
 
 TelinkDongle* TelinkDongle::instance = nullptr;
 

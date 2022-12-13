@@ -1,0 +1,6 @@
+FILE(GLOB src "*.cpp")
+add_library(upStatus STATIC ${src})
+target_include_directories(upStatus INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_link_libraries(upStatus PUBLIC qlibc)
+target_link_libraries(upStatus PUBLIC serial)
+target_link_libraries(upStatus PUBLIC log)

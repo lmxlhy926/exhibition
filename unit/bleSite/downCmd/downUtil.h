@@ -10,10 +10,10 @@
 #include <sstream>
 #include <iomanip>
 #include "qlibc/QData.h"
-#include "logic/snAddressMap.h"
-#include "logic/groupAddressMap.h"
+#include "sourceManage/snAddressMap.h"
+#include "sourceManage/groupAddressMap.h"
 #include "../parameter.h"
-#include "formatTrans/bleConfig.h"
+#include "sourceManage/bleConfig.h"
 
 using namespace std;
 

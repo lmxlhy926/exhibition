@@ -12,11 +12,11 @@
 #include <iostream>
 #include "qlibc/QData.h"
 #include "log/Logging.h"
-#include "logic/snAddressMap.h"
-#include "logic/groupAddressMap.h"
+#include "sourceManage/snAddressMap.h"
+#include "sourceManage/groupAddressMap.h"
 #include "siteService/service_site_manager.h"
 #include "../parameter.h"
-#include "bleConfig.h"
+#include "sourceManage/bleConfig.h"
 #include "common/httpUtil.h"
 #include "deviceTypeExtract.h"
 

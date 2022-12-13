@@ -3,7 +3,7 @@
 //
 
 #include "scanListmanage.h"
-#include "formatTrans/bleConfig.h"
+#include "bleConfig.h"
 
 ScanListmanage* ScanListmanage::instance = nullptr;
 

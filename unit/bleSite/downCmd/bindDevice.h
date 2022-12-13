@@ -6,7 +6,7 @@
 #define EXHIBITION_BINDDEVICE_H
 
 #include "qlibc/QData.h"
-#include "snAddressMap.h"
+#include "sourceManage/snAddressMap.h"
 
 class BindDevice {
 private:

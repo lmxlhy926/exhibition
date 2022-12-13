@@ -3,13 +3,12 @@
 //
 
 #include "bindDevice.h"
-#include "formatTrans/downUtil.h"
-#include "formatTrans/statusEvent.h"
+#include "downCmd/downUtil.h"
+#include "upStatus/statusEvent.h"
 #include "log/Logging.h"
-#include "../parameter.h"
 #include "siteService/service_site_manager.h"
 #include "common/httpUtil.h"
-#include "logic/scanListmanage.h"
+#include "sourceManage/scanListmanage.h"
 
 using namespace servicesite;
 

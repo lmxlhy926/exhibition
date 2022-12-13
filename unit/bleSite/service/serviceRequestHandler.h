@@ -7,7 +7,7 @@
 
 #include <string>
 #include "http/httplib.h"
-#include "logic/logicControl.h"
+#include "downCmd/logicControl.h"
 using namespace httplib;
 
 //扫描设备

@@ -4,7 +4,7 @@
 
 #include "groupAddressMap.h"
 #include "snAddressMap.h"
-#include "formatTrans/bleConfig.h"
+#include "bleConfig.h"
 #include <algorithm>
 #include <vector>
 #include <sstream>

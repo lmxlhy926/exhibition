@@ -4,7 +4,7 @@
 
 #include "downUtil.h"
 #include "log/Logging.h"
-#include "bleConfig.h"
+#include "sourceManage/bleConfig.h"
 #include "serial/telinkDongle.h"
 #include "../parameter.h"
 

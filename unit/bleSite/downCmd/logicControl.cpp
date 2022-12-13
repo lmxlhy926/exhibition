@@ -6,12 +6,9 @@
 #include "siteService/service_site_manager.h"
 #include "../parameter.h"
 #include "log/Logging.h"
-#include "formatTrans/downUtil.h"
-#include "formatTrans/statusEvent.h"
-#include "logic/scanListmanage.h"
-#include "bindDevice.h"
-#include <sstream>
-#include <iomanip>
+#include "downCmd/downUtil.h"
+#include "upStatus/statusEvent.h"
+#include "sourceManage/scanListmanage.h"
 
 using namespace servicesite;
 
