@@ -101,6 +101,7 @@ public:
     Event bindSuccessEvent;                     //单个设备绑定成功事件
     Event unbindSuccessEvent;                   //单个设备成功解绑事件
     Event gateWayIndexEvent;                    //拟配置节点响应报告
+    Event gateWayNetInfoEvent;                  //网络配置信息报告
 private:
     static EventTable* eventTable;
 
@@ -193,6 +194,41 @@ public:
     void postEvent() override{
         LOG_GREEN << "<<==: gateWay assign operation completed.....";
         EventTable::getInstance()->gateWayIndexEvent.notify_one();
+    }
+};
+
+
+//网关网络信息响应
+class GateWayNetInfoAck : public ReportEvent{
+private:
+    string sourceData;
+    string status;
+    string netKey;
+
+public:
+    explicit GateWayNetInfoAck(string data) : sourceData(std::move(data)){
+        init();
+    }
+
+    void postEvent() override{
+        LOG_GREEN << "<<==: GateWayNetInfoAck.....";
+        if(status == "01"){
+            qlibc::QData data;
+            data.setString("netKey", netKey);
+            EventTable::getInstance()->gateWayNetInfoEvent.putData(data);
+            EventTable::getInstance()->gateWayNetInfoEvent.notify_one();
+        }else{
+            qlibc::QData data;
+            EventTable::getInstance()->gateWayNetInfoEvent.putData(data);
+            EventTable::getInstance()->gateWayNetInfoEvent.notify_one();
+        }
+    }
+
+private:
+    void init(){
+        ReadBinaryString rs(sourceData);
+        rs.readByte(status);
+        rs.readBytes(netKey, 16);
     }
 };
 

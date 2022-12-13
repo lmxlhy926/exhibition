@@ -20,13 +20,26 @@ static const string ScanEndString = R"({"command":"scanEnd"})";
 void BindDevice::bind(QData &deviceArray) {
     std::lock_guard<std::mutex> lg(mutex_);
     Json::ArrayIndex arraySize = deviceArray.size();
+    //没有待绑定设备，则返回
     if(deviceArray.type() != Json::arrayValue){
         LOG_RED << "NO DEVICE TO ADD, scan end.....";
         qlibc::QData scanEndData(ScanEndString);
         DownUtility::parse2Send(scanEndData);
         return;
     }
-    if(arraySize > 0){   //给网关分配地址
+    //给网关分配地址
+    if(arraySize > 0){
+        //TODO 发送网络信息查询指令
+
+
+        //等待网络回复
+
+
+        //如果已分配，则不进行网关地址分配
+
+
+        //否则给网关分配地址
+
         LOG_INFO << ">>: start to assign gateway address....";
         qlibc::QData gateAddressAssign(AssignGateWayAddressString);
         DownUtility::parse2Send(gateAddressAssign);
@@ -40,6 +53,7 @@ void BindDevice::bind(QData &deviceArray) {
         }
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
+    //逐个绑定待绑定设备
     for(Json::ArrayIndex i = 0; i < arraySize; i++){
         qlibc::QData deviceItemProperty = deviceArray.getArrayElement(i);
         string deviceSn = deviceItemProperty.getString("deviceSn");
@@ -47,7 +61,7 @@ void BindDevice::bind(QData &deviceArray) {
         LOG_PURPLE << "<<: " << deviceItemProperty.getString("room_name") << "-------" << i + 1 << "/" << arraySize << "-------";
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
-
+    //绑定结束，发送停止扫描指令
     LOG_PURPLE << "...BIND DEVICE END, SCAN END....";
     qlibc::QData scanEndData(ScanEndString);
     DownUtility::parse2Send(scanEndData);
