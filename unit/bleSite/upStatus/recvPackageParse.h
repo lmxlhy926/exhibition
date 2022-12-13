@@ -17,7 +17,7 @@ class RecvPackageParse{
     static string packageString;
     static bool enable;
 public:
-    //读取串口产生的包数据，拼接包，解析完整包
+    //读取串口产生的子包数据，拼接为完整包，解析完整包
     static bool handlePackageString(string& subPackageString);
 
     static void disableUpload();

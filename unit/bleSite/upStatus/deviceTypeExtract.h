@@ -21,12 +21,16 @@ public:
         initDeviceTypeData();
     }
 
+    //获取设备子类
     string getDeviceModel();
 
+    //获取设备子类码
     string getDeviceModelCode();
 
+    //获取设备大类
     string getDeviceType();
 
+    //获取设备大类码
     string getDeviceTypeCode();
 
 private:

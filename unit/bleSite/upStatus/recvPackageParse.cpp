@@ -58,6 +58,8 @@ void RecvPackageParse::disableUpload() {
 }
 
 void RecvPackageParse::parse2Event(string& completePackageString) {
+    LOG_INFO << "packageString: " << completePackageString;
+
     string hciType, subType, packageIndex;
     ReadBinaryString rs(completePackageString);
     rs.read2Byte().readByte(hciType).readByte(subType).readByte(packageIndex);

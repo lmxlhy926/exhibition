@@ -1,0 +1,7 @@
+FILE(GLOB sourceManage "*.cpp")
+add_library(downCmd STATIC ${src})
+target_include_directories(downCmd INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_link_libraries(downCmd PUBLIC qlibc)
+target_link_libraries(downCmd PUBLIC serial)
+target_link_libraries(downCmd PUBLIC log)
+target_link_libraries(downCmd PUBLIC bleLogic)

@@ -49,15 +49,17 @@ bool TelinkDongle::startReceive() {
         return false;
     }
 
-    //创建线程，读取数据
+    //从发送队列读取数据，发送
     sendCommandThread = new std::thread([this]() {
         sendThreadFunc();
     });
 
+    //从串口读取数据，拼接为独立包，加入接收队列
     receiveThread = new std::thread([this](){
         handleReceiveData();
     });
 
+    //从接收队列读取子包，拼接为完整包，处理上报包数据
     packageHandleThread = new std::thread([this](){
         packageHandel();
     });
