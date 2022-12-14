@@ -36,13 +36,14 @@ void BindDevice::bind(QData &deviceArray) {
             qlibc::QData netResData = EventTable::getInstance()->gateWayNetInfoEvent.getData();
             string netKey = netResData.getString("netKey");
             if(!netKey.empty()){
-                LOG_PURPLE << "<<: netKey is already set....";
+                LOG_PURPLE << "<<: netKey is already set, <" << netKey << ">......";
+                bleConfig::getInstance()->storeNetKey(netKey);
             }else{
                 LOG_INFO << ">>: start to assign gateway address....";
                 qlibc::QData gateAddressAssign(AssignGateWayAddressString);
                 DownUtility::parse2Send(gateAddressAssign);
                 if(EventTable::getInstance()->gateWayIndexEvent.wait(10) == std::cv_status::no_timeout){
-                    LOG_PURPLE << "<<: successed to assgin GatewatAddress....";
+                    LOG_PURPLE << "<<: successed to assgin GatewatAddress， <" << bleConfig::getInstance()->getNetKey() << ">....";
                 }else{
                     LOG_RED << "<<: FAILED TO GatewatAddress, scan end....";
                     qlibc::QData scanEndData(ScanEndString);

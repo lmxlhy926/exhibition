@@ -5,6 +5,7 @@
 #include "bleConfig.h"
 #include "qlibc/FileUtils.h"
 #include <iostream>
+#include <utility>
 #include "log/Logging.h"
 
 bleConfig* bleConfig::instance = nullptr;
@@ -279,6 +280,16 @@ void bleConfig::saveScanListData(qlibc::QData& data){
 
 void bleConfig::enqueue(std::function<void()> fn) {
     threadPool.enqueue(std::move(fn));
+}
+
+void bleConfig::storeNetKey(string str){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    netKey = std::move(str);
+}
+
+string bleConfig::getNetKey(){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    return netKey;
 }
 
 qlibc::QData bleConfig::defaultStatus() {

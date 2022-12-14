@@ -21,6 +21,7 @@ private:
     QData deviceListData;                       //蓝牙设备列表
     QData statusListData;                       //状态列表
     QData scanListData;                         //扫描设备列表
+    string netKey;                              //网络key
     httplib::ThreadPool threadPool;             //线程池
     static bleConfig* instance;                 //静态对象
     std::recursive_mutex rMutex_;
@@ -91,6 +92,12 @@ public:
 
     //将函数加入线程池
     void enqueue(std::function<void()> fn);
+
+    //存储网络key
+    void storeNetKey(string str);
+
+    //获取网络key
+    string getNetKey();
 
 private:
     //产生设备的默认状态

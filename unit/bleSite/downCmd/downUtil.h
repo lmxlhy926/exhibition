@@ -50,6 +50,12 @@ public:
     string getCommandPrefix(){
         return deleteWhiteSpace(commandPrefix);
     }
+
+    static int getArbitrary(int num){
+        time_t t;
+        srand(time(&t));
+        return rand() % num;
+    }
 };
 
 //扫描
@@ -95,7 +101,12 @@ public:
 class LightGatewayAddressAssign : public BuildBinaryString{
 public:
     string getBinaryString() override{
-        string network_key = "11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 2A";
+        string netkeyBase = "11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E";
+        int arbitrary = getArbitrary(10000);
+        stringstream ss;
+        ss << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << arbitrary;
+        string network_key = netkeyBase + ss.str();
+        bleConfig::getInstance()->storeNetKey(deleteWhiteSpace(network_key));
         string binaryString = "E9 FF 09" + network_key + "00 00" + "00" + "11 22 33 44" + "00 01";
         return deleteWhiteSpace(binaryString);
     }
@@ -109,7 +120,7 @@ public:
     explicit LightNodeAddressAssign(string& nodeAddr) : nodeAddress(nodeAddr){}
 
     string getBinaryString() override{
-        string network_key = "11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 2A";
+        string network_key = bleConfig::getInstance()->getNetKey();
         string binaryString = "E9 FF 0A" + network_key + "00 00" + "00" + "11 22 33 44" + nodeAddress;
         return deleteWhiteSpace(binaryString);
     }
