@@ -68,6 +68,16 @@ public:
     }
 };
 
+
+//配网确认
+class NetVerify : public BuildBinaryString{
+public:
+    string getBinaryString() override{
+        return string("E9FF0C");
+    }
+};
+
+
 //连接
 class LightConnect : public BuildBinaryString{
 private:

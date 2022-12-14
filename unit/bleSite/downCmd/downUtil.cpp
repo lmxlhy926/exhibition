@@ -31,6 +31,9 @@ string DownUtility::cmdData2BinaryCommandString(QData &cmdData) {
     }else if(command == SCANEND){   //扫描结束命令
         return LightScanEnd().getBinaryString();
 
+    }else if(command == NETVERIFY){   //网络确认
+        return NetVerify().getBinaryString();
+
     }else if(command == CONNECT){   //连接命令
         string deviceSn = cmdData.getString("deviceSn");
         return LightConnect(deviceSn).getBinaryString();

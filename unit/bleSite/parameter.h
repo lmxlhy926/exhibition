@@ -61,6 +61,7 @@ static const string WhiteList_Changed =   "whiteListModifiedByAppMsg";      //ap
 #define BIND                        "bind"
 #define UNBIND                      "unbind"
 #define CONNECT                     "connect"
+#define NETVERIFY                   "netVerify"
 #define ASSIGN_GATEWAY_ADDRESS      "assignGateWayAddress"
 #define ASSIGN_NODE_ADDRESS         "assignNodeAddress"
 #define ADD_DEVICE                  "add_device"

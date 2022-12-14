@@ -12,10 +12,10 @@
 
 using namespace servicesite;
 
+static const string NetVerifyString = R"({"command": "netVerify"})";
 static const string AssignGateWayAddressString = R"({"command":"assignGateWayAddress"})";
 static const string BindString = R"({"command":"bind"})";
 static const string ScanEndString = R"({"command":"scanEnd"})";
-
 
 void BindDevice::bind(QData &deviceArray) {
     std::lock_guard<std::mutex> lg(mutex_);
@@ -27,31 +27,37 @@ void BindDevice::bind(QData &deviceArray) {
         DownUtility::parse2Send(scanEndData);
         return;
     }
-    //给网关分配地址
+    //如果网关已分配地址则跳过，否则给网关分配地址
     if(arraySize > 0){
-        //TODO 发送网络信息查询指令
+        LOG_INFO << ">>: start to verify netKey....";
+        qlibc::QData netVerifyCommand(NetVerifyString);
+        DownUtility::parse2Send(netVerifyCommand);
+        if(EventTable::getInstance()->gateWayNetInfoEvent.wait(10) == std::cv_status::no_timeout){
+            qlibc::QData netResData = EventTable::getInstance()->gateWayNetInfoEvent.getData();
+            string netKey = netResData.getString("netKey");
+            if(!netKey.empty()){
+                LOG_PURPLE << "<<: netKey is already set....";
+            }else{
+                LOG_INFO << ">>: start to assign gateway address....";
+                qlibc::QData gateAddressAssign(AssignGateWayAddressString);
+                DownUtility::parse2Send(gateAddressAssign);
+                if(EventTable::getInstance()->gateWayIndexEvent.wait(10) == std::cv_status::no_timeout){
+                    LOG_PURPLE << "<<: successed to assgin GatewatAddress....";
+                }else{
+                    LOG_RED << "<<: FAILED TO GatewatAddress, scan end....";
+                    qlibc::QData scanEndData(ScanEndString);
+                    DownUtility::parse2Send(scanEndData);
+                    return;
+                }
+                std::this_thread::sleep_for(std::chrono::seconds(3));
 
-
-        //等待网络回复
-
-
-        //如果已分配，则不进行网关地址分配
-
-
-        //否则给网关分配地址
-
-        LOG_INFO << ">>: start to assign gateway address....";
-        qlibc::QData gateAddressAssign(AssignGateWayAddressString);
-        DownUtility::parse2Send(gateAddressAssign);
-        if(EventTable::getInstance()->gateWayIndexEvent.wait(10) == std::cv_status::no_timeout){
-            LOG_PURPLE << "<<: successed to assgin GatewatAddress....";
+            }
         }else{
-            LOG_RED << "<<: FAILED TO GatewatAddress, scan end....";
             qlibc::QData scanEndData(ScanEndString);
             DownUtility::parse2Send(scanEndData);
+            LOG_RED << "no response fro netKey verfify.....";
             return;
         }
-        std::this_thread::sleep_for(std::chrono::seconds(3));
     }
     //逐个绑定待绑定设备
     for(Json::ArrayIndex i = 0; i < arraySize; i++){
@@ -76,8 +82,9 @@ void BindDevice::bind(QData &deviceArray) {
     ServiceSiteManager::getInstance()->publishMessage(BindEndMsg, publishData.toJsonString());
 }
 
+
 bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
-    //扫描到指定设备
+    //发送扫描指令
     LOG_INFO << ">>: scan........";
     qlibc::QData scanData;
     scanData.setString("command", "scan");
@@ -107,7 +114,7 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
 
-    //给节点分配地址，大约6秒，等待返回成功，最多等待20秒。分配失败，依然进行绑定
+    //给节点分配地址，大约6秒，等待返回成功，最多等待20秒。
     LOG_INFO << ">>: start to assgin node address....";
     qlibc::QData nodeAddressAssign(SnAddressMap::getInstance()->getNodeAssignAddr(deviceSn));
     DownUtility::parse2Send(nodeAddressAssign);
@@ -115,7 +122,8 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
         LOG_PURPLE << "<<: successed to assgin node address....";
     }else{
         SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
-        LOG_RED << "<<: FAILED TO ASSIGN NODE ADDRESS, start to bind device ....";
+        LOG_RED << "<<: FAILED TO ASSIGN NODE ADDRESS ....";
+        return false;
     }
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
@@ -125,7 +133,7 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     qlibc::QData bind(BindString);
     DownUtility::parse2Send(bind);
 
-    if(EventTable::getInstance()->bindSuccessEvent.wait(120) == std::cv_status::timeout){
+    if(EventTable::getInstance()->bindSuccessEvent.wait(30) == std::cv_status::timeout){
         LOG_RED << "<<: xxxxxxxxxBIND FAILEDxxxxxxxx";
         LOG_RED << "<<: xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
         SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
