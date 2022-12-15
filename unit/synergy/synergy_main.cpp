@@ -8,11 +8,11 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 #include "qlibc/FileUtils.h"
-#include "serviceRequestHandler.h"
+#include "service/serviceRequestHandler.h"
 #include "param.h"
 #include "common/httpUtil.h"
-#include "deviceManager.h"
-#include "groupManager.h"
+#include "deviceGroupManage/deviceManager.h"
+#include "deviceGroupManage/groupManager.h"
 
 using namespace std;
 using namespace servicesite;

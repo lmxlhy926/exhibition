@@ -4,8 +4,8 @@
 
 #include "voiceStringMatch.h"
 #include "qlibc/QData.h"
-#include "../deviceManager.h"
-#include "../groupManager.h"
+#include "../deviceGroupManage/deviceManager.h"
+#include "../deviceGroupManage/groupManager.h"
 #include "common/httpUtil.h"
 #include <regex>
 

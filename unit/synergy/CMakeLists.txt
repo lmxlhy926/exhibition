@@ -1,13 +1,15 @@
+FILE(GLOB controlSrc "control/*.cpp")
+FILE(GLOB deviceGroupSrc "deviceGroupManage/*.cpp")
+FILE(GLOB serviceSrc "service/*.cpp")
+FILE(GLOB voiceControlSrc "voiceControl/*.cpp")
 
-add_subdirectory(voiceControl)
+set(src ${controlSrc}
+        ${deviceGroupSrc}
+        ${serviceSrc}
+        ${voiceControlSrc})
 
-FILE(GLOB mainSrc "*.cpp")
-FILE(GLOB subSrc "control/*.cpp")
-set(src ${mainSrc} ${subSrc})
-
-add_executable(synergy_site ${src})
+add_executable(synergy_site ${src} synergy_main.cpp)
 target_link_libraries(synergy_site PRIVATE qlibc)
 target_link_libraries(synergy_site PRIVATE siteService)
 target_link_libraries(synergy_site PRIVATE common)
 target_link_libraries(synergy_site PRIVATE log)
-target_link_libraries(synergy_site PRIVATE voice)

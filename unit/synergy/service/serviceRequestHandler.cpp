@@ -6,14 +6,14 @@
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 #include "qlibc/QData.h"
-#include "param.h"
+#include "../param.h"
 #include "common/httpUtil.h"
-#include "control/downCommand.h"
+#include "../control/downCommand.h"
 #include "log/Logging.h"
-#include "deviceManager.h"
-#include "groupManager.h"
-#include "control/sceneCommand.h"
-#include "voiceControl/voiceStringMatch.h"
+#include "../deviceGroupManage/deviceManager.h"
+#include "../deviceGroupManage/groupManager.h"
+#include "../control/sceneCommand.h"
+#include "../voiceControl/voiceStringMatch.h"
 #include <vector>
 
 using namespace servicesite;

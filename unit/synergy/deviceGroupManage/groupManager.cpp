@@ -1,37 +1,37 @@
 //
-// Created by 78472 on 2022/9/26.
+// Created by 78472 on 2022/9/27.
 //
 
-#include "deviceManager.h"
+#include "groupManager.h"
 #include "common/httpUtil.h"
-#include "param.h"
+#include "../param.h"
 
-DeviceManager* DeviceManager::instance = nullptr;
+GroupManager* GroupManager::instance = nullptr;
 
-DeviceManager *DeviceManager::getInstance() {
+GroupManager *GroupManager::getInstance() {
     if(instance == nullptr){
-        instance = new DeviceManager();
+        instance = new GroupManager();
     }
     return instance;
 }
 
-void DeviceManager::listChanged() {
+void GroupManager::listChanged() {
     changed.store(true);
 }
 
-qlibc::QData DeviceManager::getAllDeviceList() {
+qlibc::QData GroupManager::getAllGroupList() {
 //    if(changed.load()){
-//        deviceList = getDeviceList();
+//        groupList = getGroupList();
 //    }
 //    changed.store(false);
 
-    deviceList = getDeviceList();
-    return deviceList;
+    groupList = getGroupList();
+    return groupList;
 }
 
-qlibc::QData DeviceManager::getDeviceList(){
+qlibc::QData GroupManager::getGroupList(){
     qlibc::QData deviceRequest;
-    deviceRequest.setString("service_id", "get_device_list");
+    deviceRequest.setString("service_id", "get_group_list");
     deviceRequest.setValue("request", Json::nullValue);
 
     qlibc::QData bleDeviceRes, zigbeeDeviceRes, tvDeviceRes;
@@ -39,14 +39,14 @@ qlibc::QData DeviceManager::getDeviceList(){
     SiteRecord::getInstance()->sendRequest2Site(ZigbeeSiteID, deviceRequest, zigbeeDeviceRes);
     SiteRecord::getInstance()->sendRequest2Site(TvAdapterSiteID, deviceRequest, tvDeviceRes);
 
-    qlibc::QData ble_list = addSourceTag(bleDeviceRes.getData("response").getData("device_list"), BleSiteID);
-    qlibc::QData zigbee_list = addSourceTag(zigbeeDeviceRes.getData("response").getData("device_list"), ZigbeeSiteID);
-    qlibc::QData tvAdapterList = addSourceTag(tvDeviceRes.getData("response").getData("device_list"), TvAdapterSiteID);
+    qlibc::QData ble_list = addSourceTag(bleDeviceRes.getData("response").getData("group_list"), BleSiteID);
+    qlibc::QData zigbee_list = addSourceTag(zigbeeDeviceRes.getData("response").getData("group_list"), ZigbeeSiteID);
+    qlibc::QData tvAdapterList = addSourceTag(tvDeviceRes.getData("response").getData("group_list"), TvAdapterSiteID);
 
     return mergeList(ble_list, zigbee_list, tvAdapterList);
 }
 
-qlibc::QData DeviceManager::addSourceTag(qlibc::QData deviceList, string sourceSite){
+qlibc::QData GroupManager::addSourceTag(qlibc::QData deviceList, string sourceSite){
     Json::ArrayIndex num = deviceList.size();
     qlibc::QData newDeviceList;
     for(Json::ArrayIndex i = 0; i < num; ++i){
@@ -57,7 +57,7 @@ qlibc::QData DeviceManager::addSourceTag(qlibc::QData deviceList, string sourceS
     return newDeviceList;
 }
 
-qlibc::QData DeviceManager::mergeList(qlibc::QData& ble_list, qlibc::QData& zigbeeList, qlibc::QData& tvAdapterList){
+qlibc::QData GroupManager::mergeList(qlibc::QData& ble_list, qlibc::QData& zigbeeList, qlibc::QData& tvAdapterList){
     qlibc::QData deviceList;
     for(Json::ArrayIndex i = 0; i < ble_list.size(); ++i){
         qlibc::QData item = ble_list.getArrayElement(i);
@@ -73,8 +73,3 @@ qlibc::QData DeviceManager::mergeList(qlibc::QData& ble_list, qlibc::QData& zigb
     }
     return deviceList;
 }
-
-
-
-
-
