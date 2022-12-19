@@ -16,7 +16,7 @@ namespace synergy{
 //设备控制
     int cloudCommand_service_handler(const Request& request, Response& response);
 
-//获取设备列表：ble, zigbee, tvAdapter
+//获取设备列表：ble, tvAdapter
     int getDeviceList_service_handler(const Request& request, Response& response);
 
 //获取分组列表
@@ -24,6 +24,12 @@ namespace synergy{
 
 //语音控制设备入口
     int voiceControl_service_handler(const Request& request, Response& response);
+
+//设备控制
+    int deviceControl_service_handler(const Request& request, Response& response);
+
+//组控制
+    int groupControl_service_handler(const Request& request, Response& response);
 
 }
 

@@ -54,13 +54,6 @@ namespace synergy {
     };
 
 
-    //开关灯
-    regex voice_expr_power_on("(.*)(灯)(.*)(开)(.*)");
-    regex voice_expr_power_on_1("(.*)(开)(.*)(灯)(.*)");
-    regex voice_expr_power_off("(.*)(灯)(.*)(关)(.*)");
-    regex voice_expr_power_off_1("(.*)(关)(.*)(灯)(.*)");
-
-
     void classify(qlibc::QData &controlData, qlibc::QData &bleDeviceList, qlibc::QData &zigbeeDeviceList,
                   qlibc::QData &tvAdapterList) {
         string sourceSite = controlData.getString("sourceSite");
@@ -236,6 +229,38 @@ namespace synergy {
         voiceStringMatchControl voiceCtrl(voiceControlString);
         voiceCtrl.parseAndControl();
         response.set_content(okResponse.dump(), "text/json");
+        return 0;
+    }
+
+    int deviceControl_service_handler(const Request& request, Response& response){
+        //判断设备属于哪个站点
+        std::map<string, qlibc::QData> deviceListMap;
+
+        qlibc::QData deviceList = qlibc::QData(request.body).getData("request").getData("device_list");
+        Json::ArrayIndex size = deviceList.size();
+        for(Json::ArrayIndex i = 0; i < size; ++i){
+            qlibc::QData item = deviceList.getArrayElement(i);
+            string device_id = item.getString("device_id");
+            string sourceSite;
+            if(DeviceManager::getInstance()->isInDeviceList(device_id, sourceSite)){
+                auto pos = deviceListMap.find(sourceSite);
+                if(pos != deviceListMap.end()){
+                    pos->second.append(item);
+                }else{
+                    deviceListMap.insert(std::make_pair(sourceSite, qlibc::QData().append(item)));
+                }
+            }
+        }
+
+        //发送控制命令到相应的站点
+
+
+
+        return 0;
+    }
+
+    int groupControl_service_handler(const Request& request, Response& response){
+
         return 0;
     }
 }

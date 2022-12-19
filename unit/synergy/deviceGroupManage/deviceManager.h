@@ -24,13 +24,26 @@ public:
     //获取设备列表
     qlibc::QData getAllDeviceList();
 
+    bool isInDeviceList(string& device_id, string& sourceSite);
+
 private:
     //获取设备列表
-    qlibc::QData getDeviceList();
+    qlibc::QData getDeviceListLocal();
 
+    //更新站点
+    void updateSite();
+
+    //获取设备列表
+    qlibc::QData getDeviceListAllLocalNet();
+
+    //增加站点标识
     qlibc::QData addSourceTag(qlibc::QData deviceList, string sourceSite);
 
+    //列表拼接
     qlibc::QData mergeList(qlibc::QData& ble_list, qlibc::QData& zigbeeList, qlibc::QData& tvAdapterList);
+
+    //站点拼接
+    void mergeList(qlibc::QData& list, qlibc::QData& totalList);
 };
 
 

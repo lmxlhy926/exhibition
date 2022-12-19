@@ -77,30 +77,30 @@ int main(int argc, char* argv[]) {
         }
     });
 
-    threadPool_.enqueue([&](){
-        while(true){
-            int code;
-            std::vector<string> messageIdList;
-            messageIdList.push_back(Site_OnOffLine_MessageID);
-            code = serviceSiteManager->subscribeMessage(RequestIp, QuerySitePort, messageIdList);
-            if (code == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage Site_OnOffLine_MessageID ok....\n");
-                break;
-            }
-
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-            printf("subscribed Site_OnOffLine_MessageID failed....., start to subscribe in 3 seconds\n");
-        }
-    });
+//    threadPool_.enqueue([&](){
+//        while(true){
+//            int code;
+//            std::vector<string> messageIdList;
+//            messageIdList.push_back(Site_OnOffLine_MessageID);
+//            code = serviceSiteManager->subscribeMessage(RequestIp, QuerySitePort, messageIdList);
+//            if (code == ServiceSiteManager::RET_CODE_OK) {
+//                printf("subscribeMessage Site_OnOffLine_MessageID ok....\n");
+//                break;
+//            }
+//
+//            std::this_thread::sleep_for(std::chrono::seconds(3));
+//            printf("subscribed Site_OnOffLine_MessageID failed....., start to subscribe in 3 seconds\n");
+//        }
+//    });
 
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-//            int code = serviceSiteManager->start();
+            int code = serviceSiteManager->start();
             //注册启动方式
-            int code = serviceSiteManager->startByRegister();
+//            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 std::cout << "===>synergySite startByRegister error, code = " << code << std::endl;
                 std::cout << "===>synergySite startByRegister in 3 seconds...." << std::endl;

@@ -25,11 +25,11 @@ qlibc::QData DeviceManager::getAllDeviceList() {
 //    }
 //    changed.store(false);
 
-    deviceList = getDeviceList();
+    deviceList = getDeviceListAllLocalNet();
     return deviceList;
 }
 
-qlibc::QData DeviceManager::getDeviceList(){
+qlibc::QData DeviceManager::getDeviceListLocal(){
     qlibc::QData deviceRequest;
     deviceRequest.setString("service_id", "get_device_list");
     deviceRequest.setValue("request", Json::nullValue);
@@ -45,6 +45,54 @@ qlibc::QData DeviceManager::getDeviceList(){
 
     return mergeList(ble_list, zigbee_list, tvAdapterList);
 }
+
+void DeviceManager::updateSite(){
+    qlibc::QData request, response;
+    request.setString("service_id", "site_localAreaNetworkSite");
+    request.putData("request", qlibc::QData().setString("site_id", ""));
+
+    if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){
+        qlibc::QData resBody = response.getData("response");
+        Json::Value::Members members = resBody.getMemberNames();
+        for(auto& elem : members){
+            qlibc::QData siteList = resBody.getData(elem);
+            Json::ArrayIndex size = siteList.size();
+            for(Json::ArrayIndex i = 0; i < size; ++i){
+                qlibc::QData item = siteList.getArrayElement(i);
+                string site_id = item.getString("site_id");
+                if(site_id == BleSiteID || site_id == TvAdapterSiteID){
+                    string ipSiteName = elem + ":" + site_id;
+                    SiteRecord::getInstance()->addSite(ipSiteName, elem, item.getInt("port"));
+                }
+            }
+        }
+    }
+}
+
+qlibc::QData DeviceManager::getDeviceListAllLocalNet() {
+    updateSite();
+
+    qlibc::QData totalList;
+    std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
+    smatch sm;
+    for(auto& elem : siteNameSet){
+        if(regex_match(elem, sm, regex("(.*):(.*)"))){
+            string ip = sm.str(1);
+            string siteID = sm.str(2);
+            if(siteID == BleSiteID || siteID == TvAdapterSiteID){
+                qlibc::QData deviceRequest;
+                deviceRequest.setString("service_id", "get_device_list");
+                deviceRequest.setValue("request", Json::nullValue);
+                qlibc::QData deviceRes;
+                SiteRecord::getInstance()->sendRequest2Site(sm.str(0), deviceRequest, deviceRes);
+                qlibc::QData list = addSourceTag(deviceRes.getData("response").getData("device_list"), sm.str(0));
+                mergeList(list, totalList);
+            }
+        }
+    }
+    return totalList;
+}
+
 
 qlibc::QData DeviceManager::addSourceTag(qlibc::QData deviceList, string sourceSite){
     Json::ArrayIndex num = deviceList.size();
@@ -72,6 +120,14 @@ qlibc::QData DeviceManager::mergeList(qlibc::QData& ble_list, qlibc::QData& zigb
         deviceList.append(item);
     }
     return deviceList;
+}
+
+
+void DeviceManager::mergeList(qlibc::QData &list, qlibc::QData &totalList) {
+    for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
+        qlibc::QData item = deviceList.getArrayElement(i);
+        totalList.append(item);
+    }
 }
 
 

@@ -19,6 +19,7 @@ public:
 
 };
 
+
 class SingleSite{
 private:
     string siteIp;
@@ -38,6 +39,7 @@ public:
     int getSitePort();
 };
 
+
 using SingleSiteVec = std::map<string, SingleSite>;
 class SiteRecord{
 private:
@@ -52,6 +54,8 @@ public:
     bool sendRequest2Site(string siteName, qlibc::QData& request, qlibc::QData& response);
 
     void printMap();
+
+    std::set<string> getSiteName();
 };
 
 #endif //EXHIBITION_HTTPUTIL_H

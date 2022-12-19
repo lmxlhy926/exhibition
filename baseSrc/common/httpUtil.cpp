@@ -78,8 +78,9 @@ void SiteRecord::addSite(string siteName, string siteIp, int sitePort) {
     if(pos != sites.end()){
         pos->second.deleteClient();
         sites.erase(siteName);
+    }else{
+        sites.emplace(siteName, SingleSite(siteIp, sitePort));
     }
-    sites.emplace(siteName, SingleSite(siteIp, sitePort));
 }
 
 bool SiteRecord::sendRequest2Site(string siteName, qlibc::QData &request, qlibc::QData &response) {
@@ -98,3 +99,12 @@ void SiteRecord::printMap() {
         LOG_INFO << elem.first << ": <" << elem.second.getSiteIp() << ", " << elem.second.getSitePort() << ">";
     }
 }
+
+std::set<string> SiteRecord::getSiteName() {
+   std::set<string> siteNameSet;
+   for(auto& elem : sites){
+       siteNameSet.insert(elem.first);
+   }
+   return siteNameSet;
+}
+
