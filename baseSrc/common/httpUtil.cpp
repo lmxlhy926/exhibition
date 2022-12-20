@@ -76,8 +76,13 @@ void SiteRecord::addSite(string siteName, string siteIp, int sitePort) {
     std::lock_guard<std::recursive_mutex> lg(rMutex);
     auto pos = sites.find(siteName);
     if(pos != sites.end()){
-        pos->second.deleteClient();
-        sites.erase(siteName);
+        if(pos->second.getSiteIp() == siteIp && pos->second.getSitePort() == sitePort){
+            return;
+        }else{
+            pos->second.deleteClient();
+            sites.erase(siteName);
+            sites.emplace(siteName, SingleSite(siteIp, sitePort));
+        }
     }else{
         sites.emplace(siteName, SingleSite(siteIp, sitePort));
     }

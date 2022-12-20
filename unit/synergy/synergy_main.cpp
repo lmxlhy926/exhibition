@@ -34,9 +34,9 @@ int main(int argc, char* argv[]) {
     GroupManager::getInstance();
 
     //站点请求管理
-    SiteRecord::getInstance()->addSite(BleSiteID, RequestIp, BleSitePort);
-    SiteRecord::getInstance()->addSite(ZigbeeSiteID, RequestIp, ZigbeeSitePort);
-    SiteRecord::getInstance()->addSite(TvAdapterSiteID, RequestIp, TvAdapterSitePort);
+//    SiteRecord::getInstance()->addSite(BleSiteID, RequestIp, BleSitePort);
+//    SiteRecord::getInstance()->addSite(ZigbeeSiteID, RequestIp, ZigbeeSitePort);
+//    SiteRecord::getInstance()->addSite(TvAdapterSiteID, RequestIp, TvAdapterSitePort);
     SiteRecord::getInstance()->addSite(SceneSiteID, RequestIp, SceneSitePort);
 
     serviceSiteManager->registerMessageId(Scene_Msg_MessageID);   //场景指令消息
@@ -65,6 +65,17 @@ int main(int argc, char* argv[]) {
         return synergy::voiceControl_service_handler(request, response);
     });
 
+    //设备控制
+    serviceSiteManager->registerServiceRequestHandler(DeviceControl_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::deviceControl_service_handler(request, response);
+    });
+
+    //分组控制
+    serviceSiteManager->registerServiceRequestHandler(GroupControl_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::groupControl_service_handler(request, response);
+    });
 
 
     serviceSiteManager->registerMessageHandler(Site_OnOffLine_MessageID, [](const Request& request){

@@ -115,6 +115,43 @@ int subDeviceRegister_service_request_handler(const Request& request, Response& 
     return 0;
 }
 
+
+int subDeviceRegister_service_request_handler_bak(const Request& request, Response& response, bool isConnec){
+    LOG_INFO << "===>subDeviceRegister_service_request_handler: " << request.body;
+    if (!isConnec){
+        LOG_RED << "===>cant access internet......";
+        qlibc::QData errData;
+        errData.setInt("code", 1);
+        errData.setString("error", "cant access internet");
+        errData.putData("response", qlibc::QData());
+        response.set_content(errData.toJsonString(), "text/json");
+        return 0;
+    }
+
+    qlibc::QData requestData(request.body);
+    qlibc::QData registerRequest, registerResponse;
+    qlibc::QData deviceList = requestData.getData("request").getData("deviceList");
+    qlibc::QData param;
+    param.setString("domainID", configParamUtil::getInstance()->getBaseInfo().getString("domainID"));
+    param.putData("smartDeviceEdgeDTOS", deviceList);
+    registerRequest.setString("User-Agent", "curl");
+    registerRequest.putData("param", param);
+
+    cloudUtil::getInstance()->ecb_httppost(POSTDEVICELIST_URL, registerRequest, registerResponse);
+
+    qlibc::QData data;
+    if(registerResponse.getInt("code") == 200){
+        data.setInt("code", 0);
+    }else{
+        data.setInt("code", 1);
+    }
+    data.setString("error", registerResponse.getString("msg"));
+    data.putData("response", qlibc::QData());
+    response.set_content(data.toJsonString(), "text/json");
+
+    return 0;
+}
+
 int domainIdRequest_service_request_handler(const Request& request, Response& response, bool isConnec) {
     LOG_INFO << "===>domainIdRequest_service_request_handler: " << request.body;
 

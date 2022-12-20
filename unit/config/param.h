@@ -28,9 +28,10 @@ static const string DEVICE_STATUS_MESSAGE_ID = "allDeviceStatus";               
 static const string WHITELIST_MODIFIED_MESSAGE_ID = "whiteListModifiedByAppMsg";    //白名单被app修改
 
 //请求url
-static const string SCENELIST_URL = "/logic-device/scene/list";                            //请求场景列表URL
-static const string SUBDEVICE_REGISTER_URL = "/logic-device/edge/deviceRegister";          //子设备注册
-static const string WHITELIST_REQUEST_URL =  "/logic-device/edge/getLittleWhiteList";     //获取白名单
+static const string SCENELIST_URL           =  "/logic-device/scene/list";                   //请求场景列表URL
+static const string SUBDEVICE_REGISTER_URL  =  "/logic-device/edge/deviceRegister";          //子设备注册
+static const string POSTDEVICELIST_URL      =  "/logic-device/edge/postDevicesList";         //设备同步
+static const string WHITELIST_REQUEST_URL   =  "/logic-device/edge/getLittleWhiteList";      //获取白名单
 
 //服务ID, 对内提供
 static const string SCENELIST_REQUEST_SERVICE_ID =          "sceneListRequest";

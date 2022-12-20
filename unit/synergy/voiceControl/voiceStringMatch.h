@@ -6,11 +6,13 @@
 #define EXHIBITION_VOICESTRINGMATCH_H
 
 #include <string>
+#include <regex>
 using namespace std;
 
 enum VoiceMatchType{
-    device,
-    group
+    Device,
+    Group,
+    All
 };
 
 struct MatchItem{
@@ -33,19 +35,19 @@ public:
 
 private:
     //获取设备名称相匹配的设备ID
-    bool getSpecificDeviceId(string parseStr, string& deviceId, string& sourceSite, string& siteIp);
+    bool getSpecificDeviceId(string parseStr, string& deviceId, string& sourceSite);
 
     //获取组名称相匹配的组ID
-    bool getSpecificGroupId(string parseStr, string& groupId, string& sourceSite, string& siteIp);
+    bool getSpecificGroupId(string parseStr, string& groupId, string& sourceSite);
 
     //获取房间的默认组ID
-    bool getGroupIdFromRoomName(string parseStr, string& groupId, string& sourceSite, string& siteIp);
+    bool getGroupIdFromRoomName(string parseStr, string& groupId, string& sourceSite);
 
     //所有设备
-    bool getFullGroupId(string parseStr, string& groupId, string& sourceSite, string& siteIp);
+    bool getFullGroupId(string parseStr, string& groupId, string& sourceSite);
 
     //解析字符串--> MatchItem
-    bool parse2MatchItem(MatchItem& matchItem);
+    bool parse2MatchItem(smatch& sm, MatchItem& matchItem);
 
     //依据MatchItem，控制设备
     void controlDeviceOrGroupByMatchItem(MatchItem& matchItem);

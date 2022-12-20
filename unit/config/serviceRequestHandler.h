@@ -22,6 +22,9 @@ int sceneListRequest_service_request_handler(const Request& request, Response& r
 //子设备注册<内部>
 int subDeviceRegister_service_request_handler(const Request& request, Response& response, bool isConnec);
 
+//同步设备列表
+int subDeviceRegister_service_request_handler_bak(const Request& request, Response& response, bool isConnec);
+
 //获取家庭域<内部>
 int domainIdRequest_service_request_handler(const Request& request, Response& response, bool isConnec);
 

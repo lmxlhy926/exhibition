@@ -15,6 +15,7 @@
 #include "../control/sceneCommand.h"
 #include "../voiceControl/voiceStringMatch.h"
 #include <vector>
+#include <regex>
 
 using namespace servicesite;
 
@@ -87,7 +88,7 @@ namespace synergy {
         return true;
     }
 
-    qlibc::QData buildControlCmd(string device_id){
+    qlibc::QData buildControlCmd(string group_id){
         qlibc::QData command, commandList, deviceItem, deviceList;
         command.setString("command_id", "luminance_color_temperature");
         command.setInt("command_para_luminance", 0);
@@ -95,7 +96,7 @@ namespace synergy {
         command.setInt("transTime", 0);
         commandList.append(command);
 
-        deviceItem.setString("group_id", device_id);
+        deviceItem.setString("group_id", group_id);
         deviceItem.putData("command_list", commandList);
 
         qlibc::QData requestData;
@@ -118,7 +119,15 @@ namespace synergy {
             qlibc::QData controlData = buildControlCmd("FFFF");
             LOG_YELLOW << controlData.toJsonString();
             qlibc::QData resData;
-            SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, resData);
+            std::set<string> siteName = SiteRecord::getInstance()->getSiteName();
+            for(auto& elem : siteName){
+                smatch sm;
+                if(regex_match(elem, sm, regex("(.*):(.*)"))){
+                    if(sm.str(2) == BleSiteID){
+                        SiteRecord::getInstance()->sendRequest2Site(elem, controlData, resData);
+                    }
+                }
+            }
             return;
         }
 
@@ -131,11 +140,18 @@ namespace synergy {
             if(item.getBool("areaFullGroup") && area == room_no){
                 //构造灯控指令
                 string group_id = item.getString("group_id");
-                string commandValue = requestData.getData("request").getData("inParams").getString("power");
                 qlibc::QData controlData = buildControlCmd(group_id);
                 LOG_YELLOW << controlData.toJsonString();
                 qlibc::QData resData;
-                SiteRecord::getInstance()->sendRequest2Site(BleSiteID, controlData, resData);
+                std::set<string> siteName = SiteRecord::getInstance()->getSiteName();
+                for(auto& elem : siteName){
+                    smatch sm;
+                    if(regex_match(elem, sm, regex("(.*):(.*)"))){
+                        if(sm.str(2) == BleSiteID){
+                            SiteRecord::getInstance()->sendRequest2Site(elem, controlData, resData);
+                        }
+                    }
+                }
                 break;
             }
         }
@@ -171,7 +187,7 @@ namespace synergy {
             }
         }
 
-        //使用蓝牙站点
+        //针对样板间的mesh灯
         if(code == "light"){
             if(isSiteOnline(BleSiteID)){
                 lightControlBleSite(area, requestData);
@@ -179,16 +195,29 @@ namespace synergy {
             }
         }
 
-        //否则，则为第三方设备控制命令
+        //针对多媒体下挂的设备
         qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
         qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
         qlibc::QData controlList = DownCommandData(requestData).getContorlData(deviceList);
         Json::ArrayIndex controlListSize = controlList.size();
+        std::map<string, qlibc::QData> deviceListMap;
         for(Json::ArrayIndex i = 0; i < controlListSize; ++i){
             qlibc::QData controlData = controlList.getArrayElement(i);
-            classify(controlData, bleDeviceList, zigbeeDeviceList, tvAdapterList);
+            auto pos = deviceListMap.find(controlData.getString("sourceSite"));
+            if(pos != deviceListMap.end()){
+                pos->second.append(controlData);
+            }else{
+                deviceListMap.insert(std::make_pair(controlData.getString("sourceSite"), controlData));
+            }
         }
-        sendCmd(bleDeviceList, zigbeeDeviceList, tvAdapterList);
+
+        //发送控制命令到相应的站点
+        for(auto& elem : deviceListMap){
+            qlibc::QData controlRequest, controlResponse;
+            controlRequest.setString("service_id", "control_device");
+            controlRequest.putData("request", qlibc::QData().putData("device_list", elem.second));
+            SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
+        }
 
         response.set_content(okResponse.dump(), "text/json");
         return 0;
@@ -223,7 +252,7 @@ namespace synergy {
     }
 
     int voiceControl_service_handler(const Request& request, Response& response){
-        LOG_INFO << "voiceControl_service_handler";
+        LOG_INFO << "voiceControl_service_handler: " << qlibc::QData(request.body).toJsonString();
         qlibc::QData requestData(request.body);
         string voiceControlString = requestData.getData("request").getString("controlString");
         voiceStringMatchControl voiceCtrl(voiceControlString);
@@ -233,9 +262,9 @@ namespace synergy {
     }
 
     int deviceControl_service_handler(const Request& request, Response& response){
+        LOG_INFO << "deviceControl_service_handler: " << qlibc::QData(request.body).toJsonString();
         //判断设备属于哪个站点
         std::map<string, qlibc::QData> deviceListMap;
-
         qlibc::QData deviceList = qlibc::QData(request.body).getData("request").getData("device_list");
         Json::ArrayIndex size = deviceList.size();
         for(Json::ArrayIndex i = 0; i < size; ++i){
@@ -253,14 +282,46 @@ namespace synergy {
         }
 
         //发送控制命令到相应的站点
+        for(auto& elem : deviceListMap){
+            qlibc::QData controlRequest, controlResponse;
+            controlRequest.setString("service_id", "control_device");
+            controlRequest.putData("request", qlibc::QData().putData("device_list", elem.second));
+            SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
+        }
 
-
-
+        response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
 
-    int groupControl_service_handler(const Request& request, Response& response){
 
+    int groupControl_service_handler(const Request& request, Response& response){
+        //判断设备属于哪个站点
+        std::map<string, qlibc::QData> groupListMap;
+        qlibc::QData groupList = qlibc::QData(request.body).getData("request").getData("group_list");
+        Json::ArrayIndex size = groupList.size();
+        for(Json::ArrayIndex i = 0; i < size; ++i){
+            qlibc::QData item = groupList.getArrayElement(i);
+            string group_id = item.getString("group_id");
+            string sourceSite;
+            if(GroupManager::getInstance()->isInGroupList(group_id, sourceSite)){
+                auto pos = groupListMap.find(sourceSite);
+                if(pos != groupListMap.end()){
+                    pos->second.append(item);
+                }else{
+                    groupListMap.insert(std::make_pair(sourceSite, qlibc::QData().append(item)));
+                }
+            }
+        }
+
+        //发送控制命令到相应的站点
+        for(auto& elem : groupListMap){
+            qlibc::QData controlRequest, controlResponse;
+            controlRequest.setString("service_id", "control_group");
+            controlRequest.putData("request", qlibc::QData().putData("group_list", elem.second));
+            SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
+        }
+
+        response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
 }

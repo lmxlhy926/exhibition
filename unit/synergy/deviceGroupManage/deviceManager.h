@@ -7,12 +7,23 @@
 
 #include "qlibc/QData.h"
 #include <atomic>
+#include <mutex>
+#include <thread>
 
 class DeviceManager {
 private:
     std::atomic<bool> changed{true};
-    qlibc::QData deviceList;
-    DeviceManager() = default;
+    qlibc::QData deviceList_;
+    std::mutex Mutex;
+    std::thread* updateListThread;
+    DeviceManager(){
+        updateListThread = new thread([this]{
+            while(true){
+                getAllDeviceList();
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+            }
+        });
+    }
     static DeviceManager* instance;
 
 public:

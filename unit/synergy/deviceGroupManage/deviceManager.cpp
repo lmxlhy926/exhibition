@@ -25,8 +25,23 @@ qlibc::QData DeviceManager::getAllDeviceList() {
 //    }
 //    changed.store(false);
 
-    deviceList = getDeviceListAllLocalNet();
-    return deviceList;
+    qlibc::QData list = getDeviceListAllLocalNet();
+    std::lock_guard<std::mutex> lg(Mutex);
+    deviceList_ = list;
+    return deviceList_;
+}
+
+bool DeviceManager::isInDeviceList(string& device_id, string& sourceSite){
+    std::lock_guard<std::mutex> lg(Mutex);
+    Json::ArrayIndex size = deviceList_.size();
+    for(Json::ArrayIndex i = 0; i < size; ++i){
+        qlibc::QData item = deviceList_.getArrayElement(i);
+        if(item.getString("device_id") == device_id){
+            sourceSite = item.getString("sourceSite");
+            return true;
+        }
+    }
+    return false;
 }
 
 qlibc::QData DeviceManager::getDeviceListLocal(){
@@ -71,7 +86,6 @@ void DeviceManager::updateSite(){
 
 qlibc::QData DeviceManager::getDeviceListAllLocalNet() {
     updateSite();
-
     qlibc::QData totalList;
     std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
     smatch sm;
@@ -124,8 +138,8 @@ qlibc::QData DeviceManager::mergeList(qlibc::QData& ble_list, qlibc::QData& zigb
 
 
 void DeviceManager::mergeList(qlibc::QData &list, qlibc::QData &totalList) {
-    for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
-        qlibc::QData item = deviceList.getArrayElement(i);
+    for(Json::ArrayIndex i = 0; i < list.size(); ++i){
+        qlibc::QData item = list.getArrayElement(i);
         totalList.append(item);
     }
 }
