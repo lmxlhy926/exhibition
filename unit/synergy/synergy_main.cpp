@@ -21,8 +21,7 @@ using namespace std::placeholders;
 using json = nlohmann::json;
 
 int main(int argc, char* argv[]) {
-    httplib::ThreadPool threadPool_(30);
-    std::atomic<bool> http_server_thread_end(false);
+    httplib::ThreadPool threadPool_(5);
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
@@ -34,9 +33,6 @@ int main(int argc, char* argv[]) {
     GroupManager::getInstance();
 
     //站点请求管理
-//    SiteRecord::getInstance()->addSite(BleSiteID, RequestIp, BleSitePort);
-//    SiteRecord::getInstance()->addSite(ZigbeeSiteID, RequestIp, ZigbeeSitePort);
-//    SiteRecord::getInstance()->addSite(TvAdapterSiteID, RequestIp, TvAdapterSitePort);
     SiteRecord::getInstance()->addSite(SceneSiteID, RequestIp, SceneSitePort);
 
     serviceSiteManager->registerMessageId(Scene_Msg_MessageID);   //场景指令消息
@@ -77,7 +73,7 @@ int main(int argc, char* argv[]) {
         return synergy::groupControl_service_handler(request, response);
     });
 
-
+#if 0
     serviceSiteManager->registerMessageHandler(Site_OnOffLine_MessageID, [](const Request& request){
         //每次站点上线都会触发重新获取设备列表、组列表
         qlibc::QData data(request.body);
@@ -88,30 +84,30 @@ int main(int argc, char* argv[]) {
         }
     });
 
-//    threadPool_.enqueue([&](){
-//        while(true){
-//            int code;
-//            std::vector<string> messageIdList;
-//            messageIdList.push_back(Site_OnOffLine_MessageID);
-//            code = serviceSiteManager->subscribeMessage(RequestIp, QuerySitePort, messageIdList);
-//            if (code == ServiceSiteManager::RET_CODE_OK) {
-//                printf("subscribeMessage Site_OnOffLine_MessageID ok....\n");
-//                break;
-//            }
-//
-//            std::this_thread::sleep_for(std::chrono::seconds(3));
-//            printf("subscribed Site_OnOffLine_MessageID failed....., start to subscribe in 3 seconds\n");
-//        }
-//    });
+    threadPool_.enqueue([&](){
+        while(true){
+            int code;
+            std::vector<string> messageIdList;
+            messageIdList.push_back(Site_OnOffLine_MessageID);
+            code = serviceSiteManager->subscribeMessage(RequestIp, QuerySitePort, messageIdList);
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                printf("subscribeMessage Site_OnOffLine_MessageID ok....\n");
+                break;
+            }
 
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            printf("subscribed Site_OnOffLine_MessageID failed....., start to subscribe in 3 seconds\n");
+        }
+    });
+#endif
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-            int code = serviceSiteManager->start();
+//            int code = serviceSiteManager->start();
             //注册启动方式
-//            int code = serviceSiteManager->startByRegister();
+            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 std::cout << "===>synergySite startByRegister error, code = " << code << std::endl;
                 std::cout << "===>synergySite startByRegister in 3 seconds...." << std::endl;

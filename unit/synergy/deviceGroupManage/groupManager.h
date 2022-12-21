@@ -17,12 +17,12 @@ private:
     std::mutex Mutex;
     std::thread* updateListThread;
     GroupManager(){
-        while(true){
-            updateListThread = new thread([this]{
+        updateListThread = new thread([this]{
+            while(true){
                 getAllGroupList();
                 std::this_thread::sleep_for(std::chrono::seconds(5));
-            });
-        }
+            }
+        });
     }
     static GroupManager* instance;
 
@@ -39,12 +39,6 @@ public:
     bool isInGroupList(string& group_id, string& sourceSite);
 
 private:
-    //获取设备列表
-    qlibc::QData getGroupListLocal();
-
-    //更新站点
-    void updateSite();
-
     //获取组列表
     qlibc::QData getGroupListAllLocalNet();
 
@@ -52,11 +46,7 @@ private:
     qlibc::QData addSourceTag(qlibc::QData deviceList, string sourceSite);
 
     //站点拼接
-    qlibc::QData mergeList(qlibc::QData& ble_list, qlibc::QData& zigbeeList, qlibc::QData& tvAdapterList);
-
-    //站点拼接
     void mergeList(qlibc::QData& list, qlibc::QData& totalList);
-
 };
 
 #endif //EXHIBITION_GROUPMANAGER_H

@@ -35,23 +35,18 @@ public:
     //获取设备列表
     qlibc::QData getAllDeviceList();
 
+    //判断设备是否在设备列表里
     bool isInDeviceList(string& device_id, string& sourceSite);
 
 private:
-    //获取设备列表
-    qlibc::QData getDeviceListLocal();
-
     //更新站点
     void updateSite();
 
-    //获取设备列表
+    //获取局域网所有设备列表
     qlibc::QData getDeviceListAllLocalNet();
 
     //增加站点标识
     qlibc::QData addSourceTag(qlibc::QData deviceList, string sourceSite);
-
-    //列表拼接
-    qlibc::QData mergeList(qlibc::QData& ble_list, qlibc::QData& zigbeeList, qlibc::QData& tvAdapterList);
 
     //站点拼接
     void mergeList(qlibc::QData& list, qlibc::QData& totalList);

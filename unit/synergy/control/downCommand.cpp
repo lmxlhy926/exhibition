@@ -35,6 +35,7 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
            controlList.append(controlData);
        }
     }
+    LOG_INFO << "controlList: " << controlList.toJsonString();
     return controlList;
 }
 

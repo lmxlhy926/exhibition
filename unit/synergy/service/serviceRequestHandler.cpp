@@ -88,6 +88,7 @@ namespace synergy {
         return true;
     }
 
+    //构造分组控制指令
     qlibc::QData buildControlCmd(string group_id){
         qlibc::QData command, commandList, deviceItem, deviceList;
         command.setString("command_id", "luminance_color_temperature");
@@ -107,13 +108,13 @@ namespace synergy {
     }
 
     bool isSiteOnline(const std::string& siteId){
-        qlibc::QData data, responseData;
-        data.setString("service_id", "get_message_list");
-        data.putData("request", qlibc::QData());
-        return SiteRecord::getInstance()->sendRequest2Site(siteId, data, responseData);
+        qlibc::QData requestData, responseData;
+        requestData.setString("service_id", "get_message_list");
+        requestData.putData("request", qlibc::QData());
+        return httpUtil::sitePostRequest("127.0.0.1", 9000, requestData, responseData);
     }
 
-    //使用蓝牙站点
+    //软服针对样板间下发给mesh站点的控制指令
     void lightControlBleSite(const string& area, const qlibc::QData& requestData){
         if(area == "all"){      //关闭所有灯
             qlibc::QData controlData = buildControlCmd("FFFF");
@@ -195,7 +196,7 @@ namespace synergy {
             }
         }
 
-        //针对多媒体下挂的设备
+        //针对tvAdapter下挂的多媒体设备
         qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
         qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
         qlibc::QData controlList = DownCommandData(requestData).getContorlData(deviceList);
@@ -207,7 +208,7 @@ namespace synergy {
             if(pos != deviceListMap.end()){
                 pos->second.append(controlData);
             }else{
-                deviceListMap.insert(std::make_pair(controlData.getString("sourceSite"), controlData));
+                deviceListMap.insert(std::make_pair(controlData.getString("sourceSite"), qlibc::QData().append(controlData)));
             }
         }
 
