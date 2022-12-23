@@ -85,6 +85,12 @@ int main(int argc, char* argv[]){
         return site_getLocalAreaNetworkSiteInfo_service_handler(request, response);
     });
 
+    //打印资源信息
+    serviceSiteManager->registerServiceRequestHandler(Site_print_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return printResource(request, response);
+    });
+
 
     //重新启动后，发布注册消息，使各个站点重新进行注册
     qlibc::QData registerAgain;

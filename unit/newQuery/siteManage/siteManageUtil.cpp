@@ -124,11 +124,13 @@ void SiteTree::updateLocalSitePingCounter(string& siteId){
 void SiteTree::confirmIp(string& ip){
     if(!ipConfirm.load()){
         std::lock_guard<std::recursive_mutex> lg(siteMutex);
-        auto pos = ipSet.find(ip);
-        if(pos != ipSet.end()){
-            localIp = ip;
-            LOG_PURPLE << "localIp: " << ip;
-            ipConfirm.store(true);
+        auto pos = ipMap.find(ip);
+        if(pos != ipMap.end()){
+            if(regex_search(pos->second, regex("wlan")) || regex_search(pos->second, regex("eth"))){
+                localIp = ip;
+                LOG_PURPLE << "localIp: " << ip;
+                ipConfirm.store(true);
+            }
         }
     }
 }
@@ -140,10 +142,11 @@ string SiteTree::getLocalIpAddress() {
 
 void SiteTree::addNewFindSite(string& ip) {
     bool flag = false;
+    //如果是本机自己的回复，则返回
     {
         std::lock_guard<std::recursive_mutex> lg(siteMutex);
-        auto pos = ipSet.find(ip);
-        if(pos == ipSet.end()){
+        auto pos = ipMap.find(ip);
+        if(pos == ipMap.end()){
             flag = true;
         }
     }
@@ -280,8 +283,19 @@ qlibc::QData SiteTree::getLocalAreaSite(string& siteId){
     return retData;
 }
 
+qlibc::QData SiteTree::printResource(){
+    std::lock_guard<std::recursive_mutex> lg(siteMutex);
+    qlibc::QData data;
+    data.setString("localIp", localIp);
+    Json::Value array(Json::arrayValue);
+    for(auto& elem : ipMap){
+        array.append(elem.first);
+    }
+    data.setValue("ipset", array);
+    return data;
+}
 
-void SiteTree::initLocalIp() {
+int SiteTree::initLocalIp() {
     int sockets[32];
     int max_sockets = sizeof(sockets) / sizeof(sockets[0]);
     int num_sockets = 0;
@@ -291,9 +305,10 @@ void SiteTree::initLocalIp() {
     //获取所有网卡的网卡地址
     if (getifaddrs(&ifaddr) < 0){
         LOG_RED << "Unable to get interface addresses...";
-        return;
+        return -1;
     }
 
+    int retFlag = -1;
     for (ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
         if (!ifa->ifa_addr)  //网卡地址存在
             continue;
@@ -321,14 +336,29 @@ void SiteTree::initLocalIp() {
                     char buffer[128];
                     mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer), saddr,
                                                                 sizeof(struct sockaddr_in));
-                    LOG_INFO << "initLocalIp Finded Local IPv4 address: " << string(addr.str);
-                    ipSet.insert(string(addr.str));
+                    std::lock_guard<std::recursive_mutex> lg(siteMutex);
+                    auto pos = ipMap.find(string(addr.str));
+                    if(pos == ipMap.end()){
+                        LOG_INFO << "initLocalIp Finded Local IPv4 address: " << string(addr.str)
+                                 << " : " << string(ifa->ifa_name);
+                        ipMap.insert(std::make_pair(string(addr.str), string(ifa->ifa_name)));
+
+                        if(regex_search(string(ifa->ifa_name), regex("wlan")) || regex_search(string(ifa->ifa_name), regex("eth"))){
+                            if(!ipConfirm.load()){
+                                localIp = string(addr.str);
+                                LOG_PURPLE << "localIp: " << localIp;
+                                ipConfirm.store(true);
+                            }
+                        }
+                        retFlag = 0;
+                    }
                 }
             }
         }
     }
 
     freeifaddrs(ifaddr);
+    return retFlag;
 }
 
 void SiteTree::insertLocalQuerySiteInfo() {
@@ -449,7 +479,7 @@ void mdnsResponseHandle(string service_instance_string, string ipString, int sit
             //依据节点的查询站点回复来更新节点信息
             if(site_id == "site-query"){
                 //确定本机有效的IP地址
-                SiteTree::getInstance()->confirmIp(ip);
+//                SiteTree::getInstance()->confirmIp(ip);
                 //更新局域网发现的站点
                 SiteTree::getInstance()->addNewFindSite(ip);
             }

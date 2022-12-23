@@ -40,7 +40,7 @@ private:
 //被发现的节点的维护
     //<节点ip, [所有节点包含的站点信息]>
     std::unordered_map<string, Json::Value>  discoveredSiteMap;     // 局域网内发现的其它站点
-    //<ip, int>
+    //<节点ip, int>
     std::unordered_map<string, int> discoveredPingCountMap;         // 局域网内发现的节点ping计数，<=-3,自动清除
     std::thread* discoverThread;                                    // 查询局域网其它节点线程
     std::thread* discoveredPingThread;                              // 发现节点ping线程
@@ -50,7 +50,8 @@ private:
     std::atomic<bool> ipConfirm{false};         // 本机有效IP地址确认标志
     std::atomic<bool> initComplete{false};      //初始化完成
     std::string localIp = "127.0.0.1";            // 默认IP地址
-    std::unordered_set<string> ipSet;             // 本机可用的ip地址集
+    //ip---name
+    std::unordered_map<string, string> ipMap;      // 本机可用的ip地址集
 
     static SiteTree* Instance;
 
@@ -59,8 +60,9 @@ public:
     static SiteTree* getInstance();
 
     void init(){
-        initLocalIp();     //获取本机所有IP
-        site_query();      //通过返回确定本机有效IP
+        while(initLocalIp() == -1){
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
         insertLocalQuerySiteInfo(); //确定有效IP后，注册查询站点
 
         //本机站点ping计数
@@ -111,18 +113,24 @@ public:
     //获取本机ip地址，如果获取网卡地址失败，则为回环口地址
     string getLocalIpAddress();
 
-    //更新局域网节点信息、订阅节点之间通道消息
+    /*
+     * 发送查询请求，依据返回的ip来判断是否是新的节点
+     * 更新局域网节点信息、订阅节点之间通道消息
+     */
     void addNewFindSite(string& ip);
 
-    //用节点之间消息，更新本机维护的发现节点下挂的站点信息
+    //用节点之间的消息，更新本机维护的节点下的站点状态
     void updateFindSite(qlibc::QData& siteInfo);
 
-    //获取局域网内指定的站点信息
+    //获取局域网内指定的站点信息（一个或多个）
     qlibc::QData getLocalAreaSite(string& siteId);
+
+    //打印资源情况
+    qlibc::QData printResource();
 
 private:
     //初始化本机IP地址
-     void initLocalIp();
+     int initLocalIp();
 
     //插入本机查询站点消息
     void insertLocalQuerySiteInfo();

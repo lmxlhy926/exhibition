@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 using namespace std;
 
 //开关灯

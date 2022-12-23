@@ -143,3 +143,9 @@ int site_getLocalAreaNetworkSiteInfo_service_handler(const Request& request, Res
     response.set_content(successResponse(siteList).toJsonString(), "text/json");
     return 0;
 }
+
+int printResource(const Request& request, Response& response){
+    qlibc::QData data = SiteTree::getInstance()->printResource();
+    response.set_content(data.toJsonString(), "text/json");
+    return 0;
+}
