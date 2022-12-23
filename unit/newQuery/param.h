@@ -8,7 +8,7 @@
 #include <string>
 using namespace std;
 
-static const string QuerySiteID = "site-query";
+static const string QuerySiteID = "site_query";
 static const string QuerySiteName = "服务站点查询";
 static const int QuerySitePort = 9000;
 

@@ -53,6 +53,8 @@ private:
     //ip---name
     std::unordered_map<string, string> ipMap;      // 本机可用的ip地址集
 
+    std::thread* mdnsServiceThread;                //启动mdns服务线程
+
     static SiteTree* Instance;
 
 public:
@@ -87,6 +89,11 @@ public:
                 std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
                 discoveredSitePingCountDown();
             }
+        });
+
+        //开启mdns服务
+        mdnsServiceThread = new thread([this]{
+            mdnsServiceStart();
         });
 
         initComplete.store(true);
@@ -143,6 +150,9 @@ private:
 
     //查找局域网其它站点
     void site_query();
+
+    //开启mdns服务
+    void mdnsServiceStart();
 
     //发布列表里站点的上下线消息
     void publishOnOffLineMessage(qlibc::QData& siteList, string onOffLine, bool is2Node);

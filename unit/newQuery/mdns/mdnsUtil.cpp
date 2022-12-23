@@ -6,6 +6,7 @@
 #include "siteManage/siteManageUtil.h"
 #include <regex>
 #include "log/Logging.h"
+#include <arpa/inet.h>
 
 
 static char addrbuffer[64];
@@ -216,7 +217,7 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
 //        }
 
         LOG_BLUE << "Query: " << record_name << " " << string(name.str, name.length);
-        if (siteId == "site-query" || SiteTree::getInstance()->isLocalSiteExist(siteId)) {
+        if (siteId == "site_query" || SiteTree::getInstance()->isLocalSiteExist(siteId)) {
             if ((rtype == MDNS_RECORDTYPE_PTR) || (rtype == MDNS_RECORDTYPE_ANY)) {
                 // The PTR query was for our service (usually "<_service-name._tcp.local"), answer a PTR
                 // record reverse mapping the queried service name to our service instance name
@@ -261,7 +262,9 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
 
                 // A/AAAA records mapping "<hostname>.local." to IPv4/IPv6 addresses
                 if (service->address_ipv4.sin_family == AF_INET){
-                    additional[additional_count++] = service->record_a;
+                    mdns_record_t recordA = service->record_a;
+                    inet_pton(AF_INET, SiteTree::getInstance()->getLocalIpAddress().c_str(), &recordA.data.a.addr.sin_addr.s_addr);
+                    additional[additional_count++] = recordA;
                 }
 
 
@@ -1052,7 +1055,6 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
     service.txt_record[1].data.txt.key = {MDNS_STRING_CONST("other")};
     service.txt_record[1].data.txt.value = {MDNS_STRING_CONST("value")};
 
-#if 1
     // Send an announcement on startup of service
     {
 //        printf("Sending announce\n");
@@ -1071,7 +1073,6 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
             mdns_announce_multicast(sockets[isock], buffer, capacity, service.record_ptr, 0, 0,
                                     additional, additional_count);
     }
-#endif
 
     // This is a crude implementation that checks for incoming queries
     while (running) {
@@ -1126,7 +1127,7 @@ service_mdns(const char* hostname, const char* service_name, int service_port) {
         mdns_socket_close(sockets[isock]);
     printf("Closed socket%s\n", num_sockets ? "s" : "");
 
-    return 0;
+    return -1;
 }
 
 

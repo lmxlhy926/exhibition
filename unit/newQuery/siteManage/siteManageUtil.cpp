@@ -366,11 +366,11 @@ void SiteTree::insertLocalQuerySiteInfo() {
     Json::Value querySiteInfo;
     querySiteInfo["ip"] = localIp;
     querySiteInfo["port"] = 9000;
-    querySiteInfo["site_id"] = "site-query";
+    querySiteInfo["site_id"] = "site_query";
     querySiteInfo["site_status"] = "online";
     querySiteInfo["summary"] = "服务站点查询";
-    localSiteMap.insert(std::make_pair("site-query", querySiteInfo));
-    localSitePingCountMap.insert(std::make_pair("site-query", 1));
+    localSiteMap.insert(std::make_pair("site_query", querySiteInfo));
+    localSitePingCountMap.insert(std::make_pair("site_query", 1));
 }
 
 //站点计数-1，移除离线站点计数、发布站点离线消息，通过节点通道发送该消息
@@ -379,7 +379,7 @@ void SiteTree::localSitePingCountDown(){
     {
         std::lock_guard<std::recursive_mutex> lg(siteMutex);
         for(auto& elem : localSitePingCountMap){
-            if(elem.first != "site-query"){
+            if(elem.first != "site_query"){
                 elem.second += -1;
             }
         }
@@ -439,12 +439,29 @@ void SiteTree::discoveredSitePingCountDown(){
 
 
 void SiteTree::site_query() {
-    string querySiteName = "_edgeai.site-query._tcp.local.";
+    string querySiteName = "_edgeai.site_query._tcp.local.";
     mdns_query_t query[1];
     query[0].name = querySiteName.c_str();
     query[0].length = strlen(query[0].name);
     query[0].type = MDNS_RECORDTYPE_PTR;
     send_mdns_query(query, 1);
+}
+
+void SiteTree::mdnsServiceStart(){
+    string hostname = "smartHome";
+    char hostname_buffer[256];
+    size_t hostname_size = sizeof(hostname_buffer);
+    if (gethostname(hostname_buffer, hostname_size) == 0)
+        hostname = hostname_buffer;
+
+    //mdns服务器监听5353端口号，此处指定请求服务名以及返回的端口号
+    string service = "edgeai.site_query._tcp.local.";
+    int service_port = 9000;
+    while(true){
+        service_mdns(hostname.c_str(), service.c_str(), service_port);
+        LOG_RED << "failed to start mdnsService, start again in 3 seconds.....";
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
 }
 
 void SiteTree::publishOnOffLineMessage(qlibc::QData& siteList, string onOffLine, bool is2Node){
@@ -477,7 +494,7 @@ void mdnsResponseHandle(string service_instance_string, string ipString, int sit
             string ip = ipSm.str(1);
 
             //依据节点的查询站点回复来更新节点信息
-            if(site_id == "site-query"){
+            if(site_id == "site_query"){
                 //确定本机有效的IP地址
 //                SiteTree::getInstance()->confirmIp(ip);
                 //更新局域网发现的站点

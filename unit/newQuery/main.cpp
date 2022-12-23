@@ -31,12 +31,6 @@ int main(int argc, char* argv[]){
     serviceSiteManager->setServerPort(QuerySitePort);
     serviceSiteManager->setSiteIdSummary(QuerySiteID, QuerySiteName);
 
-    //开启mdns服务器，接受查询
-    threadPool_.enqueue([]{
-        mdnsServiceStart();
-    });
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
     //获取单例对象
     SiteTree::getInstance()->init();
 
@@ -105,8 +99,6 @@ int main(int argc, char* argv[]){
         while(true){
             //自启动方式
             int code = serviceSiteManager->start();
-            //注册启动方式
-//            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 std::cout << "===>querySite startByRegister error, code = " << code << std::endl;
                 std::cout << "===>querySite startByRegister in 3 seconds...." << std::endl;
