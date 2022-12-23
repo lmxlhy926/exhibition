@@ -36,6 +36,7 @@ static const string WHITELIST_REQUEST_URL   =  "/logic-device/edge/getLittleWhit
 //服务ID, 对内提供
 static const string SCENELIST_REQUEST_SERVICE_ID =          "sceneListRequest";
 static const string SUBDEVICE_REGISTER_SERVICE_ID =         "subDeviceRegister";
+static const string POSTDEVICELIST_REGISTER_SERVICE_ID =    "postDeviceList";
 static const string DOMAINID_REQUEST_SERVICE_ID =           "domainIdRequest";
 static const string ENGINEER_REQUEST_SERVICE_ID =           "engineerAppInfo";
 static const string WHITELIST_REQUEST_SERVICE_ID =          "whiteListRequest";

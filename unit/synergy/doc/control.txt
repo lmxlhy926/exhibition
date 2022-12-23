@@ -64,7 +64,10 @@
     "service_id": "cloudCommand",
     "request": {
         "action": "cookModeStart",
-        "type": "service"
+        "type": "service",
+        "inParams": {
+            "area": "101"
+        }
     }
 }
 

@@ -107,6 +107,11 @@ int main(int argc, char* argv[]) {
             return subDeviceRegister_service_request_handler(request, response, mc.isConnected());
         });
 
+        //设备列表同步
+        serviceSiteManager->registerServiceRequestHandler(POSTDEVICELIST_REGISTER_SERVICE_ID, [&](const Request& request, Response& response)->int{
+            return postDeviceList_service_request_handler(request, response, mc.isConnected());
+        });
+
         //注册获取家庭域Id处理函数
         serviceSiteManager->registerServiceRequestHandler(DOMAINID_REQUEST_SERVICE_ID, [&](const Request& request, Response& response)->int{
             return domainIdRequest_service_request_handler(request, response, mc.isConnected());
@@ -135,9 +140,9 @@ int main(int argc, char* argv[]) {
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-//            int code = serviceSiteManager->start();
+            int code = serviceSiteManager->start();
             //注册启动方式
-            int code = serviceSiteManager->startByRegister();
+//            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 LOG_RED << "===>configSite startByRegister error, code = " << code;
                 LOG_RED << "===>configSite startByRegister in 3 seconds....";

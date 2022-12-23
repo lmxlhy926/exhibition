@@ -116,8 +116,8 @@ int subDeviceRegister_service_request_handler(const Request& request, Response& 
 }
 
 
-int subDeviceRegister_service_request_handler_bak(const Request& request, Response& response, bool isConnec){
-    LOG_INFO << "===>subDeviceRegister_service_request_handler: " << request.body;
+int postDeviceList_service_request_handler(const Request& request, Response& response, bool isConnec){
+    LOG_INFO << "===>postDeviceList_service_request_handler: " << request.body;
     if (!isConnec){
         LOG_RED << "===>cant access internet......";
         qlibc::QData errData;
