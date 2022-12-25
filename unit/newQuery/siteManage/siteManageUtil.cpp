@@ -334,23 +334,22 @@ int SiteTree::initLocalIp() {
                 }
                 if (log_addr) {     //打印查询到的每个ipv4地址
                     char buffer[128];
-                    mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer), saddr,
-                                                                sizeof(struct sockaddr_in));
+                    mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer), saddr,sizeof(struct sockaddr_in));
                     std::lock_guard<std::recursive_mutex> lg(siteMutex);
+                    LOG_INFO << "initLocalIp Finded Local IPv4 address: " << string(addr.str) << " : " << string(ifa->ifa_name);
                     auto pos = ipMap.find(string(addr.str));
-                    if(pos == ipMap.end()){
-                        LOG_INFO << "initLocalIp Finded Local IPv4 address: " << string(addr.str)
-                                 << " : " << string(ifa->ifa_name);
-                        ipMap.insert(std::make_pair(string(addr.str), string(ifa->ifa_name)));
+                    if(pos != ipMap.end()){
+                        ipMap.erase(pos);
+                    }
+                    ipMap.insert(std::make_pair(string(addr.str), string(ifa->ifa_name)));
 
-                        if(regex_search(string(ifa->ifa_name), regex("wlan")) || regex_search(string(ifa->ifa_name), regex("eth"))){
-                            if(!ipConfirm.load()){
-                                localIp = string(addr.str);
-                                LOG_PURPLE << "localIp: " << localIp;
-                                ipConfirm.store(true);
-                            }
+                    if(regex_search(string(ifa->ifa_name), regex("wlan")) || regex_search(string(ifa->ifa_name), regex("eth"))){
+                        if(!ipConfirm.load()){
+                            localIp = string(addr.str);
+                            LOG_PURPLE << "localIp: " << localIp;
+                            retFlag = 0;
+                            ipConfirm.store(true);
                         }
-                        retFlag = 0;
                     }
                 }
             }

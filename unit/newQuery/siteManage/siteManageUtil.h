@@ -16,6 +16,7 @@
 #include <netdb.h>
 #include <thread>
 #include "mdns/mdnsUtil.h"
+#include "log/Logging.h"
 
 using namespace std;
 
@@ -63,6 +64,7 @@ public:
 
     void init(){
         while(initLocalIp() == -1){
+            LOG_RED << "failed to deterime localIP, start again in 5 seconds....";
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
         insertLocalQuerySiteInfo(); //确定有效IP后，注册查询站点

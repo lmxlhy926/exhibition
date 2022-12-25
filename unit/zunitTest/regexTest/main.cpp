@@ -8,6 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <unordered_map>
 using namespace std;
 
 //开关灯
@@ -46,7 +47,13 @@ string getBinaryString(){
 
 
 int main(int argc, char* argv[]){
-   std::cout << getBinaryString();
+    std::map<string, int> siMap;
+    siMap.insert(std::make_pair("hello", 1));
+    siMap.insert(std::make_pair("hello", 2));
+
+    for(auto &elem : siMap){
+        std::cout << elem.first << ":" << elem.second << std::endl;
+    }
 
     return 0;
 }
