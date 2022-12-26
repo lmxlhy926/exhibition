@@ -45,17 +45,17 @@ private:
     std::unordered_map<string, int> discoveredPingCountMap;         // 局域网内发现的节点ping计数，<=-3,自动清除
     std::thread* discoverThread;                                    // 查询局域网其它节点线程
     std::thread* discoveredPingThread;                              // 发现节点ping线程
-    int discoverPingInterval = 10;
+    int discoverPingInterval = 5;
 
     std::recursive_mutex siteMutex;                // 保护数据结构并发操作
-    std::atomic<bool> ipConfirm{false};         // 本机有效IP地址确认标志
     std::atomic<bool> initComplete{false};      //初始化完成
     std::string localIp = "127.0.0.1";            // 默认IP地址
     //ip---name
     std::unordered_map<string, string> ipMap;      // 本机可用的ip地址集
 
     std::thread* mdnsServiceThread;                //启动mdns服务线程
-
+    std::thread* findLocalIpThread;                //发现本机IP线程
+    int findIpInterval = 2;                        //确定本机IP
     static SiteTree* Instance;
 
 public:
@@ -88,7 +88,7 @@ public:
         //发现节点ping计数
         discoveredPingThread = new thread([this]{
             while(true){
-                std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
+                std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
                 discoveredSitePingCountDown();
             }
         });
@@ -96,6 +96,14 @@ public:
         //开启mdns服务
         mdnsServiceThread = new thread([this]{
             mdnsServiceStart();
+        });
+
+        //开启发现本机IP
+        findLocalIpThread = new thread([this]{
+            while(true){
+                std::this_thread::sleep_for(std::chrono::seconds(findIpInterval));
+                initLocalIp();
+            }
         });
 
         initComplete.store(true);
@@ -115,9 +123,6 @@ public:
 
     //更新本机站点计数
     void updateLocalSitePingCounter(string& siteId);
-
-    //确定本机使用的IP地址
-    void confirmIp(string& ip);
 
     //获取本机ip地址，如果获取网卡地址失败，则为回环口地址
     string getLocalIpAddress();
@@ -155,6 +160,9 @@ private:
 
     //开启mdns服务
     void mdnsServiceStart();
+
+    //更新本机列表
+    void updateLocalSiteMap();
 
     //发布列表里站点的上下线消息
     void publishOnOffLineMessage(qlibc::QData& siteList, string onOffLine, bool is2Node);

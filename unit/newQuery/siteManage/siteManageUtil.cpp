@@ -120,21 +120,6 @@ void SiteTree::updateLocalSitePingCounter(string& siteId){
 }
 
 
-//取本机IP中有回复的作为本机IP
-void SiteTree::confirmIp(string& ip){
-    if(!ipConfirm.load()){
-        std::lock_guard<std::recursive_mutex> lg(siteMutex);
-        auto pos = ipMap.find(ip);
-        if(pos != ipMap.end()){
-            if(regex_search(pos->second, regex("wlan")) || regex_search(pos->second, regex("eth"))){
-                localIp = ip;
-                LOG_PURPLE << "localIp: " << ip;
-                ipConfirm.store(true);
-            }
-        }
-    }
-}
-
 string SiteTree::getLocalIpAddress() {
    return localIp;
 }
@@ -335,8 +320,9 @@ int SiteTree::initLocalIp() {
                 if (log_addr) {     //打印查询到的每个ipv4地址
                     char buffer[128];
                     mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer), saddr,sizeof(struct sockaddr_in));
+
                     std::lock_guard<std::recursive_mutex> lg(siteMutex);
-                    LOG_INFO << "initLocalIp Finded Local IPv4 address: " << string(addr.str) << " : " << string(ifa->ifa_name);
+                    LOG_INFO << ">>>initLocalIp Finded Local IPv4 address: " << string(addr.str) << " : " << string(ifa->ifa_name);
                     auto pos = ipMap.find(string(addr.str));
                     if(pos != ipMap.end()){
                         ipMap.erase(pos);
@@ -344,12 +330,17 @@ int SiteTree::initLocalIp() {
                     ipMap.insert(std::make_pair(string(addr.str), string(ifa->ifa_name)));
 
                     if(regex_search(string(ifa->ifa_name), regex("wlan")) || regex_search(string(ifa->ifa_name), regex("eth"))){
-                        if(!ipConfirm.load()){
-                            localIp = string(addr.str);
-                            LOG_PURPLE << "localIp: " << localIp;
-                            retFlag = 0;
-                            ipConfirm.store(true);
+                        //如果本机Ip值发生变化，一般是断网重连造成的，则删除旧的本地IP值
+                        if(localIp != string(addr.str)){
+                            auto position = ipMap.find(localIp);
+                            if(position != ipMap.end()){
+                                ipMap.erase(position);
+                            }
                         }
+                        localIp = string(addr.str);
+                        updateLocalSiteMap();
+                        LOG_PURPLE << "localIp: " << localIp;
+                        retFlag = 0;
                     }
                 }
             }
@@ -460,6 +451,17 @@ void SiteTree::mdnsServiceStart(){
         service_mdns(hostname.c_str(), service.c_str(), service_port);
         LOG_RED << "failed to start mdnsService, start again in 3 seconds.....";
         std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
+}
+
+void SiteTree::updateLocalSiteMap(){
+    std::lock_guard<std::recursive_mutex> lg(siteMutex);
+    for(auto& elem : localSiteMap){
+        elem.second["ip"] = localIp;
+    }
+
+    for(auto& elem : localSiteMap){
+        LOG_INFO << localIp << ":" << qlibc::QData(elem.second).toJsonString();
     }
 }
 
