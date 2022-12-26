@@ -119,8 +119,8 @@ query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry
         mdns_record_parse_a(data, size, record_offset, record_length, &addr);
         mdns_string_t addrstr =
                 ipv4_address_to_string(namebuffer, sizeof(namebuffer), &addr, sizeof(addr));
-        printf("%.*s : %s %.*s A %.*s\n", MDNS_STRING_FORMAT(fromaddrstr), entrytype,
-               MDNS_STRING_FORMAT(entrystr), MDNS_STRING_FORMAT(addrstr));
+//        printf("%.*s : %s %.*s A %.*s\n", MDNS_STRING_FORMAT(fromaddrstr), entrytype,
+//               MDNS_STRING_FORMAT(entrystr), MDNS_STRING_FORMAT(addrstr));
         LOG_GREEN << string(fromaddrstr.str, fromaddrstr.length) << " : " << entrytype << " " << string(entrystr.str, entrystr.length)
                   << " A " << string(addrstr.str, addrstr.length);
     }

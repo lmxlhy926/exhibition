@@ -85,15 +85,6 @@ int main(int argc, char* argv[]){
         return printResource(request, response);
     });
 
-
-    //重新启动后，发布注册消息，使各个站点重新进行注册
-    qlibc::QData registerAgain;
-    registerAgain.setString("message_id", Site_RegisterAgain_MessageID);
-    registerAgain.putData("content", qlibc::QData(Json::Value(Json::objectValue)));
-    serviceSiteManager->publishMessage(Site_RegisterAgain_MessageID, registerAgain.toJsonString());
-    LOG_PURPLE << "===>publish registerAgain message to notify all other sites to register again....";
-
-
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){
@@ -109,6 +100,15 @@ int main(int argc, char* argv[]){
             }
         }
     });
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    //重新启动后，发布注册消息，使各个站点重新进行注册
+    qlibc::QData registerAgain;
+    registerAgain.setString("message_id", Site_RegisterAgain_MessageID);
+    registerAgain.putData("content", qlibc::QData(Json::Value(Json::objectValue)));
+    serviceSiteManager->publishMessage(Site_RegisterAgain_MessageID, registerAgain.toJsonString());
+    LOG_INFO << "registerAgain: " << registerAgain.toJsonString(true);
+    LOG_PURPLE << "===>publish registerAgain message to notify all other sites to register again....";
 
 
     while(true){
