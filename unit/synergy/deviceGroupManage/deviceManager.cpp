@@ -59,6 +59,9 @@ void DeviceManager::updateSite(){
                 }
             }
         }
+
+        //todo 删除不在列表中的站点
+
     }
 }
 

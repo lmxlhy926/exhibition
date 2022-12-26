@@ -51,6 +51,8 @@ public:
 
     void addSite(string siteName, string siteIp, int sitePort);
 
+    void removeSite(string siteName);
+
     bool sendRequest2Site(string siteName, qlibc::QData& request, qlibc::QData& response);
 
     void printMap();

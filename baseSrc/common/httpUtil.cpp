@@ -88,6 +88,15 @@ void SiteRecord::addSite(string siteName, string siteIp, int sitePort) {
     }
 }
 
+void SiteRecord::removeSite(string siteName) {
+    std::lock_guard<std::recursive_mutex> lg(rMutex);
+    auto pos = sites.find(siteName);
+    if(pos != sites.end()){
+        pos->second.deleteClient();
+        sites.erase(pos);
+    }
+}
+
 bool SiteRecord::sendRequest2Site(string siteName, qlibc::QData &request, qlibc::QData &response) {
     std::lock_guard<std::recursive_mutex> lg(rMutex);
     auto pos = sites.find(siteName);
