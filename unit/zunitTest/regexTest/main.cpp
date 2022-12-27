@@ -47,12 +47,10 @@ string getBinaryString(){
 
 
 int main(int argc, char* argv[]){
-    std::map<string, int> siMap;
-    siMap.insert(std::make_pair("hello", 1));
-    siMap.insert(std::make_pair("hello", 2));
-
-    for(auto &elem : siMap){
-        std::cout << elem.first << ":" << elem.second << std::endl;
+    string str = "hello";
+    smatch sm;
+    if(regex_search(str, sm, regex(""))){
+        std::cout << "sssss" << std::endl;
     }
 
     return 0;

@@ -7,21 +7,23 @@
 
 #include <string>
 #include <regex>
+#include "qlibc/QData.h"
+
+
 using namespace std;
 
 enum VoiceMatchType{
     Device,
     Group,
-    All
+    WrongType
 };
 
 struct MatchItem{
-    enum VoiceMatchType type;
+    enum VoiceMatchType type = VoiceMatchType::WrongType;
     string id;
     string command_id;
     string command_para;
     string sourceSite;
-    string siteIp;
 };
 
 class voiceStringMatchControl {
@@ -35,16 +37,19 @@ public:
 
 private:
     //获取设备名称相匹配的设备ID
-    bool getSpecificDeviceId(string parseStr, string& deviceId, string& sourceSite);
+    bool getSpecificDeviceId(qlibc::QData& deviceList, string parseStr, string& deviceId, string& sourceSite);
 
     //获取组名称相匹配的组ID
-    bool getSpecificGroupId(string parseStr, string& groupId, string& sourceSite);
+    bool getSpecificGroupId(qlibc::QData& groupList, string parseStr, string& groupId, string& sourceSite);
 
     //获取房间的默认组ID
-    bool getGroupIdFromRoomName(string parseStr, string& groupId, string& sourceSite);
+    bool getGroupIdFromRoomName(qlibc::QData& groupList, string parseStr, string& groupId, string& sourceSite);
 
     //所有设备
     bool getFullGroupId(string parseStr, string& groupId, string& sourceSite);
+
+    //打印控制结构
+    void printMatchItem(MatchItem& matchItem);
 
     //解析字符串--> MatchItem
     bool parse2MatchItem(smatch& sm, MatchItem& matchItem);

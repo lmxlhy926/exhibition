@@ -7,27 +7,33 @@
 #include "../deviceGroupManage/deviceManager.h"
 #include "../deviceGroupManage/groupManager.h"
 #include "../param.h"
+#include "log/Logging.h"
 #include "common/httpUtil.h"
 
 //开关灯
-regex voice_expr_power_on("(.*)(灯)(.*)(开)(.*)");
-regex voice_expr_power_on_1("(.*)(开)(.*)(灯)(.*)");
-regex voice_expr_power_off("(.*)(灯)(.*)(关)(.*)");
-regex voice_expr_power_off_1("(.*)(关)(.*)(灯)(.*)");
+//regex voice_expr_power_on("(.*)(灯)(.*)(开)(.*)");
+//regex voice_expr_power_on_1("(.*)(开)(.*)(灯)(.*)");
+//regex voice_expr_power_off("(.*)(灯)(.*)(关)(.*)");
+//regex voice_expr_power_off_1("(.*)(关)(.*)(灯)(.*)");
+
+regex voice_expr_power_on("(.*)(开)(.*)");
+regex voice_expr_power_off("(.*)(关)(.*)");
+
 
 
 void voiceStringMatchControl::parseAndControl() {
     smatch sm;
     //开关指令
-    if(regex_match(controlString, sm, voice_expr_power_on) || regex_match(controlString, sm, voice_expr_power_on_1)){
-        MatchItem matchItem;
+    if(regex_match(controlString, sm, voice_expr_power_on)){
+        LOG_GREEN << "voice_expr_power_on: " << "<" << sm.str(1) << ">" << sm.str(2) << "<" << sm.str(3) << ">";
+        MatchItem matchItem{};
         matchItem.command_id = "power";
         matchItem.command_para = "on";
         parse2MatchItem(sm, matchItem);
         controlDeviceOrGroupByMatchItem(matchItem);
 
-    }else if(regex_match(controlString, sm, voice_expr_power_off) || regex_match(controlString, sm, voice_expr_power_off_1)){
-        MatchItem matchItem;
+    }else if(regex_match(controlString, sm, voice_expr_power_off)){
+        MatchItem matchItem{};
         matchItem.command_id = "power";
         matchItem.command_para = "off";
         parse2MatchItem(sm, matchItem);
@@ -36,45 +42,64 @@ void voiceStringMatchControl::parseAndControl() {
 }
 
 
-bool voiceStringMatchControl::getSpecificDeviceId(string parseStr, string &deviceId, string& sourceSite) {
-    qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
+bool voiceStringMatchControl::getSpecificDeviceId(qlibc::QData& deviceList, string parseStr, string& deviceId, string& sourceSite) {
     Json::ArrayIndex size = deviceList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = deviceList.getArrayElement(i);
-        if(regex_search(parseStr, regex(item.getString("device_name")))){
-            deviceId = item.getString("device_id");
-            sourceSite = item.getString("sourceSite");
-            return true;
+        string device_name = item.getString("device_name");
+        if(!parseStr.empty() && !device_name.empty()){
+            if(regex_search(parseStr, regex(device_name))){
+                LOG_INFO << "matchDevice: " << item.toJsonString(true);
+                deviceId = item.getString("device_id");
+                sourceSite = item.getString("sourceSite");
+                return true;
+            }
         }
     }
     return false;
 }
 
 
-bool voiceStringMatchControl::getSpecificGroupId(string parseStr, string &groupId, string& sourceSite) {
-    qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
+bool voiceStringMatchControl::getSpecificGroupId(qlibc::QData& groupList, string parseStr, string& groupId, string& sourceSite) {
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = groupList.getArrayElement(i);
-        if(regex_search(parseStr, regex(item.getString("group_name")))){
-            groupId = item.getString("group_id");
-            sourceSite = item.getString("sourceSite");
-            return true;
+        string group_name = item.getString("group_name");
+        if(!parseStr.empty() && !group_name.empty()){
+            if(regex_search(parseStr, regex(group_name))){
+                qlibc::QData matchGroup;
+                matchGroup.setString("group_id", item.getString("group_id"));
+                matchGroup.setString("group_name", item.getString("group_name"));
+                matchGroup.putData("location", item.getData("location"));
+                matchGroup.setString("sourceSite", item.getString("sourceSite"));
+                LOG_INFO << "matchGroup: " << matchGroup.toJsonString(true);
+                groupId = item.getString("group_id");
+                sourceSite = item.getString("sourceSite");
+                return true;
+            }
         }
     }
     return false;
 }
 
 
-bool voiceStringMatchControl::getGroupIdFromRoomName(string parseStr, string &groupId, string& sourceSite) {
-    qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
+bool voiceStringMatchControl::getGroupIdFromRoomName(qlibc::QData& groupList, string parseStr, string& groupId, string& sourceSite) {
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = groupList.getArrayElement(i);
-        if(regex_search(parseStr, regex(item.getData("location").getString("room_name")))){
-            groupId = item.getString("group_id");
-            sourceSite = item.getString("sourceSite");
-            return true;
+        string room_name = item.getData("location").getString("room_name");
+        if(!parseStr.empty() && !room_name.empty()){
+            if(regex_search(parseStr, regex(room_name))){
+                qlibc::QData matchGroup;
+                matchGroup.setString("group_id", item.getString("group_id"));
+                matchGroup.setString("group_name", item.getString("group_name"));
+                matchGroup.putData("location", item.getData("location"));
+                matchGroup.setString("sourceSite", item.getString("sourceSite"));
+                LOG_INFO << "matchGroup: " << matchGroup.toJsonString(true);
+                groupId = item.getString("group_id");
+                sourceSite = item.getString("sourceSite");
+                return true;
+            }
         }
     }
     return false;
@@ -90,35 +115,47 @@ bool voiceStringMatchControl::getFullGroupId(string parseStr, string &groupId, s
     return false;
 }
 
+void voiceStringMatchControl::printMatchItem(MatchItem& matchItem){
+    string type = "wrongType";
+    if(matchItem.type == VoiceMatchType::Device){
+        type = "device";
+    }else if(matchItem.type == VoiceMatchType::Group){
+        type = "group";
+    }
+    qlibc::QData data;
+    data.setString("type", type);
+    data.setString("id", matchItem.id);
+    data.setString("command_id", matchItem.command_id);
+    data.setString("command_para", matchItem.command_para);
+    data.setString("sourceSite", matchItem.sourceSite);
+    LOG_GREEN << "matchItem: " << data.toJsonString(true);
+}
+
 bool voiceStringMatchControl::parse2MatchItem(smatch& sm, MatchItem &matchItem) {
+    qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
+    qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
     string deviceIdOrGroupId, sourceSite;
     bool isMatch = false;
 
     for(int i = 1; i < sm.size(); ++i){
-        if(getSpecificDeviceId(sm[i].str(), deviceIdOrGroupId, sourceSite)){            //具体设备名称
+        if(getSpecificDeviceId(deviceList, sm[i].str(), deviceIdOrGroupId, sourceSite)){            //具体设备名称
             matchItem.type = VoiceMatchType::Device;
             matchItem.id = deviceIdOrGroupId;
             matchItem.sourceSite = sourceSite;
             isMatch = true;
             break;
 
-        }else if(getSpecificGroupId(sm[i].str(), deviceIdOrGroupId, sourceSite)){       //具体组ID
+        }else if(getSpecificGroupId(groupList, sm[i].str(), deviceIdOrGroupId, sourceSite)){       //具体组ID
             matchItem.type = VoiceMatchType::Group;
             matchItem.id = deviceIdOrGroupId;
             matchItem.sourceSite = sourceSite;
             isMatch = true;
             break;
 
-        }else if(getGroupIdFromRoomName(sm[i].str(), deviceIdOrGroupId, sourceSite)){   //房间默认组ID
+        }else if(getGroupIdFromRoomName(groupList, sm[i].str(), deviceIdOrGroupId, sourceSite)){   //房间默认组ID
             matchItem.type = VoiceMatchType::Group;
             matchItem.id = deviceIdOrGroupId;
             matchItem.sourceSite = sourceSite;
-            isMatch = true;
-            break;
-
-        }else if(getFullGroupId(sm[i].str(), deviceIdOrGroupId, sourceSite)){           //所有
-            matchItem.type = VoiceMatchType::Group;
-            matchItem.id = "FFFF";
             isMatch = true;
             break;
         }
@@ -133,6 +170,7 @@ bool voiceStringMatchControl::parse2MatchItem(smatch& sm, MatchItem &matchItem) 
 
 
 void voiceStringMatchControl::controlDeviceOrGroupByMatchItem(MatchItem &matchItem) {
+    printMatchItem(matchItem);
     qlibc::QData requestData, responseData;
     if(matchItem.type == VoiceMatchType::Device){
         Json::Value command, commandList(Json::arrayValue), deviceItem, deviceList(Json::arrayValue);
@@ -146,6 +184,7 @@ void voiceStringMatchControl::controlDeviceOrGroupByMatchItem(MatchItem &matchIt
         requestData.setString("service_id", "control_device");
         requestData.putData("request", qlibc::QData().setValue("device_list", deviceList));
         SiteRecord::getInstance()->sendRequest2Site(matchItem.sourceSite, requestData, responseData);
+        LOG_BLUE << "controlResponse: " << responseData.toJsonString();
 
     }else if(matchItem.type == VoiceMatchType::Group){
         Json::Value command, commandList(Json::arrayValue), groupItem, group_list(Json::arrayValue);
@@ -159,24 +198,29 @@ void voiceStringMatchControl::controlDeviceOrGroupByMatchItem(MatchItem &matchIt
         requestData.setString("service_id", "control_group");
         requestData.putData("request", qlibc::QData().setValue("group_list", group_list));
         SiteRecord::getInstance()->sendRequest2Site(matchItem.sourceSite, requestData, responseData);
+        LOG_BLUE << "controlResponse: " << responseData.toJsonString();
 
-    }else if(matchItem.type == VoiceMatchType::All){
-        Json::Value command, commandList(Json::arrayValue), groupItem, group_list(Json::arrayValue);
-        command["command_id"] = matchItem.command_id;
-        command["command_para"] = matchItem.command_para;
-        commandList.append(command);
-        groupItem["group_id"] = matchItem.id;
-        groupItem["command_list"] = commandList;
-        group_list.append(groupItem);
-
-        requestData.setString("service_id", "control_group");
-        requestData.putData("request", qlibc::QData().setValue("group_list", group_list));
-
-        std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
-        for(auto& elem : siteNames){
-            if(elem == BleSiteID){
-                SiteRecord::getInstance()->sendRequest2Site(elem, requestData, responseData);
-            }
-        }
     }
+
+//    else if(matchItem.type == VoiceMatchType::All){
+//        Json::Value command, commandList(Json::arrayValue), groupItem, group_list(Json::arrayValue);
+//        command["command_id"] = matchItem.command_id;
+//        command["command_para"] = matchItem.command_para;
+//        commandList.append(command);
+//        groupItem["group_id"] = matchItem.id;
+//        groupItem["command_list"] = commandList;
+//        group_list.append(groupItem);
+//
+//        requestData.setString("service_id", "control_group");
+//        requestData.putData("request", qlibc::QData().setValue("group_list", group_list));
+//
+//        std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
+//        for(auto& elem : siteNames){
+//            if(elem == BleSiteID){
+//                SiteRecord::getInstance()->sendRequest2Site(elem, requestData, responseData);
+//                LOG_BLUE << "controlResponse: " << responseData.toJsonString();
+//            }
+//        }
+//    }
+
 }
