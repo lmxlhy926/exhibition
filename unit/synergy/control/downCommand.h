@@ -28,12 +28,15 @@ public:
         code = toUpper(hump2Underline(request.getString("code")));
         delay = request.getString("delay");
         inParams = request.getData("inParams");
-        LOG_PURPLE << "code: " << code << "---" << "area: " << inParams.getString("area");
+        LOG_PURPLE << "code: " << code << "---" << "area: " << inParams.getString("area")
+                   << "---" << "deviceCode: " << inParams.getString("deviceCode");
     }
 
     qlibc::QData getContorlData(qlibc::QData& deviceList);
 
     bool match(qlibc::QData& item);
+
+    bool matchNew(qlibc::QData& item);
 
     qlibc::QData buildCommandList(qlibc::QData& data);
 

@@ -26,7 +26,7 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
     ssize_t num = deviceList.size();
     for(Json::ArrayIndex i = 0; i < num; ++i){
        qlibc::QData item = deviceList.getArrayElement(i);
-       if(match(item)){     //找到匹配项，则根据匹配项构造控制指令
+       if(matchNew(item)){     //找到匹配项，则根据匹配项构造控制指令
            string sourceSite = item.getString("sourceSite");
            qlibc::QData controlData;
            controlData.setString("device_id", item.getString("device_id"));
@@ -66,6 +66,17 @@ bool DownCommandData::match(qlibc::QData& item) {
     }
 
     return false;
+}
+
+
+bool DownCommandData::matchNew(qlibc::QData& item){
+    string item_device_id = item.getString("device_id");
+    string deviceCode = inParams.getString("deviceCode");
+    if(item_device_id == deviceCode){
+        return true;
+    }else{
+        return false;
+    }
 }
 
 qlibc::QData DownCommandData::buildCommandList(qlibc::QData& data){

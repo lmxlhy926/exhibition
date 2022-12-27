@@ -111,7 +111,7 @@ namespace synergy {
         qlibc::QData requestData, responseData;
         requestData.setString("service_id", "get_message_list");
         requestData.putData("request", qlibc::QData());
-        return httpUtil::sitePostRequest("127.0.0.1", 9000, requestData, responseData);
+        return httpUtil::sitePostRequest("127.0.0.1", 9001, requestData, responseData);
     }
 
     //软服针对样板间下发给mesh站点的控制指令
