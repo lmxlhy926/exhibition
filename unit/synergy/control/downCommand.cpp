@@ -26,7 +26,7 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
     ssize_t num = deviceList.size();
     for(Json::ArrayIndex i = 0; i < num; ++i){
        qlibc::QData item = deviceList.getArrayElement(i);
-       if(matchNew(item)){     //找到匹配项，则根据匹配项构造控制指令
+       if(matchAll(item)){     //找到匹配项，则根据匹配项构造控制指令
            string sourceSite = item.getString("sourceSite");
            qlibc::QData controlData;
            controlData.setString("device_id", item.getString("device_id"));
@@ -40,42 +40,51 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
 }
 
 bool DownCommandData::match(qlibc::QData& item) {
-    string item_room_no = item.getData("location").getString("room_no");
-    string item_device_name = item.getString("device_name");
     string item_nick_name = item.getString("nick_name");
     string item_device_type = item.getString("device_type");
-    string item_sourceSite = item.getString("sourceSite");
+    string item_room_no = item.getData("location").getString("room_no");
 
     string area = inParams.getString("area");   //区域
     string kind = inParams.getString("kind");   //zd, fd, all
 
     //如果是灯设备
-    if((item_device_type == "LIGHT_SWITCH" || item_device_type == "LIGHT") && code == "LIGHT"){
-        if(area == "all"){
-            return true;
-        }else if(area == item_room_no && (kind.empty() || kind == item_nick_name)){
+    if(code == "LIGHT" && (item_device_type == "LIGHT_SWITCH" || item_device_type == "LIGHT")){  //类型匹配
+        if(area == "all" || area == item_room_no){  //区域匹配
+            if(kind == "all" || kind.empty()){
+                return true;
+            }else if(kind == item_nick_name){   //灯类型匹配
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
+
+    //其它设备
+    if(code == item_device_type){   //类型匹配
+        if(area == "all" || area == item_room_no){  //类型匹配
             return true;
         }else{
             return false;
         }
     }
 
-    //用区域和设备名字来判定设备
-    if(item_room_no == inParams.getString("area") && item_device_type == code){
-        return true;
-    }
-
     return false;
 }
 
 
-bool DownCommandData::matchNew(qlibc::QData& item){
-    string item_device_id = item.getString("device_id");
+bool DownCommandData::matchAll(qlibc::QData& item){
     string deviceCode = inParams.getString("deviceCode");
-    if(item_device_id == deviceCode){
-        return true;
-    }else{
-        return false;
+    string item_device_id = item.getString("device_id");
+    if(!deviceCode.empty()){    //通过设备标识码来判断
+        if(item_device_id == deviceCode){
+            return true;
+        }else{
+            return false;
+        }
+
+    }else{  //通过区域、类型来判断
+        return match(item);
     }
 }
 

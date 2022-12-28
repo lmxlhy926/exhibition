@@ -29,6 +29,7 @@ public:
         delay = request.getString("delay");
         inParams = request.getData("inParams");
         LOG_PURPLE << "code: " << code << "---" << "area: " << inParams.getString("area")
+                   << "---" << "kind: " << inParams.getString("kind")
                    << "---" << "deviceCode: " << inParams.getString("deviceCode");
     }
 
@@ -36,7 +37,7 @@ public:
 
     bool match(qlibc::QData& item);
 
-    bool matchNew(qlibc::QData& item);
+    bool matchAll(qlibc::QData& item);
 
     qlibc::QData buildCommandList(qlibc::QData& data);
 
