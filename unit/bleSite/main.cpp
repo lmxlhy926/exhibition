@@ -17,6 +17,41 @@ using namespace servicesite;
 using namespace httplib;
 using json = nlohmann::json;
 
+void updateGroupList2Cloud(){
+    qlibc::QData groupList = bleConfig::getInstance()->getGroupListData();
+    Json::Value::Members keyMembers = groupList.getMemberNames();
+    qlibc::QData deviceList;
+    for(auto& key : keyMembers){
+        qlibc::QData data, value(groupList.getData(key));
+        data.setString("categoryCode", "LIGHT");
+        data.setString("deviceCode", key);
+        data.setString("deviceDid", key);
+        data.setString("deviceSn", value.getString("group_name"));
+        data.setString("deviceName", value.getString("group_name"));
+        data.setString("deviceDesc", value.getString("group_name"));
+        data.setString("deviceVender", "changhong");
+        data.setString("productNickname", value.getString("group_name"));
+        data.setString("productType", "LIGHT_SWITCH");
+        data.setString("roomNo", value.getData("location").getString("room_no"));
+        data.setString("roomType", value.getData("location").getString("room_name"));
+        data.setString("roomName", value.getData("location").getString("room_name"));
+        data.setString("deviceSource", "1");
+        data.setString("isGateway", 0);
+        deviceList.append(data);
+    }
+    qlibc::QData requestData, responseData;
+    requestData.setString("service_id", "postDeviceList");
+    requestData.putData("request", qlibc::QData().putData("deviceList", deviceList));
+    while(true){
+        if(SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, requestData, responseData)){
+            break;
+        }else{
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+        }
+    }
+}
+
+
 int main(int argc, char* argv[]) {
 
     httplib::ThreadPool threadPool_(10);
@@ -36,6 +71,9 @@ int main(int argc, char* argv[]) {
         LOG_INFO << "disableUpload...........";
         RecvPackageParse::disableUpload();
     }
+
+    //同步组列表到云端
+    updateGroupList2Cloud();
 
     //单例对象
     ScanListmanage::getInstance();
