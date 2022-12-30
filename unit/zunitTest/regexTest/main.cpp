@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <sstream>
 #include <unordered_map>
+#include <vector>
 using namespace std;
 
 //开关灯
@@ -45,13 +46,30 @@ string getBinaryString(){
     return deleteWhiteSpace(binaryString);
 }
 
+std::vector<string> roomVec{
+    "客厅", "厨房"
+};
+
+//std::map<string, Json::>
+//
+//std::vector<std::vector<string>> atciton{
+//        {"打开"},
+//        {"调到", "调为"}
+//};
+
 
 int main(int argc, char* argv[]){
-    string str = "hello";
+    string voiceData = "打开厨房的设备1";
+
+    string roomMatchExpression = "(.*)(厨房|客厅)(.*)";
+    regex rg(roomMatchExpression);
     smatch sm;
-    if(regex_search(str, sm, regex(""))){
-        std::cout << "sssss" << std::endl;
+    if(regex_match(voiceData, sm, rg)){
+        std::cout << "size: " << sm.size() << std::endl;
+        std::cout << "position: " << sm.position(2)  << ", length: " << sm.length(2) << std::endl;
     }
+    voiceData.erase(6, 6);
+    std::cout << "voiceData: " << voiceData << std::endl;
 
     return 0;
 }

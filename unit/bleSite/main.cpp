@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
     }
 
     //同步组列表到云端
-    updateGroupList2Cloud();
+//    updateGroupList2Cloud();
 
     //单例对象
     ScanListmanage::getInstance();
