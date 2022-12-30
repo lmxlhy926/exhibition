@@ -20,14 +20,14 @@ void DeviceManager::listChanged() {
 }
 
 qlibc::QData DeviceManager::getAllDeviceList() {
+    std::lock_guard<std::recursive_mutex> lg(Mutex);
     qlibc::QData list = getDeviceListAllLocalNet();
-    std::lock_guard<std::mutex> lg(Mutex);
     deviceList_ = list;
     return deviceList_;
 }
 
 bool DeviceManager::isInDeviceList(string& device_id, string& sourceSite){
-    std::lock_guard<std::mutex> lg(Mutex);
+    std::lock_guard<std::recursive_mutex> lg(Mutex);
     Json::ArrayIndex size = deviceList_.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = deviceList_.getArrayElement(i);

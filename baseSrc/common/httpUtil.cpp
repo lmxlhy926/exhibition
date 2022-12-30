@@ -23,13 +23,13 @@ SingleSite::SingleSite(string ip, int port) {
 }
 
 bool SingleSite::send(qlibc::QData &request, qlibc::QData &response) {
-   if(clientptr == nullptr){
+    if(clientptr == nullptr){
        clientptr = new Client(siteIp, sitePort);
        clientptr->set_keep_alive(true);
        clientptr->set_connection_timeout(1, 0);
-   }
+    }
 
-   if(!clientptr->is_socket_open()){
+    if(!clientptr->is_socket_open()){
        clientptr->stop();
        delete clientptr;
        clientptr = nullptr;
@@ -37,14 +37,14 @@ bool SingleSite::send(qlibc::QData &request, qlibc::QData &response) {
        clientptr = new Client(siteIp, sitePort);
        clientptr->set_keep_alive(true);
        clientptr->set_connection_timeout(1, 0);
-   }
+    }
 
-   httplib::Result result =  clientptr->Post("/", request.toJsonString(), "text/json");
-   if(result != nullptr){
+    httplib::Result result =  clientptr->Post("/", request.toJsonString(), "text/json");
+    if(result != nullptr){
        response.setInitData(qlibc::QData(result.value().body));
        return true;
-   }
-   return false;
+    }
+    return false;
 }
 
 void SingleSite::deleteClient(){
@@ -115,10 +115,11 @@ void SiteRecord::printMap() {
 }
 
 std::set<string> SiteRecord::getSiteName() {
-   std::set<string> siteNameSet;
-   for(auto& elem : sites){
+    std::lock_guard<std::recursive_mutex> lg(rMutex);
+    std::set<string> siteNameSet;
+    for(auto& elem : sites){
        siteNameSet.insert(elem.first);
-   }
-   return siteNameSet;
+    }
+    return siteNameSet;
 }
 

@@ -14,7 +14,7 @@ class DeviceManager {
 private:
     std::atomic<bool> changed{true};
     qlibc::QData deviceList_;
-    std::mutex Mutex;
+    std::recursive_mutex Mutex;
     std::thread* updateListThread;
     DeviceManager(){
         updateListThread = new thread([this]{
