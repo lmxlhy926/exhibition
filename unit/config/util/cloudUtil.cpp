@@ -218,11 +218,15 @@ bool cloudUtil::ecb_httppost(const string &uri, const qlibc::QData &request, qli
     if (http_res != nullptr) {
         string decryptOut;
         lhytemp::secretUtil::ecb_decrypt_withPadding(http_res->body.c_str(), decryptOut,reinterpret_cast<const uint8_t *>(key));
+        LOG_YELLOW << "===>http_res->body: " << http_res->body;
+        LOG_YELLOW << "===>decryptOut: " << decryptOut;
         response = qlibc::QData(decryptOut);
         LOG_YELLOW << "===>httpResponse: " << response.toJsonString();
+        LOG_YELLOW << "ERROR CODE: " << to_string(http_res.error());
         return true;
     }else{
-        LOG_YELLOW << "===>httpResponse: " << "nullptr";
+        LOG_RED << "===>httpResponse: " << "http post failed....";
+        LOG_RED << "ERROR CODE: " << to_string(http_res.error());
     }
 
     return false;
