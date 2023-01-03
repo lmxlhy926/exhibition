@@ -16,29 +16,32 @@ voiceStringMatchControl::voiceStringMatchControl(string& ctrlStr)   :
     roomList({
         "客厅",
         "厨房",
-        "卧室"
+        "主卧室"
     }),
     deviceTypeMap({
-        {"LIGHT", DeviceType::LIGHT}
+        {"灯", "LIGHT"}
     }),
     matchRex2ActionCode({
         {".*(打开).*", ActionCode::powerOn},
         {".*(关闭).*", ActionCode::powerOff},
-        {".*((调|变|换|设)(到|成|为|置)).*(色温).*", ActionCode::setColor},
-        {".*(色温).*((调|变|换|设)(到|成|为|置)).*", ActionCode::setColor},
-        {".*((调|变|换|设)(到|成|为|置)).*(亮度).*", ActionCode::setColor},
-        {".*(亮度).*((调|变|换|设)(到|成|为|置)).*", ActionCode::setColor}
+        {".*((调|变|换|设)(到|成|为|置)).*(亮度).*", ActionCode::luminance1},
+        {".*(亮度).*((调|变|换|设)(到|成|为|置)).*", ActionCode::luminance2},
+        {".*((调|变|换|设)(到|成|为|置)).*(色温).*", ActionCode::color_temperature1},
+        {".*(色温).*((调|变|换|设)(到|成|为|置)).*", ActionCode::color_temperature2}
     }),
     actionCodeCaptureGroup({
         {ActionCode::powerOn, {1}},
         {ActionCode::powerOff, {1}},
-        {ActionCode::setColor, {1, 4}}
+        {ActionCode::luminance1, {1, 4}},
+        {ActionCode::luminance2, {1, 2}},
+        {ActionCode::color_temperature1, {1, 4}},
+        {ActionCode::color_temperature2, {1, 2}}
     })
 {}
 
 void voiceStringMatchControl::parseAndControl() {
     voiceString = controlParseString;
-    LOG_INFO << "voiceString: " << voiceString;
+    LOG_INFO << "total: " << voiceString;
     ParsedItem parsedItem;
 
     //确定位置
@@ -50,7 +53,7 @@ void voiceStringMatchControl::parseAndControl() {
             break;
         }
     }
-    LOG_INFO << "voiceString: " << voiceString;
+    LOG_INFO << "afterLocation: " << voiceString;
 
     //确定动作
     for(auto& mr2acItem : matchRex2ActionCode){
@@ -68,11 +71,15 @@ void voiceStringMatchControl::parseAndControl() {
             }
         }
     }
-    LOG_INFO << "voiceString: " << voiceString;
+    LOG_INFO << "afterAction: " << voiceString;
 
     //确定设备、组
-    findDeviceIdOrGroupId(voiceString, parsedItem);
-    LOG_INFO << "voiceString: " << voiceString;
+    if(findDeviceIdOrGroupId(voiceString, parsedItem)){
+        LOG_INFO << "afterDevice: " << voiceString;
+    }else{
+        LOG_RED << "vocieString matchResult: can not find device or group, match missed.....";
+        return;
+    }
 
     //确定参数
     smatch sm;
@@ -80,7 +87,7 @@ void voiceStringMatchControl::parseAndControl() {
         parsedItem.param = sm.str(1);
         voiceString.erase(sm.position(1), sm.length(1));
     }
-    LOG_INFO << "voiceString: " << voiceString;
+    LOG_INFO << "afterParam: " << voiceString;
 
     printParsedItem(parsedItem);
 
@@ -96,19 +103,12 @@ string voiceStringMatchControl::code2Action(ActionCode code){
         action = "powerOn";
     }else if(code == ActionCode::powerOff){
         action = "powerOff";
-    }else if (code == ActionCode::setColor){
-        action = "setColor";
+    }else if (code == ActionCode::luminance1 || code == ActionCode::luminance2){
+        action = "luminance";
+    }else if(code == ActionCode::color_temperature1 || code == ActionCode::luminance2){
+        action = "color_temperature";
     }
     return action;
-}
-
-string voiceStringMatchControl::deviceType2String(DeviceType deviceType){
-    for(auto& elem : deviceTypeMap){
-        if(elem.second == deviceType){
-            return elem.first;
-        }
-    }
-    return "";
 }
 
 void voiceStringMatchControl::printParsedItem(struct ParsedItem& item){
@@ -122,7 +122,7 @@ void voiceStringMatchControl::printParsedItem(struct ParsedItem& item){
     }else if(item.ctrlType == ControlType::Type){
         data.setString("type", item.devIdGrpId);
     }
-    data.setString("deviceType", deviceType2String(item.deviceType));
+    data.setString("deviceType", item.deviceType);
     data.setValue("param", item.param);
     data.setString("sourceSite", item.sourceSite);
 
@@ -130,16 +130,23 @@ void voiceStringMatchControl::printParsedItem(struct ParsedItem& item){
 }
 
 void voiceStringMatchControl::action2Command(ParsedItem& parsedItem, CommandItem& commandItem){
-    if(parsedItem.actionCode == ActionCode::powerOn){
+    if(parsedItem.actionCode == ActionCode::powerOn){   //开
         commandItem.command_id = "power";
         commandItem.command_para = "on";
 
-    }else if(parsedItem.actionCode == ActionCode::powerOff){
+    }else if(parsedItem.actionCode == ActionCode::powerOff){    //关
         commandItem.command_id = "power";
         commandItem.command_para = "off";
 
-    }else if(parsedItem.actionCode == ActionCode::setColor){
+    }else if(parsedItem.actionCode == ActionCode::luminance1 || parsedItem.actionCode == ActionCode::luminance2){   //设置亮度
+        commandItem.command_id = "luminance";
+        int luminanceValue = static_cast<int>(atoi(parsedItem.param.c_str()) * 2.5);
+        commandItem.command_para = luminanceValue;
 
+    }else if(parsedItem.actionCode == ActionCode::color_temperature1 || parsedItem.actionCode == ActionCode::color_temperature2){   //设置色温
+        commandItem.command_id = "color_temperature";
+        int ctValue = static_cast<int>(atoi(parsedItem.param.c_str()) * 38 + 2700);
+        commandItem.command_para = ctValue;
     }
 }
 
@@ -151,7 +158,6 @@ bool voiceStringMatchControl::getSpecificDeviceId(qlibc::QData& deviceList, stri
         if(!str.empty() && !device_name.empty()){
             smatch sm;
             if(regex_search(str, sm, regex(device_name))){
-                LOG_INFO << "matchDevice: " << item.toJsonString(true);
                 deviceId = item.getString("device_id");
                 sourceSite = item.getString("sourceSite");
                 str.erase(sm.position(), sm.length());
@@ -170,13 +176,7 @@ bool voiceStringMatchControl::getSpecificGroupId(qlibc::QData& groupList, string
         string group_name = item.getString("group_name");
         if(!str.empty() && !group_name.empty()){
             smatch sm;
-            if(regex_search(str, regex(group_name))){
-                qlibc::QData matchGroup;
-                matchGroup.setString("group_id", item.getString("group_id"));
-                matchGroup.setString("group_name", item.getString("group_name"));
-                matchGroup.putData("location", item.getData("location"));
-                matchGroup.setString("sourceSite", item.getString("sourceSite"));
-                LOG_INFO << "matchGroup: " << matchGroup.toJsonString(true);
+            if(regex_search(str, sm,regex(group_name))){
                 groupId = item.getString("group_id");
                 sourceSite = item.getString("sourceSite");
                 str.erase(sm.position(), sm.length());
@@ -187,7 +187,7 @@ bool voiceStringMatchControl::getSpecificGroupId(qlibc::QData& groupList, string
     return false;
 }
 
-bool voiceStringMatchControl::getDeviceType(string& str, DeviceType& deviceType){
+bool voiceStringMatchControl::getDeviceType(string& str, string& deviceType){
     for(auto& type : deviceTypeMap){
         if(!str.empty() && !type.first.empty()){
             smatch sm;
@@ -201,21 +201,14 @@ bool voiceStringMatchControl::getDeviceType(string& str, DeviceType& deviceType)
     return false;
 }
 
-bool voiceStringMatchControl::getGroupIdFromRoomNameAndType(qlibc::QData& groupList, string& roomName, string deviceType, string& groupId, string& sourceSite) {
+bool voiceStringMatchControl::getGroupIdFromRoomNameAndType(qlibc::QData& groupList, string& roomName, string& deviceType, string& groupId, string& sourceSite) {
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = groupList.getArrayElement(i);
+        bool areaFullGroup = item.getBool("areaFullGroup");
         string room_name = item.getData("location").getString("room_name");
         string group_type = item.getString("group_type");
-        if(room_name == roomName && group_type == deviceType){
-            qlibc::QData matchGroup;
-            matchGroup.setString("group_id", item.getString("group_id"));
-            matchGroup.setString("group_name", item.getString("group_name"));
-            matchGroup.setString("group_type", item.getString("group_type"));
-            matchGroup.putData("location", item.getData("location"));
-            matchGroup.setString("sourceSite", item.getString("sourceSite"));
-            LOG_INFO << "matchGroup: " << matchGroup.toJsonString(true);
-
+        if(areaFullGroup && room_name == roomName && group_type == deviceType){
             groupId = item.getString("group_id");
             sourceSite = item.getString("sourceSite");
             return true;
@@ -228,7 +221,7 @@ bool voiceStringMatchControl::findDeviceIdOrGroupId(string& str, ParsedItem& par
     qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
     qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
     string deviceIdOrGroupId, sourceSite;
-    enum DeviceType deviceType;
+    string deviceType;
     bool isMatch = false;
 
     if(getSpecificDeviceId(deviceList, str, deviceIdOrGroupId, sourceSite)){   //具体设备名称
@@ -243,9 +236,9 @@ bool voiceStringMatchControl::findDeviceIdOrGroupId(string& str, ParsedItem& par
         parsedItem.sourceSite = sourceSite;
         isMatch = true;
 
-    }else if(getDeviceType(str, deviceType)){
+    }else if(getDeviceType(str, deviceType)){   //<房间 + 类型> 确定组名
         if(!parsedItem.roomName.empty()){
-            getGroupIdFromRoomNameAndType(groupList, parsedItem.roomName, deviceType2String(deviceType), deviceIdOrGroupId, sourceSite);
+            getGroupIdFromRoomNameAndType(groupList, parsedItem.roomName, deviceType, deviceIdOrGroupId, sourceSite);
             parsedItem.ctrlType = ControlType::Group;
             parsedItem.devIdGrpId = deviceIdOrGroupId;
             parsedItem.sourceSite = sourceSite;
@@ -271,6 +264,7 @@ void voiceStringMatchControl::controlByParsedItem(ParsedItem& parsedItem){
 
         requestData.setString("service_id", "control_device");
         requestData.putData("request", qlibc::QData().setValue("device_list", deviceList));
+        LOG_GREEN << "controlRequest: " << requestData.toJsonString();
         SiteRecord::getInstance()->sendRequest2Site(parsedItem.sourceSite, requestData, responseData);
         LOG_BLUE << "controlResponse: " << responseData.toJsonString();
 
@@ -287,6 +281,7 @@ void voiceStringMatchControl::controlByParsedItem(ParsedItem& parsedItem){
 
         requestData.setString("service_id", "control_group");
         requestData.putData("request", qlibc::QData().setValue("group_list", group_list));
+        LOG_GREEN << "controlRequest: " << requestData.toJsonString();
         SiteRecord::getInstance()->sendRequest2Site(parsedItem.sourceSite, requestData, responseData);
         LOG_BLUE << "controlResponse: " << responseData.toJsonString();
 

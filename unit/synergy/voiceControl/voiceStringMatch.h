@@ -15,12 +15,10 @@ enum ActionCode{
     NoneAction = 0,
     powerOn,
     powerOff,
-    setColor
-};
-
-enum DeviceType{
-    NoneDeviceType = 0,
-    LIGHT
+    luminance1,
+    luminance2,
+    color_temperature1,
+    color_temperature2
 };
 
 //控制类型：设备、组、类型
@@ -37,7 +35,7 @@ struct ParsedItem{
     ActionCode actionCode = NoneAction;
     ControlType ctrlType = NoneType;
     string devIdGrpId;
-    enum DeviceType deviceType;
+    string deviceType;
     string param;
     string sourceSite;
 };
@@ -53,7 +51,7 @@ private:
     string controlParseString;
     string voiceString;
     std::vector<string> roomList;                      //房间列表
-    std::map<string, DeviceType> deviceTypeMap;       //设备类型列表
+    std::map<string, string> deviceTypeMap;         //设备类型列表
     std::map<string, ActionCode> matchRex2ActionCode;               //正则表达式--> 控制码
     std::map<ActionCode, std::vector<int>> actionCodeCaptureGroup;  //控制码 --- 捕获分组
 
@@ -66,9 +64,6 @@ public:
 private:
     //控制码---> 控制动作
     string code2Action(ActionCode code);
-
-    //类型码--->类型说明
-    string deviceType2String(DeviceType deviceType);
 
     //打印解析结构
     void printParsedItem(struct ParsedItem& item);
@@ -83,10 +78,10 @@ private:
     bool getSpecificGroupId(qlibc::QData& groupList, string& str, string& groupId, string& sourceSite);
 
     //获取控制的类型
-    bool getDeviceType(string& str, DeviceType& deviceType);
+    bool getDeviceType(string& str, string& deviceType);
 
     //获取房间的默认组ID
-    bool getGroupIdFromRoomNameAndType(qlibc::QData& groupList, string& roomName, string deviceType, string& groupId, string& sourceSite);
+    bool getGroupIdFromRoomNameAndType(qlibc::QData& groupList, string& roomName, string& deviceType, string& groupId, string& sourceSite);
 
     //找到设备id或者组id
     bool findDeviceIdOrGroupId(string& str, ParsedItem& parsedItem);
