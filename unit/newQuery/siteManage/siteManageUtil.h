@@ -7,6 +7,7 @@
 
 #include <string>
 #include <mutex>
+#include <condition_variable>
 #include <unordered_map>
 #include <unordered_set>
 #include <atomic>
@@ -56,6 +57,11 @@ private:
     std::thread* mdnsServiceThread;                //启动mdns服务线程
     std::thread* findLocalIpThread;                //发现本机IP线程
     int findIpInterval = 2;                        //确定本机IP
+
+    std::mutex mdnsMutex;
+    std::condition_variable cv;
+    bool ready2StartMdnsService{false};
+
     static SiteTree* Instance;
 
 public:
@@ -63,10 +69,7 @@ public:
     static SiteTree* getInstance();
 
     void init(){
-        while(initLocalIp() == -1){
-            LOG_RED << "failed to deterime localIP, start again in 5 seconds....";
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-        }
+        initLocalIp();
         insertLocalQuerySiteInfo(); //确定有效IP后，注册查询站点
 
         //本机站点ping计数

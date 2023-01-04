@@ -339,6 +339,13 @@ int SiteTree::initLocalIp() {
                         }
                         localIp = string(addr.str);
                         updateLocalSiteMap();
+                        //通知mdns服务启动
+                        {
+                            std::lock_guard<std::mutex> lgMdns(mdnsMutex);
+                            ready2StartMdnsService = true;
+                        }
+                        cv.notify_one();
+
                         LOG_PURPLE << "localIp: " << localIp;
                         retFlag = 0;
                     }
@@ -438,6 +445,13 @@ void SiteTree::site_query() {
 }
 
 void SiteTree::mdnsServiceStart(){
+    {
+        std::unique_lock<std::mutex> ul(mdnsMutex);
+        cv.wait(ul, [this]{return this->ready2StartMdnsService;});
+    }
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    LOG_BLUE << "START MDNS SERVICE.....";
+
     string hostname = "smartHome";
     char hostname_buffer[256];
     size_t hostname_size = sizeof(hostname_buffer);
@@ -458,10 +472,6 @@ void SiteTree::updateLocalSiteMap(){
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     for(auto& elem : localSiteMap){
         elem.second["ip"] = localIp;
-    }
-
-    for(auto& elem : localSiteMap){
-        LOG_INFO << localIp << ":" << qlibc::QData(elem.second).toJsonString();
     }
 }
 
@@ -496,8 +506,6 @@ void mdnsResponseHandle(string service_instance_string, string ipString, int sit
 
             //依据节点的查询站点回复来更新节点信息
             if(site_id == "site_query"){
-                //确定本机有效的IP地址
-//                SiteTree::getInstance()->confirmIp(ip);
                 //更新局域网发现的站点
                 SiteTree::getInstance()->addNewFindSite(ip);
             }
