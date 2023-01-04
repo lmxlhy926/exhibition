@@ -32,6 +32,7 @@ enum ControlType{
 //解析项：房间名、动作码、<设备号、组id、类型>、动作参数
 struct ParsedItem{
     string roomName;
+    bool hasAll{false};
     ActionCode actionCode = NoneAction;
     ControlType ctrlType = NoneType;
     string devIdGrpId;

@@ -44,7 +44,7 @@ void voiceStringMatchControl::parseAndControl() {
     LOG_INFO << "total: " << voiceString;
     ParsedItem parsedItem;
 
-    //确定位置
+    //确定房间，以及是否包含所有
     for(auto& room :roomList){
         smatch sm;
         if(regex_search(voiceString, sm, regex(room))){
@@ -52,6 +52,11 @@ void voiceStringMatchControl::parseAndControl() {
             voiceString.erase(sm.position(), sm.length());
             break;
         }
+    }
+    auto allPos = voiceString.find("所有");
+    if(allPos != std::string::npos){
+        voiceString.erase(allPos, string("所有").length());
+        parsedItem.hasAll = true;
     }
     LOG_INFO << "afterLocation: " << voiceString;
 
@@ -62,8 +67,16 @@ void voiceStringMatchControl::parseAndControl() {
             ActionCode code = mr2acItem.second;
             for(auto& accgItem : actionCodeCaptureGroup){
                 if(accgItem.first == code){
+                    std::map<string, int> str2DelMap;
                     for(auto& captureGroupIndex : accgItem.second){
-                        voiceString.erase(sm.position(captureGroupIndex), sm.length(captureGroupIndex));
+                        str2DelMap.insert(std::make_pair(sm.str(captureGroupIndex), sm.length(captureGroupIndex)));
+                    }
+                    //删除匹配到的子字符串
+                    for(auto& elem : str2DelMap){
+                        auto pos = voiceString.find(elem.first);
+                        if(pos != std::string::npos){
+                            voiceString.erase(pos, elem.second);
+                        }
                     }
                     parsedItem.actionCode = code;
                     break;
@@ -105,7 +118,7 @@ string voiceStringMatchControl::code2Action(ActionCode code){
         action = "powerOff";
     }else if (code == ActionCode::luminance1 || code == ActionCode::luminance2){
         action = "luminance";
-    }else if(code == ActionCode::color_temperature1 || code == ActionCode::luminance2){
+    }else if(code == ActionCode::color_temperature1 || code == ActionCode::color_temperature2){
         action = "color_temperature";
     }
     return action;
@@ -123,6 +136,7 @@ void voiceStringMatchControl::printParsedItem(struct ParsedItem& item){
         data.setString("type", item.devIdGrpId);
     }
     data.setString("deviceType", item.deviceType);
+    data.setBool("hasAll", item.hasAll);
     data.setValue("param", item.param);
     data.setString("sourceSite", item.sourceSite);
 
@@ -243,6 +257,11 @@ bool voiceStringMatchControl::findDeviceIdOrGroupId(string& str, ParsedItem& par
             parsedItem.devIdGrpId = deviceIdOrGroupId;
             parsedItem.sourceSite = sourceSite;
             isMatch = true;
+        }else if(parsedItem.hasAll){    //发送到所有的蓝牙站点
+            parsedItem.ctrlType = ControlType::Group;
+            parsedItem.devIdGrpId = "FFFF";
+            parsedItem.sourceSite = "ALL";
+            isMatch = true;
         }
     }
 
@@ -265,8 +284,23 @@ void voiceStringMatchControl::controlByParsedItem(ParsedItem& parsedItem){
         requestData.setString("service_id", "control_device");
         requestData.putData("request", qlibc::QData().setValue("device_list", deviceList));
         LOG_GREEN << "controlRequest: " << requestData.toJsonString();
-        SiteRecord::getInstance()->sendRequest2Site(parsedItem.sourceSite, requestData, responseData);
-        LOG_BLUE << "controlResponse: " << responseData.toJsonString();
+        if(parsedItem.sourceSite != "ALL"){
+            SiteRecord::getInstance()->sendRequest2Site(parsedItem.sourceSite, requestData, responseData);
+            LOG_BLUE << parsedItem.sourceSite << " controlResponse: " << responseData.toJsonString();
+        }else{
+            std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
+            smatch sm;
+            for(auto& elem : siteNameSet){
+                if(regex_match(elem, sm, regex("(.*):(.*)"))){
+                    string ip = sm.str(1);
+                    string siteID = sm.str(2);
+                    if(siteID == BleSiteID){
+                        SiteRecord::getInstance()->sendRequest2Site(sm.str(0), requestData, responseData);
+                        LOG_BLUE << sm.str(0) << " controlResponse: " << responseData.toJsonString();
+                    }
+                }
+            }
+        }
 
     }else if(parsedItem.ctrlType == ControlType::Group){
         Json::Value command, commandList(Json::arrayValue), groupItem, group_list(Json::arrayValue);
@@ -282,9 +316,23 @@ void voiceStringMatchControl::controlByParsedItem(ParsedItem& parsedItem){
         requestData.setString("service_id", "control_group");
         requestData.putData("request", qlibc::QData().setValue("group_list", group_list));
         LOG_GREEN << "controlRequest: " << requestData.toJsonString();
-        SiteRecord::getInstance()->sendRequest2Site(parsedItem.sourceSite, requestData, responseData);
-        LOG_BLUE << "controlResponse: " << responseData.toJsonString();
-
+        if(parsedItem.sourceSite != "ALL"){
+            SiteRecord::getInstance()->sendRequest2Site(parsedItem.sourceSite, requestData, responseData);
+            LOG_BLUE << parsedItem.sourceSite << " controlResponse: " << responseData.toJsonString();
+        }else{
+            std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
+            smatch sm;
+            for(auto& elem : siteNameSet){
+                if(regex_match(elem, sm, regex("(.*):(.*)"))){
+                    string ip = sm.str(1);
+                    string siteID = sm.str(2);
+                    if(siteID == BleSiteID){
+                        SiteRecord::getInstance()->sendRequest2Site(sm.str(0), requestData, responseData);
+                        LOG_BLUE <<  sm.str(0) << " controlResponse: " << responseData.toJsonString();
+                    }
+                }
+            }
+        }
     }
 
 }
