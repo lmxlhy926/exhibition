@@ -121,6 +121,11 @@ int main(int argc, char* argv[]) {
         serviceSiteManager->registerServiceRequestHandler(ENGINEER_REQUEST_SERVICE_ID,[&](const Request& request, Response& response) -> int{
             return engineer_service_request_handler(mc, request, response);
         });
+
+        //从云端主动获取白名单
+        serviceSiteManager->registerServiceRequestHandler(WHITELISTCLOUD_REQUEST_SERVICE_ID,[&](const Request& request, Response& response) -> int{
+            return getWhiteListFromCloud_service_request_handler(mc, request, response);
+        });
     }
 
     //获取白名单列表

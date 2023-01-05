@@ -31,6 +31,9 @@ int domainIdRequest_service_request_handler(const Request& request, Response& re
 //安装app发送请求，传递安装师傅信息<安装app>
 int engineer_service_request_handler(mqttClient& mc, const Request& request, Response& response);
 
+//从云端主动获取白名单
+int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request& request, Response& response);
+
 
 //获取白名单列表
 int whiteList_service_request_handler(const Request& request, Response& response);

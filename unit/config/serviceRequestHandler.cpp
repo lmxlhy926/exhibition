@@ -204,35 +204,51 @@ int engineer_service_request_handler(mqttClient& mc, const Request& request, Res
 }
 
 
+int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request& request, Response& response){
+    LOG_INFO << "===>getWhiteListFromCloud_service_request_handler: " << request.body;
+    if (!mc.isConnected()){
+        LOG_RED << "===>cant access internet......";
+        qlibc::QData errData;
+        errData.setInt("code", 1);
+        errData.setString("error", "cant access internet");
+        errData.putData("response", qlibc::QData());
+        response.set_content(errData.toJsonString(), "text/json");
+        return 0;
+    }
+
+    string domainID = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
+    qlibc::QData whiteListRequest, whiteListResponse;
+    qlibc::QData param;
+    param.setString("familyCode", domainID);
+    whiteListRequest.putData("param", param);
+    whiteListRequest.setString("User-Agent", "curl");
+
+    cloudUtil::getInstance()->ecb_httppost(WHITELIST_REQUEST_URL, whiteListRequest, whiteListResponse);
+
+    qlibc::QData data;
+    if(whiteListResponse.getInt("code") == 200){
+        string payloadString = whiteListResponse.getData("data").toJsonString();
+        qlibc::QData payload = mqttPayloadHandle::transform(payloadString.c_str(), payloadString.size());
+        configParamUtil::getInstance()->saveWhiteListData(payload);
+
+        data.setInt("code", 0);
+        data.setString("error", whiteListResponse.getString("msg"));
+        data.putData("response", payload);
+
+    }else{
+        data.setInt("code", 1);
+        data.setString("error", whiteListResponse.getString("msg"));
+        data.putData("response", qlibc::QData());
+    }
+
+    response.set_content(data.toJsonString(), "text/json");
+    return 0;
+}
+
+
+
 int whiteList_service_request_handler(const Request& request, Response& response){
     LOG_INFO << "===>whiteList_service_request_handler: " << request.body;
-#if 0
-//    string domainID = configParamUtil::getInstance()->getBaseInfo().getString("domainID");
-//
-//    qlibc::QData whiteListRequest, whiteListResponse;
-//    qlibc::QData param;
-//    param.setString("familyCode", domainID);
-//    whiteListRequest.putData("param", param);
-//    whiteListRequest.setString("User-Agent", "curl");
-//
-//    cloudUtil::getInstance()->ecb_httppost(WHITELIST_REQUEST_URL, whiteListRequest, whiteListResponse);
-//
-//    qlibc::QData data;
-//    if(whiteListResponse.getInt("code") == 200){
-//        string payloadString = whiteListResponse.getData("data").toJsonString();
-//        qlibc::QData payload = mqttPayloadHandle::transform(payloadString.c_str(), payloadString.size());
-//        configParamUtil::getInstance()->saveWhiteListData(payload);
-//
-//        data.setInt("code", 0);
-//        data.setString("error", whiteListResponse.getString("msg"));
-//        data.putData("response", payload);
-//
-//    }else{
-//        data.setInt("code", 1);
-//        data.setString("error", whiteListResponse.getString("msg"));
-//        data.putData("response", qlibc::QData());
-//    }
-#endif
 
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
     qlibc::QData data;

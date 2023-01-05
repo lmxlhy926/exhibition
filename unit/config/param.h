@@ -40,6 +40,7 @@ static const string POSTDEVICELIST_REGISTER_SERVICE_ID =    "postDeviceList";
 static const string DOMAINID_REQUEST_SERVICE_ID =           "domainIdRequest";
 static const string ENGINEER_REQUEST_SERVICE_ID =           "engineerAppInfo";
 static const string WHITELIST_REQUEST_SERVICE_ID =          "whiteListRequest";
+static const string WHITELISTCLOUD_REQUEST_SERVICE_ID =     "whiteListRequestCloud";
 static const string WHITELIST_UPDATE_REQUEST_SERVICE_ID =   "whiteListUpdateRequest";
 static const string WHITELIST_DELETE_REQUEST_SERVICE_ID =   "whiteListDeleteRequest";
 static const string WHITELIST_SAVE_REQUEST_SERVICE_ID =     "whiteListSaveRequest";
