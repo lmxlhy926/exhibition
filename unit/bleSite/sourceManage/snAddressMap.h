@@ -36,7 +36,7 @@ public:
         return instance;
     }
 
-    //获取分配的单播地址
+    //获取分配节点cmdData
     qlibc::QData getNodeAssignAddr(string deviceSn);
 
     //删除对应的条目并更新存储文件

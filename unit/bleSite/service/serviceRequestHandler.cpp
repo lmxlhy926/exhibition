@@ -27,7 +27,6 @@ static const nlohmann::json errResponse = {
         {"response",{}}
 };
 
-
 /*
  * 单个设备控制和组设备控制，控制指令是相同的，区分是地址是设备地址还是组地址
  * 如果是单个设备控制：则需将设备mac转换为设备地址
@@ -92,7 +91,6 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
     }
 }
 
-
 //获取扫描结果
 int scan_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
@@ -111,9 +109,9 @@ int scan_device_service_handler(const Request& request, Response& response, Logi
         retData.putData("response", res);
         response.set_content(retData.toJsonString(), "text/json");
 
-        //结束扫描
+        //发送结束扫描指令
         qlibc::QData scanEndCmd;
-        scanEndCmd.setString("command", "scanEnd");
+        scanEndCmd.setString("command", SCANEND);
         lc.parse(scanEndCmd);
     }else{
         response.set_content(errResponse.dump(), "text/json");
@@ -121,8 +119,7 @@ int scan_device_service_handler(const Request& request, Response& response, Logi
     return 0;
 }
 
-
-//绑定设备
+//添加设备：扫描、绑定
 int add_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
@@ -141,7 +138,6 @@ int add_device_service_handler(const Request& request, Response& response, Logic
     return 0;
 }
 
-
 //删除设备
 int del_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
@@ -152,7 +148,7 @@ int del_device_service_handler(const Request& request, Response& response, Logic
             size_t deviceListSize = deviceList.size();
             for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
                 qlibc::QData cmdData;
-                cmdData.setString("command", "unbind");
+                cmdData.setString("command", UNBIND);
                 cmdData.putData("deviceSn", deviceList.getArrayElement(i));
                 lc.parse(cmdData);
             }
@@ -163,7 +159,6 @@ int del_device_service_handler(const Request& request, Response& response, Logic
     }
     return 0;
 }
-
 
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc){
@@ -182,41 +177,6 @@ int control_device_service_handler(const Request& request, Response& response, L
     return 0;
 }
 
-
-//修改设备信息
-int device_config_service_handler(const Request& request, Response& response){
-    qlibc::QData requestBody(request.body);
-    LOG_INFO << "device_config_service_handler: " << requestBody.toJsonString();
-
-    qlibc::QData deviceList= bleConfig::getInstance()->getDeviceListData().getData("device_list");
-    Json::ArrayIndex deviceListSize = deviceList.size();
-    qlibc::QData configList = requestBody.getData("request").getData("device_list");
-    Json::ArrayIndex configListSize = configList.size();
-
-    qlibc::QData newDeviceList;
-    for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
-        qlibc::QData deviceItem = deviceList.getArrayElement(i);
-        for(int j = 0; j < configListSize; ++j){
-            qlibc::QData configItem = configList.getArrayElement(j);
-            if(deviceItem.getString("device_id") == configItem.getString("device_id")){
-                if(!configItem.getString("device_name").empty())
-                    deviceItem.setString("device_name", configItem.getString("device_name"));
-                deviceItem.putData("location", configItem.getData("location"));
-                newDeviceList.append(deviceItem);
-                break;
-            }
-            if(j == configListSize - 1){
-                newDeviceList.append(deviceItem);
-            }
-        }
-    }
-    bleConfig::getInstance()->saveDeviceListData(qlibc::QData().putData("device_list", newDeviceList));
-
-    response.set_content(okResponse.dump(), "text/json");
-    return 0;
-}
-
-
 //获取设备列表
 int get_device_list_service_handler(const Request& request, Response& response){
     LOG_INFO << "==>: " << qlibc::QData(request.body).toJsonString();
@@ -227,7 +187,6 @@ int get_device_list_service_handler(const Request& request, Response& response){
     response.set_content(postData.toJsonString(), "text/json");
     return 0;
 }
-
 
 //按照指定房间获取设备列表
 int get_device_list_byRoomName_service_handler(const Request& request, Response& response){
@@ -253,7 +212,6 @@ int get_device_list_byRoomName_service_handler(const Request& request, Response&
     response.set_content(postData.toJsonString(), "text/json");
     return 0;
 }
-
 
 //获取设备状态
 int get_device_state_service_handler(const Request& request, Response& response){
@@ -292,7 +250,6 @@ int get_device_state_service_handler(const Request& request, Response& response)
     return 0;
 }
 
-
 //存储设备列表
 int save_deviceList_service_handler(const Request& request, Response& response){
     qlibc::QData requestData(request.body);
@@ -323,6 +280,38 @@ int BleDevice_command_test_service_handler(const Request& request, Response& res
     return 0;
 }
 
+//修改设备信息
+int device_config_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "device_config_service_handler: " << requestBody.toJsonString();
+
+    qlibc::QData deviceList= bleConfig::getInstance()->getDeviceListData().getData("device_list");
+    Json::ArrayIndex deviceListSize = deviceList.size();
+    qlibc::QData configList = requestBody.getData("request").getData("device_list");
+    Json::ArrayIndex configListSize = configList.size();
+
+    qlibc::QData newDeviceList;
+    for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+        qlibc::QData deviceItem = deviceList.getArrayElement(i);
+        for(int j = 0; j < configListSize; ++j){
+            qlibc::QData configItem = configList.getArrayElement(j);
+            if(deviceItem.getString("device_id") == configItem.getString("device_id")){
+                if(!configItem.getString("device_name").empty())
+                    deviceItem.setString("device_name", configItem.getString("device_name"));
+                deviceItem.putData("location", configItem.getData("location"));
+                newDeviceList.append(deviceItem);
+                break;
+            }
+            if(j == configListSize - 1){
+                newDeviceList.append(deviceItem);
+            }
+        }
+    }
+    bleConfig::getInstance()->saveDeviceListData(qlibc::QData().putData("device_list", newDeviceList));
+
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
 
 //设备分组
 int group_device_service_handler(const Request& request, Response& response, LogicControl& lc){
@@ -345,6 +334,26 @@ int group_device_service_handler(const Request& request, Response& response, Log
 }
 
 
+void addRemoveGroupControl(const char* command, const string& group_id, const string& deviceSn, LogicControl& lc){
+    qlibc::QData cmdData;
+    cmdData.setString("command", string(command));
+    cmdData.setString("group_id", group_id);
+    cmdData.setString("deviceSn", deviceSn);
+
+    cmdData.setString("model_name", POWER);
+    lc.parse(cmdData);
+
+    cmdData.setString("model_name", LUMINANCE);
+    lc.parse(cmdData);
+
+    cmdData.setString("model_name", COLORTEMPERATURE);
+    lc.parse(cmdData);
+
+    cmdData.setString("model_name", LUMINANCECOLORTEMPERATURE);
+    lc.parse(cmdData);
+}
+
+
 //创建分组
 int create_group_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
@@ -361,12 +370,12 @@ int create_group_service_handler(const Request& request, Response& response){
     return 0;
 }
 
-
 //删除分组
 int delete_group_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "==>: " << requestBody.toJsonString();
     bleConfig::getInstance()->enqueue([requestBody, &lc]{
+        //依据组名，提取组下面的设备列表
         string group_id = requestBody.getData("request").getString("group_id");
         qlibc::QData device_list;
         qlibc::QData groupList = GroupAddressMap::getInstance()->getGroupList().getData("group_list");
@@ -378,23 +387,16 @@ int delete_group_service_handler(const Request& request, Response& response, Log
             }
         }
 
+        //将设备列表中的设备从分组中解除
         size_t deviceListSize = device_list.size();
         for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
-            qlibc::QData cmdData;
-            cmdData.setString("command", "delDeviceFromGroup");
-            cmdData.setString("group_id", group_id);
-            cmdData.setString("deviceSn", device_list.getArrayElement(i).asValue().asString());
-
-            cmdData.setString("model_name", POWER);
-            lc.parse(cmdData);
-
-            cmdData.setString("model_name", LUMINANCE);
-            lc.parse(cmdData);
-
-            cmdData.setString("model_name", COLORTEMPERATURE);
-            lc.parse(cmdData);
+            string deviceSn = device_list.getArrayElement(i).asValue().asString();
+            addRemoveGroupControl(DelDeviceFromGroup, group_id, deviceSn, lc);
         }
 
+        //todo 等待分组操作结束
+
+        //删除分组
         GroupAddressMap::getInstance()->deleGroup(group_id);
     });
 
@@ -434,22 +436,8 @@ int addDevice2Group_service_handler(const Request& request, Response& response, 
         qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
         size_t deviceListSize = deviceList.size();
         for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
-            qlibc::QData cmdData;
-            cmdData.setString("command", "addDevice2Group");
-            cmdData.setString("group_id", group_id);
-            cmdData.putData("deviceSn", deviceList.getArrayElement(i));
-
-            cmdData.setString("model_name", POWER);
-            lc.parse(cmdData);
-
-            cmdData.setString("model_name", LUMINANCE);
-            lc.parse(cmdData);
-
-            cmdData.setString("model_name", COLORTEMPERATURE);
-            lc.parse(cmdData);
-
-            cmdData.setString("model_name", LUMINANCECOLORTEMPERATURE);
-            lc.parse(cmdData);
+            string deviceSn = deviceList.getArrayElement(i).asValue().asString();
+            addRemoveGroupControl(AddDevice2Group, group_id, deviceSn, lc);
         }
     });
 
@@ -475,22 +463,8 @@ int groupByRoomname_service_handler(const Request& request, Response& response, 
         for(Json::ArrayIndex i = 0; i < device_list.size(); ++i){
             qlibc::QData item = device_list.getArrayElement(i);
             if(item.getData("location").getString("room_no") == room_no){
-                qlibc::QData cmdData;
-                cmdData.setString("command", "addDevice2Group");
-                cmdData.setString("group_id", group_id);
-                cmdData.setString("deviceSn", item.getString("device_id"));
-
-                cmdData.setString("model_name", POWER);
-                lc.parse(cmdData);
-
-                cmdData.setString("model_name", LUMINANCE);
-                lc.parse(cmdData);
-
-                cmdData.setString("model_name", COLORTEMPERATURE);
-                lc.parse(cmdData);
-
-                cmdData.setString("model_name", LUMINANCECOLORTEMPERATURE);
-                lc.parse(cmdData);
+                string deviceSn = item.getString("device_id");
+                addRemoveGroupControl(AddDevice2Group, group_id, deviceSn, lc);
             }
         }
     });
@@ -515,22 +489,8 @@ int removeDeviceFromGroup_service_handler(const Request& request, Response& resp
         qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
         size_t deviceListSize = deviceList.size();
         for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
-            qlibc::QData cmdData;
-            cmdData.setString("command", "delDeviceFromGroup");
-            cmdData.setString("group_id", group_id);
-            cmdData.putData("deviceSn", deviceList.getArrayElement(i));
-
-            cmdData.setString("model_name", POWER);
-            lc.parse(cmdData);
-
-            cmdData.setString("model_name", LUMINANCE);
-            lc.parse(cmdData);
-
-            cmdData.setString("model_name", COLORTEMPERATURE);
-            lc.parse(cmdData);
-
-            cmdData.setString("model_name", LUMINANCECOLORTEMPERATURE);
-            lc.parse(cmdData);
+            string deviceSn = deviceList.getArrayElement(i).asValue().asString();
+            addRemoveGroupControl(DelDeviceFromGroup, group_id, deviceSn, lc);
         }
     });
 
@@ -569,7 +529,9 @@ int getGroupList_service_handler(const Request& request, Response& response){
     return 0;
 }
 
-
+/*
+ * app修改设备属性信息后，需要更改设备列表信息
+ */
 void updateDeviceList(const Request& request){
     //获取白名单列表
     LOG_INFO << "updateDeviceList: " << request.body;

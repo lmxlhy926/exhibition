@@ -39,9 +39,14 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
     scanData.setString("command", "scan");
     DownUtility::parse2Send(scanData);
 
+    //将扫描到的设备存储到设备列表
     std::map<string, Json::Value> deviceMap;
     qlibc::QData retScanData;
     time_t time_current = time(nullptr);
+    int timeSeconds = param.getInt("timeSeconds");
+    if(timeSeconds <= 0){
+        timeSeconds = 10;
+    }
 
     while(true){
         if(EventTable::getInstance()->scanResultEvent.wait(2) == std::cv_status::no_timeout){
@@ -53,13 +58,13 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
                 deviceMap.insert(std::make_pair(deviceSn, retScanData.asValue()));
             }
         }
-        if(time(nullptr) - time_current > 10){
+        if(time(nullptr) - time_current > timeSeconds){
             LOG_PURPLE << "===>find device end....";
             break;
         }
     }
 
-    //存储到扫描列表
+    //将设备列表中的设备存储到扫描列表
     for(auto& elem : deviceMap){
         ScanListmanage::getInstance()->appendDeviceItem(elem.first, elem.second);
     }
@@ -81,7 +86,6 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
         item.setString("device_model", elem.second["device_model"].asString());
         scanedArray.append(item);
     }
-
     LOG_GREEN << "==>deviceArray: " << deviceArray.toJsonString(true);
 
     //发布扫描结果

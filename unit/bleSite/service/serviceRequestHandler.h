@@ -22,9 +22,6 @@ int del_device_service_handler(const Request& request, Response& response, Logic
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 
-//修改设备信息
-int device_config_service_handler(const Request& request, Response& response);
-
 //获取设备列表
 int get_device_list_service_handler(const Request& request, Response& response);
 
@@ -37,8 +34,12 @@ int get_device_state_service_handler(const Request& request, Response& response)
 //存储设备列表
 int save_deviceList_service_handler(const Request& request, Response& response);
 
+
 //二进制控制指令
 int BleDevice_command_test_service_handler(const Request& request, Response& response);
+
+//修改设备信息
+int device_config_service_handler(const Request& request, Response& response);
 
 
 //创建分组

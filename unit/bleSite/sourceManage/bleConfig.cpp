@@ -74,7 +74,7 @@ void bleConfig::insertDeviceItem(string& deviceID, qlibc::QData& property){
             break;
         }
     }
-
+    //提取设备的属性信息
     qlibc::QData location, newItem;
     location.setString("room_name", property.getString("room_name"));
     location.setString("room_no", property.getString("room_no"));
@@ -305,7 +305,7 @@ qlibc::QData bleConfig::defaultStatus() {
 
     qlibc::QData itemColorTemperature;
     itemColorTemperature.setString("state_id", "color_temperature");
-    itemColorTemperature.setInt("state_value", 6000);
+    itemColorTemperature.setInt("state_value", 6700);
 
     state_list.append(itemPower);
     state_list.append(itemLuminance);

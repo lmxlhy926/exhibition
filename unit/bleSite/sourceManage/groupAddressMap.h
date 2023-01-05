@@ -12,6 +12,7 @@ using namespace std;
 
 class GroupAddressMap {
 private:
+    //<组地址，属性信息>
     map<string, Json::Value> groupAddrMap;
     std::recursive_mutex rMutex_;
 

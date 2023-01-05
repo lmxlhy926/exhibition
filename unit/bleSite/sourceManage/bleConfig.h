@@ -30,34 +30,34 @@ private:
 public:
     static bleConfig* getInstance();
 
-    //设置配置路径
+    //设置加载路径
     void setConfigPath(const string &configPath);
 
-    //获取配置路径
+    //获取加载路径
     string getconfigPath();
 
-    //获取串口配置数据
+    //获取串口配置信息
     QData getSerialData();
 
-    //获取device-mac记录表
+    //获取mac-address信息
     QData getSnAddrData();
 
-    //存储device-mac记录表
+    //存储mac-address信息
     void saveSnAddrData(qlibc::QData& data);
 
     //获取设备列表
     QData getDeviceListData();
 
-    //插入新绑定的设备条目
+    //设备列表中插入新绑定的设备条目
     void insertDeviceItem(string& deviceID, qlibc::QData& property);
 
-    //插入分组信息
+    //设备列表中插入设备所属的组信息
     void insertGroupInfo(string& deviceID, string& groupName, string& groupAddress);
 
-    //删除分组信息
+    //从设备列表中删除设备的分组信息
     void deleteGroupInfo(string& deviceID);
 
-    //删除解绑的设备
+    //从设备列表中删除解绑的设备
     void deleteDeviceItem(string& deviceID);
 
     //存储设备列表
@@ -66,10 +66,10 @@ public:
     //获取设备状态列表
     QData getStatusListData();
 
-    //增加新绑定的设备的状态条目
+    //状态列表中增加新绑定的设备的状态条目
     void insertDefaultStatus(string& deviceID);
 
-    //删除解绑设备的状态条目
+    //状态列表中删除解绑设备的状态条目
     void deleteStatusItem(string& deviceID);
 
     //收到设备状态上报后，更新设备状态列表
