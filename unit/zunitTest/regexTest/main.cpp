@@ -209,7 +209,14 @@ void test(){
 
 
 int main(int argc, char* argv[]){
-    test();
+    string str = "helloworld";
+    regex sep("[ ]+");
+    sregex_token_iterator end;
+    sregex_token_iterator p(str.cbegin(), str.cend(), sep, {-1});
+    for(; p != end; p++){
+        std::cout << p->str() << std::endl;
+    }
+
 
     return 0;
 }

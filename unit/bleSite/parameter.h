@@ -19,6 +19,7 @@ static const string BLE_SITE_ID_NAME = "BLE灯控";
 static const int BLE_SITE_PORT = 9001;
 
 //服务ID
+static const string Reset_Device_Service_ID               = "reset_device";                      //重置网关
 static const string Scan_Device_Service_ID                = "scan_device";                       //扫描设备结果
 static const string Add_Device_Service_ID                 = "add_device";                        //添加设备
 static const string Del_Device_Service_ID                 = "del_device";                        //删除设备

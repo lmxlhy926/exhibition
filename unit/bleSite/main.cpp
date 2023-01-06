@@ -110,6 +110,11 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageId(BindEndMsg);                     //绑定结束
     serviceSiteManager->registerMessageId(Device_State_Changed);           //设备状态改变
 
+    //注册重置网关回调
+    serviceSiteManager->registerServiceRequestHandler(Reset_Device_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return reset_device_service_handler(request, response, lc);
+    });
 
     //注册设备扫描回调
     serviceSiteManager->registerServiceRequestHandler(Scan_Device_Service_ID,

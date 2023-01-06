@@ -10,6 +10,9 @@
 #include "downCmd/logicControl.h"
 using namespace httplib;
 
+//重置网关
+int reset_device_service_handler(const Request& request, Response& response, LogicControl& lc);
+
 //扫描设备
 int scan_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 

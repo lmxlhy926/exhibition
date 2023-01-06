@@ -13,6 +13,7 @@
 #include "sourceManage/bleConfig.h"
 #include "serviceRequestHandler.h"
 #include "siteService/nlohmann/json.hpp"
+#include <regex>
 
 
 static const nlohmann::json okResponse = {
@@ -90,6 +91,17 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
         }
     }
 }
+
+int reset_device_service_handler(const Request& request, Response& response, LogicControl& lc){
+    LOG_INFO << "reset_device_service_handler: " << qlibc::QData(request.body).toJsonString();
+    string command = "E9FF02";
+    string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
+    TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
+    telinkDonglePtr->write2Seria(command);
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
 
 //获取扫描结果
 int scan_device_service_handler(const Request& request, Response& response, LogicControl& lc){
@@ -261,15 +273,21 @@ int save_deviceList_service_handler(const Request& request, Response& response){
 }
 
 int BleDevice_command_test_service_handler(const Request& request, Response& response){
-
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
         string command = requestBody.getData("request").getString("command");
-        LOG_HLIGHT << "--->received command: " << command;
+        string commandWithoutSpace;
+        regex sep("[ ]+");
+        sregex_token_iterator end;
+        sregex_token_iterator pos(command.cbegin(), command.cend(), sep, {-1});
+        for(; pos != end; ++pos){
+            commandWithoutSpace += pos->str();
+        }
+        LOG_HLIGHT << "--->received command: " << commandWithoutSpace;
 
         string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
         TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
-        telinkDonglePtr->write2Seria(command);
+        telinkDonglePtr->write2Seria(commandWithoutSpace);
 
         response.set_content(okResponse.dump(), "text/json");
 
