@@ -68,15 +68,15 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
         }
     }
 
-    //将设备列表中的设备存储到扫描列表
-    for(auto& elem : deviceMap){
-        ScanListmanage::getInstance()->appendDeviceItem(elem.first, elem.second);
-    }
     std::map<string, Json::Value> scanedMap;
     bool bindFailedDevice = param.getBool("bindFailedDevice");
-    if(bindFailedDevice){
-        scanedMap = ScanListmanage::getInstance()->getScanListMap();
-        LOG_PURPLE << "===<SCAN>: ALL SCAN RESULT.....";
+    if(bindFailedDevice){   //将失败的设备添加进来
+        std::map<string, Json::Value> failedMap = ScanListmanage::getInstance()->getScanListMap();
+        scanedMap = deviceMap;
+        for(auto& failedItem : failedMap){
+            scanedMap.insert(std::make_pair(failedItem.first, failedItem.second));
+        }
+        LOG_PURPLE << "===<SCAN>: THIS SCAN RESULT + FAILED DEVICE.....";
     }else{
         scanedMap = deviceMap;
         LOG_PURPLE << "===<SCAN>: THIS SCAN RESULT.....";

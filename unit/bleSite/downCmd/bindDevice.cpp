@@ -146,6 +146,8 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
         LOG_RED << "<<: xxxxxxxxxBIND FAILEDxxxxxxxx";
         LOG_RED << "<<: xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
         SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
+        //将绑定失败设备加入扫描列表
+        ScanListmanage::getInstance()->appendDeviceItem(deviceSn, property.asValue());
         return false;
 
     }else{
@@ -174,6 +176,8 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
             LOG_RED << "<<: xxxxxxxxxBIND FAILEDxxxxxxxx";
             LOG_RED << "<<: xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
             SnAddressMap::getInstance()->deleteDeviceSn(deviceSn);
+            //将绑定失败设备加入扫描列表
+            ScanListmanage::getInstance()->appendDeviceItem(deviceSn, property.asValue());
             return false;
         }
     }

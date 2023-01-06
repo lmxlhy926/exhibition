@@ -33,8 +33,8 @@ void ScanListmanage::deleteDeviceItem(string &deviceSn) {
     auto pos = list.find(deviceSn);
     if(pos != list.end()){
         list.erase(pos);
+        saveData();
     }
-    saveData();
 }
 
 
