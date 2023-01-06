@@ -113,9 +113,17 @@ int scan_device_service_handler(const Request& request, Response& response, Logi
         qlibc::QData param = requestBody.getData("request");
         lc.getScanedDevices(scanDeviceArray, param);
 
+        //提取sn列表
+        qlibc::QData deviceId_list;
+        Json::ArrayIndex scanDeviceArraySize = scanDeviceArray.size();
+        for(Json::ArrayIndex i = 0; i < scanDeviceArraySize; ++i){
+            deviceId_list.append(scanDeviceArray.getArrayElement(i).getString("deviceSn"));
+        }
+
         //返回扫描结果
         qlibc::QData res, retData;
         res.putData("device_list", scanDeviceArray);
+        res.putData("deviceId_list", deviceId_list);
         retData.setInt("code", 0);
         retData.setString("error", "ok");
         retData.putData("response", res);
