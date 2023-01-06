@@ -317,7 +317,7 @@ public:
         bleConfig::getInstance()->deleteStatusItem(deviceSn);
         //从组列表中删除设备
         GroupAddressMap::getInstance()->removeDeviceFromAnyGroup(deviceSn);
-        LOG_GREEN << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
+        LOG_PURPLE << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
 
         //更新config白名单列表
         Json::Value deviceItem, device_list, device_list_content;
@@ -330,7 +330,7 @@ public:
         request.putData("request", qlibc::QData(device_list_content));
         qlibc::QData response;
         SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, request, response);
-        LOG_HLIGHT << "==>deleteDeviceList2ConfigSite: " << request.toJsonString();
+        LOG_INFO << "==>deleteDeviceList2ConfigSite: " << request.toJsonString();
 
         //发布设备解绑消息
         qlibc::QData content, publishData;

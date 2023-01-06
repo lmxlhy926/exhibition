@@ -34,10 +34,15 @@ bool LogicControl::parse(qlibc::QData &cmdData) {
 
 //进行指定时间的扫描，获取可连接的设备列表
 void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& param){
-    LOG_INFO << "start to find device.....";
+    LOG_INFO << "===<SCAN>: start to find device.....";
     qlibc::QData scanData;
     scanData.setString("command", "scan");
     DownUtility::parse2Send(scanData);
+
+    //提取允许添加的设备
+    bool enableAllowList = param.getBool("enableAllowList");
+    qlibc::QData allowAddList = param.getData("allowAddList");
+    Json::Value::ArrayIndex allowAddListSize = allowAddList.size();
 
     //将扫描到的设备存储到设备列表
     std::map<string, Json::Value> deviceMap;
@@ -53,13 +58,12 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
             retScanData = EventTable::getInstance()->scanResultEvent.getData();
             string deviceSn = retScanData.getString("deviceSn");
             if(!deviceSn.empty()){
-                retScanData.setString("room_name", param.getString("room_name"));
-                retScanData.setString("room_no", param.getString("room_no"));
+                retScanData.putData("location", param.getData("location"));
                 deviceMap.insert(std::make_pair(deviceSn, retScanData.asValue()));
             }
         }
         if(time(nullptr) - time_current > timeSeconds){
-            LOG_PURPLE << "===>find device end....";
+            LOG_PURPLE << "===<SCAN>: find device end....";
             break;
         }
     }
@@ -72,8 +76,28 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
     bool bindFailedDevice = param.getBool("bindFailedDevice");
     if(bindFailedDevice){
         scanedMap = ScanListmanage::getInstance()->getScanListMap();
+        LOG_PURPLE << "===<SCAN>: ALL SCAN RESULT.....";
     }else{
         scanedMap = deviceMap;
+        LOG_PURPLE << "===<SCAN>: THIS SCAN RESULT.....";
+    }
+
+    //剔除不在允许安装列表中的设备
+    if(enableAllowList){
+        for(auto pos = scanedMap.begin(); pos != scanedMap.end();){
+            bool isFind = false;
+            for(Json::ArrayIndex i = 0; i < allowAddListSize; ++i){
+                string deviceSn = allowAddList.getArrayElement(i).asValue().asString();
+                if(pos->first == deviceSn){
+                    pos++;
+                    isFind = true;
+                    break;
+                }
+            }
+            if(!isFind){
+                pos = scanedMap.erase(pos);
+            }
+        }
     }
 
     qlibc::QData scanedArray;
@@ -86,7 +110,7 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
         item.setString("device_model", elem.second["device_model"].asString());
         scanedArray.append(item);
     }
-    LOG_GREEN << "==>deviceArray: " << deviceArray.toJsonString(true);
+    LOG_GREEN << "===<SCAN>: deviceArray: " << deviceArray.toJsonString(true);
 
     //发布扫描结果
     qlibc::QData content, publishData;

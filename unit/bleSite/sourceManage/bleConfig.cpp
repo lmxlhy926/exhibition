@@ -75,16 +75,13 @@ void bleConfig::insertDeviceItem(string& deviceID, qlibc::QData& property){
         }
     }
     //提取设备的属性信息
-    qlibc::QData location, newItem;
-    location.setString("room_name", property.getString("room_name"));
-    location.setString("room_no", property.getString("room_no"));
-
+    qlibc::QData newItem;
     newItem.setString("device_id", deviceID);
     newItem.setString("device_type", property.getString("device_type"));
     newItem.setString("device_typeCode", property.getString("device_typeCode"));
     newItem.setString("device_model", property.getString("device_model"));
     newItem.setString("device_modelCode", property.getString("device_modelCode"));
-    newItem.putData("location", location);
+    newItem.putData("location", property.getData("location"));
 
     deviceListArray.append(newItem);
 

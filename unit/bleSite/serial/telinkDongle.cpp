@@ -116,10 +116,8 @@ void TelinkDongle::sendThreadFunc(){
             std::vector<uint8_t> commandVec = commandString2BinaryByte(commandString);
             if(commonSerial.write2Serial(commandVec.data(), static_cast<int>(commandVec.size()))){
                 LOG_HLIGHT << "==>sendCmd<true>: " << binary2SendString(commandVec);
-                LOG_PURPLE << "sendList.size(): " << sendList.size();
             }else{
                 LOG_HLIGHT << "==>sendCmd<false>: " << binary2SendString(commandVec);
-                LOG_RED << "sendList.size(): " << sendList.size();
             }
             this_thread::sleep_for(std::chrono::milliseconds(500));
 

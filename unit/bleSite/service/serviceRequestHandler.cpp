@@ -98,8 +98,8 @@ int scan_device_service_handler(const Request& request, Response& response, Logi
     if(requestBody.type() != Json::nullValue){
         //发送扫描指令，获取扫描结果
         qlibc::QData scanDeviceArray;
-        qlibc::QData emptyParam;
-        lc.getScanedDevices(scanDeviceArray, emptyParam);
+        qlibc::QData param = requestBody.getData("request");
+        lc.getScanedDevices(scanDeviceArray, param);
 
         //返回扫描结果
         qlibc::QData res, retData;
