@@ -1,7 +1,6 @@
 .idea
 /unit/paramData
 /out
-/unit/bleSite/data
 /cmake-build-debug_cygwin
 /cmake-build-debug_wsl
 /cmake-build-minsizerel_android_armeabi-v7a

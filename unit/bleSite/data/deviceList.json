@@ -1,0 +1,187 @@
+{
+	"device_list" : 
+	[
+		{
+			"device_id" : "5A8E7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "EDA17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "3CA27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "66977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "FE8E7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "3AA27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "068F7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "D98A7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "83A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "38A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "608E7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "47A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "F3A17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "6号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "过道13射灯",
+				"room_no" : "0"
+			}
+		}
+	]
+}

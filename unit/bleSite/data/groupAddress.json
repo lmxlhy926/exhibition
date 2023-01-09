@@ -1,0 +1,76 @@
+{
+	"01C0" : 
+	{
+		"device_list" : 
+		[
+			"5A8E7B971B30",
+			"EDA17B971B30",
+			"3CA27B971B30",
+			"66977B971B30",
+			"FE8E7B971B30",
+			"3AA27B971B30"
+		],
+		"group_name" : "6号取13射灯-1",
+		"location" : 
+		{
+			"room_name" : "6号区",
+			"room_no" : "0"
+		}
+	},
+	"02C0" : 
+	{
+		"device_list" : 
+		[
+			"068F7B971B30",
+			"D98A7B971B30",
+			"83A27B971B30",
+			"38A27B971B30"
+		],
+		"group_name" : "6号取13射灯-2",
+		"location" : 
+		{
+			"room_name" : "6号区",
+			"room_no" : "0"
+		}
+	},
+	"03C0" : 
+	{
+		"device_list" : 
+		[
+			"608E7B971B30",
+			"47A27B971B30",
+			"F3A17B971B30"
+		],
+		"group_name" : "6号取13射灯-3",
+		"location" : 
+		{
+			"room_name" : "6号区",
+			"room_no" : "0"
+		}
+	},
+	"04C0" : 
+	{
+		"device_list" : 
+		[
+			"5A8E7B971B30",
+			"EDA17B971B30",
+			"3CA27B971B30",
+			"66977B971B30",
+			"FE8E7B971B30",
+			"3AA27B971B30",
+			"068F7B971B30",
+			"D98A7B971B30",
+			"83A27B971B30",
+			"38A27B971B30",
+			"608E7B971B30",
+			"47A27B971B30",
+			"F3A17B971B30"
+		],
+		"group_name" : "6号厅13射灯-完整组",
+		"location" : 
+		{
+			"room_name" : "6号区",
+			"room_no" : "0"
+		}
+	}
+}
