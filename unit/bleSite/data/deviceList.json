@@ -490,6 +490,42 @@
 				"room_name" : "2号区9个射灯",
 				"room_no" : "0"
 			}
+		},
+		{
+			"device_id" : "15D655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "2号区域灯带",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "4DD455971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "2号区域灯带",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "B2E955971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "2号区域灯带",
+				"room_no" : "0"
+			}
 		}
 	]
 }

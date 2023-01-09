@@ -11,6 +11,10 @@
 	{
 		"unicast_address" : "1B02"
 	},
+	"15D655971B30" : 
+	{
+		"unicast_address" : "2302"
+	},
 	"30A27B971B30" : 
 	{
 		"unicast_address" : "0D02"
@@ -51,6 +55,10 @@
 	{
 		"unicast_address" : "0402"
 	},
+	"4DD455971B30" : 
+	{
+		"unicast_address" : "2402"
+	},
 	"54977B971B30" : 
 	{
 		"unicast_address" : "1D02"
@@ -90,6 +98,10 @@
 	"89A27B971B30" : 
 	{
 		"unicast_address" : "2002"
+	},
+	"B2E955971B30" : 
+	{
+		"unicast_address" : "2502"
 	},
 	"D98A7B971B30" : 
 	{
