@@ -72,5 +72,79 @@
 			"room_name" : "6号区",
 			"room_no" : "0"
 		}
+	},
+	"05C0" : 
+	{
+		"device_list" : 
+		[
+			"EEA17B971B30",
+			"31A27B971B30",
+			"FFA17B971B30",
+			"F0A17B971B30",
+			"40A27B971B30"
+		],
+		"group_name" : "4号厅13射灯-1",
+		"location" : 
+		{
+			"room_name" : "4号区",
+			"room_no" : "0"
+		}
+	},
+	"06C0" : 
+	{
+		"device_list" : 
+		[
+			"F4A17B971B30",
+			"FAA07B971B30",
+			"E68A7B971B30"
+		],
+		"group_name" : "4号厅13射灯-2",
+		"location" : 
+		{
+			"room_name" : "4号区",
+			"room_no" : "0"
+		}
+	},
+	"07C0" : 
+	{
+		"device_list" : 
+		[
+			"57977B971B30",
+			"30A27B971B30",
+			"FDA17B971B30",
+			"3EA27B971B30",
+			"7BA27B971B30"
+		],
+		"group_name" : "4号厅13射灯-3",
+		"location" : 
+		{
+			"room_name" : "4号区",
+			"room_no" : "0"
+		}
+	},
+	"08C0" : 
+	{
+		"device_list" : 
+		[
+			"EEA17B971B30",
+			"31A27B971B30",
+			"FFA17B971B30",
+			"F0A17B971B30",
+			"40A27B971B30",
+			"F4A17B971B30",
+			"FAA07B971B30",
+			"E68A7B971B30",
+			"57977B971B30",
+			"30A27B971B30",
+			"FDA17B971B30",
+			"3EA27B971B30",
+			"7BA27B971B30"
+		],
+		"group_name" : "4号厅13射灯-完整组",
+		"location" : 
+		{
+			"room_name" : "4号区",
+			"room_no" : "0"
+		}
 	}
 }

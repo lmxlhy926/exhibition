@@ -182,6 +182,188 @@
 				"room_name" : "过道13射灯",
 				"room_no" : "0"
 			}
+		},
+		{
+			"device_id" : "EEA17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "31A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "FFA17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "F0A17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "40A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "F4A17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "FAA07B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "E68A7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "57977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "30A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "FDA17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "3EA27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
+		},
+		{
+			"device_id" : "7BA27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "4号厅13射灯-完整组",
+			"location" : 
+			{
+				"room_name" : "4号区13个射灯",
+				"room_no" : "0"
+			}
 		}
 	]
 }

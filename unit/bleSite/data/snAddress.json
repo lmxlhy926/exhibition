@@ -3,6 +3,14 @@
 	{
 		"unicast_address" : "0002"
 	},
+	"30A27B971B30" : 
+	{
+		"unicast_address" : "0D02"
+	},
+	"31A27B971B30" : 
+	{
+		"unicast_address" : "0E02"
+	},
 	"38A27B971B30" : 
 	{
 		"unicast_address" : "0102"
@@ -15,9 +23,21 @@
 	{
 		"unicast_address" : "0302"
 	},
+	"3EA27B971B30" : 
+	{
+		"unicast_address" : "0F02"
+	},
+	"40A27B971B30" : 
+	{
+		"unicast_address" : "1002"
+	},
 	"47A27B971B30" : 
 	{
 		"unicast_address" : "0402"
+	},
+	"57977B971B30" : 
+	{
+		"unicast_address" : "1102"
 	},
 	"5A8E7B971B30" : 
 	{
@@ -31,6 +51,10 @@
 	{
 		"unicast_address" : "0702"
 	},
+	"7BA27B971B30" : 
+	{
+		"unicast_address" : "1202"
+	},
 	"83A27B971B30" : 
 	{
 		"unicast_address" : "0802"
@@ -39,16 +63,44 @@
 	{
 		"unicast_address" : "0902"
 	},
+	"E68A7B971B30" : 
+	{
+		"unicast_address" : "1302"
+	},
 	"EDA17B971B30" : 
 	{
 		"unicast_address" : "0A02"
+	},
+	"EEA17B971B30" : 
+	{
+		"unicast_address" : "1402"
+	},
+	"F0A17B971B30" : 
+	{
+		"unicast_address" : "1502"
 	},
 	"F3A17B971B30" : 
 	{
 		"unicast_address" : "0B02"
 	},
+	"F4A17B971B30" : 
+	{
+		"unicast_address" : "1602"
+	},
+	"FAA07B971B30" : 
+	{
+		"unicast_address" : "1702"
+	},
+	"FDA17B971B30" : 
+	{
+		"unicast_address" : "1802"
+	},
 	"FE8E7B971B30" : 
 	{
 		"unicast_address" : "0C02"
+	},
+	"FFA17B971B30" : 
+	{
+		"unicast_address" : "1902"
 	}
 }
