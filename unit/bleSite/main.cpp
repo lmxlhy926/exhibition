@@ -220,22 +220,22 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageHandler(WhiteList_Changed, updateDeviceList);
 
     //订阅白名单改变消息
-//    threadPool_.enqueue([&](){
-//        while(true){
-//            int code;
-//            std::vector<string> messageIdList;
-//            messageIdList.push_back(WhiteList_Changed);
-//            code = serviceSiteManager->subscribeMessage(LocalIp, ConfigPort, messageIdList);
-//
-//            if (code == ServiceSiteManager::RET_CODE_OK) {
-//                printf("subscribeMessage whiteListModifiedByAppMsg ok.\n");
-//                break;
-//            }
-//
-//            std::this_thread::sleep_for(std::chrono::seconds(3));
-//            printf("subscribed whiteListModifiedByAppMsg failed....., start to subscribe in 3 seconds\n");
-//        }
-//    });
+    threadPool_.enqueue([&](){
+        while(true){
+            int code;
+            std::vector<string> messageIdList;
+            messageIdList.push_back(WhiteList_Changed);
+            code = serviceSiteManager->subscribeMessage(LocalIp, ConfigPort, messageIdList);
+
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                printf("subscribeMessage whiteListModifiedByAppMsg ok.\n");
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            printf("subscribed whiteListModifiedByAppMsg failed....., start to subscribe in 3 seconds\n");
+        }
+    });
 
 
     // 站点监听线程启动
@@ -253,6 +253,19 @@ int main(int argc, char* argv[]) {
                 LOG_PURPLE << "===>bleSite startByRegister successfully.....";
                 break;
             }
+        }
+    });
+
+    //定时更新配置站点白名单，将绑定的灯的信息同步到配置站点
+    threadPool_.enqueue([](){
+        while(true){
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            qlibc::QData request;
+            request.setString("service_id", "whiteListUpdateRequest");
+            request.putData("request", bleConfig::getInstance()->getDeviceListData());
+            qlibc::QData response;
+            SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, request, response);
+            LOG_INFO << "==>updateDeviceList2ConfigSite";
         }
     });
 
