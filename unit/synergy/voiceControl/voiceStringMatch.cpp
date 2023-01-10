@@ -11,12 +11,28 @@
 #include "common/httpUtil.h"
 
 
+string voiceStringMatchControl::lastModifyedDeviceOrGroup;
+int voiceStringMatchControl::tempLuminance = 0;
+int voiceStringMatchControl::tempTemperature = 0;
+
+
 voiceStringMatchControl::voiceStringMatchControl(string& ctrlStr)   :
     controlParseString(ctrlStr),
     roomList({
+        "主卧",
+        "儿童房",
+        "书房",
+
         "客厅",
+        "餐厅",
         "厨房",
-        "主卧室"
+        "主卫",
+        "次卫",
+
+        "玄关",
+        "景观阳台",
+        "生活阳台",
+        "过道",
     }),
     deviceTypeMap({
         {"灯", "LIGHT"}
@@ -24,6 +40,10 @@ voiceStringMatchControl::voiceStringMatchControl(string& ctrlStr)   :
     matchRex2ActionCode({
         {".*(打开).*", ActionCode::powerOn},
         {".*(关闭).*", ActionCode::powerOff},
+        {".*(亮一点).*",ActionCode::luminanceUp},
+        {".*(暗一点).*", ActionCode::luminanceDown},
+        {".*(冷一点).*", ActionCode::temperatureUp},
+        {".*(暖一点).*", ActionCode::temperatureDown},
         {".*((调|变|换|设)(到|成|为|置)).*(亮度).*", ActionCode::luminance1},
         {".*(亮度).*((调|变|换|设)(到|成|为|置)).*", ActionCode::luminance2},
         {".*((调|变|换|设)(到|成|为|置)).*(色温).*", ActionCode::color_temperature1},
@@ -32,6 +52,10 @@ voiceStringMatchControl::voiceStringMatchControl(string& ctrlStr)   :
     actionCodeCaptureGroup({
         {ActionCode::powerOn, {1}},
         {ActionCode::powerOff, {1}},
+        {ActionCode::luminanceUp, {1}},
+        {ActionCode::luminanceDown, {1}},
+        {ActionCode::temperatureUp, {1}},
+        {ActionCode::temperatureDown, {1}},
         {ActionCode::luminance1, {1, 4}},
         {ActionCode::luminance2, {1, 2}},
         {ActionCode::color_temperature1, {1, 4}},
@@ -40,7 +64,13 @@ voiceStringMatchControl::voiceStringMatchControl(string& ctrlStr)   :
 {}
 
 void voiceStringMatchControl::parseAndControl() {
-    voiceString = controlParseString;
+    //去除包含的字符
+    regex sep("[ ]+");
+    sregex_token_iterator end;
+    sregex_token_iterator p(controlParseString.cbegin(), controlParseString.cend(), sep, {-1});
+    for(; p != end; p++){
+        voiceString += p->str();
+    }
     LOG_INFO << "total: " << voiceString;
     ParsedItem parsedItem;
 
@@ -86,7 +116,7 @@ void voiceStringMatchControl::parseAndControl() {
     }
     LOG_INFO << "afterAction: " << voiceString;
 
-    //确定设备、组
+    //查找确定的设备、分组
     if(findDeviceIdOrGroupId(voiceString, parsedItem)){
         LOG_INFO << "afterDevice: " << voiceString;
     }else{
@@ -117,9 +147,17 @@ string voiceStringMatchControl::code2Action(ActionCode code){
     }else if(code == ActionCode::powerOff){
         action = "powerOff";
     }else if (code == ActionCode::luminance1 || code == ActionCode::luminance2){
-        action = "luminance";
+        action = "set luminance";
     }else if(code == ActionCode::color_temperature1 || code == ActionCode::color_temperature2){
-        action = "color_temperature";
+        action = "set color_temperature";
+    }else if(code == ActionCode::luminanceUp){
+        action = "luminance up";
+    }else if(code == ActionCode::luminanceDown){
+        action = "luminance down";
+    }else if(code == ActionCode::temperatureUp){
+        action = "temperature up";
+    }else if(code == ActionCode::temperatureDown){
+        action = "temperature down";
     }
     return action;
 }
@@ -144,24 +182,77 @@ void voiceStringMatchControl::printParsedItem(struct ParsedItem& item){
 }
 
 void voiceStringMatchControl::action2Command(ParsedItem& parsedItem, CommandItem& commandItem){
+    std::lock_guard<std::mutex> lg(Mutex);
+
     if(parsedItem.actionCode == ActionCode::powerOn){   //开
         commandItem.command_id = "power";
         commandItem.command_para = "on";
+        lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
 
     }else if(parsedItem.actionCode == ActionCode::powerOff){    //关
         commandItem.command_id = "power";
         commandItem.command_para = "off";
+        lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
 
     }else if(parsedItem.actionCode == ActionCode::luminance1 || parsedItem.actionCode == ActionCode::luminance2){   //设置亮度
         commandItem.command_id = "luminance";
-        int luminanceValue = static_cast<int>(atoi(parsedItem.param.c_str()) * 2.5);
+        int luminanceValue = static_cast<int>(atoi(parsedItem.param.c_str()) * 2.55);
         commandItem.command_para = luminanceValue;
+        lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
 
     }else if(parsedItem.actionCode == ActionCode::color_temperature1 || parsedItem.actionCode == ActionCode::color_temperature2){   //设置色温
         commandItem.command_id = "color_temperature";
         int ctValue = static_cast<int>(atoi(parsedItem.param.c_str()) * 38 + 2700);
         commandItem.command_para = ctValue;
+        lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
+
+    }else if(parsedItem.actionCode == ActionCode::luminanceUp || parsedItem.actionCode == ActionCode::luminanceDown){   //亮一点、暗一点
+        commandItem.command_id = "luminance";
+        if(lastModifyedDeviceOrGroup != parsedItem.devIdGrpId){
+            tempLuminance = defaultLuminance;
+        }else{
+            if(parsedItem.actionCode == ActionCode::luminanceUp){
+                if(tempLuminance + deltaLuminance > 100){
+                    tempLuminance = 100;
+                }else{
+                    tempLuminance += deltaLuminance;
+                }
+            }else{
+                if(tempLuminance - deltaLuminance < 0){
+                    tempLuminance = 0;
+                }else{
+                    tempLuminance -= deltaLuminance;
+                }
+            }
+        }
+        int valueInt = static_cast<int>(tempLuminance * 2.55);
+        commandItem.command_para = valueInt;
+        lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
+
+    }else if(parsedItem.actionCode == ActionCode::temperatureUp || parsedItem.actionCode == ActionCode::temperatureDown){   //冷一点、暖一点
+        commandItem.command_id = "color_temperature";
+        if(lastModifyedDeviceOrGroup != parsedItem.devIdGrpId){
+            tempTemperature = defaultTemperature;
+        }else{
+            if(parsedItem.actionCode == ActionCode::temperatureUp){
+                if(tempTemperature + deltaTemperature > 100){
+                    tempTemperature = 100;
+                }else{
+                    tempTemperature += deltaTemperature;
+                }
+            }else{
+                if(tempTemperature - deltaTemperature < 0){
+                    tempTemperature = 0;
+                }else{
+                    tempTemperature -= deltaTemperature;
+                }
+            }
+        }
+        int valueInt = static_cast<int>(tempTemperature * 38 + 2700);
+        commandItem.command_para = valueInt;
+        lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
     }
+
 }
 
 bool voiceStringMatchControl::getSpecificDeviceId(qlibc::QData& deviceList, string& str, string& deviceId, string& sourceSite) {

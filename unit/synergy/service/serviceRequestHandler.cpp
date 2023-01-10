@@ -287,7 +287,9 @@ namespace synergy {
             qlibc::QData controlRequest, controlResponse;
             controlRequest.setString("service_id", "control_device");
             controlRequest.putData("request", qlibc::QData().putData("device_list", elem.second));
+            LOG_GREEN << elem.first << "controlRequest: " << controlRequest.toJsonString();
             SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
+            LOG_BLUE << elem.first << " controlResponse: " << controlResponse.toJsonString();
         }
 
         response.set_content(okResponse.dump(), "text/json");
@@ -296,6 +298,7 @@ namespace synergy {
 
 
     int groupControl_service_handler(const Request& request, Response& response){
+        LOG_INFO << "groupControl_service_handler: " << qlibc::QData(request.body).toJsonString();
         //判断设备属于哪个站点
         std::map<string, qlibc::QData> groupListMap;
         qlibc::QData groupList = qlibc::QData(request.body).getData("request").getData("group_list");
@@ -319,7 +322,9 @@ namespace synergy {
             qlibc::QData controlRequest, controlResponse;
             controlRequest.setString("service_id", "control_group");
             controlRequest.putData("request", qlibc::QData().putData("group_list", elem.second));
+            LOG_GREEN << elem.first << "controlRequest: " << controlRequest.toJsonString();
             SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
+            LOG_BLUE << elem.first << " controlResponse: " << controlResponse.toJsonString();
         }
 
         response.set_content(okResponse.dump(), "text/json");

@@ -597,6 +597,7 @@ void updateDeviceList(const Request& request){
                 qlibc::QData configDevice = lightDevices.getArrayElement(j);
 
                 if(configDevice.getString("device_sn") == deviceItem.getString("device_id")){
+                    //只更新设备列表的位置、名字信息
                     qlibc::QData location;
                     location.setString("room_name", configDevice.getString("room_name"));
                     location.setString("room_no", configDevice.getString("room_no"));

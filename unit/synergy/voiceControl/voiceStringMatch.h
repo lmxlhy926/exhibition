@@ -8,6 +8,7 @@
 #include <string>
 #include <regex>
 #include "qlibc/QData.h"
+#include <mutex>
 using namespace std;
 
 //动作码：指示相应的控制命令
@@ -18,7 +19,11 @@ enum ActionCode{
     luminance1,
     luminance2,
     color_temperature1,
-    color_temperature2
+    color_temperature2,
+    luminanceUp,
+    luminanceDown,
+    temperatureUp,
+    temperatureDown
 };
 
 //控制类型：设备、组、类型
@@ -52,9 +57,18 @@ private:
     string controlParseString;
     string voiceString;
     std::vector<string> roomList;                      //房间列表
-    std::map<string, string> deviceTypeMap;         //设备类型列表
+    std::map<string, string> deviceTypeMap;             //设备类型列表
     std::map<string, ActionCode> matchRex2ActionCode;               //正则表达式--> 控制码
     std::map<ActionCode, std::vector<int>> actionCodeCaptureGroup;  //控制码 --- 捕获分组
+
+    static string lastModifyedDeviceOrGroup;
+    static int tempLuminance;
+    static int tempTemperature;
+    const int defaultLuminance = 60;
+    const int deltaLuminance = 20;
+    const int defaultTemperature = 60;
+    const int deltaTemperature = 20;
+    std::mutex Mutex;   //保护静态变量
 
 public:
     explicit voiceStringMatchControl(string& ctrlStr);

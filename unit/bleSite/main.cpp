@@ -72,9 +72,6 @@ int main(int argc, char* argv[]) {
         RecvPackageParse::disableUpload();
     }
 
-    //同步组列表到云端
-//    updateGroupList2Cloud();
-
     //单例对象
     ScanListmanage::getInstance();
 
@@ -245,9 +242,9 @@ int main(int argc, char* argv[]) {
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-            int code = serviceSiteManager->start();
+//            int code = serviceSiteManager->start();
             //注册启动方式
-//            int code = serviceSiteManager->startByRegister();
+            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 LOG_RED << "===>bleSite startByRegister error, code = " << code;
                 LOG_RED << "===>bleSite startByRegister in 3 seconds....";

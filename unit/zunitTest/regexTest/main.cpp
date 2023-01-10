@@ -209,13 +209,16 @@ void test(){
 
 
 int main(int argc, char* argv[]){
-    string str = "helloworld";
+    string str = "打开 客厅 的 灯";
     regex sep("[ ]+");
     sregex_token_iterator end;
     sregex_token_iterator p(str.cbegin(), str.cend(), sep, {-1});
+    string totalString;
     for(; p != end; p++){
         std::cout << p->str() << std::endl;
+        totalString += p->str();
     }
+    std::cout << "totalString: " << totalString << std::endl;
 
 
     return 0;
