@@ -271,7 +271,7 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
     ret.setString("msg", "success");
     response.set_content(ret.toJsonString(), "text/json");
 
-    //发布白名单消息
+    //发布白名单修改信息
     qlibc::QData publishData;
     publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
     publishData.putData("content", qlibc::QData());

@@ -5,6 +5,7 @@
 #include "groupManager.h"
 #include "common/httpUtil.h"
 #include "../param.h"
+#include "log/Logging.h"
 
 GroupManager* GroupManager::instance = nullptr;
 
@@ -20,8 +21,8 @@ void GroupManager::listChanged() {
 }
 
 qlibc::QData GroupManager::getAllGroupList() {
-    qlibc::QData list = getGroupListAllLocalNet();
     std::lock_guard<std::mutex> lg(Mutex);
+    qlibc::QData list = getGroupListAllLocalNet();
     groupList = list;
     return groupList;
 }
@@ -47,7 +48,7 @@ qlibc::QData GroupManager::getGroupListAllLocalNet(){
         if(regex_match(elem, sm, regex("(.*):(.*)"))){
             string ip = sm.str(1);
             string siteID = sm.str(2);
-            if(siteID == BleSiteID || siteID == ZigbeeSiteID){
+            if((siteID == BleSiteID || siteID == ZigbeeSiteID) && ip != "127.0.0.1"){
                 qlibc::QData groupRequest;
                 groupRequest.setString("service_id", "get_group_list");
                 groupRequest.setValue("request", Json::nullValue);

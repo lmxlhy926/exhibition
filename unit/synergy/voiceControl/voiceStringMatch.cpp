@@ -310,10 +310,9 @@ bool voiceStringMatchControl::getGroupIdFromRoomNameAndType(qlibc::QData& groupL
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = groupList.getArrayElement(i);
-        bool areaFullGroup = item.getBool("areaFullGroup");
         string room_name = item.getData("location").getString("room_name");
         string group_type = item.getString("group_type");
-        if(areaFullGroup && room_name == roomName && group_type == deviceType){
+        if(room_name == roomName){
             groupId = item.getString("group_id");
             sourceSite = item.getString("sourceSite");
             return true;

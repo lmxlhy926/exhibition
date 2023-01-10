@@ -74,7 +74,7 @@ qlibc::QData DeviceManager::getDeviceListAllLocalNet() {
         if(regex_match(elem, sm, regex("(.*):(.*)"))){
             string ip = sm.str(1);
             string siteID = sm.str(2);
-            if(siteID == BleSiteID || siteID == TvAdapterSiteID || siteID == ZigbeeSiteID){
+            if((siteID == BleSiteID || siteID == TvAdapterSiteID || siteID == ZigbeeSiteID) && ip != "127.0.0.1"){
                 qlibc::QData deviceRequest;
                 deviceRequest.setString("service_id", "get_device_list");
                 deviceRequest.setValue("request", Json::nullValue);
