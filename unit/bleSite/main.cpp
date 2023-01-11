@@ -219,7 +219,7 @@ int main(int argc, char* argv[]) {
     //注册白名单改变助理函数
     serviceSiteManager->registerMessageHandler(WhiteList_Changed, updateDeviceList);
 
-    //订阅白名单改变消息
+    //订阅白名单改变消息，收到消息后，将白名单配置的设备属性信息同步到蓝牙设备列表
     threadPool_.enqueue([&](){
         while(true){
             int code;
