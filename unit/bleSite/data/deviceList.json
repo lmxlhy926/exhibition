@@ -916,6 +916,188 @@
 				"room_name" : "十分净头顶L型17个灯",
 				"room_no" : "-1"
 			}
+		},
+		{
+			"device_id" : "008860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "068A60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "078860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "088A60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "398860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "4A5B60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "4A8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "8D6C60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "918860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "BF8E60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "CF8960971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "DE6B60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E28960971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "十分薄滚筒洗衣机上13个",
+			"location" : 
+			{
+				"room_name" : "十分薄滚筒洗衣机上13个",
+				"room_no" : "-1"
+			}
 		}
 	]
 }

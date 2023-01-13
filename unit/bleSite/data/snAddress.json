@@ -1,4 +1,8 @@
 {
+	"008860971B30" : 
+	{
+		"unicast_address" : "4202"
+	},
 	"016E60971B30" : 
 	{
 		"unicast_address" : "3102"
@@ -11,9 +15,21 @@
 	{
 		"unicast_address" : "2602"
 	},
+	"068A60971B30" : 
+	{
+		"unicast_address" : "4302"
+	},
 	"068F7B971B30" : 
 	{
 		"unicast_address" : "0002"
+	},
+	"078860971B30" : 
+	{
+		"unicast_address" : "4402"
+	},
+	"088A60971B30" : 
+	{
+		"unicast_address" : "4502"
 	},
 	"0A8F7B971B30" : 
 	{
@@ -55,6 +71,10 @@
 	{
 		"unicast_address" : "0102"
 	},
+	"398860971B30" : 
+	{
+		"unicast_address" : "4602"
+	},
 	"3A8860971B30" : 
 	{
 		"unicast_address" : "3602"
@@ -86,6 +106,14 @@
 	"47A27B971B30" : 
 	{
 		"unicast_address" : "0402"
+	},
+	"4A5B60971B30" : 
+	{
+		"unicast_address" : "4702"
+	},
+	"4A8860971B30" : 
+	{
+		"unicast_address" : "4802"
 	},
 	"4DD455971B30" : 
 	{
@@ -147,6 +175,14 @@
 	{
 		"unicast_address" : "2902"
 	},
+	"8D6C60971B30" : 
+	{
+		"unicast_address" : "4902"
+	},
+	"918860971B30" : 
+	{
+		"unicast_address" : "4A02"
+	},
 	"934E39971B30" : 
 	{
 		"unicast_address" : "2A02"
@@ -191,6 +227,10 @@
 	{
 		"unicast_address" : "3E02"
 	},
+	"BF8E60971B30" : 
+	{
+		"unicast_address" : "4B02"
+	},
 	"C26C60971B30" : 
 	{
 		"unicast_address" : "3F02"
@@ -199,13 +239,25 @@
 	{
 		"unicast_address" : "2E02"
 	},
+	"CF8960971B30" : 
+	{
+		"unicast_address" : "4C02"
+	},
 	"D98A7B971B30" : 
 	{
 		"unicast_address" : "0902"
 	},
+	"DE6B60971B30" : 
+	{
+		"unicast_address" : "4D02"
+	},
 	"DF8960971B30" : 
 	{
 		"unicast_address" : "4002"
+	},
+	"E28960971B30" : 
+	{
+		"unicast_address" : "4E02"
 	},
 	"E5BD1D971B30" : 
 	{
