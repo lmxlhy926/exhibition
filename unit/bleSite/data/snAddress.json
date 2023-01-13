@@ -55,9 +55,25 @@
 	{
 		"unicast_address" : "1A02"
 	},
+	"0AEA55971B30" : 
+	{
+		"unicast_address" : "8E02"
+	},
+	"0CD555971B30" : 
+	{
+		"unicast_address" : "8C02"
+	},
+	"0DD555971B30" : 
+	{
+		"unicast_address" : "8502"
+	},
 	"0EA17B971B30" : 
 	{
 		"unicast_address" : "1B02"
+	},
+	"0EE955971B30" : 
+	{
+		"unicast_address" : "9002"
 	},
 	"0F6E60971B30" : 
 	{
@@ -65,7 +81,7 @@
 	},
 	"15D655971B30" : 
 	{
-		"unicast_address" : "2302"
+		"unicast_address" : "8A02"
 	},
 	"174E39971B30" : 
 	{
@@ -86,6 +102,10 @@
 	"1A8F60971B30" : 
 	{
 		"unicast_address" : "6302"
+	},
+	"1BD655971B30" : 
+	{
+		"unicast_address" : "9102"
 	},
 	"266E60971B30" : 
 	{
@@ -197,7 +217,7 @@
 	},
 	"4DD455971B30" : 
 	{
-		"unicast_address" : "2402"
+		"unicast_address" : "2302"
 	},
 	"538860971B30" : 
 	{
@@ -235,6 +255,10 @@
 	{
 		"unicast_address" : "2802"
 	},
+	"5DD355971B30" : 
+	{
+		"unicast_address" : "8F02"
+	},
 	"5F977B971B30" : 
 	{
 		"unicast_address" : "5902"
@@ -258,6 +282,10 @@
 	"699060971B30" : 
 	{
 		"unicast_address" : "7202"
+	},
+	"71D555971B30" : 
+	{
+		"unicast_address" : "8702"
 	},
 	"78A27B971B30" : 
 	{
@@ -367,17 +395,29 @@
 	{
 		"unicast_address" : "6802"
 	},
+	"B2D455971B30" : 
+	{
+		"unicast_address" : "8602"
+	},
 	"B2E955971B30" : 
 	{
-		"unicast_address" : "2502"
+		"unicast_address" : "2402"
 	},
 	"B49260971B30" : 
 	{
 		"unicast_address" : "2D02"
 	},
+	"B4E955971B30" : 
+	{
+		"unicast_address" : "2502"
+	},
 	"B69060971B30" : 
 	{
 		"unicast_address" : "3B02"
+	},
+	"B6E655971B30" : 
+	{
+		"unicast_address" : "8B02"
 	},
 	"B79060971B30" : 
 	{
@@ -386,6 +426,10 @@
 	"B79260971B30" : 
 	{
 		"unicast_address" : "3C02"
+	},
+	"B8E655971B30" : 
+	{
+		"unicast_address" : "9202"
 	},
 	"BA8960971B30" : 
 	{
@@ -410,6 +454,10 @@
 	"C28F60971B30" : 
 	{
 		"unicast_address" : "8302"
+	},
+	"C3E655971B30" : 
+	{
+		"unicast_address" : "8802"
 	},
 	"C86260971B30" : 
 	{
@@ -446,6 +494,10 @@
 	"E28960971B30" : 
 	{
 		"unicast_address" : "4E02"
+	},
+	"E2E255971B30" : 
+	{
+		"unicast_address" : "8D02"
 	},
 	"E56B60971B30" : 
 	{
@@ -526,6 +578,10 @@
 	"FE8E7B971B30" : 
 	{
 		"unicast_address" : "0C02"
+	},
+	"FEE955971B30" : 
+	{
+		"unicast_address" : "8902"
 	},
 	"FFA17B971B30" : 
 	{
