@@ -1686,6 +1686,174 @@
 				"room_name" : "中央空调上面15个",
 				"room_no" : "-1"
 			}
+		},
+		{
+			"device_id" : "174E39971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "178860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "198860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "3B8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "4D3039971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "568860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "7CD81D971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "8B9260971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "938860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C04C39971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C28F60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "F96C60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "13C0",
+			"group_name" : "新风系统上面12个筒灯",
+			"location" : 
+			{
+				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
 		}
 	]
 }
