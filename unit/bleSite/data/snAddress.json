@@ -1,0 +1,126 @@
+{
+	"028F7B971B30" : 
+	{
+		"unicast_address" : "1102"
+	},
+	"02A17B971B30" : 
+	{
+		"unicast_address" : "1202"
+	},
+	"248860971B30" : 
+	{
+		"unicast_address" : "0002"
+	},
+	"34A27B971B30" : 
+	{
+		"unicast_address" : "1302"
+	},
+	"37A27B971B30" : 
+	{
+		"unicast_address" : "1402"
+	},
+	"3BA27B971B30" : 
+	{
+		"unicast_address" : "1502"
+	},
+	"3D8860971B30" : 
+	{
+		"unicast_address" : "0102"
+	},
+	"428860971B30" : 
+	{
+		"unicast_address" : "0202"
+	},
+	"44A27B971B30" : 
+	{
+		"unicast_address" : "1602"
+	},
+	"4F8860971B30" : 
+	{
+		"unicast_address" : "0302"
+	},
+	"52977B971B30" : 
+	{
+		"unicast_address" : "1702"
+	},
+	"5FD81D971B30" : 
+	{
+		"unicast_address" : "0402"
+	},
+	"638E7B971B30" : 
+	{
+		"unicast_address" : "1802"
+	},
+	"6E6C60971B30" : 
+	{
+		"unicast_address" : "0502"
+	},
+	"79A27B971B30" : 
+	{
+		"unicast_address" : "1902"
+	},
+	"818E60971B30" : 
+	{
+		"unicast_address" : "0602"
+	},
+	"88A27B971B30" : 
+	{
+		"unicast_address" : "1A02"
+	},
+	"918E60971B30" : 
+	{
+		"unicast_address" : "0702"
+	},
+	"983039971B30" : 
+	{
+		"unicast_address" : "0802"
+	},
+	"AE8860971B30" : 
+	{
+		"unicast_address" : "0902"
+	},
+	"C36C60971B30" : 
+	{
+		"unicast_address" : "0A02"
+	},
+	"C48960971B30" : 
+	{
+		"unicast_address" : "0B02"
+	},
+	"C48E60971B30" : 
+	{
+		"unicast_address" : "0C02"
+	},
+	"CE6C60971B30" : 
+	{
+		"unicast_address" : "0D02"
+	},
+	"D56C60971B30" : 
+	{
+		"unicast_address" : "0E02"
+	},
+	"E58E7B971B30" : 
+	{
+		"unicast_address" : "1B02"
+	},
+	"E8A17B971B30" : 
+	{
+		"unicast_address" : "1C02"
+	},
+	"E98E7B971B30" : 
+	{
+		"unicast_address" : "1D02"
+	},
+	"EB7060971B30" : 
+	{
+		"unicast_address" : "0F02"
+	},
+	"EFA17B971B30" : 
+	{
+		"unicast_address" : "1E02"
+	},
+	"F85760971B30" : 
+	{
+		"unicast_address" : "1002"
+	}
+}
