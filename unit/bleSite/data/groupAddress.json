@@ -81,5 +81,22 @@
 			"room_name" : "8kMax上顶盘型",
 			"room_no" : "-1"
 		}
+	},
+	"04C0" : 
+	{
+		"device_list" : 
+		[
+			"00A17B971B30",
+			"0DA17B971B30",
+			"53977B971B30",
+			"5C977B971B30",
+			"60977B971B30"
+		],
+		"group_name" : "小房间射灯",
+		"location" : 
+		{
+			"room_name" : "小房间射灯",
+			"room_no" : "-1"
+		}
 	}
 }

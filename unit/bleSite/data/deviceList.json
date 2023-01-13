@@ -658,6 +658,76 @@
 				"room_name" : "8kMax上顶盘型",
 				"room_no" : "-1"
 			}
+		},
+		{
+			"device_id" : "00A17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "小房间射灯",
+			"location" : 
+			{
+				"room_name" : "小房间射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "0DA17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "小房间射灯",
+			"location" : 
+			{
+				"room_name" : "小房间射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "53977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "小房间射灯",
+			"location" : 
+			{
+				"room_name" : "小房间射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "5C977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "小房间射灯",
+			"location" : 
+			{
+				"room_name" : "小房间射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "60977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "小房间射灯",
+			"location" : 
+			{
+				"room_name" : "小房间射灯",
+				"room_no" : "-1"
+			}
 		}
 	]
 }
