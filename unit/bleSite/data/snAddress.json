@@ -11,9 +11,17 @@
 	{
 		"unicast_address" : "3202"
 	},
+	"048F7B971B30" : 
+	{
+		"unicast_address" : "5302"
+	},
 	"04D455971B30" : 
 	{
 		"unicast_address" : "2602"
+	},
+	"05A17B971B30" : 
+	{
+		"unicast_address" : "5402"
 	},
 	"068A60971B30" : 
 	{
@@ -63,6 +71,10 @@
 	{
 		"unicast_address" : "0E02"
 	},
+	"35A27B971B30" : 
+	{
+		"unicast_address" : "5502"
+	},
 	"36A27B971B30" : 
 	{
 		"unicast_address" : "2202"
@@ -74,6 +86,10 @@
 	"398860971B30" : 
 	{
 		"unicast_address" : "4602"
+	},
+	"39A27B971B30" : 
+	{
+		"unicast_address" : "5602"
 	},
 	"3A8860971B30" : 
 	{
@@ -95,9 +111,17 @@
 	{
 		"unicast_address" : "1002"
 	},
+	"42A27B971B30" : 
+	{
+		"unicast_address" : "5702"
+	},
 	"43A27B971B30" : 
 	{
 		"unicast_address" : "1C02"
+	},
+	"45A27B971B30" : 
+	{
+		"unicast_address" : "5802"
 	},
 	"468A60971B30" : 
 	{
@@ -147,13 +171,25 @@
 	{
 		"unicast_address" : "2802"
 	},
+	"5F977B971B30" : 
+	{
+		"unicast_address" : "5902"
+	},
 	"608E7B971B30" : 
 	{
 		"unicast_address" : "0602"
 	},
+	"61977B971B30" : 
+	{
+		"unicast_address" : "5A02"
+	},
 	"66977B971B30" : 
 	{
 		"unicast_address" : "0702"
+	},
+	"78A27B971B30" : 
+	{
+		"unicast_address" : "5B02"
 	},
 	"7AA27B971B30" : 
 	{
@@ -171,6 +207,10 @@
 	{
 		"unicast_address" : "0802"
 	},
+	"85A27B971B30" : 
+	{
+		"unicast_address" : "5C02"
+	},
 	"89A27B971B30" : 
 	{
 		"unicast_address" : "2002"
@@ -182,6 +222,10 @@
 	"8D6C60971B30" : 
 	{
 		"unicast_address" : "4902"
+	},
+	"8FA27B971B30" : 
+	{
+		"unicast_address" : "5D02"
 	},
 	"918860971B30" : 
 	{
@@ -267,6 +311,10 @@
 	{
 		"unicast_address" : "4E02"
 	},
+	"E58A7B971B30" : 
+	{
+		"unicast_address" : "5E02"
+	},
 	"E5BD1D971B30" : 
 	{
 		"unicast_address" : "4102"
@@ -307,6 +355,10 @@
 	{
 		"unicast_address" : "1602"
 	},
+	"F6A17B971B30" : 
+	{
+		"unicast_address" : "5F02"
+	},
 	"F88760971B30" : 
 	{
 		"unicast_address" : "3002"
@@ -318,6 +370,10 @@
 	"FAA07B971B30" : 
 	{
 		"unicast_address" : "1702"
+	},
+	"FD8E7B971B30" : 
+	{
+		"unicast_address" : "6002"
 	},
 	"FDA17B971B30" : 
 	{

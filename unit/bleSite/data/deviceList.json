@@ -1154,6 +1154,202 @@
 				"room_name" : "球型灯旁边4个",
 				"room_no" : "-1"
 			}
+		},
+		{
+			"device_id" : "048F7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "05A17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "35A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "39A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "42A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "45A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "5F977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "61977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "78A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "85A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "8FA27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E58A7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "F6A17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "FD8E7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "10C0",
+			"group_name" : "云硅谷上方15射灯，一个坏了",
+			"location" : 
+			{
+				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_no" : "-1"
+			}
 		}
 	]
 }
