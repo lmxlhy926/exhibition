@@ -98,5 +98,21 @@
 			"room_name" : "小房间射灯",
 			"room_no" : "-1"
 		}
+	},
+	"05C0" : 
+	{
+		"device_list" : 
+		[
+			"05D555971B30",
+			"76E655971B30",
+			"EFE555971B30",
+			"FFE555971B30"
+		],
+		"group_name" : "",
+		"location" : 
+		{
+			"room_name" : "小房间灯带",
+			"room_no" : "-1"
+		}
 	}
 }

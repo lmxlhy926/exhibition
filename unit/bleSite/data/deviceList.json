@@ -728,6 +728,130 @@
 				"room_name" : "小房间射灯",
 				"room_no" : "-1"
 			}
+		},
+		{
+			"device_id" : "11D655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "盘型灯下方灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "07D555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "盘型灯对侧电视墙灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C3DB55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "盘型灯对侧电视墙灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "EFD355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "盘型灯对侧电视墙灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "01D455971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "游戏体验区",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "26D755971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "游戏体验区",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "05D555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "05C0",
+			"location" : 
+			{
+				"room_name" : "小房间灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "76E655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "05C0",
+			"location" : 
+			{
+				"room_name" : "小房间灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "EFE555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "05C0",
+			"location" : 
+			{
+				"room_name" : "小房间灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "FFE555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "05C0",
+			"location" : 
+			{
+				"room_name" : "小房间灯带",
+				"room_no" : "-1"
+			}
 		}
 	]
 }
