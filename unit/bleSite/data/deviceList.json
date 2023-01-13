@@ -1490,6 +1490,202 @@
 				"room_name" : "舒适柔风上面10个",
 				"room_no" : "-1"
 			}
+		},
+		{
+			"device_id" : "058A60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "188A60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "2B8F60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "3C8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "3F8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "588860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "673E39971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "699060971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "8B8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "9B8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "A48860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "AF8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C86260971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E56B60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "12C0",
+			"group_name" : "中央空调上面15个",
+			"location" : 
+			{
+				"room_name" : "中央空调上面15个",
+				"room_no" : "-1"
+			}
 		}
 	]
 }
