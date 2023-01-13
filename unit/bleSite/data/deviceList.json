@@ -526,6 +526,158 @@
 				"room_name" : "2号区域灯带",
 				"room_no" : "0"
 			}
+		},
+		{
+			"device_id" : "04D455971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "前台上顶大灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "564E39971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0CC0",
+			"group_name" : "前台上顶筒灯10个",
+			"location" : 
+			{
+				"room_name" : "前台上顶筒灯10个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "5B8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0CC0",
+			"group_name" : "前台上顶筒灯10个",
+			"location" : 
+			{
+				"room_name" : "前台上顶筒灯10个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "8B8E60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0CC0",
+			"group_name" : "前台上顶筒灯10个",
+			"location" : 
+			{
+				"room_name" : "前台上顶筒灯10个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "934E39971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0CC0",
+			"group_name" : "前台上顶筒灯10个",
+			"location" : 
+			{
+				"room_name" : "前台上顶筒灯10个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "9D8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0CC0",
+			"group_name" : "前台上顶筒灯10个",
+			"location" : 
+			{
+				"room_name" : "前台上顶筒灯10个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "A28860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0CC0",
+			"group_name" : "前台上顶筒灯10个",
+			"location" : 
+			{
+				"room_name" : "前台上顶筒灯10个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B49260971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0CC0",
+			"group_name" : "前台上顶筒灯10个",
+			"location" : 
+			{
+				"room_name" : "前台上顶筒灯10个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "CF6C60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0CC0",
+			"group_name" : "前台上顶筒灯10个",
+			"location" : 
+			{
+				"room_name" : "前台上顶筒灯10个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "ED8E60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0CC0",
+			"group_name" : "前台上顶筒灯10个",
+			"location" : 
+			{
+				"room_name" : "前台上顶筒灯10个",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "F88760971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0CC0",
+			"group_name" : "前台上顶筒灯10个",
+			"location" : 
+			{
+				"room_name" : "前台上顶筒灯10个",
+				"room_no" : "-1"
+			}
 		}
 	]
 }
