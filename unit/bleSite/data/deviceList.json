@@ -434,6 +434,230 @@
 				"room_name" : "8kMaxL型射灯",
 				"room_no" : "-1"
 			}
+		},
+		{
+			"device_id" : "0ACC55971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "24A441971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "57A441971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "5BA341971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "66DE55971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "6AE055971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "71E055971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "7DE055971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "80A441971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "84D055971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B6A941971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C6A941971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C9DB55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "D5A941971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "DCE055971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E3AB41971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
 		}
 	]
 }
