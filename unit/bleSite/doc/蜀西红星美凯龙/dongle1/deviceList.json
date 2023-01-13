@@ -492,42 +492,6 @@
 			}
 		},
 		{
-			"device_id" : "15D655971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "2号区域灯带",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "4DD455971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "2号区域灯带",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "B2E955971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "2号区域灯带",
-				"room_no" : "0"
-			}
-		},
-		{
 			"device_id" : "04D455971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
@@ -1852,6 +1816,210 @@
 			"location" : 
 			{
 				"room_name" : "新风系统上面12个筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "0DD555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "新氧仓灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B2D455971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "新氧仓灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "71D555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "滚筒洗衣机灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C3E655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "滚筒洗衣机灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "FEE955971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "滚筒洗衣机灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "15D655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "美菱墙",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "4DD455971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "美菱墙",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B2E955971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "美菱墙",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B4E955971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "全无尘",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B6E655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "全无尘",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "0CD555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "前台正面",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E2E255971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "前台正面",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "0AEA55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "热水灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "5DD355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "热水灯带",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "0EE955971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "长虹空调墙",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "1BD655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "长虹空调墙",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B8E655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "长虹空调墙",
 				"room_no" : "-1"
 			}
 		}
