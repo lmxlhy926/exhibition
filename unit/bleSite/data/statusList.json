@@ -905,7 +905,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 65535
+					"state_value" : 65280
 				},
 				{
 					"state_id" : "color_temperature",
@@ -924,7 +924,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 65535
+					"state_value" : 65280
 				},
 				{
 					"state_id" : "color_temperature",
@@ -943,7 +943,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 65535
+					"state_value" : 65280
 				},
 				{
 					"state_id" : "color_temperature",
@@ -962,7 +962,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 65535
+					"state_value" : 65280
 				},
 				{
 					"state_id" : "color_temperature",
@@ -981,7 +981,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 65535
+					"state_value" : 65280
 				},
 				{
 					"state_id" : "color_temperature",
