@@ -678,6 +678,244 @@
 				"room_name" : "前台上顶筒灯10个",
 				"room_no" : "-1"
 			}
+		},
+		{
+			"device_id" : "016E60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "046D60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "0F6E60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "266E60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "273B60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "3A8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "468A60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "558860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "959260971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "AED61D971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B69060971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B79260971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "BA8960971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "BAD61D971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C26C60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "DF8960971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E5BD1D971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "十分净头顶L型17个灯",
+			"location" : 
+			{
+				"room_name" : "十分净头顶L型17个灯",
+				"room_no" : "-1"
+			}
 		}
 	]
 }
