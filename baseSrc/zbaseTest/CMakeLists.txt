@@ -1,5 +1,4 @@
 #add_subdirectory(http)
 #add_subdirectory(log)
-add_subdirectory(mqttTest)
 #add_subdirectory(qlibcTest)
 add_subdirectory(siteServiceTest)
