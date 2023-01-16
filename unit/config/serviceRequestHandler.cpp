@@ -431,3 +431,31 @@ int tvSound_service_request_handler(const Request& request, Response& response){
     response.set_content(retData.toJsonString(), "text/json");
     return 0;
 }
+
+//获取场景配置文件
+int getConfigFile_service_request_handler(const Request& request, Response& response){
+    LOG_INFO << "===>getConfigFile_service_request_handler: " << request.body;
+
+    qlibc::QData payload = configParamUtil::getInstance()->getSceneConfigFile();
+    qlibc::QData data;
+    data.setInt("code", 0);
+    data.setString("error", "ok");
+    data.putData("response", payload);
+
+    response.set_content(data.toJsonString(), "text/json");
+    return 0;
+}
+
+//保存场景配置文件
+int saveConfigFile_service_request_handler(const Request& request, Response& response){
+    qlibc::QData data(request.body);
+    LOG_INFO << "==>saveConfigFile_service_request_handler: " << data.toJsonString();
+    qlibc::QData seceConfigFile = data.getData("request");
+    configParamUtil::getInstance()->saveSceneConfigFile(seceConfigFile);
+
+    qlibc::QData ret;
+    ret.setInt("code", 0);
+    ret.setString("msg", "success");
+    response.set_content(ret.toJsonString(), "text/json");
+    return 0;
+}

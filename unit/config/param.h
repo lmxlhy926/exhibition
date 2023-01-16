@@ -47,5 +47,9 @@ static const string WHITELIST_SAVE_REQUEST_SERVICE_ID =     "whiteListSaveReques
 static const string GETALLLIST_REQUEST_SERVICE_ID =         "get_all_device_list";
 static const string TVSOUND_REQUEST_SERVICE_ID =            "tvSound";
 
+static const string GETSCENECONFIGFILE_REQUEST_SERVICE_ID =      "getSceneConfigFile";
+static const string SAVESCENECONFIGFILE_REQUEST_SERVICE_ID =     "saveSceneConfigFile";
+
+
 
 #endif //EXHIBITION_PARAM_H

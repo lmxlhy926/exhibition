@@ -98,5 +98,18 @@ void configParamUtil::saveOriginWhiteListData(QData &data){
     originWhiteListData.saveToFile(FileUtils::contactFileName(dataDirPath, "config/originWhiteList.json"), true);
 }
 
+qlibc::QData configParamUtil::getSceneConfigFile(){
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    if(sceneConfigFile.empty())
+        sceneConfigFile.loadFromFile("/data/changhong/edge_midware/sceneConfig.json");
+    return sceneConfigFile;
+}
+
+void configParamUtil::saveSceneConfigFile(QData& data){
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    sceneConfigFile.setInitData(data);
+    sceneConfigFile.saveToFile("/data/changhong/edge_midware/sceneConfig.json", true);
+}
+
 
 

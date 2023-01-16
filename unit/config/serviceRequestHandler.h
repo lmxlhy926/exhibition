@@ -53,4 +53,12 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
 //电视发声
 int tvSound_service_request_handler(const Request& request, Response& response);
 
+//获取场景配置文件
+int getConfigFile_service_request_handler(const Request& request, Response& response);
+
+//保存场景配置文件
+int saveConfigFile_service_request_handler(const Request& request, Response& response);
+
+
+
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

@@ -27,6 +27,7 @@ private:
     QData cloudServerData;              //云端http服务器配置参数
     QData whiteListData;                //云端下发的转换后的白名单信息
     QData originWhiteListData;          //远端下发的原始白名单
+    QData sceneConfigFile;              //场景配置文件
     static configParamUtil *instance;
     std::recursive_mutex mutex_;
 
@@ -62,6 +63,9 @@ public:
 
     void saveOriginWhiteListData(QData &data);
 
+    qlibc::QData getSceneConfigFile();
+
+    void saveSceneConfigFile(QData& data);
 };
 
 #endif //EXHIBITION_CONFIGPARAMUTIL_H

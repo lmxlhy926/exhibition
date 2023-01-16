@@ -83,6 +83,7 @@ int main(int argc, char* argv[]) {
         }
         mc.setDefaultHandler(mqttPayloadHandle::handle);
         mc.addDataHooker([](const std::string& topic, void *payload, int payloadLen, char* buffer, int* len)->bool{
+            LOG_PURPLE << "payloadLen: " << payloadLen;
             const string in = string(reinterpret_cast<char *>(payload), 0, payloadLen);
             string out;
             const uint8_t key[] = "123456asdfgh1234";
@@ -90,6 +91,7 @@ int main(int argc, char* argv[]) {
 
             strcpy(buffer, out.data());
             *len = static_cast<int>(out.size());
+            LOG_PURPLE << "out.size(): " << out.size();
 
             return true;
         });
@@ -140,6 +142,11 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID,getAllDeviceList_service_request_handler);
     //让电视发声
     serviceSiteManager->registerServiceRequestHandler(TVSOUND_REQUEST_SERVICE_ID,tvSound_service_request_handler);
+    //获取场景配置文件
+    serviceSiteManager->registerServiceRequestHandler(GETSCENECONFIGFILE_REQUEST_SERVICE_ID, getConfigFile_service_request_handler);
+    //保存场景配置文件
+    serviceSiteManager->registerServiceRequestHandler(SAVESCENECONFIGFILE_REQUEST_SERVICE_ID, saveConfigFile_service_request_handler);
+
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
