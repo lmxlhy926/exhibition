@@ -1,14 +1,10 @@
-1. 底层库的集成
-Json处理
-    Json::Value
-    qlibc
-通信模块
-    mqttClient
-    httpClient
-    httpServer
-    socketClient
+工作拆解
+    配置站点
+    查询站点		： 	多站点的上下线，本地ip的实时确定
+    设备管理站点	：	设备列表变化，语义控制
+    蓝牙站点		：  相对组控制，状态返回，适配其它灯的控制命令
 
-线程池
+
 
 
 

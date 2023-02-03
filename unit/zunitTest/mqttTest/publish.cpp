@@ -9,7 +9,7 @@
 
 using namespace qlibc;
 
-#define TOPIC               "edge/lhy/device/domainWhite"
+#define TOPIC               "edge/domainIDlhy/device/domainWhite"
 #define CLIENTID            "lhy"
 #define CONFIGPAHT          "/mnt/d/bywg/project/exhibition/unit/zunitTest/mqttTest/data/mqttconfig.json"
 #define CONTENTFILEPATH     "/mnt/d/bywg/project/exhibition/unit/zunitTest/mqttTest/data/send.json"

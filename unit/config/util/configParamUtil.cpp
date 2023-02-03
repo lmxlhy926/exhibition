@@ -101,14 +101,14 @@ void configParamUtil::saveOriginWhiteListData(QData &data){
 qlibc::QData configParamUtil::getSceneConfigFile(){
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if(sceneConfigFile.empty())
-        sceneConfigFile.loadFromFile("/data/changhong/edge_midware/sceneConfig.json");
+        sceneConfigFile.loadFromFile("/data/changhong/edge_midware/rules-config.txt");
     return sceneConfigFile;
 }
 
 void configParamUtil::saveSceneConfigFile(QData& data){
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     sceneConfigFile.setInitData(data);
-    sceneConfigFile.saveToFile("/data/changhong/edge_midware/sceneConfig.json", true);
+    sceneConfigFile.saveToFile("/data/changhong/edge_midware/rules-config.txt", true);
 }
 
 

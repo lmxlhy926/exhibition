@@ -41,19 +41,10 @@ void test(){
     }
 }
 
-void test1(){
-    string bleSiteName = "ble_light";
-    string LocalIp = "192.168.58.116";
-    int bleSitePort = 9001;
-
-    SiteRecord::getInstance()->addSite(bleSiteName, LocalIp, bleSitePort);
-}
-
-
-void groupControl(string group_id, string command_id, string command_para){
+void groupControl(string group_id, string command_id, int command_para){
     qlibc::QData command, commandList, groupListItem, groupList, controlData;
     command.setString("command_id", command_id);
-    command.setString("command_para", command_para);
+    command.setInt("command_para", command_para);
     command.setInt("transTime", 0);
     commandList.append(command);
     groupListItem.setString("group_id", group_id);
@@ -70,50 +61,21 @@ void groupControl(string group_id, string command_id, string command_para){
 }
 
 
-//09C0
-void control2(int delay){
-    groupControl("0BC0", "power", "off");
-    std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    groupControl("09C0", "power", "on");
-    std::this_thread::sleep_for(std::chrono::seconds(delay));
-
-    groupControl("09C0", "power", "off");
-    groupControl("0AC0", "power", "on");
-}
-
-
-//05C0
 void control4(int delay){
-    groupControl("08C0", "power", "off");
+    groupControl("08C0", "luminance", 100);
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    groupControl("05C0", "power", "on");
-
-    groupControl("05C0", "power", "off");
-    groupControl("06C0", "power", "on");
+    groupControl("05C0", "luminance", 255);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
 
-    groupControl("06C0", "power", "off");
-    groupControl("07C0", "power", "on");
-}
-
-
-//01C0
-void control6(int delay){
-    groupControl("04C0", "power", "off");
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-
-    groupControl("01C0", "power", "on");
-
-    groupControl("01C0", "power", "off");
-    groupControl("02C0", "power", "on");
+    groupControl("06C0", "luminance", 255);
+    groupControl("05C0", "luminance", 100);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
 
-    groupControl("02C0", "power", "off");
-    groupControl("03C0", "power", "on");
+    groupControl("07C0", "luminance", 255);
+    groupControl("06C0", "luminance", 100);
 }
-
 
 
 int main(int argc, char* argv[]){

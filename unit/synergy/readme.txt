@@ -50,25 +50,7 @@
 		* 确定设备或组
 
 
-regex voice_expr_ctrl_room(".*((打开)|(关闭))(.*)(的灯).*");
-regex voice_expr_set_color_temp("(.*)((调|变|换|设)(到|成|为|置))(.*)(色温)[^0-9]*(\\d*).*");
-regex voice_expr_set_color_temp_3("(.*)(色温)(.*)((调|变|换|设)(到|成|为|置))[^0-9]*(\\d*).*");
-// regex voice_expr_set_color_temp_2(".*((冷)|(冷白)|(中性)|(白)|(正白)|(暖白)|(暖))((光)|(色)).*");
-regex voice_expr_set_color_temp_2("(.*)((冷)|(冷百)|(暖百)|(暖)|(中性)|(正百)|(白))((光)|(色))(.*)");
-regex voice_expr_set_lum("(.*)((调|变|换|设)(到|成|为|置))(.*)(亮度)[^0-9]*(\\d*).*");
-regex voice_expr_set_lum_2("(.*)(亮度)(.*)((调|变|换|设)(到|成|为|置))[^0-9]*(\\d*).*");
-regex voice_expr_power_on("(.*)(灯)(.*)(开).*");
-regex voice_expr_power_off("(.*)(灯)(.*)(关).*");
-regex voice_expr_power_on_2("(.*)(开)(.*)(灯).*");
-regex voice_expr_power_off_2("(.*)(关)(.*)(灯).*");
-// regex voice_expr_lum_inc(".*(灯).*(亮一点).*");
-// regex voice_expr_lum_rdu(".*(灯).*(暗一点).*");
-// regex voice_expr_color_temp_inc(".*(灯).*((冷一点)|(白一点)).*");
-// regex voice_expr_color_temp_rdu(".*(灯).*((暖一点)|(黄一点)).*");
-regex voice_expr_lum_inc("(.*)(亮一点)(.*)");
-regex voice_expr_lum_rdu("(.*)(暗一点)(.*)");
-regex voice_expr_color_temp_inc("(.*)((冷一点)|(白一点))(.*)");
-regex voice_expr_color_temp_rdu("(.*)((暖一点)|(黄一点))(.*)");
+
 
 
 
@@ -103,3 +85,19 @@ regex voice_expr_color_temp_rdu("(.*)((暖一点)|(黄一点))(.*)");
 id:
 command_id
 command_param
+
+房间	客厅，主卧，书房，玄关，景观阳台，主卫、次卫、餐厅，厨房，儿童房，生活阳台，过道，餐厅
+
+1	打开/关闭所有灯
+	打开/关闭所有窗帘
+	所有灯调亮/调暗一点
+	所有灯调暖/调冷一点
+
+3	打开/关闭(指定房间)的灯
+	打开/关闭(指定设备)
+	打开/关闭(指定分组)
+4	打开/关闭(指定房间)的窗帘
+
+	(指定房间的灯)调亮/调暗/调冷/调暖一点
+	(指定设备)调亮/调暗/调冷/调暖一点
+	(指定分组)调亮/调暗/调冷/调暖一点
