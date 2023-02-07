@@ -21,6 +21,49 @@ SiteTree *SiteTree::getInstance() {
    return Instance;
 }
 
+void SiteTree::init(){
+    initLocalIp();
+    insertLocalQuerySiteInfo(); //确定有效IP后，自动注册查询站点
+    //开启主机发现线程
+    discoverThread = new thread([this]{
+        while(true){
+            std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
+            site_query();
+        }
+    });
+
+    //开启mdns服务线程
+    mdnsServiceThread = new thread([this]{
+        mdnsServiceStart();
+    });
+
+    //开启主机IP确认线程
+    determineLocalIpThread = new thread([this]{
+        while(true){
+            std::this_thread::sleep_for(std::chrono::seconds(determineLocalIpInterval));
+            initLocalIp();
+        }
+    });
+
+    //本机站点ping计数递减线程
+    localPingCoutDownThread = new thread([this]{
+        while(true){
+            std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
+            localSitePingCountDown();
+        }
+    });
+
+    //局域网内其它主机ping计数递减线程
+    discoveredPingCountDownThread = new thread([this]{
+        while(true){
+            std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
+            discoveredSitePingCountDown();
+        }
+    });
+
+    initComplete.store(true);
+}
+
 //站点注册：更新siteMap, sitePingCountMap
 void SiteTree::siteRegister(string& siteId, Json::Value &value) {
     {
@@ -110,8 +153,8 @@ bool SiteTree::isLocalSiteExist(string &siteId) {
     return false;
 }
 
-//更新本机站点计数
-void SiteTree::updateLocalSitePingCounter(string& siteId){
+//站点计数归一
+void SiteTree::resetLocalSitePingCounter(string& siteId){
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     auto pos = localSitePingCountMap.find(siteId);
     if(pos != localSitePingCountMap.end()){
@@ -284,18 +327,18 @@ int SiteTree::initLocalIp() {
     int sockets[32];
     int max_sockets = sizeof(sockets) / sizeof(sockets[0]);
     int num_sockets = 0;
+    int retFlag = -1;
 
     struct ifaddrs* ifaddr = nullptr;
     struct ifaddrs* ifa = nullptr;
-    //获取所有网卡的网卡地址
-    if (getifaddrs(&ifaddr) < 0){
+    if (getifaddrs(&ifaddr) < 0){   //获取所有网卡的网卡地址
         LOG_RED << "Unable to get interface addresses...";
         return -1;
     }
 
-    int retFlag = -1;
+    // 遍历获取的本机网卡信息
     for (ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
-        if (!ifa->ifa_addr)  //网卡地址存在
+        if (!ifa->ifa_addr)  //网卡地址有效
             continue;
         if (!(ifa->ifa_flags & IFF_UP) || !(ifa->ifa_flags & IFF_MULTICAST))        //接口启用、支持组播
             continue;
@@ -308,7 +351,7 @@ int SiteTree::initLocalIp() {
                 int log_addr = 0;
                 if (num_sockets < max_sockets) {
                     saddr->sin_port = htons(0);      //分配端口号
-                    int sock = mdns_socket_open_ipv4(saddr);     //创建socket, 绑定该地址
+                    int sock = mdns_socket_open_ipv4(saddr);  //创建socket, 绑定该地址
                     if (sock >= 0) {
                         num_sockets++;
                         mdns_socket_close(sock);
@@ -317,12 +360,14 @@ int SiteTree::initLocalIp() {
                         log_addr = 0;
                     }
                 }
-                if (log_addr) {     //打印查询到的每个ipv4地址
+
+                if (log_addr) {
                     char buffer[128];
                     mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer), saddr,sizeof(struct sockaddr_in));
-
                     std::lock_guard<std::recursive_mutex> lg(siteMutex);
                     LOG_INFO << ">>>initLocalIp Finded Local IPv4 address: " << string(addr.str) << " : " << string(ifa->ifa_name);
+
+                    //更新本机网卡信息
                     auto pos = ipMap.find(string(addr.str));
                     if(pos != ipMap.end()){
                         ipMap.erase(pos);
@@ -330,22 +375,21 @@ int SiteTree::initLocalIp() {
                     ipMap.insert(std::make_pair(string(addr.str), string(ifa->ifa_name)));
 
                     if(regex_search(string(ifa->ifa_name), regex("wlan")) || regex_search(string(ifa->ifa_name), regex("eth"))){
-                        //如果本机Ip值发生变化，一般是断网重连造成的，则删除旧的本地IP值
+                        //如果本机IP值发生变化（一般是断网重连造成的），则删除旧的本地IP值
                         if(localIp != string(addr.str)){
                             auto position = ipMap.find(localIp);
                             if(position != ipMap.end()){
                                 ipMap.erase(position);
                             }
                         }
-                        localIp = string(addr.str);
-                        updateLocalSiteMap();
-                        //通知mdns服务启动
+                        localIp = string(addr.str);   // 更新本机IP地址
+                        updateLocalSiteIp();             // 更新本机站点信息中的Ip地址信息
+
                         {
                             std::lock_guard<std::mutex> lgMdns(mdnsMutex);
                             ready2StartMdnsService = true;
                         }
-                        cv.notify_one();
-
+                        cv.notify_one();     //通知mdns服务启动
                         LOG_PURPLE << "localIp: " << localIp;
                         retFlag = 0;
                     }
@@ -395,7 +439,6 @@ void SiteTree::localSitePingCountDown(){
             }
         }
     }
-
     //发布离线站点消息
     publishOnOffLineMessage(offlineList, "offline", true);
 }
@@ -468,7 +511,7 @@ void SiteTree::mdnsServiceStart(){
     }
 }
 
-void SiteTree::updateLocalSiteMap(){
+void SiteTree::updateLocalSiteIp(){
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     for(auto& elem : localSiteMap){
         elem.second["ip"] = localIp;

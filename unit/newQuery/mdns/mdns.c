@@ -70,6 +70,7 @@ int mdns_socket_setup_ipv4(int sock, const struct sockaddr_in* saddr) {
         sock_addr.sin_len = sizeof(struct sockaddr_in);
 #endif
     } else {
+        //设置组播发送接口
         memcpy(&sock_addr, saddr, sizeof(struct sockaddr_in));
         setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, (const char*)&sock_addr.sin_addr,
                    sizeof(sock_addr.sin_addr));
@@ -78,6 +79,7 @@ int mdns_socket_setup_ipv4(int sock, const struct sockaddr_in* saddr) {
 #endif
     }
 
+    //给套接字文件描述符绑定地址
     if (bind(sock, (struct sockaddr*)&sock_addr, sizeof(struct sockaddr_in)))
         return -1;
 
@@ -85,6 +87,7 @@ int mdns_socket_setup_ipv4(int sock, const struct sockaddr_in* saddr) {
     unsigned long param = 1;
 	ioctlsocket(sock, FIONBIO, &param);
 #else
+    //设置为非阻塞模式
     const int flags = fcntl(sock, F_GETFL, 0);
     fcntl(sock, F_SETFL, flags | O_NONBLOCK);
 #endif

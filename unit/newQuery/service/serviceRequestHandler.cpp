@@ -121,7 +121,7 @@ int site_ping_service_handler(const Request& request, Response& response){
     qlibc::QData reqData(request.body);
     LOG_INFO  << "site_ping_service_handler: " << reqData.toJsonString();
     string site_id = reqData.getData("request").getString("site_id");
-    SiteTree::getInstance()->updateLocalSitePingCounter(site_id);
+    SiteTree::getInstance()->resetLocalSitePingCounter(site_id);
     response.set_content(okResponse.dump(), "text/json");
     return 0;
 }
