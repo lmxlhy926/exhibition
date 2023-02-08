@@ -35,12 +35,12 @@ private:
     std::unordered_map<string, Json::Value> localSiteMap;           // 本机站点全记录，<siteId, Json::Value>
     std::unordered_map<string, int> localSitePingCountMap;          // 本机在线站点的ping计数，<=-3,自动清除。<siteId, int>
     const int localPingInterval = 10;                               // ping事时间间隔
-    std::thread* localPingCoutDownThread;                           // 本机ping自减线程
+    std::thread* localPingCoutDownThread;                           // 本机ping计数自减线程
 
 //局域网内其它主机
     std::unordered_map<string, Json::Value>  discoveredSiteMap;     // 局域网内发现的其它站点，<主机ip, 对应主机上的所有站点信息>
     std::unordered_map<string, int> discoveredPingCountMap;         // 局域网内发现的节点ping计数，<=-3,自动清除。<主机ip, int>
-    int discoverPingInterval = 5;                                   // 主动查询时间间隔
+    int discoverPingInterval = 10;                                  // 主动查询时间间隔
     std::thread* discoveredPingCountDownThread;                     // 发现节点ping线程
     std::thread* discoverThread;                                    // 查询局域网内其它主机线程
 
@@ -50,14 +50,14 @@ private:
 
 //本机ip确定
     std::unordered_map<string, string> ipMap;      // 本机网卡信息, <ip, name>
-    const int determineLocalIpInterval = 2;        // 确定ip操作间隔时间
+    const int determineLocalIpInterval = 5;        // 确定ip操作间隔时间
     std::thread* determineLocalIpThread;           // 确认本机IP线程
 
 //启动mdns服务
     std::mutex mdnsMutex;
     std::condition_variable cv;
     bool ready2StartMdnsService{false};
-    std::thread* mdnsServiceThread;                //启动mdns服务线程
+    std::thread* mdnsServiceThread;                 //启动mdns服务线程
 
     static SiteTree* Instance;
 
@@ -87,38 +87,50 @@ public:
     string getLocalIpAddress();
 
     /*
-     * 发送查询请求，依据返回的ip来判断是否是新的节点
-     * 更新局域网节点信息、订阅节点之间通道消息
+     * 接收到查询报文的返回，依据返回的ip来判断是否是新的节点
+     * 更新局域网主机信息、订阅节点之间通道消息
      */
     void addNewFindSite(string& ip);
 
-    //用节点之间的消息，更新本机维护的节点下的站点状态
+    // 用主机之间的消息，更新本机维护的主机下的站点状态
     // 根据其它主机发送的
     void updateFindSite(qlibc::QData& siteInfo);
 
-    //获取局域网内指定的站点信息（一个或多个）
+    //获取局域网内所有主机下的指定的站点信息
     qlibc::QData getLocalAreaSite(string& siteId);
 
     //打印资源情况
-    qlibc::QData printResource();
+    qlibc::QData printIpAddress();
 
 private:
-    // 获取本地网卡信息，确定本机ip地址有效，通知mdns服务开启
+    /*
+     *  获取本机网卡信息，记录所有网卡地址，选出合适的地址作为本机IP地址
+     *  确定ip地址后，通知mdns服务线程开始mdns服务
+     */
      int initLocalIp();
 
-    //向本机注册查询站点
+    /*
+     * 向本机注册查询站点
+     * ！查询站点需要站点自己主动注册
+     */
     void insertLocalQuerySiteInfo();
 
-    //本机站点ping计数递减一次，移除离线站点
+    /*
+     * 本机所有站点ping计数递减一次
+     * 如果计数 <= -3, 则认为站点离线，移除离线站点，在本机内发送站点离线消息
+     */
     void localSitePingCountDown();
 
-    //局域网内其他主机ping计数递减一次，移除离线主机
+    /*
+     * 局域网内所有其它主机ping计数递减一次
+     * 主机计数 <= -3，认为该主机离线，随后清除离线主机
+     */
     void discoveredSitePingCountDown();
 
     //发送mdns查询报文
     void site_query();
 
-    //开启mdns服务
+    //开启mdns服务，接受查询报文
     void mdnsServiceStart();
 
     //更新本机站点信息中的ip地址
@@ -128,8 +140,7 @@ private:
     void publishOnOffLineMessage(qlibc::QData& siteList, string onOffLine, bool is2Node);
 };
 
-
-//站点mdns请求发现返回消息处理
+//mdns请求的响应处理
 void mdnsResponseHandle(string service_instance_string, string ipString, int sitePort);
 
 

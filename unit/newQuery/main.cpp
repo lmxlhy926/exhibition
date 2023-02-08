@@ -24,7 +24,6 @@ using namespace servicesite;
 
 int main(int argc, char* argv[]){
     httplib::ThreadPool threadPool_(20);
-    std::atomic<bool> http_server_thread_end(false);
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
@@ -68,21 +67,21 @@ int main(int argc, char* argv[]){
     });
 
     //获取本地站点信息
-    serviceSiteManager->registerServiceRequestHandler(Site_localSite_Service_ID,
+    serviceSiteManager->registerServiceRequestHandler(Site_LocalSite_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return site_getLocalSiteInfo_service_handler(request, response);
     });
 
     //获取局域网内所有节点信息
-    serviceSiteManager->registerServiceRequestHandler(Site_localAreaSite_Service_ID,
+    serviceSiteManager->registerServiceRequestHandler(Site_LocalAreaSite_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return site_getLocalAreaNetworkSiteInfo_service_handler(request, response);
     });
 
     //打印资源信息
-    serviceSiteManager->registerServiceRequestHandler(Site_print_Service_ID,
+    serviceSiteManager->registerServiceRequestHandler(Site_Print_IpAddress_ID,
                                                       [](const Request& request, Response& response) -> int{
-        return printResource(request, response);
+        return printIpAddress(request, response);
     });
 
     // 站点监听线程启动

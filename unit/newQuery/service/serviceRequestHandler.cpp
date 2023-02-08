@@ -34,35 +34,6 @@ qlibc::QData successResponse(qlibc::QData& resData){
     return data;
 }
 
-void mdnsServiceStart(){
-    string hostname = "smartHome";
-    char hostname_buffer[256];
-    size_t hostname_size = sizeof(hostname_buffer);
-    if (gethostname(hostname_buffer, hostname_size) == 0)
-        hostname = hostname_buffer;
-
-    //mdns服务器监听5353端口号，此处指定请求服务名以及返回的端口号
-    string service = "edgeai.site-query._tcp.local.";
-    int service_port = 9000;
-    while(true){
-        service_mdns(hostname.c_str(), service.c_str(), service_port);
-        LOG_RED << "failed to start mdnsService, start again in 3 seconds.....";
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-    }
-}
-
-void site_query_node2node_message_handler(const Request& request){
-    qlibc::QData reqData(request.body);
-    LOG_INFO << "Received node2node_message: " << reqData.toJsonString();
-    reqData.setString("message_id", Site_OnOffLine_MessageID);
-    qlibc::QData content = reqData.getData("content");
-    //更新发现节点下挂的站点信息
-    SiteTree::getInstance()->updateFindSite(content);
-    //发布其它节点站点的上下线消息
-    ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, reqData.toJsonString());
-    LOG_INFO << "Publish onoffline: " << reqData.toJsonString();
-}
-
 //站点注册
 int site_register_service_handler(const Request& request, Response& response){
     qlibc::QData reqData(request.body);
@@ -145,8 +116,22 @@ int site_getLocalAreaNetworkSiteInfo_service_handler(const Request& request, Res
     return 0;
 }
 
-int printResource(const Request& request, Response& response){
-    qlibc::QData data = SiteTree::getInstance()->printResource();
+void site_query_node2node_message_handler(const Request& request){
+    qlibc::QData reqData(request.body);
+    LOG_INFO << "Received node2node_message: " << reqData.toJsonString();
+    reqData.setString("message_id", Site_OnOffLine_MessageID);
+    qlibc::QData content = reqData.getData("content");
+    //更新局域网内发现的主机下的站点信息
+    SiteTree::getInstance()->updateFindSite(content);
+#if 0
+    //发布其它节点站点的上下线消息
+    ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, reqData.toJsonString());
+    LOG_INFO << "Publish onoffline: " << reqData.toJsonString();
+#endif
+}
+
+int printIpAddress(const Request& request, Response& response){
+    qlibc::QData data = SiteTree::getInstance()->printIpAddress();
     response.set_content(data.toJsonString(), "text/json");
     return 0;
 }

@@ -24,18 +24,6 @@ SiteTree *SiteTree::getInstance() {
 void SiteTree::init(){
     initLocalIp();
     insertLocalQuerySiteInfo(); //确定有效IP后，自动注册查询站点
-    //开启主机发现线程
-    discoverThread = new thread([this]{
-        while(true){
-            std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
-            site_query();
-        }
-    });
-
-    //开启mdns服务线程
-    mdnsServiceThread = new thread([this]{
-        mdnsServiceStart();
-    });
 
     //开启主机IP确认线程
     determineLocalIpThread = new thread([this]{
@@ -45,11 +33,11 @@ void SiteTree::init(){
         }
     });
 
-    //本机站点ping计数递减线程
-    localPingCoutDownThread = new thread([this]{
+    //开启主机发现线程
+    discoverThread = new thread([this]{
         while(true){
-            std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
-            localSitePingCountDown();
+            std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
+            site_query();
         }
     });
 
@@ -58,6 +46,19 @@ void SiteTree::init(){
         while(true){
             std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
             discoveredSitePingCountDown();
+        }
+    });
+
+    //开启mdns服务线程
+    mdnsServiceThread = new thread([this]{
+        mdnsServiceStart();
+    });
+
+    //本机站点ping计数递减线程
+    localPingCoutDownThread = new thread([this]{
+        while(true){
+            std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
+            localSitePingCountDown();
         }
     });
 
@@ -81,14 +82,14 @@ void SiteTree::siteRegister(string& siteId, Json::Value &value) {
         localSitePingCountMap.insert(std::make_pair(siteId, 1));
     }
 
-    //发布站点上线消息
+    //在本机发布站点上线消息
     qlibc::QData siteOnOffData;
     siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
     siteOnOffData.setValue("content", value);
     ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
     LOG_INFO << "Publish onoffline: " << siteOnOffData.toJsonString();
 
-    //向节点传送站点上线消息
+    //向其它主机发布站点上线消息
     siteOnOffData.setString("message_id", Node2Node_MessageID);
     ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
     LOG_INFO << "Publish node2node: " << siteOnOffData.toJsonString();
@@ -111,14 +112,14 @@ void SiteTree::siteUnregister(string& siteId) {
     }
 
     if(flag){
-        //发布站点下线消息
+        //在本机发布站点下线消息
         qlibc::QData siteOnOffData;
         siteOnOffData.setString("message_id", Site_OnOffLine_MessageID);
         siteOnOffData.setValue("content", value);
         ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, siteOnOffData.toJsonString());
         LOG_INFO << "Publish onoffline: " << siteOnOffData.toJsonString();
 
-        //向节点传送站点下线消息
+        //向其它主机传送站点下线消息
         siteOnOffData.setString("message_id", Node2Node_MessageID);
         ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
         LOG_INFO << "Publish node2node: " << siteOnOffData.toJsonString();
@@ -164,9 +165,9 @@ void SiteTree::resetLocalSitePingCounter(string& siteId){
 
 
 string SiteTree::getLocalIpAddress() {
-   return localIp;
+    std::lock_guard<std::recursive_mutex> lg(siteMutex);
+    return localIp;
 }
-
 
 void SiteTree::addNewFindSite(string& ip) {
     bool flag = false;
@@ -180,13 +181,13 @@ void SiteTree::addNewFindSite(string& ip) {
     }
 
     /*
-     * 不处理第一次因确认本机IP接收到的返回，因此此时站点服务器尚未开启
-     * 只处理非本机IP地址的节点
+     * 1. 不处理第一次因确认本机IP接收到的返回，因此此时本机站点服务器尚未开启
+     * 2. 只处理非本机IP地址的节点
+     * 3. 获取相应主机下的站点信息，如果之前存在则更新，如果之前不存在则添加
      */
     if(flag && initComplete.load()){
-        //有则更新，无则添加
         qlibc::QData request, response;
-        request.setString("service_id", Site_localSite_Service_ID);
+        request.setString("service_id", Site_LocalSite_Service_ID);
         request.putData("request", qlibc::QData());
         if(httpUtil::sitePostRequest(ip, 9000, request, response)){
             bool isNewNode = false;
@@ -220,8 +221,9 @@ void SiteTree::addNewFindSite(string& ip) {
     }
 }
 
+
 /*
- * 更新站点节点下挂的站点信息
+ * 更新主机下挂的站点信息
  *      1. 删除下线站点
  *      2. 忽略本来在线的站点
  *      3. 增加新上线的站点
@@ -311,7 +313,7 @@ qlibc::QData SiteTree::getLocalAreaSite(string& siteId){
     return retData;
 }
 
-qlibc::QData SiteTree::printResource(){
+qlibc::QData SiteTree::printIpAddress(){
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     qlibc::QData data;
     data.setString("localIp", localIp);
@@ -365,14 +367,12 @@ int SiteTree::initLocalIp() {
                     char buffer[128];
                     mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer), saddr,sizeof(struct sockaddr_in));
                     std::lock_guard<std::recursive_mutex> lg(siteMutex);
-                    LOG_INFO << ">>>initLocalIp Finded Local IPv4 address: " << string(addr.str) << " : " << string(ifa->ifa_name);
-
-                    //更新本机网卡信息
                     auto pos = ipMap.find(string(addr.str));
                     if(pos != ipMap.end()){
                         ipMap.erase(pos);
                     }
                     ipMap.insert(std::make_pair(string(addr.str), string(ifa->ifa_name)));
+                    LOG_PURPLE << "initLocalIp: " << string(addr.str) << " : " << string(ifa->ifa_name);
 
                     if(regex_search(string(ifa->ifa_name), regex("wlan")) || regex_search(string(ifa->ifa_name), regex("eth"))){
                         //如果本机IP值发生变化（一般是断网重连造成的），则删除旧的本地IP值
@@ -381,15 +381,13 @@ int SiteTree::initLocalIp() {
                             if(position != ipMap.end()){
                                 ipMap.erase(position);
                             }
-                        }
-                        localIp = string(addr.str);   // 更新本机IP地址
-                        updateLocalSiteIp();             // 更新本机站点信息中的Ip地址信息
-
-                        {
+                            localIp = string(addr.str);   // 更新本机IP地址
+                            updateLocalSiteIp();             // 更新本机站点信息中的Ip地址信息
                             std::lock_guard<std::mutex> lgMdns(mdnsMutex);
                             ready2StartMdnsService = true;
+                            cv.notify_one();     //通知mdns服务启动
                         }
-                        cv.notify_one();     //通知mdns服务启动
+
                         LOG_PURPLE << "localIp: " << localIp;
                         retFlag = 0;
                     }
@@ -469,12 +467,14 @@ void SiteTree::discoveredSitePingCountDown(){
         }
     }
 
+#if 0
     //监测到节点掉线后，发布节点下挂的站点的离线消息
     Json::Value::Members keys = offLineData.getMemberNames();
     for(auto& key : keys){
         qlibc::QData offList = offLineData.getData(key);
         publishOnOffLineMessage(offList, "offline", false);
     }
+#endif
 }
 
 

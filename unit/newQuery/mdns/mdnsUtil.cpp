@@ -267,7 +267,6 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                     additional[additional_count++] = recordA;
                 }
 
-
                 // Send the answer, unicast or multicast depending on flag in query
                 uint16_t unicast = (rclass & MDNS_UNICAST_RESPONSE);
 //                printf("  --> answer %.*s (%s)\n",
@@ -277,12 +276,10 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
                         << " " << (unicast ? "unicast" : "multicast");
 
                 if (unicast) {
-                    LOG_BLUE << "unicast------";
                     mdns_query_answer_unicast(sock, from, addrlen, sendbuffer, sizeof(sendbuffer),
                                               query_id, static_cast<mdns_record_type_t>(rtype), name.str, name.length, answer, 0, 0,
                                               additional, additional_count);
                 } else {
-                    LOG_BLUE << "multicast------";
                     mdns_query_answer_multicast(sock, sendbuffer, sizeof(sendbuffer), answer, 0, 0,
                                                 additional, additional_count);
                 }
@@ -696,7 +693,7 @@ open_client_sockets(int* sockets, int max_sockets, int port) {
                     mdns_string_t addr = ipv4_address_to_string(buffer, sizeof(buffer), saddr,
                                                                 sizeof(struct sockaddr_in));
 //                    printf("...Local IPv4 address: %.*s\n", MDNS_STRING_FORMAT(addr));
-                    LOG_INFO << "......Local IPv4 address: " << string(addr.str);
+                    LOG_GREEN << "......Local IPv4 address: " << string(addr.str);
                 }
             }
         } else if (ifa->ifa_addr->sa_family == AF_INET6) {

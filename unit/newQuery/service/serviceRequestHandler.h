@@ -9,31 +9,29 @@
 #include <http/httplib.h>
 using namespace httplib;
 
-//开启mdns服务
-void mdnsServiceStart();
 
-//查询节点之间的消息通道
-void site_query_node2node_message_handler(const Request& request);
-
-//站点注册
+//站点注册服务
 int site_register_service_handler(const Request& request, Response& response);
 
-//站点注销
+//站点注销服务
 int site_unRegister_service_handler(const Request& request, Response& response);
 
-//站点查询
+//站点查询服务
 int site_query_service_handler(const Request& request, Response& response, httplib::ThreadPool& threadPool);
 
-//站点心跳
+//站点心跳服务
 int site_ping_service_handler(const Request& request, Response& response);
 
-//获取本机站点信息
+//获取本机站点信息服务
 int site_getLocalSiteInfo_service_handler(const Request& request, Response& response);
 
-//获取局域网内所有节点信息
+//获取局域网内所有主机下的站点信息服务
 int site_getLocalAreaNetworkSiteInfo_service_handler(const Request& request, Response& response);
 
+//查询节点之间的消息处理函数
+void site_query_node2node_message_handler(const Request& request);
+
 //打印资源信息
-int printResource(const Request& request, Response& response);
+int printIpAddress(const Request& request, Response& response);
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

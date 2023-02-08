@@ -17,9 +17,9 @@ static const string Site_Register_Service_ID = "site_register";                 
 static const string Site_UnRegister_Service_ID = "site_unregister";                 //站点注销
 static const string Site_Query_Service_ID = "site_query";                           //站点查询
 static const string Site_Ping_Service_ID = "site_ping";                             //站点ping
-static const string Site_localSite_Service_ID = "site_localSite";                   //获取本机站点
-static const string Site_localAreaSite_Service_ID = "site_localAreaNetworkSite";    //获取局域网发现的所有站点
-static const string Site_print_Service_ID = "site_print";                           //获取局域网发现的所有站点
+static const string Site_LocalSite_Service_ID = "site_localSite";                   //获取本机站点
+static const string Site_LocalAreaSite_Service_ID = "site_localAreaNetworkSite";    //获取局域网发现的所有站点
+static const string Site_Print_IpAddress_ID = "site_printIpAdress";                 //打印Ip地址信息
 
 
 //订阅消息ID
