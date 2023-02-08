@@ -13,7 +13,7 @@ namespace synergy{
 //判断站点是否在线（通过请求站点）
     bool isSiteOnline(const std::string& siteId);
 
-//设备控制 + 场景指令转换解析
+//场景指令转换解析 + 设备控制
     int cloudCommand_service_handler(const Request& request, Response& response);
 
 //获取设备列表：ble, zigbee, tvAdapter
@@ -22,7 +22,7 @@ namespace synergy{
 //获取分组列表：ble, zigbee
     int getGroupList_service_handler(const Request& request, Response& response);
 
-//语音控制设备入口
+//语音控制入口
     int voiceControl_service_handler(const Request& request, Response& response);
 
 //设备控制

@@ -165,7 +165,7 @@ namespace synergy {
         string code = requestData.getData("request").getString("code");
         string area = requestData.getData("request").getData("inParams").getString("area");
 
-        //场景指令
+        //场景指令转换后，发送到场景站点
         for(auto& elem : sceneVec){     //通过action判断是否是场景指令
             if(action == elem){     //场景指令
                 //发布场景指令消息
@@ -190,7 +190,7 @@ namespace synergy {
 
         //针对样板间的mesh灯
         if(code == "light"){
-            if(isSiteOnline(BleSiteID)){
+            if(isSiteOnline(BleSiteID)){    //如果蓝牙站点在线，则走蓝牙站点控制
                 lightControlBleSite(area, requestData);
                 return 0;
             }

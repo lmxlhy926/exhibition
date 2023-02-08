@@ -55,19 +55,19 @@ int main(int argc, char* argv[]) {
         return synergy::getGroupList_service_handler(request, response);
     });
 
-    //语音控制指令
+    //语音控制服务
     serviceSiteManager->registerServiceRequestHandler(VoiceControl_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return synergy::voiceControl_service_handler(request, response);
     });
 
-    //设备控制
+    //设备控制服务
     serviceSiteManager->registerServiceRequestHandler(DeviceControl_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return synergy::deviceControl_service_handler(request, response);
     });
 
-    //分组控制
+    //分组控制服务
     serviceSiteManager->registerServiceRequestHandler(GroupControl_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return synergy::groupControl_service_handler(request, response);
