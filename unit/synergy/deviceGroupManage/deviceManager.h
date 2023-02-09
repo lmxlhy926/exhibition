@@ -16,11 +16,13 @@ private:
     qlibc::QData deviceList_;
     std::recursive_mutex Mutex;
     std::thread* updateListThread;
+    const int updateListInterval = 10;
     DeviceManager(){
+        //开启线程定时更新设备列表
         updateListThread = new thread([this]{
             while(true){
-                getAllDeviceList();
-                std::this_thread::sleep_for(std::chrono::seconds(5));
+                updateDeviceList();
+                std::this_thread::sleep_for(std::chrono::seconds(updateListInterval));
             }
         });
     }
@@ -32,6 +34,8 @@ public:
     //列表变更
     void listChanged();
 
+    void updateDeviceList();
+
     //获取设备列表
     qlibc::QData getAllDeviceList();
 
@@ -39,7 +43,7 @@ public:
     bool isInDeviceList(string& device_id, string& sourceSite);
 
 private:
-    //更新站点
+    //更新站点记录
     void updateSite();
 
     //获取局域网所有设备列表

@@ -19,10 +19,14 @@ void DeviceManager::listChanged() {
     changed.store(true);
 }
 
+void DeviceManager::updateDeviceList(){
+    qlibc::QData list = getDeviceListAllLocalNet();
+    std::lock_guard<std::recursive_mutex> lg(Mutex);
+    deviceList_ = list;
+}
+
 qlibc::QData DeviceManager::getAllDeviceList() {
     std::lock_guard<std::recursive_mutex> lg(Mutex);
-    qlibc::QData list = getDeviceListAllLocalNet();
-    deviceList_ = list;
     return deviceList_;
 }
 
@@ -43,8 +47,7 @@ void DeviceManager::updateSite(){
     qlibc::QData request, response;
     request.setString("service_id", "site_localAreaNetworkSite");
     request.putData("request", qlibc::QData().setString("site_id", ""));
-
-    if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){
+    if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){    //获取局域网内所有发现的站点
         qlibc::QData resBody = response.getData("response");
         Json::Value::Members members = resBody.getMemberNames();
         for(auto& elem : members){
@@ -54,20 +57,17 @@ void DeviceManager::updateSite(){
                 qlibc::QData item = siteList.getArrayElement(i);
                 string site_id = item.getString("site_id");
                 if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){
-                    string ipSiteName = elem + ":" + site_id;
-                    SiteRecord::getInstance()->addSite(ipSiteName, elem, item.getInt("port"));
+                    string ipSiteName = elem + ":" + site_id;   //ip:siteID
+                    SiteRecord::getInstance()->addSite(ipSiteName, elem, item.getInt("port"));  //记录选定的站点
                 }
             }
         }
-
-        //todo 删除不在列表中的站点
-
     }
 }
 
 qlibc::QData DeviceManager::getDeviceListAllLocalNet() {
-    updateSite();
-    qlibc::QData totalList;
+    updateSite();   //更新站点记录
+    qlibc::QData totalList;     //存储总列表
     std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
     smatch sm;
     for(auto& elem : siteNameSet){
@@ -79,8 +79,8 @@ qlibc::QData DeviceManager::getDeviceListAllLocalNet() {
                 deviceRequest.setString("service_id", "get_device_list");
                 deviceRequest.setValue("request", Json::nullValue);
                 qlibc::QData deviceRes;
-                SiteRecord::getInstance()->sendRequest2Site(sm.str(0), deviceRequest, deviceRes);
-                qlibc::QData list = addSourceTag(deviceRes.getData("response").getData("device_list"), sm.str(0));
+                SiteRecord::getInstance()->sendRequest2Site(sm.str(0), deviceRequest, deviceRes);   //获取设备列表
+                qlibc::QData list = addSourceTag(deviceRes.getData("response").getData("device_list"), sm.str(0));  //给列表条目加入来源标签
                 mergeList(list, totalList);
             }
         }

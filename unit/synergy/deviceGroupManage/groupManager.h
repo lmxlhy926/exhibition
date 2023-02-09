@@ -16,11 +16,13 @@ private:
     qlibc::QData groupList;
     std::mutex Mutex;
     std::thread* updateListThread;
+    const int updateGroupListInterval = 10;
     GroupManager(){
+        //开启线程定时更新组列表
         updateListThread = new thread([this]{
             while(true){
-                getAllGroupList();
-                std::this_thread::sleep_for(std::chrono::seconds(5));
+                updateGroupList();
+                std::this_thread::sleep_for(std::chrono::seconds(updateGroupListInterval));
             }
         });
     }
@@ -31,6 +33,9 @@ public:
 
     //列表变更
     void listChanged();
+
+    //更新组列表
+    void updateGroupList();
 
     //获取设备列表
     qlibc::QData getAllGroupList();

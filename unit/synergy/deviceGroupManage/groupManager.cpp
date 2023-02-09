@@ -20,10 +20,14 @@ void GroupManager::listChanged() {
     changed.store(true);
 }
 
+void GroupManager::updateGroupList(){
+    qlibc::QData list = getGroupListAllLocalNet();
+    std::lock_guard<std::mutex> lg(Mutex);
+    groupList = list;
+}
+
 qlibc::QData GroupManager::getAllGroupList() {
     std::lock_guard<std::mutex> lg(Mutex);
-    qlibc::QData list = getGroupListAllLocalNet();
-    groupList = list;
     return groupList;
 }
 
@@ -53,8 +57,8 @@ qlibc::QData GroupManager::getGroupListAllLocalNet(){
                 groupRequest.setString("service_id", "get_group_list");
                 groupRequest.setValue("request", Json::nullValue);
                 qlibc::QData groupRes;
-                SiteRecord::getInstance()->sendRequest2Site(sm.str(0), groupRequest, groupRes);
-                qlibc::QData list = addSourceTag(groupRes.getData("response").getData("group_list"), sm.str(0));
+                SiteRecord::getInstance()->sendRequest2Site(sm.str(0), groupRequest, groupRes);     //获取组列表
+                qlibc::QData list = addSourceTag(groupRes.getData("response").getData("group_list"), sm.str(0));    //给组条目添加标签
                 mergeList(list, totalList);
             }
         }

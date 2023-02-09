@@ -33,21 +33,26 @@ public:
                    << "---" << "deviceCode: " << inParams.getString("deviceCode");
     }
 
+    //依据下发命令、设备列表定位设备，返回控制指令
     qlibc::QData getContorlData(qlibc::QData& deviceList);
 
+    //按区域、类型进行匹配，定位设备
+    bool fuzzyMatch(qlibc::QData& item);
+
+    //按设备号，或者区域、类型进行匹配
     bool match(qlibc::QData& item);
 
-    bool matchAll(qlibc::QData& item);
-
+    //构造控制命令列表
     qlibc::QData buildCommandList(qlibc::QData& data);
 
+    //预定命令列表中是否包含该命令
     bool commandMatch(string& key);
 
+    //驼峰转下划线
     static string hump2Underline(string in);
 
+    //小写转大写
     static string toUpper(string in);
 };
-
-
 
 #endif //EXHIBITION_DOWNCOMMAND_H

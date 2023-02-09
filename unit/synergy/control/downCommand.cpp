@@ -26,7 +26,7 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
     ssize_t num = deviceList.size();
     for(Json::ArrayIndex i = 0; i < num; ++i){
        qlibc::QData item = deviceList.getArrayElement(i);
-       if(matchAll(item)){     //找到匹配项，则根据匹配项构造控制指令
+       if(match(item)){     //找到匹配项，则根据匹配项构造控制指令
            string sourceSite = item.getString("sourceSite");
            qlibc::QData controlData;
            controlData.setString("device_id", item.getString("device_id"));
@@ -39,20 +39,22 @@ qlibc::QData DownCommandData::getContorlData(qlibc::QData &deviceList) {
     return controlList;
 }
 
-bool DownCommandData::match(qlibc::QData& item) {
+bool DownCommandData::fuzzyMatch(qlibc::QData& item) {
+    //设备属性提取
     string item_nick_name = item.getString("nick_name");
     string item_device_type = item.getString("device_type");
     string item_room_no = item.getData("location").getString("room_no");
 
+    //匹配参数提取
     string area = inParams.getString("area");   //区域
     string kind = inParams.getString("kind");   //zd, fd, all
 
     //如果是灯设备
     if(code == "LIGHT" && (item_device_type == "LIGHT_SWITCH" || item_device_type == "LIGHT")){  //类型匹配
-        if(area == "all" || area == item_room_no){  //区域匹配
+        if(area == "all" || area == item_room_no){      //区域匹配
             if(kind == "all" || kind.empty()){
                 return true;
-            }else if(kind == item_nick_name){   //灯类型匹配
+            }else if(kind == item_nick_name){   //类型匹配
                 return true;
             }else{
                 return false;
@@ -73,7 +75,7 @@ bool DownCommandData::match(qlibc::QData& item) {
 }
 
 
-bool DownCommandData::matchAll(qlibc::QData& item){
+bool DownCommandData::match(qlibc::QData& item){
     string deviceCode = inParams.getString("deviceCode");
     string item_device_id = item.getString("device_id");
     if(!deviceCode.empty()){    //通过设备标识码来判断
@@ -84,7 +86,7 @@ bool DownCommandData::matchAll(qlibc::QData& item){
         }
 
     }else{  //通过区域、类型来判断
-        return match(item);
+        return fuzzyMatch(item);
     }
 }
 
@@ -92,7 +94,7 @@ qlibc::QData DownCommandData::buildCommandList(qlibc::QData& data){
     qlibc::QData commandList;
     Json::Value::Members keys = data.getMemberNames();
     for(auto& key : keys){
-        if(commandMatch(key)){
+        if(commandMatch(key)){  //inParams包含控制命令
             qlibc::QData command;
             command.setString("command_id", hump2Underline(key));
             command.putData("command_para", data.getData(key));

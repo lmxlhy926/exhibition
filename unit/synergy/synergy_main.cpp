@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     GroupManager::getInstance();
 
     //站点请求管理
-    SiteRecord::getInstance()->addSite(SceneSiteID, RequestIp, SceneSitePort);
+    SiteRecord::getInstance()->addSite(SceneSiteID, RequestIp, SceneSitePort);  //加入场景站点
 
     serviceSiteManager->registerMessageId(Scene_Msg_MessageID);   //场景指令消息
 
