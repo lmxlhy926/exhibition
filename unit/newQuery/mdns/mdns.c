@@ -42,7 +42,7 @@ int mdns_socket_open_ipv4(const struct sockaddr_in* saddr) {
 
 int mdns_socket_setup_ipv4(int sock, const struct sockaddr_in* saddr) {
     unsigned char ttl = 1;
-    unsigned char loopback = 1;
+    unsigned char loopback = 0;
     unsigned int reuseaddr = 1;
     struct ip_mreq req;
 
