@@ -390,5 +390,222 @@
 			"room_name" : "新风系统上面12个筒灯",
 			"room_no" : "-1"
 		}
+	},
+	"14C0" : 
+	{
+		"device_list" : 
+		[
+			"EEA17B971B30",
+			"31A27B971B30",
+			"FFA17B971B30",
+			"F0A17B971B30"
+		],
+		"group_name" : "十分净组",
+		"location" : 
+		{
+			"room_name" : "十分净组",
+			"room_no" : "-1"
+		}
+	},
+	"15C0" : 
+	{
+		"device_list" : 
+		[
+			"40A27B971B30"
+		],
+		"group_name" : "菱形组",
+		"location" : 
+		{
+			"room_name" : "菱形组",
+			"room_no" : "-1"
+		}
+	},
+	"16C0" : 
+	{
+		"device_list" : 
+		[
+			"F4A17B971B30",
+			"FAA07B971B30",
+			"E68A7B971B30",
+			"57977B971B30",
+			"30A27B971B30",
+			"FDA17B971B30"
+		],
+		"group_name" : "M鲜生组",
+		"location" : 
+		{
+			"room_name" : "M鲜生组",
+			"room_no" : "-1"
+		}
+	},
+	"17C0" : 
+	{
+		"device_list" : 
+		[
+			"3EA27B971B30",
+			"7BA27B971B30",
+			"5A8E7B971B30"
+		],
+		"group_name" : "厨房新体验组",
+		"location" : 
+		{
+			"room_name" : "厨房新体验组",
+			"room_no" : "-1"
+		}
+	},
+	"18C0" : 
+	{
+		"device_list" : 
+		[
+			"EDA17B971B30",
+			"3CA27B971B30",
+			"66977B971B30",
+			"FE8E7B971B30"
+		],
+		"group_name" : "滚筒洗衣机组",
+		"location" : 
+		{
+			"room_name" : "滚筒洗衣机组",
+			"room_no" : "-1"
+		}
+	},
+	"19C0" : 
+	{
+		"device_list" : 
+		[
+			"3AA27B971B30",
+			"068F7B971B30"
+		],
+		"group_name" : "全无尘组",
+		"location" : 
+		{
+			"room_name" : "全无尘组",
+			"room_no" : "-1"
+		}
+	},
+	"1AC0" : 
+	{
+		"device_list" : 
+		[
+			"D98A7B971B30",
+			"83A27B971B30"
+		],
+		"group_name" : "全无尘组pro",
+		"location" : 
+		{
+			"room_name" : "全无尘组pro",
+			"room_no" : "-1"
+		}
+	},
+	"1BC0" : 
+	{
+		"device_list" : 
+		[
+			"38A27B971B30",
+			"608E7B971B30"
+		],
+		"group_name" : "仰望",
+		"location" : 
+		{
+			"room_name" : "仰望",
+			"room_no" : "-1"
+		}
+	},
+	"1CC0" : 
+	{
+		"device_list" : 
+		[
+			"47A27B971B30",
+			"F3A17B971B30",
+			"FD8E7B971B30",
+			"61977B971B30",
+			"42A27B971B30"
+		],
+		"group_name" : "共享舒适组",
+		"location" : 
+		{
+			"room_name" : "共享舒适组",
+			"room_no" : "-1"
+		}
+	},
+	"1DC0" : 
+	{
+		"device_list" : 
+		[
+			"E78E7B971B30",
+			"89A27B971B30",
+			"54977B971B30",
+			"81A27B971B30",
+			"7AA27B971B30"
+		],
+		"group_name" : "全屋采暖组",
+		"location" : 
+		{
+			"room_name" : "全屋采暖组",
+			"room_no" : "-1"
+		}
+	},
+	"1EC0" : 
+	{
+		"device_list" : 
+		[
+			"0EA17B971B30",
+			"43A27B971B30",
+			"0A8F7B971B30",
+			"36A27B971B30"
+		],
+		"group_name" : "生活热水组",
+		"location" : 
+		{
+			"room_name" : "生活热水组",
+			"room_no" : "-1"
+		}
+	},
+	"1FC0" : 
+	{
+		"device_list" : 
+		[
+			"45A27B971B30",
+			"78A27B971B30",
+			"F6A17B971B30"
+		],
+		"group_name" : "新风系统组",
+		"location" : 
+		{
+			"room_name" : "新风系统组",
+			"room_no" : "-1"
+		}
+	},
+	"20C0" : 
+	{
+		"device_list" : 
+		[
+			"E58A7B971B30",
+			"05A17B971B30",
+			"35A27B971B30",
+			"5F977B971B30",
+			"39A27B971B30",
+			"85A27B971B30"
+		],
+		"group_name" : "中央空调组",
+		"location" : 
+		{
+			"room_name" : "中央空调组",
+			"room_no" : "-1"
+		}
+	},
+	"21C0" : 
+	{
+		"device_list" : 
+		[
+			"8FA27B971B30",
+			"048F7B971B30"
+		],
+		"group_name" : "厨房体验组",
+		"location" : 
+		{
+			"room_name" : "厨房体验组",
+			"room_no" : "-1"
+		}
 	}
 }
