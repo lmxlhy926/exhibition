@@ -2,2024 +2,858 @@
 	"device_list" : 
 	[
 		{
-			"device_id" : "04D455971B30",
+			"device_id" : "248860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "3D8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "428860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "4F8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "5FD81D971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "6E6C60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "818E60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "918E60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "983039971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "AE8860971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C36C60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C48960971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C48E60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "CE6C60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "D56C60971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "EB7060971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "F85760971B30",
+			"device_model" : "双色筒灯",
+			"device_modelCode" : "20",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "8kMaxL型筒灯",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型筒灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "0ACC55971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "24A441971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "57A441971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "5BA341971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "66DE55971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "6AE055971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "71E055971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "7DE055971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "80A441971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "84D055971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B6A941971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C6A941971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "C9DB55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "D5A941971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "DCE055971B30",
+			"device_model" : "磁吸轨道泛光灯",
+			"device_modelCode" : "28",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E3AB41971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "8kMax上顶盘型",
+			"location" : 
+			{
+				"room_name" : "8kMax上顶盘型",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "00A17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "小房间射灯",
+			"location" : 
+			{
+				"room_name" : "小房间射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "0DA17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "小房间射灯",
+			"location" : 
+			{
+				"room_name" : "小房间射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "53977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "小房间射灯",
+			"location" : 
+			{
+				"room_name" : "小房间射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "5C977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "小房间射灯",
+			"location" : 
+			{
+				"room_name" : "小房间射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "60977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "小房间射灯",
+			"location" : 
+			{
+				"room_name" : "小房间射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "11D655971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
 			"location" : 
 			{
-				"room_name" : "前台上顶大灯带",
+				"room_name" : "盘型灯下方灯带",
 				"room_no" : "-1"
 			}
 		},
 		{
-			"device_id" : "564E39971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0CC0",
-			"group_name" : "前台上顶筒灯10个",
-			"location" : 
-			{
-				"room_name" : "前台上顶筒灯10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "5B8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0CC0",
-			"group_name" : "前台上顶筒灯10个",
-			"location" : 
-			{
-				"room_name" : "前台上顶筒灯10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "8B8E60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0CC0",
-			"group_name" : "前台上顶筒灯10个",
-			"location" : 
-			{
-				"room_name" : "前台上顶筒灯10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "934E39971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0CC0",
-			"group_name" : "前台上顶筒灯10个",
-			"location" : 
-			{
-				"room_name" : "前台上顶筒灯10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "9D8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0CC0",
-			"group_name" : "前台上顶筒灯10个",
-			"location" : 
-			{
-				"room_name" : "前台上顶筒灯10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "A28860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0CC0",
-			"group_name" : "前台上顶筒灯10个",
-			"location" : 
-			{
-				"room_name" : "前台上顶筒灯10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "B49260971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0CC0",
-			"group_name" : "前台上顶筒灯10个",
-			"location" : 
-			{
-				"room_name" : "前台上顶筒灯10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "CF6C60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0CC0",
-			"group_name" : "前台上顶筒灯10个",
-			"location" : 
-			{
-				"room_name" : "前台上顶筒灯10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "ED8E60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0CC0",
-			"group_name" : "前台上顶筒灯10个",
-			"location" : 
-			{
-				"room_name" : "前台上顶筒灯10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "F88760971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0CC0",
-			"group_name" : "前台上顶筒灯10个",
-			"location" : 
-			{
-				"room_name" : "前台上顶筒灯10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "016E60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "046D60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "0F6E60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "266E60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "273B60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "3A8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "468A60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "558860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "959260971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "AED61D971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "B69060971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "B79260971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "BA8960971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "BAD61D971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "C26C60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "DF8960971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "E5BD1D971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0DC0",
-			"group_name" : "十分净头顶L型17个灯",
-			"location" : 
-			{
-				"room_name" : "十分净头顶L型17个灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "008860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "068A60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "078860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "088A60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "398860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "4A5B60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "4A8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "8D6C60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "918860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "BF8E60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "CF8960971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "DE6B60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "E28960971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0EC0",
-			"group_name" : "十分薄滚筒洗衣机上13个",
-			"location" : 
-			{
-				"room_name" : "十分薄滚筒洗衣机上13个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "473C60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0FC0",
-			"group_name" : "球型灯旁边4个",
-			"location" : 
-			{
-				"room_name" : "球型灯旁边4个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "E19060971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0FC0",
-			"group_name" : "球型灯旁边4个",
-			"location" : 
-			{
-				"room_name" : "球型灯旁边4个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "E88960971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0FC0",
-			"group_name" : "球型灯旁边4个",
-			"location" : 
-			{
-				"room_name" : "球型灯旁边4个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "F98760971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "0FC0",
-			"group_name" : "球型灯旁边4个",
-			"location" : 
-			{
-				"room_name" : "球型灯旁边4个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "048860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "11C0",
-			"group_name" : "舒适柔风上面10个筒灯",
-			"location" : 
-			{
-				"room_name" : "舒适柔风上面10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "066D60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "11C0",
-			"group_name" : "舒适柔风上面10个筒灯",
-			"location" : 
-			{
-				"room_name" : "舒适柔风上面10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "1A8F60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "11C0",
-			"group_name" : "舒适柔风上面10个筒灯",
-			"location" : 
-			{
-				"room_name" : "舒适柔风上面10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "538860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "11C0",
-			"group_name" : "舒适柔风上面10个筒灯",
-			"location" : 
-			{
-				"room_name" : "舒适柔风上面10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "804E39971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "11C0",
-			"group_name" : "舒适柔风上面10个筒灯",
-			"location" : 
-			{
-				"room_name" : "舒适柔风上面10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "8F8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "11C0",
-			"group_name" : "舒适柔风上面10个筒灯",
-			"location" : 
-			{
-				"room_name" : "舒适柔风上面10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "A78860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "11C0",
-			"group_name" : "舒适柔风上面10个筒灯",
-			"location" : 
-			{
-				"room_name" : "舒适柔风上面10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "B09260971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "11C0",
-			"group_name" : "舒适柔风上面10个筒灯",
-			"location" : 
-			{
-				"room_name" : "舒适柔风上面10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "B79060971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "11C0",
-			"group_name" : "舒适柔风上面10个筒灯",
-			"location" : 
-			{
-				"room_name" : "舒适柔风上面10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "CD8960971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "11C0",
-			"group_name" : "舒适柔风上面10个筒灯",
-			"location" : 
-			{
-				"room_name" : "舒适柔风上面10个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "058A60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "188A60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "2B8F60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "3C8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "3F8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "588860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "673E39971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "699060971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "8B8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "9B8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "A48860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "AF8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "C86260971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "E56B60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "12C0",
-			"group_name" : "中央空调上面15个",
-			"location" : 
-			{
-				"room_name" : "中央空调上面15个",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "174E39971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "178860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "198860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "3B8860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "4D3039971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "568860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "7CD81D971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "8B9260971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "938860971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "C04C39971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "C28F60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "F96C60971B30",
-			"device_model" : "双色筒灯",
-			"device_modelCode" : "20",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "13C0",
-			"group_name" : "新风系统上面12个筒灯",
-			"location" : 
-			{
-				"room_name" : "新风系统上面12个筒灯",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "0DD555971B30",
+			"device_id" : "EFD355971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
 			"location" : 
 			{
-				"room_name" : "新氧仓灯带",
+				"room_name" : "盘型灯对侧电视墙灯带",
 				"room_no" : "-1"
 			}
 		},
 		{
-			"device_id" : "B2D455971B30",
+			"device_id" : "01D455971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
 			"location" : 
 			{
-				"room_name" : "新氧仓灯带",
+				"room_name" : "游戏体验区",
 				"room_no" : "-1"
 			}
 		},
 		{
-			"device_id" : "71D555971B30",
+			"device_id" : "26D755971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
 			"location" : 
 			{
-				"room_name" : "滚筒洗衣机灯带",
+				"room_name" : "游戏体验区",
 				"room_no" : "-1"
 			}
 		},
 		{
-			"device_id" : "C3E655971B30",
+			"device_id" : "05D555971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
+			"group_address" : "05C0",
 			"location" : 
 			{
-				"room_name" : "滚筒洗衣机灯带",
+				"room_name" : "小房间灯带",
 				"room_no" : "-1"
 			}
 		},
 		{
-			"device_id" : "FEE955971B30",
+			"device_id" : "76E655971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
+			"group_address" : "05C0",
 			"location" : 
 			{
-				"room_name" : "滚筒洗衣机灯带",
+				"room_name" : "小房间灯带",
 				"room_no" : "-1"
 			}
 		},
 		{
-			"device_id" : "15D655971B30",
+			"device_id" : "EFE555971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
+			"group_address" : "05C0",
 			"location" : 
 			{
-				"room_name" : "美菱墙",
+				"room_name" : "小房间灯带",
 				"room_no" : "-1"
 			}
 		},
 		{
-			"device_id" : "4DD455971B30",
+			"device_id" : "FFE555971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
+			"group_address" : "05C0",
 			"location" : 
 			{
-				"room_name" : "美菱墙",
+				"room_name" : "小房间灯带",
 				"room_no" : "-1"
 			}
 		},
 		{
-			"device_id" : "B2E955971B30",
+			"device_id" : "E58E7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "06C0",
+			"group_name" : "启客8k组",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "EFA17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "06C0",
+			"group_name" : "启客8k组",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "79A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "06C0",
+			"group_name" : "启客8k组",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "02A17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "07C0",
+			"group_name" : "启客全场景",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "44A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "07C0",
+			"group_name" : "启客全场景",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "34A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "07C0",
+			"group_name" : "启客全场景",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "52977B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "游戏体验厅",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "638E7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "08C0",
+			"group_name" : "游戏体验厅",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "3BA27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "09C0",
+			"group_name" : "K歌区",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "88A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "09C0",
+			"group_name" : "K歌区",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E98E7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "09C0",
+			"group_name" : "K歌区",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "37A27B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0AC0",
+			"group_name" : "健身区",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "028F7B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0AC0",
+			"group_name" : "健身区",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E8A17B971B30",
+			"device_model" : "磁吸轨道灯导航灯",
+			"device_modelCode" : "2A",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0AC0",
+			"group_name" : "健身区",
+			"location" : 
+			{
+				"room_name" : "8kMaxL型射灯",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "07D555971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
+			"group_address" : "0BC0",
+			"group_name" : "启客8k组灯带",
 			"location" : 
 			{
-				"room_name" : "美菱墙",
+				"room_name" : "盘型灯对侧电视墙灯带",
 				"room_no" : "-1"
 			}
 		},
 		{
-			"device_id" : "B4E955971B30",
+			"device_id" : "C3DB55971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
+			"group_address" : "0BC0",
+			"group_name" : "启客8k组灯带",
 			"location" : 
 			{
-				"room_name" : "全无尘",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "B6E655971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "全无尘",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "0CD555971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "前台正面",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "E2E255971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "前台正面",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "0AEA55971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "热水灯带",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "5DD355971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "热水灯带",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "0EE955971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "长虹空调墙",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "1BD655971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "长虹空调墙",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "B8E655971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "长虹空调墙",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "EEA17B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "14C0",
-			"group_name" : "十分净组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "31A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "14C0",
-			"group_name" : "十分净组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "FFA17B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "14C0",
-			"group_name" : "十分净组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "F0A17B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "14C0",
-			"group_name" : "十分净组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "40A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "15C0",
-			"group_name" : "菱形组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "F4A17B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "16C0",
-			"group_name" : "M鲜生组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "FAA07B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "16C0",
-			"group_name" : "M鲜生组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "E68A7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "16C0",
-			"group_name" : "M鲜生组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "57977B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "16C0",
-			"group_name" : "M鲜生组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "30A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "16C0",
-			"group_name" : "M鲜生组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "FDA17B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "16C0",
-			"group_name" : "M鲜生组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "3EA27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "17C0",
-			"group_name" : "厨房新体验组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "7BA27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "17C0",
-			"group_name" : "厨房新体验组",
-			"location" : 
-			{
-				"room_name" : "4号区13个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "5A8E7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "17C0",
-			"group_name" : "厨房新体验组",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "EDA17B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "18C0",
-			"group_name" : "滚筒洗衣机组",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "3CA27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "18C0",
-			"group_name" : "滚筒洗衣机组",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "66977B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "18C0",
-			"group_name" : "滚筒洗衣机组",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "FE8E7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "18C0",
-			"group_name" : "滚筒洗衣机组",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "3AA27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "19C0",
-			"group_name" : "全无尘组",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "068F7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "19C0",
-			"group_name" : "全无尘组",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "D98A7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1AC0",
-			"group_name" : "全无尘组pro",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "83A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1AC0",
-			"group_name" : "全无尘组pro",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "38A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1BC0",
-			"group_name" : "仰望",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "608E7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1BC0",
-			"group_name" : "仰望",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "47A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1CC0",
-			"group_name" : "共享舒适组",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "F3A17B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1CC0",
-			"group_name" : "共享舒适组",
-			"location" : 
-			{
-				"room_name" : "过道13射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "E78E7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1DC0",
-			"group_name" : "全屋采暖组",
-			"location" : 
-			{
-				"room_name" : "2号区9个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "89A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1DC0",
-			"group_name" : "全屋采暖组",
-			"location" : 
-			{
-				"room_name" : "2号区9个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "54977B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1DC0",
-			"group_name" : "全屋采暖组",
-			"location" : 
-			{
-				"room_name" : "2号区9个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "81A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1DC0",
-			"group_name" : "全屋采暖组",
-			"location" : 
-			{
-				"room_name" : "2号区9个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "7AA27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1DC0",
-			"group_name" : "全屋采暖组",
-			"location" : 
-			{
-				"room_name" : "2号区9个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "0EA17B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1EC0",
-			"group_name" : "生活热水组",
-			"location" : 
-			{
-				"room_name" : "2号区9个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "43A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1EC0",
-			"group_name" : "生活热水组",
-			"location" : 
-			{
-				"room_name" : "2号区9个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "0A8F7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1EC0",
-			"group_name" : "生活热水组",
-			"location" : 
-			{
-				"room_name" : "2号区9个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "36A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1EC0",
-			"group_name" : "生活热水组",
-			"location" : 
-			{
-				"room_name" : "2号区9个射灯",
-				"room_no" : "0"
-			}
-		},
-		{
-			"device_id" : "45A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1FC0",
-			"group_name" : "新风系统组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "78A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1FC0",
-			"group_name" : "新风系统组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "F6A17B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1FC0",
-			"group_name" : "新风系统组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "E58A7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "20C0",
-			"group_name" : "中央空调组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "05A17B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "20C0",
-			"group_name" : "中央空调组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "35A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "20C0",
-			"group_name" : "中央空调组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "5F977B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "20C0",
-			"group_name" : "中央空调组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "39A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "20C0",
-			"group_name" : "中央空调组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "85A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "20C0",
-			"group_name" : "中央空调组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "8FA27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "21C0",
-			"group_name" : "厨房体验组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "048F7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "21C0",
-			"group_name" : "厨房体验组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "FD8E7B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1CC0",
-			"group_name" : "共享舒适组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "61977B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1CC0",
-			"group_name" : "共享舒适组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "42A27B971B30",
-			"device_model" : "磁吸轨道灯导航灯",
-			"device_modelCode" : "2A",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "1CC0",
-			"group_name" : "共享舒适组",
-			"location" : 
-			{
-				"room_name" : "云硅谷上方15射灯，一个坏了",
+				"room_name" : "盘型灯对侧电视墙灯带",
 				"room_no" : "-1"
 			}
 		}
