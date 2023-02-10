@@ -78,8 +78,18 @@ void control4(int delay){
 }
 
 
+void blink(){
+    while(true){
+        groupControl("FFFF", "luminance", 50);
+        sleep(3);
+        groupControl("FFFF", "luminance", 255);
+    }
+}
+
+
+
 int main(int argc, char* argv[]){
-    control4(5);
+    blink();
     return 0;
 }
 
