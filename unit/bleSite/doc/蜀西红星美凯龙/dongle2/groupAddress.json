@@ -114,5 +114,93 @@
 			"room_name" : "小房间灯带",
 			"room_no" : "-1"
 		}
+	},
+	"06C0" : 
+	{
+		"device_list" : 
+		[
+			"E58E7B971B30",
+			"EFA17B971B30",
+			"79A27B971B30"
+		],
+		"group_name" : "启客8k组",
+		"location" : 
+		{
+			"room_name" : "启客8k组",
+			"room_no" : "-1"
+		}
+	},
+	"07C0" : 
+	{
+		"device_list" : 
+		[
+			"02A17B971B30",
+			"44A27B971B30",
+			"34A27B971B30"
+		],
+		"group_name" : "启客全场景",
+		"location" : 
+		{
+			"room_name" : "启客全场景",
+			"room_no" : "-1"
+		}
+	},
+	"08C0" : 
+	{
+		"device_list" : 
+		[
+			"52977B971B30",
+			"638E7B971B30"
+		],
+		"group_name" : "游戏体验厅",
+		"location" : 
+		{
+			"room_name" : "游戏体验厅",
+			"room_no" : "-1"
+		}
+	},
+	"09C0" : 
+	{
+		"device_list" : 
+		[
+			"3BA27B971B30",
+			"88A27B971B30",
+			"E98E7B971B30"
+		],
+		"group_name" : "K歌区",
+		"location" : 
+		{
+			"room_name" : "K歌区",
+			"room_no" : "-1"
+		}
+	},
+	"0AC0" : 
+	{
+		"device_list" : 
+		[
+			"37A27B971B30",
+			"028F7B971B30",
+			"E8A17B971B30"
+		],
+		"group_name" : "健身区",
+		"location" : 
+		{
+			"room_name" : "健身区",
+			"room_no" : "-1"
+		}
+	},
+	"0BC0" : 
+	{
+		"device_list" : 
+		[
+			"07D555971B30",
+			"C3DB55971B30"
+		],
+		"group_name" : "启客8k组灯带",
+		"location" : 
+		{
+			"room_name" : "启客8k组灯带",
+			"room_no" : "-1"
+		}
 	}
 }
