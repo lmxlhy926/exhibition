@@ -79,7 +79,7 @@
 		"location" : 
 		{
 			"room_name" : "8kMax上顶盘型",
-			"room_no" : "-1"
+			"room_no" : "12"
 		}
 	},
 	"04C0" : 
@@ -96,7 +96,7 @@
 		"location" : 
 		{
 			"room_name" : "小房间射灯",
-			"room_no" : "-1"
+			"room_no" : "16"
 		}
 	},
 	"05C0" : 
@@ -112,7 +112,7 @@
 		"location" : 
 		{
 			"room_name" : "小房间灯带",
-			"room_no" : "-1"
+			"room_no" : "16"
 		}
 	},
 	"06C0" : 
@@ -123,11 +123,11 @@
 			"EFA17B971B30",
 			"79A27B971B30"
 		],
-		"group_name" : "启客8k组",
+		"group_name" : "启客8k组射灯",
 		"location" : 
 		{
-			"room_name" : "启客8k组",
-			"room_no" : "-1"
+			"room_name" : "启客8k组射灯",
+			"room_no" : "13"
 		}
 	},
 	"07C0" : 
@@ -138,11 +138,11 @@
 			"44A27B971B30",
 			"34A27B971B30"
 		],
-		"group_name" : "启客全场景",
+		"group_name" : "启客全场景射灯",
 		"location" : 
 		{
-			"room_name" : "启客全场景",
-			"room_no" : "-1"
+			"room_name" : "启客全场景射灯",
+			"room_no" : "14"
 		}
 	},
 	"08C0" : 
@@ -152,11 +152,11 @@
 			"52977B971B30",
 			"638E7B971B30"
 		],
-		"group_name" : "游戏体验厅",
+		"group_name" : "游戏体验厅射灯",
 		"location" : 
 		{
-			"room_name" : "游戏体验厅",
-			"room_no" : "-1"
+			"room_name" : "游戏体验厅射灯",
+			"room_no" : "14"
 		}
 	},
 	"09C0" : 
@@ -167,11 +167,11 @@
 			"88A27B971B30",
 			"E98E7B971B30"
 		],
-		"group_name" : "K歌区",
+		"group_name" : "K歌区射灯",
 		"location" : 
 		{
-			"room_name" : "K歌区",
-			"room_no" : "-1"
+			"room_name" : "K歌区射灯",
+			"room_no" : "15"
 		}
 	},
 	"0AC0" : 
@@ -182,11 +182,11 @@
 			"028F7B971B30",
 			"E8A17B971B30"
 		],
-		"group_name" : "健身区",
+		"group_name" : "健身区射灯",
 		"location" : 
 		{
-			"room_name" : "健身区",
-			"room_no" : "-1"
+			"room_name" : "健身区射灯",
+			"room_no" : "15"
 		}
 	},
 	"0BC0" : 
@@ -200,7 +200,68 @@
 		"location" : 
 		{
 			"room_name" : "启客8k组灯带",
-			"room_no" : "-1"
+			"room_no" : "13"
+		}
+	},
+	"0CC0" : 
+	{
+		"device_list" : 
+		[
+			"11D655971B30"
+		],
+		"group_name" : "启客8kumax组灯带",
+		"location" : 
+		{
+			"room_name" : "启客8kumax组灯带",
+			"room_no" : "12"
+		}
+	},
+	"0DC0" : 
+	{
+		"device_list" : 
+		[
+			"0ACC55971B30",
+			"24A441971B30",
+			"57A441971B30",
+			"5BA341971B30",
+			"66DE55971B30",
+			"6AE055971B30",
+			"71E055971B30",
+			"7DE055971B30",
+			"80A441971B30",
+			"84D055971B30",
+			"B6A941971B30",
+			"C6A941971B30",
+			"C9DB55971B30",
+			"D5A941971B30",
+			"DCE055971B30",
+			"E3AB41971B30",
+			"11D655971B30"
+		],
+		"group_name" : "8kumax大组",
+		"areaFullGroup" : true,
+		"location" : 
+		{
+			"room_name" : "8kumax大组",
+			"room_no" : "12"
+		}
+	},
+	"0EC0" : 
+	{
+		"device_list" : 
+		[
+			"E58E7B971B30",
+			"EFA17B971B30",
+			"79A27B971B30",
+			"07D555971B30",
+			"C3DB55971B30"
+		],
+		"group_name" : "启客8kumax大组",
+		"areaFullGroup" : true,
+		"location" : 
+		{
+			"room_name" : "启客8kumax大组",
+			"room_no" : "13"
 		}
 	}
 }
