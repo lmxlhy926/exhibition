@@ -22,6 +22,7 @@
 			"F85760971B30"
 		],
 		"group_name" : "8kMaxL型筒灯",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "8kMaxL型筒灯",
@@ -48,6 +49,7 @@
 			"EFA17B971B30"
 		],
 		"group_name" : "8kMaxL型射灯",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "8kMaxL型射灯",
@@ -76,6 +78,7 @@
 			"E3AB41971B30"
 		],
 		"group_name" : "8kMax上顶盘型",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "8kMax上顶盘型",
@@ -93,6 +96,7 @@
 			"60977B971B30"
 		],
 		"group_name" : "小房间射灯",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "小房间射灯",
@@ -109,6 +113,7 @@
 			"FFE555971B30"
 		],
 		"group_name" : "",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "小房间灯带",
@@ -124,6 +129,7 @@
 			"79A27B971B30"
 		],
 		"group_name" : "启客8k组射灯",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "启客8k组射灯",
@@ -139,6 +145,7 @@
 			"34A27B971B30"
 		],
 		"group_name" : "启客全场景射灯",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "启客全场景射灯",
@@ -153,6 +160,7 @@
 			"638E7B971B30"
 		],
 		"group_name" : "游戏体验厅射灯",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "游戏体验厅射灯",
@@ -168,6 +176,7 @@
 			"E98E7B971B30"
 		],
 		"group_name" : "K歌区射灯",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "K歌区射灯",
@@ -183,6 +192,7 @@
 			"E8A17B971B30"
 		],
 		"group_name" : "健身区射灯",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "健身区射灯",
@@ -197,6 +207,7 @@
 			"C3DB55971B30"
 		],
 		"group_name" : "启客8k组灯带",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "启客8k组灯带",
@@ -210,6 +221,7 @@
 			"11D655971B30"
 		],
 		"group_name" : "启客8kumax组灯带",
+		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "启客8kumax组灯带",
@@ -239,6 +251,7 @@
 			"11D655971B30"
 		],
 		"group_name" : "8kumax大组",
+		"dongleId": "2",
 		"areaFullGroup" : true,
 		"location" : 
 		{
@@ -257,6 +270,7 @@
 			"C3DB55971B30"
 		],
 		"group_name" : "启客8kumax大组",
+		"dongleId": "2",
 		"areaFullGroup" : true,
 		"location" : 
 		{

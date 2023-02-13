@@ -11,6 +11,7 @@
 			"3AA27B971B30"
 		],
 		"group_name" : "6号取13射灯-1",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "6号区",
@@ -27,6 +28,7 @@
 			"38A27B971B30"
 		],
 		"group_name" : "6号取13射灯-2",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "6号区",
@@ -42,6 +44,7 @@
 			"F3A17B971B30"
 		],
 		"group_name" : "6号取13射灯-3",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "6号区",
@@ -67,6 +70,7 @@
 			"F3A17B971B30"
 		],
 		"group_name" : "6号厅13射灯-完整组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "6号区",
@@ -84,6 +88,7 @@
 			"40A27B971B30"
 		],
 		"group_name" : "4号厅13射灯-1",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "4号区",
@@ -99,6 +104,7 @@
 			"E68A7B971B30"
 		],
 		"group_name" : "4号厅13射灯-2",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "4号区",
@@ -116,6 +122,7 @@
 			"7BA27B971B30"
 		],
 		"group_name" : "4号厅13射灯-3",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "4号区",
@@ -141,6 +148,7 @@
 			"7BA27B971B30"
 		],
 		"group_name" : "4号厅13射灯-完整组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "4号区",
@@ -158,6 +166,7 @@
 			"7AA27B971B30"
 		],
 		"group_name" : "2号区域9射灯-1",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "2号区",
@@ -174,6 +183,7 @@
 			"36A27B971B30"
 		],
 		"group_name" : "2号区域9射灯-2",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "2号区",
@@ -195,6 +205,7 @@
 			"36A27B971B30"
 		],
 		"group_name" : "2号区域9射灯-完整组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "2号区",
@@ -217,6 +228,7 @@
 			"F88760971B30"
 		],
 		"group_name" : "前台上顶筒灯10个",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "前台上顶筒灯10个",
@@ -246,6 +258,7 @@
 			"E5BD1D971B30"
 		],
 		"group_name" : "十分净头顶L型17个灯",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "十分净头顶L型17个灯",
@@ -271,6 +284,7 @@
 			"E28960971B30"
 		],
 		"group_name" : "十分薄滚筒洗衣机上13个",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "十分薄滚筒洗衣机上13个",
@@ -287,6 +301,7 @@
 			"F98760971B30"
 		],
 		"group_name" : "球型灯旁边4个",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "球型灯旁边4个",
@@ -313,6 +328,7 @@
 			"FD8E7B971B30"
 		],
 		"group_name" : "云硅谷上方15射灯，一个坏了",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "云硅谷上方15射灯，一个坏了",
@@ -335,6 +351,7 @@
 			"CD8960971B30"
 		],
 		"group_name" : "舒适柔风上面10个筒灯",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "舒适柔风上面10个筒灯",
@@ -361,6 +378,7 @@
 			"E56B60971B30"
 		],
 		"group_name" : "中央空调上面15个",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "中央空调上面15个",
@@ -385,6 +403,7 @@
 			"F96C60971B30"
 		],
 		"group_name" : "新风系统上面12个筒灯",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "新风系统上面12个筒灯",
@@ -401,6 +420,7 @@
 			"F0A17B971B30"
 		],
 		"group_name" : "十分净组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "十分净组",
@@ -414,6 +434,7 @@
 			"40A27B971B30"
 		],
 		"group_name" : "菱形组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "菱形组",
@@ -432,6 +453,7 @@
 			"FDA17B971B30"
 		],
 		"group_name" : "M鲜生组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "M鲜生组",
@@ -447,6 +469,7 @@
 			"5A8E7B971B30"
 		],
 		"group_name" : "厨房新体验组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "厨房新体验组",
@@ -463,6 +486,7 @@
 			"FE8E7B971B30"
 		],
 		"group_name" : "滚筒洗衣机组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "滚筒洗衣机组",
@@ -477,6 +501,7 @@
 			"068F7B971B30"
 		],
 		"group_name" : "全无尘组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "全无尘组",
@@ -491,6 +516,7 @@
 			"83A27B971B30"
 		],
 		"group_name" : "全无尘组pro",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "全无尘组pro",
@@ -505,6 +531,7 @@
 			"608E7B971B30"
 		],
 		"group_name" : "仰望",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "仰望",
@@ -522,6 +549,7 @@
 			"42A27B971B30"
 		],
 		"group_name" : "共享舒适组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "共享舒适组",
@@ -539,6 +567,7 @@
 			"7AA27B971B30"
 		],
 		"group_name" : "全屋采暖组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "全屋采暖组",
@@ -555,6 +584,7 @@
 			"36A27B971B30"
 		],
 		"group_name" : "生活热水组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "生活热水组",
@@ -570,6 +600,7 @@
 			"F6A17B971B30"
 		],
 		"group_name" : "新风系统组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "新风系统组",
@@ -588,6 +619,7 @@
 			"85A27B971B30"
 		],
 		"group_name" : "中央空调组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "中央空调组",
@@ -602,6 +634,7 @@
 			"048F7B971B30"
 		],
 		"group_name" : "厨房体验组",
+		"dongleId": "1",
 		"location" : 
 		{
 			"room_name" : "厨房体验组",
