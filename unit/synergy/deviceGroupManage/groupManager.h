@@ -43,6 +43,8 @@ public:
     //是否在分组列表中
     bool isInGroupList(string& group_id, string& sourceSite);
 
+    bool isInGroupList_dongle(string& group_id, string& dongleId, string& sourceSite);
+
 private:
     //获取组列表
     qlibc::QData getGroupListAllLocalNet();

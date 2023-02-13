@@ -44,6 +44,28 @@ bool GroupManager::isInGroupList(string& group_id, string& sourceSite){
     return false;
 }
 
+bool GroupManager::isInGroupList_dongle(string& group_id, string& dongleId, string& sourceSite){
+    std::lock_guard<std::mutex> lg(Mutex);
+    Json::ArrayIndex size = groupList.size();
+    for(Json::ArrayIndex i = 0; i < size; ++i){
+        qlibc::QData item = groupList.getArrayElement(i);
+        if(item.getString("group_id") == group_id){
+            if(!dongleId.empty()){
+                if(item.getString("dongleId") == dongleId){
+                    sourceSite = item.getString("sourceSite");
+                    return true;
+                }
+            }else{
+                sourceSite = item.getString("sourceSite");
+                return true;
+            }
+        }
+    }
+    return false;
+
+
+}
+
 qlibc::QData GroupManager::getGroupListAllLocalNet(){
     qlibc::QData totalList;
     std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();

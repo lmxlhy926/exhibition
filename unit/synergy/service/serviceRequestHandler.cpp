@@ -277,8 +277,9 @@ namespace synergy {
         for(Json::ArrayIndex i = 0; i < size; ++i){
             qlibc::QData item = controlGroupList.getArrayElement(i);
             string group_id = item.getString("group_id");
+            string dongleId = item.getString("dongleId");
             string sourceSite;
-            if(GroupManager::getInstance()->isInGroupList(group_id, sourceSite)){
+            if(GroupManager::getInstance()->isInGroupList_dongle(group_id, dongleId, sourceSite)){
                 auto pos = controlGroupListMap.find(sourceSite);
                 if(pos != controlGroupListMap.end()){
                     pos->second.append(item);
