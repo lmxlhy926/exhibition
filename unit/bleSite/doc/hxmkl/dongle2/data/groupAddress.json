@@ -21,8 +21,8 @@
 			"EB7060971B30",
 			"F85760971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "8kMaxL型筒灯",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "8kMaxL型筒灯",
@@ -48,8 +48,8 @@
 			"E98E7B971B30",
 			"EFA17B971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "8kMaxL型射灯",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "8kMaxL型射灯",
@@ -77,8 +77,8 @@
 			"DCE055971B30",
 			"E3AB41971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "8kMax上顶盘型",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "8kMax上顶盘型",
@@ -95,8 +95,8 @@
 			"5C977B971B30",
 			"60977B971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "小房间射灯",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "小房间射灯",
@@ -112,8 +112,8 @@
 			"EFE555971B30",
 			"FFE555971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "小房间灯带",
@@ -128,8 +128,8 @@
 			"EFA17B971B30",
 			"79A27B971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "启客8k组射灯",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "启客8k组射灯",
@@ -144,8 +144,8 @@
 			"44A27B971B30",
 			"34A27B971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "启客全场景射灯",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "启客全场景射灯",
@@ -159,8 +159,8 @@
 			"52977B971B30",
 			"638E7B971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "游戏体验厅射灯",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "游戏体验厅射灯",
@@ -175,8 +175,8 @@
 			"88A27B971B30",
 			"E98E7B971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "K歌区射灯",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "K歌区射灯",
@@ -191,8 +191,8 @@
 			"028F7B971B30",
 			"E8A17B971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "健身区射灯",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "健身区射灯",
@@ -206,8 +206,8 @@
 			"07D555971B30",
 			"C3DB55971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "启客8k组灯带",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "启客8k组灯带",
@@ -220,8 +220,8 @@
 		[
 			"11D655971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "启客8kumax组灯带",
-		"dongleId": "2",
 		"location" : 
 		{
 			"room_name" : "启客8kumax组灯带",
@@ -230,6 +230,7 @@
 	},
 	"0DC0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"0ACC55971B30",
@@ -250,9 +251,8 @@
 			"E3AB41971B30",
 			"11D655971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "8kumax大组",
-		"dongleId": "2",
-		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "8kumax大组",
@@ -261,6 +261,7 @@
 	},
 	"0EC0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"E58E7B971B30",
@@ -269,13 +270,71 @@
 			"07D555971B30",
 			"C3DB55971B30"
 		],
+		"dongleId" : "2",
 		"group_name" : "启客8kumax大组",
-		"dongleId": "2",
-		"areaFullGroup" : true,
 		"location" : 
 		{
 			"room_name" : "启客8kumax大组",
 			"room_no" : "13"
+		}
+	},
+	"0FC0" : 
+	{
+		"device_list" : 
+		[
+			"02A17B971B30",
+			"44A27B971B30",
+			"34A27B971B30",
+			"52977B971B30",
+			"638E7B971B30",
+			"EFD355971B30",
+			"01D455971B30",
+			"26D755971B30"
+		],
+		"group_name" : "14号区域大组",
+		"location" : 
+		{
+			"room_name" : "14号区域",
+			"room_no" : "14"
+		}
+	},
+	"10C0" : 
+	{
+		"device_list" : 
+		[
+			"3BA27B971B30",
+			"88A27B971B30",
+			"E98E7B971B30",
+			"37A27B971B30",
+			"028F7B971B30",
+			"E8A17B971B30"
+		],
+		"group_name" : "15号区域大组",
+		"location" : 
+		{
+			"room_name" : "15号区域",
+			"room_no" : "15"
+		}
+	},
+	"11C0" : 
+	{
+		"device_list" : 
+		[
+			"05D555971B30",
+			"76E655971B30",
+			"EFE555971B30",
+			"FFE555971B30",
+			"00A17B971B30",
+			"0DA17B971B30",
+			"53977B971B30",
+			"5C977B971B30",
+			"60977B971B30"
+		],
+		"group_name" : "16号区域大组",
+		"location" : 
+		{
+			"room_name" : "16号区域",
+			"room_no" : "16"
 		}
 	}
 }
