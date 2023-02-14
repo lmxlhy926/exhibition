@@ -252,7 +252,7 @@
 			"11D655971B30"
 		],
 		"dongleId" : "2",
-		"group_name" : "8kumax大组",
+		"group_name" : "12区域大组",
 		"location" : 
 		{
 			"room_name" : "8kumax大组",
@@ -271,7 +271,7 @@
 			"C3DB55971B30"
 		],
 		"dongleId" : "2",
-		"group_name" : "启客8kumax大组",
+		"group_name" : "13号区域大组",
 		"location" : 
 		{
 			"room_name" : "启客8kumax大组",
@@ -292,6 +292,8 @@
 			"26D755971B30"
 		],
 		"group_name" : "14号区域大组",
+		"areaFullGroup" : true,
+		"dongleId" : "2",
 		"location" : 
 		{
 			"room_name" : "14号区域",
@@ -310,6 +312,8 @@
 			"E8A17B971B30"
 		],
 		"group_name" : "15号区域大组",
+		"areaFullGroup" : true,
+		"dongleId" : "2",
 		"location" : 
 		{
 			"room_name" : "15号区域",
@@ -331,6 +335,8 @@
 			"60977B971B30"
 		],
 		"group_name" : "16号区域大组",
+		"areaFullGroup" : true,
+		"dongleId" : "2",
 		"location" : 
 		{
 			"room_name" : "16号区域",
