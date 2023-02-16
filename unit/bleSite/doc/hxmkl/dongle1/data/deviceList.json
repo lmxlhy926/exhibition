@@ -1170,18 +1170,6 @@
 			}
 		},
 		{
-			"device_id" : "B2E955971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "美菱墙",
-				"room_no" : "-1"
-			}
-		},
-		{
 			"device_id" : "B6E655971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
@@ -2006,162 +1994,6 @@
 			}
 		},
 		{
-			"device_id" : "13CE55971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "2ED355971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "30D355971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "32D355971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "34D755971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "38D455971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "41D355971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "46D355971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "47D355971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "5DD355971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "68E655971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "71D555971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "79E655971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
 			"device_id" : "81D555971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
@@ -2198,103 +2030,7 @@
 			}
 		},
 		{
-			"device_id" : "ADDE55971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "B4E955971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
 			"device_id" : "D7E255971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "D7E555971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "E6E555971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "E7E555971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "F4D355971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "F5D355971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "F6D355971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
@@ -2342,11 +2078,321 @@
 			}
 		},
 		{
+			"device_id" : "F4D355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "14C0",
+			"group_name" : "区域2大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "2ED355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "1DC0",
+			"group_name" : "区域3大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "38D455971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "1DC0",
+			"group_name" : "区域3大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "5DD355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "1DC0",
+			"group_name" : "区域3大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "34D755971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "17C0",
+			"group_name" : "区域5大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "41D355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "17C0",
+			"group_name" : "区域5大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "68E655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "17C0",
+			"group_name" : "区域5大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "ADDE55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "17C0",
+			"group_name" : "区域5大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "F5D355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "17C0",
+			"group_name" : "区域5大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "71D555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "26C0",
+			"group_name" : "区域6大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "32D355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "24C0",
+			"group_name" : "区域18大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E6E555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "24C0",
+			"group_name" : "区域18大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "79E655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "24C0",
+			"group_name" : "区域18大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "46D355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "24C0",
+			"group_name" : "区域18大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "E7E555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "1EC0",
+			"group_name" : "区域21",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "F6D355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "1EC0",
+			"group_name" : "区域21",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B2E955971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "24C0",
+			"group_name" : "区域18大组",
+			"location" : 
+			{
+				"room_name" : "美菱墙",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "13CE55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "26C0",
+			"group_name" : "区域6大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "47D355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "25C0",
+			"group_name" : "区域7大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
 			"device_id" : "FEE555971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
+			"group_address" : "25C0",
+			"group_name" : "区域7大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B4E955971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "25C0",
+			"group_name" : "区域7大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "30D355971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "25C0",
+			"group_name" : "区域7大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "D7E555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "27C0",
+			"group_name" : "2，18，19，20 大灯带",
 			"location" : 
 			{
 				"room_name" : "无",
