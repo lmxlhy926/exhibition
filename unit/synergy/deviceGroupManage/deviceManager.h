@@ -18,11 +18,12 @@ private:
     std::thread* updateListThread;
     const int updateListInterval = 10;
     DeviceManager(){
+        updateSite();
         //开启线程定时更新设备列表
         updateListThread = new thread([this]{
             while(true){
-                updateDeviceList();
                 std::this_thread::sleep_for(std::chrono::seconds(updateListInterval));
+                updateDeviceList();
             }
         });
     }

@@ -17,43 +17,7 @@ using namespace servicesite;
 using namespace httplib;
 using json = nlohmann::json;
 
-void updateGroupList2Cloud(){
-    qlibc::QData groupList = bleConfig::getInstance()->getGroupListData();
-    Json::Value::Members keyMembers = groupList.getMemberNames();
-    qlibc::QData deviceList;
-    for(auto& key : keyMembers){
-        qlibc::QData data, value(groupList.getData(key));
-        data.setString("categoryCode", "LIGHT");
-        data.setString("deviceCode", key);
-        data.setString("deviceDid", key);
-        data.setString("deviceSn", value.getString("group_name"));
-        data.setString("deviceName", value.getString("group_name"));
-        data.setString("deviceDesc", value.getString("group_name"));
-        data.setString("deviceVender", "changhong");
-        data.setString("productNickname", value.getString("group_name"));
-        data.setString("productType", "LIGHT_SWITCH");
-        data.setString("roomNo", value.getData("location").getString("room_no"));
-        data.setString("roomType", value.getData("location").getString("room_name"));
-        data.setString("roomName", value.getData("location").getString("room_name"));
-        data.setString("deviceSource", "1");
-        data.setString("isGateway", 0);
-        deviceList.append(data);
-    }
-    qlibc::QData requestData, responseData;
-    requestData.setString("service_id", "postDeviceList");
-    requestData.putData("request", qlibc::QData().putData("deviceList", deviceList));
-    while(true){
-        if(SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, requestData, responseData)){
-            break;
-        }else{
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-        }
-    }
-}
-
-
 int main(int argc, char* argv[]) {
-
     httplib::ThreadPool threadPool_(10);
     //站点请求管理
     SiteRecord::getInstance()->addSite(ConfigSiteName, LocalIp, ConfigPort);
@@ -242,9 +206,9 @@ int main(int argc, char* argv[]) {
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-            int code = serviceSiteManager->start();
+//            int code = serviceSiteManager->start();
             //注册启动方式
-//            int code = serviceSiteManager->startByRegister();
+            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 LOG_RED << "===>bleSite startByRegister error, code = " << code;
                 LOG_RED << "===>bleSite startByRegister in 3 seconds....";
@@ -256,7 +220,7 @@ int main(int argc, char* argv[]) {
         }
     });
 
-    //定时更新配置站点白名单，将绑定的灯的信息同步到配置站点
+    //定时更新配置站点白名单，将绑定的灯的信息同步到白名单
 //    threadPool_.enqueue([](){
 //        while(true){
 //            std::this_thread::sleep_for(std::chrono::seconds(10));

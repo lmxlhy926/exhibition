@@ -16,14 +16,11 @@ GroupManager *GroupManager::getInstance() {
     return instance;
 }
 
-void GroupManager::listChanged() {
-    changed.store(true);
-}
-
 void GroupManager::updateGroupList(){
     qlibc::QData list = getGroupListAllLocalNet();
     std::lock_guard<std::mutex> lg(Mutex);
     groupList = list;
+    init.store(true);
 }
 
 qlibc::QData GroupManager::getAllGroupList() {
@@ -31,20 +28,21 @@ qlibc::QData GroupManager::getAllGroupList() {
     return groupList;
 }
 
-bool GroupManager::isInGroupList(string& group_id, string& sourceSite){
-    std::lock_guard<std::mutex> lg(Mutex);
-    Json::ArrayIndex size = groupList.size();
+qlibc::QData GroupManager::getBleGroupList(){
+    qlibc::QData allGroupList = getAllGroupList();
+    qlibc::QData bleGroupList;
+    Json::ArrayIndex size = allGroupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
-        qlibc::QData item = groupList.getArrayElement(i);
-        if(item.getString("group_id") == group_id){
-            sourceSite = item.getString("sourceSite");
-            return true;
+        qlibc::QData item = allGroupList.getArrayElement(i);
+        string sourceSite = item.getString("sourceSite");
+        if(regex_match(sourceSite, regex(".*:ble_light"))){
+            bleGroupList.append(item);
         }
     }
-    return false;
+    return bleGroupList;
 }
 
-bool GroupManager::isInGroupList_dongle(string& group_id, string& dongleId, string& sourceSite){
+bool GroupManager::isInGroupList(string& group_id, string& sourceSite, string& dongleId){
     std::lock_guard<std::mutex> lg(Mutex);
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
@@ -62,13 +60,14 @@ bool GroupManager::isInGroupList_dongle(string& group_id, string& dongleId, stri
         }
     }
     return false;
-
-
 }
 
 qlibc::QData GroupManager::getGroupListAllLocalNet(){
     qlibc::QData totalList;
     std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
+    for(auto& elem : siteNameSet){
+        LOG_INFO << "siteName: " << elem;
+    }
     smatch sm;
     for(auto& elem : siteNameSet){
         if(regex_match(elem, sm, regex("(.*):(.*)"))){

@@ -33,12 +33,13 @@ static const string QuerySiteName = "服务站点查询";
 static const int QuerySitePort = 9000;
 
 //服务ID
-static const string Control_Service_ID          = "cloudCommand";
-static const string GetDeviceList_Service_ID    = "get_device_list";
-static const string GetGroupList_Service_ID     = "get_group_list";
-static const string VoiceControl_Service_ID     = "voiceControl";
-static const string DeviceControl_Service_ID    = "control_device";
-static const string GroupControl_Service_ID     = "control_group";
+static const string Control_Service_ID              = "cloudCommand";
+static const string GetDeviceList_Service_ID        = "get_device_list";
+static const string GetGroupList_Service_ID         = "get_group_list";
+static const string VoiceControl_Service_ID         = "voiceControl";
+static const string DeviceControl_Service_ID        = "control_device";
+static const string GroupControl_Service_ID         = "control_group";
+static const string BleGroupRegister_Service_ID     = "register_bleGroup";
 
 //订阅消息ID
 static const string DeviceList_changed_messageID = "deviceList_changed";

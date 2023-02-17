@@ -279,7 +279,7 @@ namespace synergy {
             string group_id = item.getString("group_id");
             string dongleId = item.getString("dongleId");
             string sourceSite;
-            if(GroupManager::getInstance()->isInGroupList_dongle(group_id, dongleId, sourceSite)){
+            if(GroupManager::getInstance()->isInGroupList(group_id, sourceSite, dongleId)){
                 auto pos = controlGroupListMap.find(sourceSite);
                 if(pos != controlGroupListMap.end()){
                     pos->second.append(item);
@@ -298,6 +298,45 @@ namespace synergy {
             SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
             LOG_BLUE << elem.first << " controlResponse: " << controlResponse.toJsonString();
         }
+
+        response.set_content(okResponse.dump(), "text/json");
+        return 0;
+    }
+
+    int bleDeviceRegister_service_handler(const Request& request, Response& response){
+        LOG_INFO << "bleDeviceRegister_service_handler: " << qlibc::QData(request.body).toJsonString();
+        qlibc::QData groupList = GroupManager::getInstance()->getBleGroupList();
+        Json::ArrayIndex size = groupList.size();
+        qlibc::QData deviceList;
+        for(Json::ArrayIndex i = 0; i < size; ++i){
+            qlibc::QData item = groupList.getArrayElement(i);
+            qlibc::QData data;
+            data.setString("categoryCode", "LIGHT");
+            data.setString("deviceCode", item.getString("group_id"));
+            data.setString("deviceDid", item.getString("group_id"));
+            data.setString("deviceSn", item.getString("group_name"));
+            data.setString("deviceName", item.getString("group_name"));
+            data.setString("deviceDesc", item.getString("group_name"));
+            data.setString("deviceVender", "changhong");
+            data.setString("productNickname", item.getString("group_name"));
+            data.setString("productType", "LIGHT_SWITCH");
+            data.setString("roomNo", item.getData("location").getString("room_no"));
+            data.setString("roomType", item.getData("location").getString("room_name"));
+            data.setString("roomName", item.getData("location").getString("room_name"));
+            data.setString("deviceSource", "1");
+            data.setInt("isGateway", 0);
+            deviceList.append(data);
+        }
+        qlibc::QData requestData, responseData;
+        requestData.setString("service_id", "postDeviceList");
+        requestData.putData("request", qlibc::QData().putData("deviceList", deviceList));
+        LOG_INFO << "requestData: " << requestData.toJsonString(true);
+
+//        if(httpUtil::sitePostRequest("127.0.0.1", 9006, requestData, responseData)){
+//            response.set_content(okResponse.dump(), "text/json");
+//        }else{
+//            response.set_content(errResponse.dump(), "text/json");
+//        }
 
         response.set_content(okResponse.dump(), "text/json");
         return 0;

@@ -30,6 +30,9 @@ namespace synergy{
 
 //组控制
     int groupControl_service_handler(const Request& request, Response& response);
+
+//蓝牙设备注册
+    int bleDeviceRegister_service_handler(const Request& request, Response& response);
 }
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H
