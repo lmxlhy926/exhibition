@@ -116,6 +116,15 @@ int site_getLocalAreaNetworkSiteInfo_service_handler(const Request& request, Res
     return 0;
 }
 
+int site_getLocalAreaNetworkSiteInfoExceptOwn_service_handler(const Request& request, Response& response){
+    qlibc::QData reqData(request.body);
+    LOG_INFO  << "site_getLocalAreaNetworkSiteInfoExceptOwn_service_handler: " << reqData.toJsonString();
+    string site_id = reqData.getData("request").getString("site_id");
+    qlibc::QData siteList = SiteTree::getInstance()->getLocalAreaSiteExceptOwn(site_id);
+    response.set_content(successResponse(siteList).toJsonString(), "text/json");
+    return 0;
+}
+
 void site_query_node2node_message_handler(const Request& request){
     qlibc::QData reqData(request.body);
     LOG_INFO << "Received node2node_message: " << reqData.toJsonString();

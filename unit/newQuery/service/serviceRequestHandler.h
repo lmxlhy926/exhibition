@@ -28,6 +28,9 @@ int site_getLocalSiteInfo_service_handler(const Request& request, Response& resp
 //获取局域网内所有主机下的站点信息服务
 int site_getLocalAreaNetworkSiteInfo_service_handler(const Request& request, Response& response);
 
+//获取局域网内本机外的所有站点信息
+int site_getLocalAreaNetworkSiteInfoExceptOwn_service_handler(const Request& request, Response& response);
+
 //查询节点之间的消息处理函数
 void site_query_node2node_message_handler(const Request& request);
 

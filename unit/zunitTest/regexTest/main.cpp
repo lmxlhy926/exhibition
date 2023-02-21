@@ -209,18 +209,10 @@ void test(){
 
 
 int main(int argc, char* argv[]){
-    string str = "打开 客厅 的 灯";
-    regex sep("[ ]+");
-    sregex_token_iterator end;
-    sregex_token_iterator p(str.cbegin(), str.cend(), sep, {-1});
-    string totalString;
-    for(; p != end; p++){
-        std::cout << p->str() << std::endl;
-        totalString += p->str();
-    }
-    std::cout << "totalString: " << totalString << std::endl;
-
-
+   string str = "10.1.1.1:bl_site";
+   if(regex_match(str, regex(".*:ble_site"))){
+       std::cout << "match..." << std::endl;
+   }
     return 0;
 }
 

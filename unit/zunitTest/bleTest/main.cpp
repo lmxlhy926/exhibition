@@ -54,6 +54,27 @@ void groupControl(string group_id, string command_id, int command_para){
     controlData.putData("request", qlibc::QData().putData("group_list", groupList));
 
     string bleSiteName = "ble_light";
+    string LocalIp = "10.1.1.120";
+    int bleSitePort = 9001;
+    qlibc::QData controlRes;
+    httpUtil::sitePostRequest(LocalIp, bleSitePort, controlData, controlRes);
+}
+
+
+void groupControl_color(string group_id, string command_id, int commandParaLuminance, int commandParaColorTemperature){
+    qlibc::QData command, commandList, groupListItem, groupList, controlData;
+    command.setString("command_id", command_id);
+    command.setInt("command_para_luminance", commandParaLuminance);
+    command.setInt("command_para_color_temperature", commandParaColorTemperature);
+    command.setInt("transTime", 0);
+    commandList.append(command);
+    groupListItem.setString("group_id", group_id);
+    groupListItem.putData("command_list", commandList);
+    groupList.append(groupListItem);
+    controlData.setString("service_id", "control_group");
+    controlData.putData("request", qlibc::QData().putData("group_list", groupList));
+
+    string bleSiteName = "ble_light";
     string LocalIp = "127.0.0.1";
     int bleSitePort = 9001;
     qlibc::QData controlRes;
@@ -80,9 +101,10 @@ void control4(int delay){
 
 void blink(){
     while(true){
-        groupControl("FFFF", "luminance", 50);
-        sleep(3);
-        groupControl("FFFF", "luminance", 255);
+        groupControl_color("FFFF", "luminance_color_temperature", 255, 2700);
+        sleep(2);
+        groupControl_color("FFFF", "luminance_color_temperature", 255, 6500);
+        sleep(2);
     }
 }
 

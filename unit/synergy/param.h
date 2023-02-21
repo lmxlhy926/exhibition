@@ -40,6 +40,7 @@ static const string VoiceControl_Service_ID         = "voiceControl";
 static const string DeviceControl_Service_ID        = "control_device";
 static const string GroupControl_Service_ID         = "control_group";
 static const string BleGroupRegister_Service_ID     = "register_bleGroup";
+static const string BleDeviceOperation_Service_ID   = "bleDeviceOperation";
 
 //订阅消息ID
 static const string DeviceList_changed_messageID = "deviceList_changed";

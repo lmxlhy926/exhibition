@@ -341,4 +341,11 @@ namespace synergy {
         response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
+
+    int bleDeviceOperation_service_handler(const Request& request, Response& response){
+        LOG_INFO << qlibc::QData(request.body).toJsonString(true);
+        response.set_content(okResponse.dump(), "text/json");
+        return 0;
+    }
+
 }

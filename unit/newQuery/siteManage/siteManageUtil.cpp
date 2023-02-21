@@ -313,6 +313,30 @@ qlibc::QData SiteTree::getLocalAreaSite(string& siteId){
     return retData;
 }
 
+
+qlibc::QData SiteTree::getLocalAreaSiteExceptOwn(string& siteId){
+    std::lock_guard<std::recursive_mutex> lg(siteMutex);
+    qlibc::QData retData;
+    if(!siteId.empty()){
+        for(auto& elem : discoveredSiteMap){
+            Json::ArrayIndex size = elem.second.size();
+            for(Json::ArrayIndex i = 0; i < size; ++i){
+                if(elem.second[i]["site_id"] == siteId){
+                    retData.setValue(elem.first, Json::Value(qlibc::QData().append(elem.second[i]).asValue()));
+                    break;
+                }
+            }
+        }
+
+    }else{
+        for(auto& elem : discoveredSiteMap){
+            retData.setValue(elem.first, elem.second);
+        }
+    }
+
+    return retData;
+}
+
 qlibc::QData SiteTree::printIpAddress(){
     std::lock_guard<std::recursive_mutex> lg(siteMutex);
     qlibc::QData data;

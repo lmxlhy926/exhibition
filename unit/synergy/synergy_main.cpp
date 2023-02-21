@@ -79,6 +79,13 @@ int main(int argc, char* argv[]) {
         return synergy::bleDeviceRegister_service_handler(request, response);
     });
 
+    //蓝牙设备操作
+    serviceSiteManager->registerServiceRequestHandler(BleDeviceOperation_Service_ID,
+                                                      [](const Request& request, Response& response)->int{
+        return synergy::bleDeviceOperation_service_handler(request, response);
+    });
+
+
 #if 0
     serviceSiteManager->registerMessageHandler(Site_OnOffLine_MessageID, [](const Request& request){
         //每次站点上线都会触发重新获取设备列表、组列表

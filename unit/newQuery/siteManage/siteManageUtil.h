@@ -99,6 +99,9 @@ public:
     //获取局域网内所有主机下的指定的站点信息
     qlibc::QData getLocalAreaSite(string& siteId);
 
+    //获取局域网内本机外的指定站点信息
+    qlibc::QData getLocalAreaSiteExceptOwn(string& siteId);
+
     //打印资源情况
     qlibc::QData printIpAddress();
 

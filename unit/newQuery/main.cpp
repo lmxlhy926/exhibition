@@ -78,6 +78,12 @@ int main(int argc, char* argv[]){
         return site_getLocalAreaNetworkSiteInfo_service_handler(request, response);
     });
 
+    //获取局域网内本机外的所有站点信息
+    serviceSiteManager->registerServiceRequestHandler(Site_LocalAreaSiteExceptOwn_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return site_getLocalAreaNetworkSiteInfoExceptOwn_service_handler(request, response);
+    });
+
     //打印资源信息
     serviceSiteManager->registerServiceRequestHandler(Site_Print_IpAddress_ID,
                                                       [](const Request& request, Response& response) -> int{
