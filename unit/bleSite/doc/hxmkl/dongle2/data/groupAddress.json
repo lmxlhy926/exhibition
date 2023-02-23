@@ -280,6 +280,7 @@
 	},
 	"0FC0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"02A17B971B30",
@@ -291,9 +292,8 @@
 			"01D455971B30",
 			"26D755971B30"
 		],
-		"group_name" : "14号区域大组",
-		"areaFullGroup" : true,
 		"dongleId" : "2",
+		"group_name" : "14号区域大组",
 		"location" : 
 		{
 			"room_name" : "14号区域",
@@ -302,6 +302,7 @@
 	},
 	"10C0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"3BA27B971B30",
@@ -311,9 +312,8 @@
 			"028F7B971B30",
 			"E8A17B971B30"
 		],
-		"group_name" : "15号区域大组",
-		"areaFullGroup" : true,
 		"dongleId" : "2",
+		"group_name" : "15号区域大组",
 		"location" : 
 		{
 			"room_name" : "15号区域",
@@ -322,6 +322,7 @@
 	},
 	"11C0" : 
 	{
+		"areaFullGroup" : true,
 		"device_list" : 
 		[
 			"05D555971B30",
@@ -334,9 +335,8 @@
 			"5C977B971B30",
 			"60977B971B30"
 		],
-		"group_name" : "16号区域大组",
-		"areaFullGroup" : true,
 		"dongleId" : "2",
+		"group_name" : "16号区域大组",
 		"location" : 
 		{
 			"room_name" : "16号区域",

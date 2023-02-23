@@ -880,18 +880,6 @@
 				"room_name" : "无",
 				"room_no" : "-1"
 			}
-		},
-		{
-			"device_id" : "0DD555971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
 		}
 	]
 }

@@ -1197,25 +1197,6 @@
 					"state_value" : 6700
 				}
 			]
-		},
-		{
-			"device_id" : "0DD555971B30",
-			"online_state" : "online",
-			"state_list" : 
-			[
-				{
-					"state_id" : "power",
-					"state_value" : "on"
-				},
-				{
-					"state_id" : "luminance",
-					"state_value" : 17694
-				},
-				{
-					"state_id" : "color_temperature",
-					"state_value" : 6700
-				}
-			]
 		}
 	]
 }
