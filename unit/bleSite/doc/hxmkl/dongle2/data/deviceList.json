@@ -856,16 +856,16 @@
 			}
 		},
 		{
-			"device_id" : "11D655971B30",
+			"device_id" : "A02546971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
 			"group_address" : "0DC0",
-			"group_name" : "8kumax大组",
+			"group_name" : "12区域大组",
 			"location" : 
 			{
-				"room_name" : "盘型灯下方灯带",
+				"room_name" : "无",
 				"room_no" : "-1"
 			}
 		},
@@ -875,6 +875,50 @@
 			"device_modelCode" : "2C",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "12区域大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "11D655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0DC0",
+			"group_name" : "12区域大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "81D555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0EC0",
+			"group_name" : "13号区域大组",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "D7E255971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "0FC0",
+			"group_name" : "14号区域大组",
 			"location" : 
 			{
 				"room_name" : "无",
