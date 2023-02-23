@@ -1209,7 +1209,7 @@
 				},
 				{
 					"state_id" : "luminance",
-					"state_value" : 65535
+					"state_value" : 24218
 				},
 				{
 					"state_id" : "color_temperature",

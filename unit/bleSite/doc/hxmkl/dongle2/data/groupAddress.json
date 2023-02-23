@@ -249,9 +249,9 @@
 			"D5A941971B30",
 			"DCE055971B30",
 			"E3AB41971B30",
-			"11D655971B30",
 			"A02546971B30",
-			"8ACC55971B30"
+			"8ACC55971B30",
+			"11D655971B30"
 		],
 		"dongleId" : "2",
 		"group_name" : "12区域大组",
@@ -345,6 +345,19 @@
 		{
 			"room_name" : "16号区域",
 			"room_no" : "16"
+		}
+	},
+	"12C0" : 
+	{
+		"device_list" : 
+		[
+			"11D655971B30"
+		],
+		"group_name" : "8kmiLed柜体中间",
+		"location" : 
+		{
+			"room_name" : "ss",
+			"room_no" : "6"
 		}
 	}
 }
