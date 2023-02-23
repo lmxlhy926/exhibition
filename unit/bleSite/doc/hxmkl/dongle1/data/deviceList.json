@@ -2395,6 +2395,8 @@
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
+			"group_address" : "1CC0",
+			"group_name" : "共享舒适组",
 			"location" : 
 			{
 				"room_name" : "无",
@@ -2407,6 +2409,8 @@
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
+			"group_address" : "1CC0",
+			"group_name" : "共享舒适组",
 			"location" : 
 			{
 				"room_name" : "无",
