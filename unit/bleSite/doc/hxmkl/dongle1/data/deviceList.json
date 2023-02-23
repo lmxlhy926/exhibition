@@ -1714,20 +1714,6 @@
 			}
 		},
 		{
-			"device_id" : "B8E655971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "20C0",
-			"group_name" : "区域9大组",
-			"location" : 
-			{
-				"room_name" : "长虹空调墙",
-				"room_no" : "-1"
-			}
-		},
-		{
 			"device_id" : "74E655971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
@@ -2420,6 +2406,20 @@
 			"location" : 
 			{
 				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "B8E655971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "2CC0",
+			"group_name" : "9,10贴地灯带",
+			"location" : 
+			{
+				"room_name" : "长虹空调墙",
 				"room_no" : "-1"
 			}
 		}

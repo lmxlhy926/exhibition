@@ -834,8 +834,8 @@
 			"38D455971B30",
 			"ACDE55971B30"
 		],
-		"group_name" : "区域3左右面",
 		"dongleId" : "1",
+		"group_name" : "区域3左右面",
 		"location" : 
 		{
 			"room_name" : "区域3左右面",
@@ -860,12 +860,26 @@
 			"E9E255971B30",
 			"09D655971B30"
 		],
-		"group_name" : "区域4左右面",
 		"dongleId" : "1",
+		"group_name" : "区域4左右面",
 		"location" : 
 		{
 			"room_name" : "区域4左右面",
 			"room_no" : "4"
+		}
+	},
+	"2CC0" : 
+	{
+		"device_list" : 
+		[
+			"B8E655971B30"
+		],
+		"group_name" : "9,10贴地灯带",
+		"dongleId" : "1",
+		"location" : 
+		{
+			"room_name" : "9，10",
+			"room_no" : "9"
 		}
 	}
 }
