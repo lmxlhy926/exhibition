@@ -1896,55 +1896,7 @@
 			}
 		},
 		{
-			"device_id" : "81D555971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "A02546971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
 			"device_id" : "ACDE55971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "D7E255971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "无",
-				"room_no" : "-1"
-			}
-		},
-		{
-			"device_id" : "11D655971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",

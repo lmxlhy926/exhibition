@@ -767,8 +767,8 @@
 		[
 			"D7E555971B30"
 		],
-		"group_name" : "2，18，19，20 大灯带",
 		"dongleId" : "1",
+		"group_name" : "2，18，19，20 大灯带",
 		"location" : 
 		{
 			"room_name" : "2，18，19，20 大灯带",
@@ -786,8 +786,8 @@
 			"46D355971B30",
 			"B2E955971B30"
 		],
-		"group_name" : "区域3",
 		"dongleId" : "1",
+		"group_name" : "区域3",
 		"location" : 
 		{
 			"room_name" : "区域3，十分净面",
@@ -803,8 +803,8 @@
 			"FDA17B971B30",
 			"79E655971B30"
 		],
-		"group_name" : "区域4",
 		"dongleId" : "1",
+		"group_name" : "区域4",
 		"location" : 
 		{
 			"room_name" : "区域4，十分净面",
