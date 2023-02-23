@@ -768,6 +768,7 @@
 			"D7E555971B30"
 		],
 		"group_name" : "2，18，19，20 大灯带",
+		"dongleId" : "1",
 		"location" : 
 		{
 			"room_name" : "2，18，19，20 大灯带",
@@ -786,6 +787,7 @@
 			"B2E955971B30"
 		],
 		"group_name" : "区域3",
+		"dongleId" : "1",
 		"location" : 
 		{
 			"room_name" : "区域3，十分净面",
@@ -802,6 +804,7 @@
 			"79E655971B30"
 		],
 		"group_name" : "区域4",
+		"dongleId" : "1",
 		"location" : 
 		{
 			"room_name" : "区域4，十分净面",
