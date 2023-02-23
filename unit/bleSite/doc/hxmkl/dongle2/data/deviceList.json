@@ -868,6 +868,30 @@
 				"room_name" : "盘型灯下方灯带",
 				"room_no" : "-1"
 			}
+		},
+		{
+			"device_id" : "8ACC55971B30",
+			"device_model" : "磁吸轨道折叠灯",
+			"device_modelCode" : "2C",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
+		},
+		{
+			"device_id" : "0DD555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "无",
+				"room_no" : "-1"
+			}
 		}
 	]
 }
