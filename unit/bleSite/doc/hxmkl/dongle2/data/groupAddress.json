@@ -354,10 +354,213 @@
 			"11D655971B30"
 		],
 		"group_name" : "8kmiLed柜体中间",
+		"dongleId" : "2",
 		"location" : 
 		{
 			"room_name" : "ss",
 			"room_no" : "6"
+		}
+	},
+	"13C0" : 
+	{
+		"device_list" : 
+		[
+			"24A441971B30",
+			"57A441971B30",
+			"5BA341971B30",
+			"66DE55971B30",
+			"6AE055971B30",
+			"71E055971B30",
+			"7DE055971B30",
+			"80A441971B30",
+			"84D055971B30",
+			"B6A941971B30",
+			"C6A941971B30",
+			"C9DB55971B30",
+			"D5A941971B30",
+			"DCE055971B30",
+			"E3AB41971B30",
+			"8ACC55971B30"
+		],
+		"group_name" : "区域12盘型灯",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域12盘型灯",
+			"room_no" : "12"
+		}
+	},
+	"14C0" : 
+	{
+		"device_list" : 
+		[
+			"11D655971B30",
+			"A02546971B30"
+		],
+		"group_name" : "区域12柜体灯",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域12柜体灯",
+			"room_no" : "12"
+		}
+	},
+	"15C0" : 
+	{
+		"device_list" : 
+		[
+			"E58E7B971B30",
+			"EFA17B971B30",
+			"79A27B971B30",
+			"81D555971B30"
+		],
+		"group_name" : "区域13射灯",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域13射灯",
+			"room_no" : "13"
+		}
+	},
+	"16C0" : 
+	{
+		"device_list" : 
+		[
+			"C3DB55971B30",
+			"07D555971B30"
+		],
+		"group_name" : "区域13灯带",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域13灯带",
+			"room_no" : "13"
+		}
+	},
+	"17C0" : 
+	{
+		"device_list" : 
+		[
+			"02A17B971B30",
+			"44A27B971B30",
+			"34A27B971B30",
+			"52977B971B30",
+			"638E7B971B30"
+		],
+		"group_name" : "区域14射灯",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域14射灯",
+			"room_no" : "14"
+		}
+	},
+	"18C0" : 
+	{
+		"device_list" : 
+		[
+			"EFD355971B30",
+			"01D455971B30",
+			"D7E255971B30"
+		],
+		"group_name" : "区域14灯带",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域14灯带",
+			"room_no" : "14"
+		}
+	},
+	"19C0" : 
+	{
+		"device_list" : 
+		[
+			"3BA27B971B30",
+			"88A27B971B30",
+			"E98E7B971B30",
+			"37A27B971B30",
+			"028F7B971B30",
+			"E8A17B971B30"
+		],
+		"group_name" : "区域15射灯",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域15射灯",
+			"room_no" : "15"
+		}
+	},
+	"1AC0" : 
+	{
+		"device_list" : 
+		[
+			"26D755971B30"
+		],
+		"group_name" : "区域15灯带",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域15灯带",
+			"room_no" : "15"
+		}
+	},
+	"1BC0" : 
+	{
+		"device_list" : 
+		[
+			"EFE555971B30"
+		],
+		"group_name" : "区域16圆形",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域16圆形",
+			"room_no" : "16"
+		}
+	},
+	"1CC0" : 
+	{
+		"device_list" : 
+		[
+			"FFE555971B30",
+			"05D555971B30"
+		],
+		"group_name" : "区域16竖墙",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域16竖墙",
+			"room_no" : "16"
+		}
+	},
+	"1DC0" : 
+	{
+		"device_list" : 
+		[
+			"76E655971B30"
+		],
+		"group_name" : "区域16正墙",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域16正墙",
+			"room_no" : "16"
+		}
+	},
+	"1EC0" : 
+	{
+		"device_list" : 
+		[
+			"EFE555971B30",
+			"FFE555971B30",
+			"05D555971B30"
+		],
+		"group_name" : "区域16圆形竖型灯",
+		"dongleId" : "2",
+		"location" : 
+		{
+			"room_name" : "区域16圆形竖型灯",
+			"room_no" : "16"
 		}
 	}
 }
