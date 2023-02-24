@@ -41,7 +41,8 @@ void test(){
     }
 }
 
-void groupControl(string group_id, string command_id, int command_para){
+
+void groupControl(string group_id, string command_id, int command_para, string IP){
     qlibc::QData command, commandList, groupListItem, groupList, controlData;
     command.setString("command_id", command_id);
     command.setInt("command_para", command_para);
@@ -53,20 +54,18 @@ void groupControl(string group_id, string command_id, int command_para){
     controlData.setString("service_id", "control_group");
     controlData.putData("request", qlibc::QData().putData("group_list", groupList));
 
-    string bleSiteName = "ble_light";
-    string LocalIp = "10.1.1.120";
-    int bleSitePort = 9001;
+    int PORT = 9001;
     qlibc::QData controlRes;
-    httpUtil::sitePostRequest(LocalIp, bleSitePort, controlData, controlRes);
+    httpUtil::sitePostRequest(IP, PORT, controlData, controlRes);
 }
 
 
-void groupControl_color(string group_id, string command_id, int commandParaLuminance, int commandParaColorTemperature){
+void groupControl_color(string group_id, string command_id, int commandParaLuminance, int commandParaColorTemperature, int transTime, string IP){
     qlibc::QData command, commandList, groupListItem, groupList, controlData;
     command.setString("command_id", command_id);
     command.setInt("command_para_luminance", commandParaLuminance);
     command.setInt("command_para_color_temperature", commandParaColorTemperature);
-    command.setInt("transTime", 0);
+    command.setInt("transTime", transTime);
     commandList.append(command);
     groupListItem.setString("group_id", group_id);
     groupListItem.putData("command_list", commandList);
@@ -74,64 +73,43 @@ void groupControl_color(string group_id, string command_id, int commandParaLumin
     controlData.setString("service_id", "control_group");
     controlData.putData("request", qlibc::QData().putData("group_list", groupList));
 
-    string bleSiteName = "ble_light";
-    string LocalIp = "127.0.0.1";
     int bleSitePort = 9001;
     qlibc::QData controlRes;
-    httpUtil::sitePostRequest(LocalIp, bleSitePort, controlData, controlRes);
+    httpUtil::sitePostRequest(IP, bleSitePort, controlData, controlRes);
 }
 
-
-
-void control4(int delay){
-    groupControl("08C0", "luminance", 100);
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-
-    groupControl("05C0", "luminance", 255);
-    std::this_thread::sleep_for(std::chrono::seconds(delay));
-
-    groupControl("06C0", "luminance", 255);
-    groupControl("05C0", "luminance", 100);
-    std::this_thread::sleep_for(std::chrono::seconds(delay));
-
-    groupControl("07C0", "luminance", 255);
-    groupControl("06C0", "luminance", 100);
-}
 
 
 void blink(){
     while(true){
-        groupControl_color("FFFF", "luminance_color_temperature", 255, 2700);
-        sleep(2);
-        groupControl_color("FFFF", "luminance_color_temperature", 255, 6500);
-        sleep(2);
+        groupControl_color("FFFF", "luminance_color_temperature", 255, 6500, 0, "127.0.0.1");
+//        groupControl_color("FFFF", "luminance_color_temperature", 255, 6500, 0, "10.1.1.120");
+        sleep(4);
+        groupControl_color("FFFF", "luminance_color_temperature", 0, 6500, 30, "127.0.0.1");
+//        groupControl_color("FFFF", "luminance_color_temperature", 0, 6500, 30, "10.1.1.120");
+        sleep(4);
+        groupControl_color("FFFF", "luminance_color_temperature", 255, 2700, 0, "127.0.0.1");
+//        groupControl_color("FFFF", "luminance_color_temperature", 255, 2700, 0, "10.1.1.120");
+        sleep(4);
+        groupControl_color("FFFF", "luminance_color_temperature", 0, 2700, 30, "127.0.0.1");
+//        groupControl_color("FFFF", "luminance_color_temperature", 0, 2700, 30, "10.1.1.120");
+        sleep(4);
+    }
+}
+
+void blink1(){
+    while(true){
+        groupControl_color("20C0", "luminance_color_temperature", 75, 2700, 30, "10.1.1.120");
+        sleep(4);
+        groupControl_color("20C0", "luminance_color_temperature", 255, 2700, 30, "10.1.1.120");
+        sleep(4);
     }
 }
 
 
 
 int main(int argc, char* argv[]){
-    blink();
+    blink1();
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
