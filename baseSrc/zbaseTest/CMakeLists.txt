@@ -2,3 +2,4 @@
 #add_subdirectory(log)
 #add_subdirectory(qlibcTest)
 add_subdirectory(siteServiceTest)
+add_subdirectory(spdlogTest)
