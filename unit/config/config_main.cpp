@@ -21,6 +21,9 @@ using json = nlohmann::json;
 
 
 int main(int argc, char* argv[]) {
+    //增加log打印
+    string path = "/data/changhong/edge_midware/lhy/configSiteLog.txt";
+    muduo::logInitLogger(path);
 
     if(argc != 2 && argc !=3 ){
         LOG_RED << "Usage Error.....";

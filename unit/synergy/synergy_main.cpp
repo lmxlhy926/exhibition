@@ -13,6 +13,7 @@
 #include "common/httpUtil.h"
 #include "deviceGroupManage/deviceManager.h"
 #include "deviceGroupManage/groupManager.h"
+#include "log/Logging.h"
 
 using namespace std;
 using namespace servicesite;
@@ -21,6 +22,10 @@ using namespace std::placeholders;
 using json = nlohmann::json;
 
 int main(int argc, char* argv[]) {
+    //增加log打印
+    string path = "/data/changhong/edge_midware/lhy/synergySiteLog.txt";
+    muduo::logInitLogger(path);
+
     httplib::ThreadPool threadPool_(5);
 
     // 创建 serviceSiteManager 对象, 单例

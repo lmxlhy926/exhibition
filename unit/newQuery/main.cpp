@@ -23,6 +23,10 @@ using namespace servicesite;
 
 
 int main(int argc, char* argv[]){
+    //增加log打印
+    string path = "/data/changhong/edge_midware/lhy/querySiteLog.txt";
+    muduo::logInitLogger(path);
+
     httplib::ThreadPool threadPool_(20);
 
     // 创建 serviceSiteManager 对象, 单例
