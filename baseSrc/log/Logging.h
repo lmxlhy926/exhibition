@@ -47,9 +47,8 @@
 
 
 namespace muduo{
-    extern std::vector<spdlog::sink_ptr> sinks;
-    extern std::shared_ptr<spdlog::logger> mylogger;
-    extern void logInit(string& path);    //初始化log文件路径
+    extern void logInit(string& path);          //初始化log文件路径
+    extern void logInitLogger(string& path);    //初始化log文件路径
 
     /*
      * 打印过程：创建一个Logger对象(构造函数)，输出内容，析构（提取内容，真正打印输出）

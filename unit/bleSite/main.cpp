@@ -20,7 +20,7 @@ using json = nlohmann::json;
 int main(int argc, char* argv[]) {
     //设置log路径
     string path = "/data/changhong/edge_midware/bleSiteLog.txt";
-    muduo::logInit(path);
+    muduo::logInitLogger(path);
 
     httplib::ThreadPool threadPool_(10);
     //站点请求管理
