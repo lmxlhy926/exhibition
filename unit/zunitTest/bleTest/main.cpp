@@ -99,17 +99,18 @@ void blink(){
 
 void blink1(){
     while(true){
-        groupControl_color("20C0", "luminance_color_temperature", 75, 2700, 30, "10.1.1.120");
-        sleep(4);
-        groupControl_color("20C0", "luminance_color_temperature", 255, 2700, 30, "10.1.1.120");
-        sleep(4);
+        groupControl_color("FFFF", "luminance_color_temperature", 0, 2700, 30, "10.1.1.120");
+        groupControl_color("FFFF", "luminance_color_temperature", 255, 6500, 30, "10.1.1.120");
     }
 }
 
 
 
 int main(int argc, char* argv[]){
-    blink1();
+    for(int i = 0; i < 20; ++i){
+        groupControl_color("FFFF", "luminance_color_temperature", 0, 2700, 0, "10.1.1.120");
+        groupControl_color("FFFF", "luminance_color_temperature", 255, 6500, 0, "10.1.1.120");
+    }
     return 0;
 }
 
