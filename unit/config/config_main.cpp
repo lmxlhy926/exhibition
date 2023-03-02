@@ -11,14 +11,12 @@
 #include "util/secretUtils.h"
 #include "param.h"
 #include "log/Logging.h"
-#include "util/fileSync.h"
 
 using namespace std;
 using namespace servicesite;
 using namespace httplib;
 using namespace std::placeholders;
 using json = nlohmann::json;
-
 
 int main(int argc, char* argv[]) {
     //增加log打印
@@ -37,33 +35,23 @@ int main(int argc, char* argv[]) {
         LOG_PURPLE << "RK3308.........";
     }
 
-    //. 设置线程池
-    httplib::ThreadPool threadPool_(10);
-    std::atomic<bool> http_server_thread_end(false);
-
-    //. 配置本站点启动信息
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->setServerPort(ConfigSitePort);
     serviceSiteManager->setSiteIdSummary(CONFIG_SITE_ID, CONFIG_SITE_ID_NAME);
-
-    //set site supported subscribed message
-    serviceSiteManager->registerMessageId(WHITELIST_MESSAGE_ID);
-    serviceSiteManager->registerMessageId(RECEIVED_WHITELIST_ID);
-    serviceSiteManager->registerMessageId(WHITELIST_MODIFIED_MESSAGE_ID);
-    serviceSiteManager->registerMessageId(FileSync_MESSAGE_ID);
-
-   //. 设置配置文件加载路径
+    httplib::ThreadPool threadPool_(10);
+    //设置配置文件加载路径
     configParamUtil* configPathPtr = configParamUtil::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
 
-    //. 初始化cloudUtil, 加载http服务器配置信息
-    QData httpConfigData = configPathPtr->getCloudServerData();
-    const string dataDirPath = configPathPtr->getconfigPath();
-    cloudUtil::getInstance()->init(httpConfigData.getString("ip"), httpConfigData.getInt("port"), dataDirPath);
 
     mqttClient mc;
     if(!ISRK3308){
-        //. 开启线程，阻塞进行电视加入大白名单
+        //初始化cloudUtil, 加载http服务器配置信息
+        QData httpConfigData = configPathPtr->getCloudServerData();
+        const string dataDirPath = configPathPtr->getconfigPath();
+        cloudUtil::getInstance()->init(httpConfigData.getString("ip"), httpConfigData.getInt("port"), dataDirPath);
+
+        //开启线程，阻塞进行电视加入大白名单
         threadPool_.enqueue([](){
             cloudUtil::getInstance()->joinTvWhite();
         });
@@ -101,9 +89,7 @@ int main(int argc, char* argv[]) {
             return true;
         });
         mc.connect();
-    }
 
-    if(!ISRK3308){
         //注册请求场景列表处理函数
         serviceSiteManager->registerServiceRequestHandler(SCENELIST_REQUEST_SERVICE_ID,[&](const Request& request, Response& response)->int{
             return sceneListRequest_service_request_handler(request, response, mc.isConnected());
@@ -135,32 +121,49 @@ int main(int argc, char* argv[]) {
         });
     }
 
+
     //获取白名单列表
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID,whiteList_service_request_handler);
-    //增加白名单灯控设备条目
-    serviceSiteManager->registerServiceRequestHandler(WHITELIST_UPDATE_REQUEST_SERVICE_ID,whiteList_update_service_request_handler);
-    //删除白名单灯控设备条目
-    serviceSiteManager->registerServiceRequestHandler(WHITELIST_DELETE_REQUEST_SERVICE_ID,whiteList_delete_service_request_handler);
+
     //保存白名单列表
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_SAVE_REQUEST_SERVICE_ID,whiteList_save_service_request_handler);
+
+    //同步保存白名单
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID,whiteList_sync_save_service_request_handler);
+
+    //增加白名单灯控设备条目
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_UPDATE_REQUEST_SERVICE_ID,whiteList_update_service_request_handler);
+
+    //删除白名单灯控设备条目
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_DELETE_REQUEST_SERVICE_ID,whiteList_delete_service_request_handler);
+
+    //获取场景配置文件
+    serviceSiteManager->registerServiceRequestHandler(GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, getSceneFile_service_request_handler);
+
+    //保存场景配置文件
+    serviceSiteManager->registerServiceRequestHandler(SAVE_SCENECONFIG_FILE_REQUEST_SERVICE_ID, saveSceneFile_service_request_handler);
+
+    //同步场景配置文件
+    serviceSiteManager->registerServiceRequestHandler(SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID, saveSceneFile_sync_service_request_handler);
+
     //获取灯控设备列表
     serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID,getAllDeviceList_service_request_handler);
-    //让电视发声
-    serviceSiteManager->registerServiceRequestHandler(TVSOUND_REQUEST_SERVICE_ID,tvSound_service_request_handler);
-    //获取场景配置文件
-    serviceSiteManager->registerServiceRequestHandler(GETSCENECONFIGFILE_REQUEST_SERVICE_ID, getConfigFile_service_request_handler);
-    //保存场景配置文件
-    serviceSiteManager->registerServiceRequestHandler(SAVESCENECONFIGFILE_REQUEST_SERVICE_ID, saveConfigFile_service_request_handler);
 
-    ServiceSiteManager::getInstance()->registerMessageHandler(FileSync_MESSAGE_ID, fileSync::updateFile);
+
+    //set site supported subscribed message
+    serviceSiteManager->registerMessageId(WHITELIST_MESSAGE_ID);                //发布白名单给第三方
+    serviceSiteManager->registerMessageId(RECEIVED_WHITELIST_ID);               //发布消息，告知已接收到白名单
+    serviceSiteManager->registerMessageId(WHITELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知白名单已被修改
+    serviceSiteManager->registerMessageId(SCENELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知场景文件已被修改
+
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-//            int code = serviceSiteManager->start();
+            int code = serviceSiteManager->start();
             //注册启动方式
-            int code = serviceSiteManager->startByRegister();
+//            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 LOG_RED << "===>configSite startByRegister error, code = " << code;
                 LOG_RED << "===>configSite startByRegister in 3 seconds....";

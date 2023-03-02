@@ -9,7 +9,6 @@
 #include <http/httplib.h>
 using namespace httplib;
 
-
 //站点注册服务
 int site_register_service_handler(const Request& request, Response& response);
 
@@ -31,10 +30,11 @@ int site_getLocalAreaNetworkSiteInfo_service_handler(const Request& request, Res
 //获取局域网内本机外的所有站点信息
 int site_getLocalAreaNetworkSiteInfoExceptOwn_service_handler(const Request& request, Response& response);
 
-//查询节点之间的消息处理函数
-void site_query_node2node_message_handler(const Request& request);
-
 //打印资源信息
 int printIpAddress(const Request& request, Response& response);
+
+//面板之间传递上下线消息，用来更新站点列表
+void site_OnOff_node2node_message_handler(const Request& request);
+
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

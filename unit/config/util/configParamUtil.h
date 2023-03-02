@@ -20,15 +20,17 @@ using namespace qlibc;
 class configParamUtil {
 private:
     string dataDirPath;                 //文件配置路径
+
     QData baseInfoData;                 //家庭基本参数信息
     QData recordData;                   //电视加入大白名单、电视注册结果
     QData secretFileNameData;           //获取文件名字
     QData mqttConfigData;               //获取mqtt配置信息
     QData cloudServerData;              //云端http服务器配置参数
 
-    QData whiteListData;                //云端下发的转换后的白名单信息
     QData originWhiteListData;          //远端下发的原始白名单
+    QData whiteListData;                //云端下发的转换后的白名单信息
     QData sceneConfigFile;              //场景配置文件
+
     static configParamUtil *instance;
     std::recursive_mutex mutex_;
 
@@ -38,11 +40,11 @@ private:
 public:
     static configParamUtil *getInstance();
 
-    //设置文件配置路径
-    void setConfigPath(const string &configPath);
-
     //获取文件配置路径
     string getconfigPath();
+
+    //设置文件配置路径
+    void setConfigPath(const string &configPath);
 
     //获取家庭基本参数信息
     QData getBaseInfo();
@@ -67,6 +69,7 @@ public:
 
     //获取http服务器配置消息
     QData getCloudServerData();
+
 
     //获取白名单
     QData getWhiteList();

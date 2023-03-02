@@ -23,9 +23,9 @@ static const string Site_LocalAreaSiteExceptOwn_Service_ID = "site_localAreaNetw
 static const string Site_Print_IpAddress_ID         = "site_printIpAdress";              //打印Ip地址信息
 
 //订阅消息ID
-static const string Node2Node_MessageID = "node2node";                           //节点消息通道
-static const string Site_OnOffLine_MessageID = "site_onoffline";                 //站点上下线
-static const string Site_RegisterAgain_MessageID = "register2QuerySiteAgain";    //站点重新注册
-static const string Site_Requery_Result_MessageID = "site_query_result";         //站点查询结果
+static const string Site_OnOff_Node2Node_MessageID  = "site_OnOff_node2node";       //节点消息通道
+static const string Site_OnOffLine_MessageID        = "site_onoffline";             //站点上下线
+static const string Site_RegisterAgain_MessageID    = "register2QuerySiteAgain";    //站点重新注册
+static const string Site_Requery_Result_MessageID   = "site_query_result";          //站点查询结果
 
 #endif //EXHIBITION_PARAM_H

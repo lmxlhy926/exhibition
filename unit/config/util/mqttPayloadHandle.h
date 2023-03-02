@@ -11,7 +11,7 @@
 
 using namespace std;
 
-static const string WHITELIST_MESSAGE_ID = "whiteList";
+static const string WHITELIST_MESSAGE_ID =  "whiteList";
 static const string RECEIVED_WHITELIST_ID = "receivedWhiteList";
 
 class mqttPayloadHandle {

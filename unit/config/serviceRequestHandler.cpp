@@ -8,6 +8,7 @@
 #include "siteService/service_site_manager.h"
 #include "util/mqttPayloadHandle.h"
 #include "log/Logging.h"
+#include <algorithm>
 using namespace servicesite;
 
 int test_service_request_handler(const Request& request, Response& response) {
@@ -245,10 +246,54 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
     return 0;
 }
 
+void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
+    LOG_PURPLE << "start to sync " << site_id << " ......";
+    std::map<int, Json::Value> resultMap;
+    qlibc::QData app_site_list;
+    Json::ArrayIndex app_site_list_size  = 0;
+
+    //获取所有面板上的保存内容
+    qlibc::QData request, response;
+    request.setString("service_id", "get_app_site_list");
+    request.putData("request", qlibc::QData());
+    if(httpUtil::sitePostRequest("127.0.0.1", 9012, request, response)){
+        app_site_list.setInitData(response.getData("response").getData("app_site_list"));
+        app_site_list_size = app_site_list.size();
+        for(Json::ArrayIndex i = 0; i < app_site_list_size; ++i){
+            qlibc::QData item = app_site_list.getArrayElement(i);
+            if(item.getString("site_id") == site_id){
+                qlibc::QData contentRequest, contentResponse;
+                contentRequest.setString("service_id", getServiceId);
+                contentRequest.putData("request", qlibc::QData());
+                if(httpUtil::sitePostRequest(item.getString("ip"), 9006, contentRequest, contentResponse)){
+                    qlibc::QData content(contentResponse.getData("response"));
+                    if(!content.empty()){
+                        resultMap.insert(std::make_pair(atoi(content.getString("timeStamp").c_str()), content.asValue()));
+                    }
+                }
+            }
+        }
+    }
+
+    //获得最新的内容
+    auto pos = max_element(resultMap.begin(), resultMap.end());
+    qlibc::QData newestContent(pos->second);
+
+    //向所有站点更新内容
+    for(Json::ArrayIndex i = 0; i < app_site_list_size; ++i){
+        qlibc::QData item = app_site_list.getArrayElement(i);
+        if(item.getString("site_id") == site_id){
+            qlibc::QData contentSaveRequest, contentSaveResponse;
+            contentSaveRequest.setString("service_id", saveServiceId);
+            contentSaveRequest.putData("request", newestContent);
+            httpUtil::sitePostRequest(item.getString("ip"), 9006, contentSaveRequest, contentSaveResponse);
+        }
+    }
+}
 
 
 int whiteList_service_request_handler(const Request& request, Response& response){
-    LOG_INFO << "===>whiteList_service_request_handler: " << request.body;
+    LOG_INFO << "===>whiteList_service_request_handler: " << qlibc::QData(request.body).toJsonString();
 
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
     qlibc::QData data;
@@ -266,20 +311,29 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
     qlibc::QData whiteListData = data.getData("request");
     configParamUtil::getInstance()->saveWhiteListData(whiteListData);
 
+    whiteList_sync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID);    //同步白名单
+
     qlibc::QData ret;
     ret.setInt("code", 0);
     ret.setString("msg", "success");
     response.set_content(ret.toJsonString(), "text/json");
 
-    //发布白名单修改信息
-    qlibc::QData publishData;
-    publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
-    publishData.putData("content", qlibc::QData());
-    ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-
     return 0;
 }
 
+int whiteList_sync_save_service_request_handler(const Request& request, Response& response){
+    qlibc::QData whiteListData = qlibc::QData(request.body).getData("request");
+    qlibc::QData localWhiteList = configParamUtil::getInstance()->getWhiteList();
+    if(atoi(localWhiteList.getString("timeStamp").c_str()) < atoi(whiteListData.getString("timeStamp").c_str())){
+        configParamUtil::getInstance()->saveWhiteListData(whiteListData);
+        //发布白名单修改信息
+        qlibc::QData publishData;
+        publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
+        publishData.putData("content", qlibc::QData());
+        ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+    }
+    return 0;
+}
 
 int whiteList_update_service_request_handler(const Request& request, Response& response){
     LOG_HLIGHT << "==>whiteList_update_service_request_handler";
@@ -365,6 +419,52 @@ int whiteList_delete_service_request_handler(const Request& request, Response& r
     return 0;
 }
 
+
+//获取场景配置文件
+int getSceneFile_service_request_handler(const Request& request, Response& response){
+    LOG_INFO << "===>getConfigFile_service_request_handler: " << qlibc::QData(request.body).toJsonString();
+
+    qlibc::QData payload = configParamUtil::getInstance()->getSceneConfigFile();
+    qlibc::QData data;
+    data.setInt("code", 0);
+    data.setString("error", "ok");
+    data.putData("response", payload);
+
+    response.set_content(data.toJsonString(), "text/json");
+    return 0;
+}
+
+//保存场景配置文件
+int saveSceneFile_service_request_handler(const Request& request, Response& response){
+    qlibc::QData data(request.body);
+    LOG_INFO << "==>saveConfigFile_service_request_handler: " << data.toJsonString();
+    qlibc::QData seceConfigFile = data.getData("request");
+    configParamUtil::getInstance()->saveSceneConfigFile(seceConfigFile);
+
+    whiteList_sync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID);    //同步场景文件
+
+    qlibc::QData ret;
+    ret.setInt("code", 0);
+    ret.setString("msg", "success");
+    response.set_content(ret.toJsonString(), "text/json");
+    return 0;
+}
+
+int saveSceneFile_sync_service_request_handler(const Request& request, Response& response){
+    qlibc::QData data = qlibc::QData(request.body).getData("request");
+    qlibc::QData localData = configParamUtil::getInstance()->getSceneConfigFile();
+    if(atoi(localData.getString("timeStamp").c_str()) < atoi(data.getString("timeStamp").c_str())){
+        configParamUtil::getInstance()->saveSceneConfigFile(data);
+        //发布场景文件被修改消息
+        qlibc::QData publishData;
+        publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
+        publishData.putData("content", qlibc::QData());
+        ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+    }
+
+    return 0;
+}
+
 int getAllDeviceList_service_request_handler(const Request& request, Response& response){
     //请求tvAdapter设备列表, 请求雷达、语音面板设备列表
     LOG_INFO << "getAllDeviceList_service_request_handler" << request.body;
@@ -409,53 +509,5 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
 
     response.set_content(data.toJsonString(), "text/json");
 
-    return 0;
-}
-
-int tvSound_service_request_handler(const Request& request, Response& response){
-    LOG_INFO << "tvSound_service_request_handler" << request.body;
-    qlibc::QData requestData = qlibc::QData(request.body).getData("request");
-
-    qlibc::QData data, content;
-    data.setString("message_id", "getTvSound");
-    content.setString("sn", requestData.getString("sn"));
-    data.putData("content", content);
-
-    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-    serviceSiteManager->publishMessage(TVSOUND_MESSAGE_ID, data.toJsonString());
-
-    qlibc::QData retData;
-    retData.setInt("code", 0);
-    retData.setString("error", "ok");
-    retData.putData("response", qlibc::QData());
-    response.set_content(retData.toJsonString(), "text/json");
-    return 0;
-}
-
-//获取场景配置文件
-int getConfigFile_service_request_handler(const Request& request, Response& response){
-    LOG_INFO << "===>getConfigFile_service_request_handler: " << request.body;
-
-    qlibc::QData payload = configParamUtil::getInstance()->getSceneConfigFile();
-    qlibc::QData data;
-    data.setInt("code", 0);
-    data.setString("error", "ok");
-    data.putData("response", payload);
-
-    response.set_content(data.toJsonString(), "text/json");
-    return 0;
-}
-
-//保存场景配置文件
-int saveConfigFile_service_request_handler(const Request& request, Response& response){
-    qlibc::QData data(request.body);
-    LOG_INFO << "==>saveConfigFile_service_request_handler: " << data.toJsonString();
-    qlibc::QData seceConfigFile = data.getData("request");
-    configParamUtil::getInstance()->saveSceneConfigFile(seceConfigFile);
-
-    qlibc::QData ret;
-    ret.setInt("code", 0);
-    ret.setString("msg", "success");
-    response.set_content(ret.toJsonString(), "text/json");
     return 0;
 }

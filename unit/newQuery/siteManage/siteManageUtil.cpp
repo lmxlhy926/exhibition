@@ -90,8 +90,8 @@ void SiteTree::siteRegister(string& siteId, Json::Value &value) {
     LOG_INFO << "Publish onoffline: " << siteOnOffData.toJsonString();
 
     //向其它主机发布站点上线消息
-    siteOnOffData.setString("message_id", Node2Node_MessageID);
-    ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
+    siteOnOffData.setString("message_id", Site_OnOff_Node2Node_MessageID);
+    ServiceSiteManager::getInstance()->publishMessage(Site_OnOff_Node2Node_MessageID, siteOnOffData.toJsonString());
     LOG_INFO << "Publish node2node: " << siteOnOffData.toJsonString();
 }
 
@@ -120,8 +120,8 @@ void SiteTree::siteUnregister(string& siteId) {
         LOG_INFO << "Publish onoffline: " << siteOnOffData.toJsonString();
 
         //向其它主机传送站点下线消息
-        siteOnOffData.setString("message_id", Node2Node_MessageID);
-        ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
+        siteOnOffData.setString("message_id", Site_OnOff_Node2Node_MessageID);
+        ServiceSiteManager::getInstance()->publishMessage(Site_OnOff_Node2Node_MessageID, siteOnOffData.toJsonString());
         LOG_INFO << "Publish node2node: " << siteOnOffData.toJsonString();
     }
 }
@@ -215,7 +215,7 @@ void SiteTree::addNewFindSite(string& ip) {
 
             //订阅节点消息通道，重复订阅也没有关系
             std::vector<string> messageIdList;
-            messageIdList.push_back(Node2Node_MessageID);
+            messageIdList.push_back(Site_OnOff_Node2Node_MessageID);
             ServiceSiteManager::subscribeMessage(ip, 9000, messageIdList);
         }
     }
@@ -554,8 +554,8 @@ void SiteTree::publishOnOffLineMessage(qlibc::QData& siteList, string onOffLine,
         LOG_INFO << "Publish onoffline: " << siteOnOffData.toJsonString();
 
         if(is2Node){
-            siteOnOffData.setString("message_id", Node2Node_MessageID);
-            ServiceSiteManager::getInstance()->publishMessage(Node2Node_MessageID, siteOnOffData.toJsonString());
+            siteOnOffData.setString("message_id", Site_OnOff_Node2Node_MessageID);
+            ServiceSiteManager::getInstance()->publishMessage(Site_OnOff_Node2Node_MessageID, siteOnOffData.toJsonString());
             LOG_INFO << "Publish node2node: " << siteOnOffData.toJsonString();
         }
     }

@@ -15,7 +15,6 @@ using namespace std;
 using namespace httplib;
 using json = nlohmann::json;
 
-
 //获取情景列表<内部>
 int sceneListRequest_service_request_handler(const Request& request, Response& response, bool isConnec);
 
@@ -25,15 +24,19 @@ int subDeviceRegister_service_request_handler(const Request& request, Response& 
 //同步设备列表
 int postDeviceList_service_request_handler(const Request& request, Response& response, bool isConnec);
 
-//获取家庭域<内部>
+//获取家庭域ID
 int domainIdRequest_service_request_handler(const Request& request, Response& response, bool isConnec);
 
-//安装app发送请求，传递安装师傅信息<安装app>
+//接收app发送的安装师傅信息，注册电视，保存安装信息，置位注册电视成功标志
 int engineer_service_request_handler(mqttClient& mc, const Request& request, Response& response);
 
-//从云端主动获取白名单
+//从云端主动获取白名单，转换并保存白名单，但是不发布消息
 int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request& request, Response& response);
 
+
+//-----------------------------------------------------------------------------------------------------------------
+//同步白名单
+void whiteList_sync(string site_id, string getServiceId, string saveServiceId);
 
 //获取白名单列表
 int whiteList_service_request_handler(const Request& request, Response& response);
@@ -41,24 +44,25 @@ int whiteList_service_request_handler(const Request& request, Response& response
 //app保存白名单列表
 int whiteList_save_service_request_handler(const Request& request, Response& response);
 
+//白名单同步保存
+int whiteList_sync_save_service_request_handler(const Request& request, Response& response);
+
 //蓝牙站点添加新设备时，增加相应的条目
 int whiteList_update_service_request_handler(const Request& request, Response& response);
 
 //蓝牙站点解绑设备时，删除相应的条目
 int whiteList_delete_service_request_handler(const Request& request, Response& response);
 
-//获取设备列表，返回给智慧安装app
-int getAllDeviceList_service_request_handler(const Request& request, Response& response);
-
-//电视发声
-int tvSound_service_request_handler(const Request& request, Response& response);
-
 //获取场景配置文件
-int getConfigFile_service_request_handler(const Request& request, Response& response);
+int getSceneFile_service_request_handler(const Request& request, Response& response);
 
 //保存场景配置文件
-int saveConfigFile_service_request_handler(const Request& request, Response& response);
+int saveSceneFile_service_request_handler(const Request& request, Response& response);
 
+//场景文件同步保存
+int saveSceneFile_sync_service_request_handler(const Request& request, Response& response);
 
+//获取设备列表，返回给智慧安装app
+int getAllDeviceList_service_request_handler(const Request& request, Response& response);
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

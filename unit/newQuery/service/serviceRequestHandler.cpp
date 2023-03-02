@@ -125,22 +125,16 @@ int site_getLocalAreaNetworkSiteInfoExceptOwn_service_handler(const Request& req
     return 0;
 }
 
-void site_query_node2node_message_handler(const Request& request){
-    qlibc::QData reqData(request.body);
-    LOG_INFO << "Received node2node_message: " << reqData.toJsonString();
-    reqData.setString("message_id", Site_OnOffLine_MessageID);
-    qlibc::QData content = reqData.getData("content");
-    //更新局域网内发现的主机下的站点信息
-    SiteTree::getInstance()->updateFindSite(content);
-#if 0
-    //发布其它节点站点的上下线消息
-    ServiceSiteManager::getInstance()->publishMessage(Site_OnOffLine_MessageID, reqData.toJsonString());
-    LOG_INFO << "Publish onoffline: " << reqData.toJsonString();
-#endif
-}
-
 int printIpAddress(const Request& request, Response& response){
     qlibc::QData data = SiteTree::getInstance()->printIpAddress();
     response.set_content(data.toJsonString(), "text/json");
     return 0;
 }
+
+void site_OnOff_node2node_message_handler(const Request& request){
+    qlibc::QData reqData(request.body);
+    LOG_INFO << "Received node2node_message: " << reqData.toJsonString();
+    qlibc::QData content = reqData.getData("content");
+    SiteTree::getInstance()->updateFindSite(content);   //更新局域网内发现的主机下的站点信息
+}
+

@@ -27,24 +27,11 @@ int main(int argc, char* argv[]){
     string path = "/data/changhong/edge_midware/lhy/querySiteLog.txt";
     muduo::logInitLogger(path);
 
-    httplib::ThreadPool threadPool_(20);
-
-    // 创建 serviceSiteManager 对象, 单例
-    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
+    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance(); // 创建 serviceSiteManager 对象, 单例
     serviceSiteManager->setServerPort(QuerySitePort);
     serviceSiteManager->setSiteIdSummary(QuerySiteID, QuerySiteName);
-
-    //获取单例对象
-    SiteTree::getInstance()->init();
-
-    //注册本站点发布的消息
-    serviceSiteManager->registerMessageId(Node2Node_MessageID);             //节点消息通道
-    serviceSiteManager->registerMessageId(Site_OnOffLine_MessageID);        //上下线消息
-    serviceSiteManager->registerMessageId(Site_RegisterAgain_MessageID);    //重新注册消息
-    serviceSiteManager->registerMessageId(Site_Requery_Result_MessageID);   //站点查询结果消息
-
-    //注册其它查询节点发布消息处理函数
-    serviceSiteManager->registerMessageHandler( Node2Node_MessageID, site_query_node2node_message_handler);
+    SiteTree::getInstance()->init();     //获取单例对象
+    httplib::ThreadPool threadPool_(20);
 
     //站点注册服务
     serviceSiteManager->registerServiceRequestHandler(Site_Register_Service_ID,
@@ -94,6 +81,15 @@ int main(int argc, char* argv[]){
         return printIpAddress(request, response);
     });
 
+    //注册本站点发布的消息
+    serviceSiteManager->registerMessageId(Site_OnOff_Node2Node_MessageID);             //节点消息通道
+    serviceSiteManager->registerMessageId(Site_OnOffLine_MessageID);        //上下线消息
+    serviceSiteManager->registerMessageId(Site_RegisterAgain_MessageID);    //重新注册消息
+    serviceSiteManager->registerMessageId(Site_Requery_Result_MessageID);   //站点查询结果消息
+
+    //注册其它查询节点发布消息处理函数
+    serviceSiteManager->registerMessageHandler( Site_OnOff_Node2Node_MessageID, site_OnOff_node2node_message_handler);
+
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){
@@ -116,9 +112,7 @@ int main(int argc, char* argv[]){
     registerAgain.setString("message_id", Site_RegisterAgain_MessageID);
     registerAgain.putData("content", qlibc::QData(Json::Value(Json::objectValue)));
     serviceSiteManager->publishMessage(Site_RegisterAgain_MessageID, registerAgain.toJsonString());
-    LOG_INFO << "registerAgain: " << registerAgain.toJsonString(true);
-    LOG_PURPLE << "===>publish registerAgain message to notify all other sites to register again....";
-
+    LOG_PURPLE << "Notify all other sites to register again: " << registerAgain.toJsonString(true);
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(60 *10));

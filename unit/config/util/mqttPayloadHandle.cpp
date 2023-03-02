@@ -113,27 +113,23 @@ qlibc::QData mqttPayloadHandle::transform(const char* payloadReceive, int len){
 bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int len) {
     //转换白名单格式
     qlibc::QData payload = transform(payloadReceive, len);
-
     //存储转换后的白名单
     configParamUtil::getInstance()->saveWhiteListData(payload);
 
-    //发布
+    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
+    //发布白名单
     qlibc::QData publishData;
     publishData.setString("message_id", "whiteList");
     publishData.putData("content", payload);
-    LOG_INFO << "--->publishData: " << publishData.toJsonString();
+    serviceSiteManager->publishMessage(WHITELIST_MESSAGE_ID, publishData.toJsonString());
+    LOG_PURPLE << "......publish whiteList to third party............";
 
+    //通知智慧安装app，收到了白名单
     qlibc::QData receivedData;
     receivedData.setString("message_id", "receivedWhiteList");
     receivedData.putData("content", qlibc::QData());
-
-    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-    serviceSiteManager->publishMessage(WHITELIST_MESSAGE_ID, publishData.toJsonString());
     serviceSiteManager->publishMessage(RECEIVED_WHITELIST_ID, receivedData.toJsonString());
-
-
-    LOG_PURPLE << "......publish whiteList............";
-    LOG_PURPLE << "......publish receivedWhiteList............";
+    LOG_PURPLE << "......publish to app, config site receivedWhiteList............";
 
     return true;
 }

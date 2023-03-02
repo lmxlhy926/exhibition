@@ -15,13 +15,13 @@ configParamUtil *configParamUtil::getInstance() {
     return instance;
 }
 
+string configParamUtil::getconfigPath() {
+    return dataDirPath;
+}
+
 void configParamUtil::setConfigPath(const string& configPath) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     dataDirPath = configPath;
-}
-
-string configParamUtil::getconfigPath() {
-    return dataDirPath;
 }
 
 QData configParamUtil::getBaseInfo() {
