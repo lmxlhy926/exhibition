@@ -11,8 +11,8 @@
 #include "service/serviceRequestHandler.h"
 #include "param.h"
 #include "common/httpUtil.h"
-#include "deviceGroupManage/deviceManager.h"
-#include "deviceGroupManage/groupManager.h"
+#include "sourceManage/deviceManager.h"
+#include "sourceManage/groupManager.h"
 #include "log/Logging.h"
 
 using namespace std;
@@ -34,48 +34,25 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setSiteIdSummary(SynergySiteID, SynergySiteName);
 
     //单例对象
+    SiteRecord::getInstance()->addSite(SceneSiteID, RequestIp, SceneSitePort);  //加入场景站点
     DeviceManager::getInstance();
     GroupManager::getInstance();
 
     //站点请求管理
-    SiteRecord::getInstance()->addSite(SceneSiteID, RequestIp, SceneSitePort);  //加入场景站点
-
     serviceSiteManager->registerMessageId(Scene_Msg_MessageID);   //场景指令消息
 
+
+//注册服务
     //设备控制 + 场景命令
     serviceSiteManager->registerServiceRequestHandler(Control_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return synergy::cloudCommand_service_handler(request, response);
     });
 
-    //获取设备列表：蓝牙，zigbee, tv_adapter
-    serviceSiteManager->registerServiceRequestHandler(GetDeviceList_Service_ID,
-                                                      [](const Request& request, Response& response) -> int{
-        return synergy::getDeviceList_service_handler(request, response);
-    });
-
-    //获取分组列表: 蓝牙，zigbee, tv_adapter
-    serviceSiteManager->registerServiceRequestHandler(GetGroupList_Service_ID,
-                                                      [](const Request& request, Response& response) -> int{
-        return synergy::getGroupList_service_handler(request, response);
-    });
-
     //语音控制服务
     serviceSiteManager->registerServiceRequestHandler(VoiceControl_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
         return synergy::voiceControl_service_handler(request, response);
-    });
-
-    //设备控制服务
-    serviceSiteManager->registerServiceRequestHandler(DeviceControl_Service_ID,
-                                                      [](const Request& request, Response& response) -> int{
-        return synergy::deviceControl_service_handler(request, response);
-    });
-
-    //分组控制服务
-    serviceSiteManager->registerServiceRequestHandler(GroupControl_Service_ID,
-                                                      [](const Request& request, Response& response) -> int{
-        return synergy::groupControl_service_handler(request, response);
     });
 
     //蓝牙设备注册服务
@@ -89,6 +66,86 @@ int main(int argc, char* argv[]) {
                                                       [](const Request& request, Response& response)->int{
         return synergy::bleDeviceOperation_service_handler(request, response);
     });
+
+
+
+    //注册重置网关回调
+    serviceSiteManager->registerServiceRequestHandler(Reset_Device_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::reset_device_service_handler(request, response);
+    });
+
+    //注册设备扫描回调
+    serviceSiteManager->registerServiceRequestHandler(Scan_Device_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::scan_device_service_handler(request, response);
+    });
+
+    //注册设备绑定回调
+    serviceSiteManager->registerServiceRequestHandler(Add_Device_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::add_device_service_handler(request, response);
+    });
+
+    //注册设备解绑回调
+    serviceSiteManager->registerServiceRequestHandler(Del_Device_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::del_device_service_handler(request, response);
+    });
+
+    //注册设备控制回调
+    serviceSiteManager->registerServiceRequestHandler(Control_Device_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::deviceControl_service_handler(request, response);
+    });
+
+
+    //获取设备列表
+    serviceSiteManager->registerServiceRequestHandler(Get_DeviceList_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::getDeviceList_service_handler(request, response);
+    });
+
+    //获取设备状态
+    serviceSiteManager->registerServiceRequestHandler(Get_DeviceState_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::get_device_state_service_handler(request, response);
+    });
+
+
+    //创建分组
+    serviceSiteManager->registerServiceRequestHandler(CreateGroup_Device_Service_ID, synergy::create_group_service_handler);
+
+    //删除分组
+    serviceSiteManager->registerServiceRequestHandler(DeleteGroup_Device_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::delete_group_service_handler(request, response);
+    });
+
+    //重命名分组
+    serviceSiteManager->registerServiceRequestHandler(RenameGroup_Device_Service_ID, synergy::rename_group_service_handler);
+
+    //添加设备进分组
+    serviceSiteManager->registerServiceRequestHandler(AddDevice2Group_Device_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::addDevice2Group_service_handler(request, response);
+    });
+
+
+    //从分组删除设备
+    serviceSiteManager->registerServiceRequestHandler(RemoveDeviceFromGroup_Device_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::removeDeviceFromGroup_service_handler(request, response);
+    });
+
+    //控制分组
+    serviceSiteManager->registerServiceRequestHandler(ControlGroup_Device_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::groupControl_service_handler(request, response);
+    });
+
+    //获取分组列表
+    serviceSiteManager->registerServiceRequestHandler(GetGroupList_Device_Service_ID, synergy::getGroupList_service_handler);
 
 
 #if 0
@@ -123,9 +180,9 @@ int main(int argc, char* argv[]) {
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-//            int code = serviceSiteManager->start();
+            int code = serviceSiteManager->start();
             //注册启动方式
-            int code = serviceSiteManager->startByRegister();
+//            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 std::cout << "===>synergySite startByRegister error, code = " << code << std::endl;
                 std::cout << "===>synergySite startByRegister in 3 seconds...." << std::endl;

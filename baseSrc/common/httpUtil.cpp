@@ -27,6 +27,7 @@ bool SingleSite::send(qlibc::QData &request, qlibc::QData &response) {
        clientptr = new Client(siteIp, sitePort);
        clientptr->set_keep_alive(true);
        clientptr->set_connection_timeout(1, 0);
+       clientptr->set_read_timeout(30, 0);
     }
 
     if(!clientptr->is_socket_open()){
@@ -37,6 +38,7 @@ bool SingleSite::send(qlibc::QData &request, qlibc::QData &response) {
        clientptr = new Client(siteIp, sitePort);
        clientptr->set_keep_alive(true);
        clientptr->set_connection_timeout(1, 0);
+       clientptr->set_read_timeout(30, 0);
     }
 
     httplib::Result result =  clientptr->Post("/", request.toJsonString(), "text/json");

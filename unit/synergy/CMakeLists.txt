@@ -1,10 +1,10 @@
-FILE(GLOB controlSrc "control/*.cpp")
-FILE(GLOB deviceGroupSrc "deviceGroupManage/*.cpp")
-FILE(GLOB serviceSrc "service/*.cpp")
-FILE(GLOB voiceControlSrc "voiceControl/*.cpp")
+FILE(GLOB controlSrc        "control/*.cpp")
+FILE(GLOB sourceManageSrc   "sourceManage/*.cpp")
+FILE(GLOB serviceSrc        "service/*.cpp")
+FILE(GLOB voiceControlSrc   "voiceControl/*.cpp")
 
 set(src ${controlSrc}
-        ${deviceGroupSrc}
+        ${sourceManageSrc}
         ${serviceSrc}
         ${voiceControlSrc})
 

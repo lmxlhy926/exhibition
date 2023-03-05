@@ -34,13 +34,28 @@ static const int QuerySitePort = 9000;
 
 //服务ID
 static const string Control_Service_ID              = "cloudCommand";
-static const string GetDeviceList_Service_ID        = "get_device_list";
-static const string GetGroupList_Service_ID         = "get_group_list";
 static const string VoiceControl_Service_ID         = "voiceControl";
-static const string DeviceControl_Service_ID        = "control_device";
-static const string GroupControl_Service_ID         = "control_group";
 static const string BleGroupRegister_Service_ID     = "register_bleGroup";
 static const string BleDeviceOperation_Service_ID   = "bleDeviceOperation";
+
+
+//服务ID
+static const string Reset_Device_Service_ID               = "reset_device";                      //重置网关
+static const string Scan_Device_Service_ID                = "scan_device";                       //扫描设备结果
+static const string Add_Device_Service_ID                 = "add_device";                        //添加设备
+static const string Del_Device_Service_ID                 = "del_device";                        //删除设备
+static const string Control_Device_Service_ID             = "control_device";                    //控制设备
+static const string Get_DeviceList_Service_ID             = "get_device_list";                   //获取设备列表
+static const string Get_DeviceState_Service_ID            = "get_device_state";                  //获取设备状态
+
+//组服务ID
+static const string CreateGroup_Device_Service_ID               = "create_group";                   //创建分组
+static const string DeleteGroup_Device_Service_ID               = "delete_group";                   //删除分组
+static const string RenameGroup_Device_Service_ID               = "rename_group";                   //重命名分组
+static const string AddDevice2Group_Device_Service_ID           = "add_device_to_group";            //添加设备进分组
+static const string RemoveDeviceFromGroup_Device_Service_ID     = "remove_device_from_group";       //从分组删除设备
+static const string ControlGroup_Device_Service_ID              = "control_group";                  //控制分组
+static const string GetGroupList_Device_Service_ID              = "get_group_list";                 //获取分组列表
 
 //订阅消息ID
 static const string DeviceList_changed_messageID = "deviceList_changed";

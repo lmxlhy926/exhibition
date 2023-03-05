@@ -9,6 +9,7 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
+#include "siteManager.h"
 
 class DeviceManager {
 private:
@@ -18,7 +19,7 @@ private:
     std::thread* updateListThread;
     const int updateListInterval = 10;
     DeviceManager(){
-        updateSite();
+        updateDeviceList();
         //开启线程定时更新设备列表
         updateListThread = new thread([this]{
             while(true){
@@ -35,23 +36,21 @@ public:
     //列表变更
     void listChanged();
 
-    void updateDeviceList();
-
     //获取设备列表
     qlibc::QData getAllDeviceList();
 
     //判断设备是否在设备列表里
-    bool isInDeviceList(string& device_id, string& sourceSite);
+    bool isInDeviceList(string& device_id, string& inSourceSite, string& outSourceSite);
+
+    //去掉来源标识，还原mac
+    qlibc::QData restoreMac(qlibc::QData& item, string& inSourceSite);
 
 private:
-    //更新站点记录
-    void updateSite();
+    //更新设备列表
+    void updateDeviceList();
 
-    //获取局域网所有设备列表
-    qlibc::QData getDeviceListAllLocalNet();
-
-    //增加站点标识
-    qlibc::QData addSourceTag(qlibc::QData deviceList, string sourceSite);
+    //设备mac后增加来源标识
+    qlibc::QData addMacSource(qlibc::QData deviceList, string sourceTag);
 
     //站点拼接
     void mergeList(qlibc::QData& list, qlibc::QData& totalList);

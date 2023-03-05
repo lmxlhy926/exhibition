@@ -16,13 +16,6 @@ GroupManager *GroupManager::getInstance() {
     return instance;
 }
 
-void GroupManager::updateGroupList(){
-    qlibc::QData list = getGroupListAllLocalNet();
-    std::lock_guard<std::mutex> lg(Mutex);
-    groupList = list;
-    init.store(true);
-}
-
 qlibc::QData GroupManager::getAllGroupList() {
     std::lock_guard<std::mutex> lg(Mutex);
     return groupList;
@@ -42,19 +35,21 @@ qlibc::QData GroupManager::getBleGroupList(){
     return bleGroupList;
 }
 
-bool GroupManager::isInGroupList(string& group_id, string& sourceSite, string& dongleId){
+bool GroupManager::isInGroupList(string& group_id, string& inSourceSite, string& outSourceSite){
     std::lock_guard<std::mutex> lg(Mutex);
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = groupList.getArrayElement(i);
-        if(item.getString("group_id") == group_id){
-            if(!dongleId.empty()){
-                if(item.getString("dongleId") == dongleId){
-                    sourceSite = item.getString("sourceSite");
-                    return true;
-                }
-            }else{
-                sourceSite = item.getString("sourceSite");
+        string itemGrpId = item.getString("group_id");
+        string transGrpId = group_id;
+        if(!inSourceSite.empty()){
+            transGrpId.append(">").append(inSourceSite);
+        }
+
+        if(itemGrpId == transGrpId){
+            smatch sm;
+            if(regex_match(itemGrpId, sm, regex("(.*)>(.*)"))){
+                outSourceSite = sm.str(2);
                 return true;
             }
         }
@@ -62,40 +57,57 @@ bool GroupManager::isInGroupList(string& group_id, string& sourceSite, string& d
     return false;
 }
 
-qlibc::QData GroupManager::getGroupListAllLocalNet(){
+qlibc::QData GroupManager::restoreGrp(qlibc::QData& item, string& inSourceSite){
+    if(inSourceSite.empty()){
+        string group_id = item.getString("group_id");
+        smatch sm;
+        if(regex_match(group_id, sm, regex("(.*)>(.*)"))){
+            group_id = sm.str(1);
+            item.setString("group_id", group_id);
+        }
+    }
+    item.removeMember("sourceSite");
+    return item;
+}
+
+void GroupManager::updateGroupList(){
+    siteManager::updateSite();
     qlibc::QData totalList;
     std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
-    for(auto& elem : siteNameSet){
-        LOG_INFO << "siteName: " << elem;
-    }
     smatch sm;
     for(auto& elem : siteNameSet){
         if(regex_match(elem, sm, regex("(.*):(.*)"))){
-            string ip = sm.str(1);
+            string uid = sm.str(1);
             string siteID = sm.str(2);
-            if((siteID == BleSiteID || siteID == ZigbeeSiteID) && ip != "127.0.0.1"){
+            if((siteID == BleSiteID || siteID == ZigbeeSiteID)){
                 qlibc::QData groupRequest;
                 groupRequest.setString("service_id", "get_group_list");
                 groupRequest.setValue("request", Json::nullValue);
                 qlibc::QData groupRes;
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), groupRequest, groupRes);     //获取组列表
-                qlibc::QData list = addSourceTag(groupRes.getData("response").getData("group_list"), sm.str(0));    //给组条目添加标签
+                qlibc::QData list = addGrpSourceTag(groupRes.getData("response").getData("group_list"),
+                                                 string().append(uid).append(":").append(siteID));    //给组条目添加标签
                 mergeList(list, totalList);
             }
         }
     }
-    return totalList;
+
+    std::lock_guard<std::mutex> lg(Mutex);
+    groupList = totalList;
+    init.store(true);
 }
 
-qlibc::QData GroupManager::addSourceTag(qlibc::QData deviceList, string sourceSite){
-    Json::ArrayIndex num = deviceList.size();
-    qlibc::QData newDeviceList;
+qlibc::QData GroupManager::addGrpSourceTag(qlibc::QData groupList, string grpSource){
+    Json::ArrayIndex num = groupList.size();
+    qlibc::QData newGroupList;
     for(Json::ArrayIndex i = 0; i < num; ++i){
-        qlibc::QData item = deviceList.getArrayElement(i);
-        item.setString("sourceSite", sourceSite);
-        newDeviceList.append(item);
+        qlibc::QData item = groupList.getArrayElement(i);
+        string group_id = item.getString("group_id");
+        group_id.append(">").append(grpSource);
+        item.setString("group_id", group_id);
+        newGroupList.append(item);
     }
-    return newDeviceList;
+    return newGroupList;
 }
 
 void GroupManager::mergeList(qlibc::QData &list, qlibc::QData &totalList) {

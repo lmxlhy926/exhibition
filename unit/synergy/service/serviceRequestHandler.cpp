@@ -10,8 +10,8 @@
 #include "common/httpUtil.h"
 #include "../control/downCommand.h"
 #include "log/Logging.h"
-#include "../deviceGroupManage/deviceManager.h"
-#include "../deviceGroupManage/groupManager.h"
+#include "../sourceManage/deviceManager.h"
+#include "../sourceManage/groupManager.h"
 #include "../control/sceneCommand.h"
 #include "../voiceControl/voiceStringMatch.h"
 #include <vector>
@@ -194,33 +194,6 @@ namespace synergy {
         return 0;
     }
 
-    int getDeviceList_service_handler(const Request &request, Response &response) {
-        LOG_INFO << "getDeviceList_service_handler";
-        qlibc::QData res;
-        res.putData("device_list", DeviceManager::getInstance()->getAllDeviceList());
-
-        qlibc::QData data;
-        data.setInt("code", 0);
-        data.setString("error", "ok");
-        data.putData("response", res);
-
-        response.set_content(data.toJsonString(), "text/json");
-        return 0;
-    }
-
-    int getGroupList_service_handler(const Request &request, Response &response) {
-        LOG_INFO << "getGroupList_service_handler";
-        qlibc::QData res;
-        res.putData("group_list", GroupManager::getInstance()->getAllGroupList());
-
-        qlibc::QData data;
-        data.setInt("code", 0);
-        data.setString("error", "ok");
-        data.putData("response", res);
-
-        response.set_content(data.toJsonString(), "text/json");
-        return 0;
-    }
 
     int voiceControl_service_handler(const Request& request, Response& response){
         LOG_INFO << "voiceControl_service_handler: " << qlibc::QData(request.body).toJsonString();
@@ -228,77 +201,6 @@ namespace synergy {
         string voiceControlString = requestData.getData("request").getString("controlString");
         voiceStringMatchControl voiceCtrl(voiceControlString);
         voiceCtrl.parseAndControl();
-        response.set_content(okResponse.dump(), "text/json");
-        return 0;
-    }
-
-    int deviceControl_service_handler(const Request& request, Response& response){
-        LOG_INFO << "deviceControl_service_handler: " << qlibc::QData(request.body).toJsonString();
-
-        std::map<string, qlibc::QData> controlDeviceListMap;
-        qlibc::QData controlDeviceList = qlibc::QData(request.body).getData("request").getData("device_list");
-        Json::ArrayIndex size = controlDeviceList.size();
-        for(Json::ArrayIndex i = 0; i < size; ++i){
-            qlibc::QData item = controlDeviceList.getArrayElement(i);
-            string device_id = item.getString("device_id");
-            string sourceSite;
-            if(DeviceManager::getInstance()->isInDeviceList(device_id, sourceSite)){    //待控制设备存在于设备列表中
-                //按设备来源归类设备
-                auto pos = controlDeviceListMap.find(sourceSite);
-                if(pos != controlDeviceListMap.end()){
-                    pos->second.append(item);
-                }else{
-                    controlDeviceListMap.insert(std::make_pair(sourceSite, qlibc::QData().append(item)));
-                }
-            }
-        }
-
-        //发送控制命令到相应的站点
-        for(auto& elem : controlDeviceListMap){    //按设备来源发送命令
-            qlibc::QData controlRequest, controlResponse;
-            controlRequest.setString("service_id", "control_device");
-            controlRequest.putData("request", qlibc::QData().putData("device_list", elem.second));
-            LOG_GREEN << elem.first << "controlRequest: " << controlRequest.toJsonString();
-            SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
-            LOG_BLUE << elem.first << " controlResponse: " << controlResponse.toJsonString();
-        }
-
-        response.set_content(okResponse.dump(), "text/json");
-        return 0;
-    }
-
-
-    int groupControl_service_handler(const Request& request, Response& response){
-        LOG_INFO << "groupControl_service_handler: " << qlibc::QData(request.body).toJsonString();
-        //判断设备属于哪个站点
-        std::map<string, qlibc::QData> controlGroupListMap;
-        qlibc::QData controlGroupList = qlibc::QData(request.body).getData("request").getData("group_list");
-        Json::ArrayIndex size = controlGroupList.size();
-        for(Json::ArrayIndex i = 0; i < size; ++i){
-            qlibc::QData item = controlGroupList.getArrayElement(i);
-            string group_id = item.getString("group_id");
-            string dongleId = item.getString("dongleId");
-            string sourceSite;
-            if(GroupManager::getInstance()->isInGroupList(group_id, sourceSite, dongleId)){
-                auto pos = controlGroupListMap.find(sourceSite);
-                if(pos != controlGroupListMap.end()){
-                    pos->second.append(item);
-                }else{
-                    controlGroupListMap.insert(std::make_pair(sourceSite, qlibc::QData().append(item)));
-                }
-            }
-        }
-
-        //发送控制命令到相应的站点
-        for(auto& elem : controlGroupListMap){
-            qlibc::QData controlRequest, controlResponse;
-            controlRequest.setString("service_id", "control_group");
-            controlRequest.putData("request", qlibc::QData().putData("group_list", elem.second));
-            LOG_GREEN << elem.first << "controlRequest: " << controlRequest.toJsonString();
-            SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
-            LOG_BLUE << elem.first << " controlResponse: " << controlResponse.toJsonString();
-        }
-
         response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
@@ -345,6 +247,198 @@ namespace synergy {
     int bleDeviceOperation_service_handler(const Request& request, Response& response){
         LOG_INFO << qlibc::QData(request.body).toJsonString(true);
         response.set_content(okResponse.dump(), "text/json");
+        return 0;
+    }
+
+
+    void sendRequest(const Request& request, Response& response){
+        qlibc::QData requestData(request.body), responseData;
+        string sourceSite = requestData.getData("request").getString("sourceSite");
+        requestData.asValue()["request"].removeMember("sourceSite");
+        std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
+        for(auto& siteName : siteNames){
+            if(siteName == sourceSite){
+                SiteRecord::getInstance()->sendRequest2Site(siteName, requestData, responseData);
+                LOG_INFO << "responseData: " << responseData.toJsonString();
+                response.set_content(responseData.toJsonString(), "text/json");
+                break;
+            }
+        }
+    }
+
+
+//重置网关
+    int reset_device_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->reset_device_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//扫描设备
+    int scan_device_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->scan_device_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//添加设备
+    int add_device_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->add_device_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//删除设备
+    int del_device_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->del_device_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//设备控制
+    int deviceControl_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->deviceControl_service_handler: " << qlibc::QData(request.body).toJsonString();
+        std::map<string, qlibc::QData> controlDeviceListMap;
+        qlibc::QData controlDeviceList = qlibc::QData(request.body).getData("request").getData("device_list");
+        Json::ArrayIndex size = controlDeviceList.size();
+        for(Json::ArrayIndex i = 0; i < size; ++i){
+            qlibc::QData item = controlDeviceList.getArrayElement(i);
+            string device_id = item.getString("device_id");
+            string inSourceSite = item.getString("sourceSite");
+            string outSourceSite;
+            if(DeviceManager::getInstance()->isInDeviceList(device_id, inSourceSite, outSourceSite)){    //待控制设备存在于设备列表中
+                //按设备来源归类设备
+                auto pos = controlDeviceListMap.find(outSourceSite);
+                if(pos != controlDeviceListMap.end()){
+                    pos->second.append(DeviceManager::getInstance()->restoreMac(item, inSourceSite));
+                }else{
+                    controlDeviceListMap.insert(
+                            std::make_pair(outSourceSite,qlibc::QData().append(DeviceManager::getInstance()->restoreMac(item, inSourceSite))));
+                }
+            }
+        }
+
+        //发送控制命令到相应的站点
+        for(auto& elem : controlDeviceListMap){    //按设备来源发送命令
+            qlibc::QData controlRequest, controlResponse;
+            controlRequest.setString("service_id", "control_device");
+            controlRequest.putData("request", qlibc::QData().putData("device_list", elem.second));
+            LOG_GREEN << elem.first << "controlRequest: " << controlRequest.toJsonString();
+            SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
+            LOG_BLUE << elem.first << " controlResponse: " << controlResponse.toJsonString();
+        }
+
+        response.set_content(okResponse.dump(), "text/json");
+        return 0;
+    }
+
+//获取设备列表：ble, zigbee, tvAdapter
+    int getDeviceList_service_handler(const Request &request, Response &response) {
+        LOG_INFO << "synergy->getDeviceList_service_handler";
+        qlibc::QData res;
+        res.putData("device_list", DeviceManager::getInstance()->getAllDeviceList());
+
+        qlibc::QData data;
+        data.setInt("code", 0);
+        data.setString("error", "ok");
+        data.putData("response", res);
+
+        response.set_content(data.toJsonString(), "text/json");
+        return 0;
+    }
+
+//获取设备状态
+    int get_device_state_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->get_device_state_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//创建分组
+    int create_group_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->create_group_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//删除分组，删除前先将设备移除分组
+    int delete_group_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->delete_group_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//重命名分组
+    int rename_group_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->rename_group_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//添加设备进入分组
+    int addDevice2Group_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->addDevice2Group_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//从分组移除设备
+    int removeDeviceFromGroup_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->removeDeviceFromGroup_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//组控制
+    int groupControl_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->groupControl_service_handler: " << qlibc::QData(request.body).toJsonString();
+        //判断设备属于哪个站点
+        std::map<string, qlibc::QData> controlGroupListMap;
+        qlibc::QData controlGroupList = qlibc::QData(request.body).getData("request").getData("group_list");
+        Json::ArrayIndex size = controlGroupList.size();
+        for(Json::ArrayIndex i = 0; i < size; ++i){
+            qlibc::QData item = controlGroupList.getArrayElement(i);
+            string group_id = item.getString("group_id");
+            string inSourceSite = item.getString("sourceSite");
+            string outSourceSite;
+            if(GroupManager::getInstance()->isInGroupList(group_id, inSourceSite,outSourceSite)){
+                auto pos = controlGroupListMap.find(outSourceSite);
+                if(pos != controlGroupListMap.end()){
+                    pos->second.append(GroupManager::getInstance()->restoreGrp(item, inSourceSite));
+                }else{
+                    controlGroupListMap.insert(std::make_pair(outSourceSite,
+                                                              qlibc::QData().append(GroupManager::getInstance()->restoreGrp(item, inSourceSite))));
+                }
+            }
+        }
+
+        //发送控制命令到相应的站点
+        for(auto& elem : controlGroupListMap){
+            qlibc::QData controlRequest, controlResponse;
+            controlRequest.setString("service_id", "control_group");
+            controlRequest.putData("request", qlibc::QData().putData("group_list", elem.second));
+            LOG_GREEN << elem.first << "controlRequest: " << controlRequest.toJsonString();
+            SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
+            LOG_BLUE << elem.first << " controlResponse: " << controlResponse.toJsonString();
+        }
+
+        response.set_content(okResponse.dump(), "text/json");
+        return 0;
+    }
+
+//获取分组列表：ble, zigbee
+    int getGroupList_service_handler(const Request &request, Response &response) {
+        LOG_INFO << "synergy->getGroupList_service_handler: " << qlibc::QData(request.body).toJsonString();
+        LOG_INFO << "getGroupList_service_handler";
+        qlibc::QData res;
+        res.putData("group_list", GroupManager::getInstance()->getAllGroupList());
+
+        qlibc::QData data;
+        data.setInt("code", 0);
+        data.setString("error", "ok");
+        data.putData("response", res);
+
+        response.set_content(data.toJsonString(), "text/json");
         return 0;
     }
 

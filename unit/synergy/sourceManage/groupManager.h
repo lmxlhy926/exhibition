@@ -9,6 +9,7 @@
 #include "qlibc/QData.h"
 #include <mutex>
 #include <thread>
+#include "siteManager.h"
 
 class GroupManager {
 private:
@@ -32,9 +33,6 @@ private:
 public:
     static GroupManager* getInstance();
 
-    //更新组列表
-    void updateGroupList();
-
     //获取设备列表
     qlibc::QData getAllGroupList();
 
@@ -42,14 +40,17 @@ public:
     qlibc::QData getBleGroupList();
 
     //是否在组列表中
-    bool isInGroupList(string& group_id, string& sourceSite, string& dongleId);
+    bool isInGroupList(string& group_id, string& inSourceSite, string& outSourceSite);
+
+    //去掉来源标识，还原组
+    qlibc::QData restoreGrp(qlibc::QData& item, string& inSourceSite);
 
 private:
-    //获取组列表
-    qlibc::QData getGroupListAllLocalNet();
+    //更新组列表
+    void updateGroupList();
 
-    //增加站点标识
-    qlibc::QData addSourceTag(qlibc::QData deviceList, string sourceSite);
+    //增加组来源标识
+    qlibc::QData addGrpSourceTag(qlibc::QData groupList, string grpSource);
 
     //站点拼接
     void mergeList(qlibc::QData& list, qlibc::QData& totalList);
