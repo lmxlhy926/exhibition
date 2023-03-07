@@ -250,6 +250,151 @@ namespace synergy {
         return 0;
     }
 
+    int updateWhiteList_service_handler(const Request& request, Response& response){
+        LOG_INFO << "updateWhiteList_service_handler...";
+        //更新并获取设备列表
+        DeviceManager::getInstance()->updateDeviceList();
+        qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
+        Json::ArrayIndex deviceListSize = deviceList.size();
+
+        //将设备列表转换为白名单格式
+        qlibc::QData transDeviceList;
+        for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+            qlibc::QData item = deviceList.getArrayElement(i);
+            string device_id = item.getString("device_id");
+            smatch sm;
+            if(regex_match(device_id, sm, regex("(.*)>(.*)"))){
+                device_id = sm.str(1);
+            }
+            qlibc::QData newItem;
+            newItem.setString("category_code", item.getString("device_type"));
+            newItem.setString("device_sn", device_id);
+            newItem.setString("device_type", item.getString("device_typeCode"));
+            newItem.setString("device_model", item.getString("device_modelCode"));
+            newItem.setString("room_name", item.getData("location").getString("room_name"));
+            newItem.setString("room_no", item.getData("location").getString("room_no"));
+            transDeviceList.append(newItem);
+        }
+
+        //提取所有灯具设备
+        std::map<string, Json::Value> lightDeviceMap;
+        for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+            qlibc::QData item = transDeviceList.getArrayElement(i);
+            if(item.getString("category_code") == "LIGHT"){
+                lightDeviceMap.insert(std::make_pair(item.getString("device_sn"), item.asValue()));
+            }
+        }
+
+        //获取白名单列表
+        qlibc::QData whiteListRequest, whiteListResponse, originWhiteList;
+        whiteListRequest.setString("service_id", "whiteListRequest");
+        whiteListRequest.putData("request", qlibc::QData());
+        if(httpUtil::sitePostRequest("127.0.0.1", 9006, whiteListRequest, whiteListResponse)){
+            if(whiteListResponse.getInt("code") == 0){
+                originWhiteList = whiteListResponse.getData("response");
+            }else{
+                qlibc::QData ret;
+                ret.setInt("code", -1);
+                ret.setString("msg", "cant get whiteList");
+                response.set_content(ret.toJsonString(), "text/json");
+                return 0;
+            }
+        }else{
+            qlibc::QData ret;
+            ret.setInt("code", -1);
+            ret.setString("msg", "cant get whiteList");
+            response.set_content(ret.toJsonString(), "text/json");
+            return 0;
+        }
+
+        bool changed = false;
+        bool updateSuccess = false;
+
+        //构造白名单设备Map
+        std::map<string, Json::Value> originWhiteDeviceMap;
+        qlibc::QData originWhiteListDevices = originWhiteList.getData("info").getData("devices");
+        size_t originWhiteListSize = originWhiteListDevices.size();
+        for(Json::ArrayIndex i = 0; i < originWhiteListSize; ++i){
+            qlibc::QData item = originWhiteListDevices.getArrayElement(i);
+            originWhiteDeviceMap.insert(std::make_pair(item.getString("device_sn"), item.asValue()));
+        }
+
+        //删除灯具列表中不存在的设备
+        for(auto pos = originWhiteDeviceMap.begin(); pos != originWhiteDeviceMap.end();){
+            if(pos->second["category_code"].asString() == "LIGHT"){
+                if(lightDeviceMap.find(pos->first) == lightDeviceMap.end()){
+                    pos = originWhiteDeviceMap.erase(pos);
+                    changed = true;
+                }else{
+                    pos++;
+                }
+            }else{
+                pos++;
+            }
+        }
+
+        //添加灯具列表中存在但是白名单中却没有的设备
+        for(auto pos = lightDeviceMap.begin(); pos != lightDeviceMap.end(); ++pos){
+            if(originWhiteDeviceMap.find(pos->first) == originWhiteDeviceMap.end()){
+                originWhiteDeviceMap.insert(std::make_pair(pos->first, pos->second));
+                changed = true;
+            }
+        }
+
+        //如果白名单有更改，则更新白名单
+        if(changed){
+            qlibc::QData newDeviceList;
+            for(auto& item : originWhiteDeviceMap){
+                newDeviceList.append(item.second);
+            }
+            originWhiteList.asValue()["info"]["devices"] = newDeviceList.asValue();
+            originWhiteList.asValue()["timeStamp"] = std::to_string(time(nullptr));
+
+            //存储白名单
+            qlibc::QData whiteRequest, whiteResponse;
+            whiteRequest.setString("service_id", "whiteListSaveRequest");
+            whiteRequest.putData("request", originWhiteList);
+            if(httpUtil::sitePostRequest("127.0.0.1", 9006, whiteRequest, whiteResponse)){
+                if(whiteResponse.getInt("code") == 0){
+                    updateSuccess = true;
+                }
+            }
+        }
+
+        if(updateSuccess){
+            qlibc::QData ret;
+            ret.setInt("code", 0);
+            ret.setString("msg", "udpate success");
+            response.set_content(ret.toJsonString(), "text/json");
+        }else{
+            qlibc::QData ret;
+            ret.setInt("code", 0);
+            ret.setString("msg", "nothing needed to change");
+            response.set_content(ret.toJsonString(), "text/json");
+        }
+        return 0;
+    }
+
+    int updateDeviceList_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->updateDeviceList_service_handler...";
+        DeviceManager::getInstance()->updateDeviceList();
+        qlibc::QData ret;
+        ret.setInt("code", 0);
+        ret.setString("msg", "success");
+        response.set_content(ret.toJsonString(), "text/json");
+        return 0;
+    }
+
+    int updateGroupList_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->updateGroupList_service_handler...";
+        GroupManager::getInstance()->updateGroupList();
+        qlibc::QData ret;
+        ret.setInt("code", 0);
+        ret.setString("msg", "success");
+        response.set_content(ret.toJsonString(), "text/json");
+        return 0;
+    }
+
 
     void sendRequest(const Request& request, Response& response){
         qlibc::QData requestData(request.body), responseData;

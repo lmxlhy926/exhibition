@@ -185,34 +185,41 @@ int main(int argc, char* argv[]) {
 
 
     //注册白名单改变助理函数
-    serviceSiteManager->registerMessageHandler(WhiteList_Changed, updateDeviceList);
+    serviceSiteManager->registerMessageHandler(WHITELIST_MODIFIED_MESSAGE_ID, updateDeviceList);
 
-    //订阅白名单改变消息，收到消息后，将白名单配置的设备属性信息同步到蓝牙设备列表
+
+    //提取蓝牙站点设备列表，定时配置站点白名单进行更新
+    threadPool_.enqueue([](){
+        while(true){
+            util::updateWhiteDeviceList();
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+        }
+    });
+
+
+    //白名单被app修改，将白名单配置的设备属性信息同步到蓝牙设备列表
 //    threadPool_.enqueue([&](){
 //        while(true){
 //            int code;
 //            std::vector<string> messageIdList;
-//            messageIdList.push_back(WhiteList_Changed);
+//            messageIdList.push_back(WHITELIST_MODIFIED_MESSAGE_ID);
 //            code = serviceSiteManager->subscribeMessage(LocalIp, ConfigPort, messageIdList);
-//
 //            if (code == ServiceSiteManager::RET_CODE_OK) {
-//                printf("subscribeMessage whiteListModifiedByAppMsg ok.\n");
+//                printf("subscribeMessage whiteListModified ok.\n");
 //                break;
 //            }
-//
 //            std::this_thread::sleep_for(std::chrono::seconds(3));
-//            printf("subscribed whiteListModifiedByAppMsg failed....., start to subscribe in 3 seconds\n");
+//            LOG_RED << "subscribed whiteListModified failed....., start to subscribe in 3 seconds";
 //        }
 //    });
-
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-//            int code = serviceSiteManager->start();
+            int code = serviceSiteManager->start();
             //注册启动方式
-            int code = serviceSiteManager->startByRegister();
+//            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 LOG_RED << "===>bleSite startByRegister error, code = " << code;
                 LOG_RED << "===>bleSite startByRegister in 3 seconds....";
@@ -223,19 +230,6 @@ int main(int argc, char* argv[]) {
             }
         }
     });
-
-    //定时更新配置站点白名单，将绑定的灯的信息同步到白名单
-//    threadPool_.enqueue([](){
-//        while(true){
-//            std::this_thread::sleep_for(std::chrono::seconds(10));
-//            qlibc::QData request;
-//            request.setString("service_id", "whiteListUpdateRequest");
-//            request.putData("request", bleConfig::getInstance()->getDeviceListData());
-//            qlibc::QData response;
-//            SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, request, response);
-//            LOG_INFO << "==>updateDeviceList2ConfigSite";
-//        }
-//    });
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(60 *10));

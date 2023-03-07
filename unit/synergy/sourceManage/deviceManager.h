@@ -45,10 +45,10 @@ public:
     //去掉来源标识，还原mac
     qlibc::QData restoreMac(qlibc::QData& item, string& inSourceSite);
 
-private:
     //更新设备列表
     void updateDeviceList();
 
+private:
     //设备mac后增加来源标识
     qlibc::QData addMacSource(qlibc::QData deviceList, string sourceTag);
 

@@ -19,6 +19,7 @@
 #include "sourceManage/bleConfig.h"
 #include "common/httpUtil.h"
 #include "deviceTypeExtract.h"
+#include "../sourceManage/util.h"
 
 using namespace servicesite;
 using namespace std;
@@ -320,17 +321,7 @@ public:
         LOG_PURPLE << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
 
         //更新config白名单列表
-        Json::Value deviceItem, device_list, device_list_content;
-        deviceItem["device_id"] = deviceSn;
-        device_list[0] = deviceItem;
-        device_list_content["device_list"] = device_list;
-
-        qlibc::QData request;
-        request.setString("service_id", "whiteListDeleteRequest");
-        request.putData("request", qlibc::QData(device_list_content));
-        qlibc::QData response;
-        SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, request, response);
-        LOG_INFO << "==>deleteDeviceList2ConfigSite: " << request.toJsonString();
+        util::updateWhiteDeviceList();
 
         //发布设备解绑消息
         qlibc::QData content, publishData;

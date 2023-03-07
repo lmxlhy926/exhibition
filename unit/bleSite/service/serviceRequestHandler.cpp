@@ -14,6 +14,7 @@
 #include "serviceRequestHandler.h"
 #include "siteService/nlohmann/json.hpp"
 #include <regex>
+#include "../sourceManage/util.h"
 
 
 static const nlohmann::json okResponse = {
@@ -560,19 +561,22 @@ int getGroupList_service_handler(const Request& request, Response& response){
  */
 void updateDeviceList(const Request& request){
     //获取白名单列表
-    LOG_INFO << "updateDeviceList: " << request.body;
+    LOG_INFO << "==>update deviceList property according to whiteList: " << request.body;
+    //获取本机配置站点白名单
     qlibc::QData whiteListRequest, whiteListResponse;
     whiteListRequest.setString("service_id", "whiteListRequest");
     whiteListRequest.putData("request", qlibc::QData());
     SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, whiteListRequest, whiteListResponse);
 
     if(whiteListResponse.getInt("code") == 0){
+        //提取出白名单设备列表
         qlibc::QData configWhiteListDevices = whiteListResponse.getData("response").getData("info").getData("devices");
         size_t configWhiteListDevicesSize = configWhiteListDevices.size();
         if(0 == configWhiteListDevicesSize){
             return;
         }
 
+        //提取出白名单设备列表中的灯列表
         qlibc::QData lightDevices;
         for(int i = 0; i < configWhiteListDevicesSize; ++i){
             qlibc::QData item = configWhiteListDevices.getArrayElement(i);
@@ -586,39 +590,38 @@ void updateDeviceList(const Request& request){
             return;
         }
 
+        //提取蓝牙设备列表
         qlibc::QData deviceList = bleConfig::getInstance()->getDeviceListData().getData("device_list");
         size_t deviceListSize = deviceList.size();
-        qlibc::QData newDeviceList;
 
+        qlibc::QData newDeviceList;
         for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
             qlibc::QData deviceItem =  deviceList.getArrayElement(i);
-
             for(Json::ArrayIndex j = 0; j < lightDeviceSize; ++j){
-                qlibc::QData configDevice = lightDevices.getArrayElement(j);
-
-                if(configDevice.getString("device_sn") == deviceItem.getString("device_id")){
+                qlibc::QData lightDevice = lightDevices.getArrayElement(j);
+                if(lightDevice.getString("device_sn") == deviceItem.getString("device_id")){
                     //只更新设备列表的位置、名字信息
                     qlibc::QData location;
-                    location.setString("room_name", configDevice.getString("room_name"));
-                    location.setString("room_no", configDevice.getString("room_no"));
-                    deviceItem.setString("device_name", configDevice.getString("device_name"));
-                    deviceItem.setString("device_brand", configDevice.getString("device_brand"));
+                    location.setString("room_name", lightDevice.getString("room_name"));
+                    location.setString("room_no", lightDevice.getString("room_no"));
+                    deviceItem.setString("device_name", lightDevice.getString("device_name"));
                     deviceItem.putData("location", location);
-
                     newDeviceList.append(deviceItem);
                     break;
                 }
 
-                if(j == configWhiteListDevicesSize -1){
+                if(j == lightDeviceSize -1){
                     newDeviceList.append(deviceItem);
                 }
             }
         }
 
-        //存储设备列表
+        //更新属性后，存储设备列表
         qlibc::QData saveData;
         saveData.putData("device_list", newDeviceList);
         bleConfig::getInstance()->saveDeviceListData(saveData);
-    }
 
+        //通知设备管理站点，进行设备列表更新
+        util::updateDeviceList();
+    }
 }

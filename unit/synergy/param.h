@@ -37,6 +37,9 @@ static const string Control_Service_ID              = "cloudCommand";
 static const string VoiceControl_Service_ID         = "voiceControl";
 static const string BleGroupRegister_Service_ID     = "register_bleGroup";
 static const string BleDeviceOperation_Service_ID   = "bleDeviceOperation";
+static const string UpdateWhiteList_Service_ID      = "updateWhiteList";
+static const string UpdateDeviceList_Service_ID     = "updateDeviceList";
+static const string UpdateGroupList_Service_ID      = "updateGroupList";
 
 
 //服务ID
@@ -58,7 +61,6 @@ static const string ControlGroup_Device_Service_ID              = "control_group
 static const string GetGroupList_Device_Service_ID              = "get_group_list";                 //获取分组列表
 
 //订阅消息ID
-static const string DeviceList_changed_messageID = "deviceList_changed";
 static const string Site_OnOffLine_MessageID = "site_onoffline";
 
 //发布消息ID

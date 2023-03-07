@@ -45,10 +45,10 @@ public:
     //去掉来源标识，还原组
     qlibc::QData restoreGrp(qlibc::QData& item, string& inSourceSite);
 
-private:
     //更新组列表
     void updateGroupList();
 
+public:
     //增加组来源标识
     qlibc::QData addGrpSourceTag(qlibc::QData groupList, string grpSource);
 

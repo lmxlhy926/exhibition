@@ -9,6 +9,7 @@
 #include "siteService/service_site_manager.h"
 #include "common/httpUtil.h"
 #include "sourceManage/scanListmanage.h"
+#include "../sourceManage/util.h"
 
 using namespace servicesite;
 
@@ -82,7 +83,7 @@ void BindDevice::bind(QData &deviceArray) {
     DownUtility::parse2Send(scanEndData);
 
     //更新配置站点的白名单
-    updateDeviceList2ConfigSite();
+    util::updateWhiteDeviceList();
 
     //发布绑定结束消息
     qlibc::QData publishData;
@@ -183,14 +184,5 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     }
 }
 
-void BindDevice::updateDeviceList2ConfigSite() {
-    //更新config白名单列表
-    qlibc::QData request;
-    request.setString("service_id", "whiteListUpdateRequest");
-    request.putData("request", bleConfig::getInstance()->getDeviceListData());
-    qlibc::QData response;
-    SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, request, response);
-    LOG_INFO << "==>updateDeviceList2ConfigSite";
-}
 
 

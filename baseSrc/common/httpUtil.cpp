@@ -7,7 +7,6 @@
 
 bool httpUtil::sitePostRequest(const string& ip, int port, qlibc::QData& request, qlibc::QData& response){
     httplib::Client client(ip, port);
-    client.set_connection_timeout(2);
     httplib::Result result =  client.Post("/", request.toJsonString(), "text/json");
     if(result != nullptr){
         response.setInitData(qlibc::QData(result.value().body));

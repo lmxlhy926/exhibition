@@ -34,7 +34,6 @@ static const string WHITELIST_REQUEST_SERVICE_ID                    =    "whiteL
 static const string WHITELIST_SAVE_REQUEST_SERVICE_ID               =    "whiteListSaveRequest";
 static const string WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID          =    "whiteListSyncSaveRequest";
 static const string WHITELIST_UPDATE_REQUEST_SERVICE_ID             =    "whiteListUpdateRequest";
-static const string WHITELIST_DELETE_REQUEST_SERVICE_ID             =    "whiteListDeleteRequest";
 static const string GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID         =    "getSceneConfigFile";
 static const string SAVE_SCENECONFIG_FILE_REQUEST_SERVICE_ID        =    "saveSceneConfigFile";
 static const string SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID    =    "saveSceneConfigFile";
@@ -42,7 +41,7 @@ static const string GETALLLIST_REQUEST_SERVICE_ID                   =    "get_al
 
 
 //消息发布ID
-static const string WHITELIST_MODIFIED_MESSAGE_ID   = "whiteListModifiedByAppMsg";    //白名单被app修改
-static const string SCENELIST_MODIFIED_MESSAGE_ID   = "sceneListModifiedByAppMsg";    //场景文件被app修改
+static const string WHITELIST_MODIFIED_MESSAGE_ID   = "whiteListModified";    //白名单被app修改
+static const string SCENELIST_MODIFIED_MESSAGE_ID   = "sceneListModified";    //场景文件被app修改
 
 #endif //EXHIBITION_PARAM_H

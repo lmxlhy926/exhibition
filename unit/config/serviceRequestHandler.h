@@ -38,20 +38,17 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
 //同步白名单
 void whiteList_sync(string site_id, string getServiceId, string saveServiceId);
 
+//白名单同步保存，不对外开放
+int whiteList_sync_save_service_request_handler(const Request& request, Response& response);
+
 //获取白名单列表
 int whiteList_service_request_handler(const Request& request, Response& response);
 
-//app保存白名单列表
+//保存白名单，并将白名单同步到每个配置站点
 int whiteList_save_service_request_handler(const Request& request, Response& response);
 
-//白名单同步保存
-int whiteList_sync_save_service_request_handler(const Request& request, Response& response);
-
-//蓝牙站点添加新设备时，增加相应的条目
+//蓝牙设备列表对白名单进行更新, 不对外开放
 int whiteList_update_service_request_handler(const Request& request, Response& response);
-
-//蓝牙站点解绑设备时，删除相应的条目
-int whiteList_delete_service_request_handler(const Request& request, Response& response);
 
 //获取场景配置文件
 int getSceneFile_service_request_handler(const Request& request, Response& response);

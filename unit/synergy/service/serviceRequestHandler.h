@@ -25,6 +25,16 @@ namespace synergy{
 //蓝牙设备操作
     int bleDeviceOperation_service_handler(const Request& request, Response& response);
 
+//请求更新白名单
+    int updateWhiteList_service_handler(const Request& request, Response& response);
+
+//更新设备列表
+    int updateDeviceList_service_handler(const Request& request, Response& response);
+
+//更新组列表
+    int updateGroupList_service_handler(const Request& request, Response& response);
+
+
 
 //重置网关
     int reset_device_service_handler(const Request& request, Response& response);

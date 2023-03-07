@@ -45,15 +45,15 @@ static const string GetGroupList_Device_Service_ID              = "get_group_lis
 static const string Ble_Device_Test_Command_Service_ID = "BleDeviceCommand";
 
 //站点支持的消息
-static const string ScanResultMsg =                    "scanResultMsg";                     //扫描结果消息
-static const string SingleDeviceBindSuccessMsg =       "singleDeviceBindSuccessMsg";        //单个设备绑定成功
-static const string SingleDeviceUnbindSuccessMsg =     "singleDeviceUnbindSuccessMsg";      //单个设备解绑成功
-static const string BindEndMsg =                       "bindEndMsg";                        //绑定结束
-static const string Device_State_Changed =             "device_state_changed";              //设备状态改变
+static const string ScanResultMsg                   =   "scanResultMsg";                     //扫描结果消息
+static const string SingleDeviceBindSuccessMsg      =   "singleDeviceBindSuccessMsg";        //单个设备绑定成功
+static const string SingleDeviceUnbindSuccessMsg    =   "singleDeviceUnbindSuccessMsg";      //单个设备解绑成功
+static const string BindEndMsg                      =   "bindEndMsg";                        //绑定结束
+static const string Device_State_Changed            =   "device_state_changed";              //设备状态改变
 
 
 //站点订阅的消息
-static const string WhiteList_Changed =   "whiteListModifiedByAppMsg";      //app修改了白名单
+static const string WHITELIST_MODIFIED_MESSAGE_ID   = "whiteListModified";    //白名单被app修改
 
 
 //扫描绑定指令

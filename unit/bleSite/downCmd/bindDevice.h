@@ -21,9 +21,6 @@ public:
 private:
     //绑定设备
     bool addDevice(string& deviceSn, qlibc::QData& property);
-
-    //更新白名单
-    void updateDeviceList2ConfigSite();
 };
 
 #endif //EXHIBITION_BINDDEVICE_H

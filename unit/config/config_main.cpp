@@ -131,11 +131,8 @@ int main(int argc, char* argv[]) {
     //同步保存白名单
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID,whiteList_sync_save_service_request_handler);
 
-    //增加白名单灯控设备条目
+    //灯控设备同步到白名单
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_UPDATE_REQUEST_SERVICE_ID,whiteList_update_service_request_handler);
-
-    //删除白名单灯控设备条目
-    serviceSiteManager->registerServiceRequestHandler(WHITELIST_DELETE_REQUEST_SERVICE_ID,whiteList_delete_service_request_handler);
 
     //获取场景配置文件
     serviceSiteManager->registerServiceRequestHandler(GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, getSceneFile_service_request_handler);

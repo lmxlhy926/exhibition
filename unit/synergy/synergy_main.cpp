@@ -68,6 +68,26 @@ int main(int argc, char* argv[]) {
     });
 
 
+    //请求白名单更新
+    serviceSiteManager->registerServiceRequestHandler(UpdateWhiteList_Service_ID,
+                                                      [](const Request& request, Response& response)->int{
+        return synergy::updateWhiteList_service_handler(request, response);
+    });
+
+    //请求设备列表更新
+    serviceSiteManager->registerServiceRequestHandler(UpdateDeviceList_Service_ID,
+                                                      [](const Request& request, Response& response)->int{
+        return synergy::updateDeviceList_service_handler(request, response);
+    });
+
+    //请求组列表更新
+    serviceSiteManager->registerServiceRequestHandler(UpdateGroupList_Service_ID,
+                                                      [](const Request& request, Response& response)->int{
+        return synergy::updateGroupList_service_handler(request, response);
+    });
+
+
+
 
     //注册重置网关回调
     serviceSiteManager->registerServiceRequestHandler(Reset_Device_Service_ID,

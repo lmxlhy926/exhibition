@@ -256,7 +256,13 @@ void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
     qlibc::QData request, response;
     request.setString("service_id", "get_app_site_list");
     request.putData("request", qlibc::QData());
-    if(httpUtil::sitePostRequest("127.0.0.1", 9012, request, response)){
+    bool siteBool = httpUtil::sitePostRequest("127.0.0.1", 9012, request, response);
+
+    siteBool = true;
+    response.loadFromFile("/mnt/d/bywg/project/exhibition/unit/config/appSite.json");
+
+
+    if(siteBool){
         app_site_list.setInitData(response.getData("response").getData("app_site_list"));
         app_site_list_size = app_site_list.size();
         for(Json::ArrayIndex i = 0; i < app_site_list_size; ++i){
@@ -265,7 +271,8 @@ void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
                 qlibc::QData contentRequest, contentResponse;
                 contentRequest.setString("service_id", getServiceId);
                 contentRequest.putData("request", qlibc::QData());
-                if(httpUtil::sitePostRequest(item.getString("ip"), 9006, contentRequest, contentResponse)){
+                string ip = item.getString("ip");
+                if(httpUtil::sitePostRequest(ip, 9006, contentRequest, contentResponse)){
                     qlibc::QData content(contentResponse.getData("response"));
                     if(!content.empty()){
                         resultMap.insert(std::make_pair(atoi(content.getString("timeStamp").c_str()), content.asValue()));
@@ -273,6 +280,10 @@ void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
                 }
             }
         }
+    }
+
+    if(resultMap.size() == 0){
+        return;
     }
 
     //获得最新的内容
@@ -289,6 +300,22 @@ void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
             httpUtil::sitePostRequest(item.getString("ip"), 9006, contentSaveRequest, contentSaveResponse);
         }
     }
+}
+
+
+int whiteList_sync_save_service_request_handler(const Request& request, Response& response){
+    LOG_INFO << "==>whiteList_sync_save_service_request_handler...";
+    qlibc::QData whiteListData = qlibc::QData(request.body).getData("request");
+    qlibc::QData localWhiteList = configParamUtil::getInstance()->getWhiteList();
+    if(atoi(localWhiteList.getString("timeStamp").c_str()) < atoi(whiteListData.getString("timeStamp").c_str())){
+        configParamUtil::getInstance()->saveWhiteListData(whiteListData);
+        //发布白名单修改信息
+        qlibc::QData publishData;
+        publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
+        publishData.putData("content", qlibc::QData());
+        ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+    }
+    return 0;
 }
 
 
@@ -313,6 +340,12 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
 
     whiteList_sync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID);    //同步白名单
 
+    //发布白名单修改信息
+    qlibc::QData publishData;
+    publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
+    publishData.putData("content", qlibc::QData());
+    ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+
     qlibc::QData ret;
     ret.setInt("code", 0);
     ret.setString("msg", "success");
@@ -321,101 +354,86 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
     return 0;
 }
 
-int whiteList_sync_save_service_request_handler(const Request& request, Response& response){
-    qlibc::QData whiteListData = qlibc::QData(request.body).getData("request");
-    qlibc::QData localWhiteList = configParamUtil::getInstance()->getWhiteList();
-    if(atoi(localWhiteList.getString("timeStamp").c_str()) < atoi(whiteListData.getString("timeStamp").c_str())){
-        configParamUtil::getInstance()->saveWhiteListData(whiteListData);
-        //发布白名单修改信息
-        qlibc::QData publishData;
-        publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
-        publishData.putData("content", qlibc::QData());
-        ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-    }
-    return 0;
-}
 
+//增加新的设备、删除旧的设备
 int whiteList_update_service_request_handler(const Request& request, Response& response){
     LOG_HLIGHT << "==>whiteList_update_service_request_handler";
+    //蓝牙站点所有设备
+    std::map<string, Json::Value> bleSiteDeviceMap;
     qlibc::QData bleSiteDeviceList = qlibc::QData(request.body).getData("request").getData("device_list");
     size_t bleSiteDeviceListSize = bleSiteDeviceList.size();
-
-    qlibc::QData configWhiteList = configParamUtil::getInstance()->getWhiteList();
-    qlibc::QData devices = configWhiteList.getData("info").getData("devices");
-
     for(Json::ArrayIndex i = 0; i < bleSiteDeviceListSize; ++i){
-        qlibc::QData deviceItem = bleSiteDeviceList.getArrayElement(i);
-        string device_id = deviceItem.getString("device_id");
-        string device_type = deviceItem.getString("device_type");
-        string device_typeCode = deviceItem.getString("device_typeCode");
-        string device_modelCode = deviceItem.getString("device_modelCode");
-        string room_name = deviceItem.getData("location").getString("room_name");
-        string room_no = deviceItem.getData("location").getString("room_no");
+        qlibc::QData item = bleSiteDeviceList.getArrayElement(i);
+        bleSiteDeviceMap.insert(std::make_pair(item.getString("category_code"), item.asValue()));
+    }
 
-        for(Json::ArrayIndex j = 0; j < devices.size(); ++j){
-            if(devices.getArrayElement(j).getString("device_sn") == device_id){
-                break;
-            }else if(devices.getArrayElement(j).getString("device_sn") != device_id && j == devices.size() -1){
-                qlibc::QData item;
-                item.setString("category_code", device_type);
-                item.setString("device_sn", device_id);
-                item.setString("device_type", device_typeCode);
-                item.setString("device_model", device_modelCode);
-                item.setString("room_name", room_name);
-                item.setString("room_no", room_no);
-                devices.append(item);
-                break;
-            }
-        }
-        if(devices.size() == 0){
-            qlibc::QData item;
-            item.setString("category_code", device_type);
-            item.setString("device_sn", device_id);
-            item.setString("device_type", device_typeCode);
-            item.setString("device_model", device_modelCode);
-            item.setString("room_name", room_name);
-            item.setString("room_no", room_no);
-            devices.append(item);
+    //原有白名单列表
+    qlibc::QData originWhiteList = configParamUtil::getInstance()->getWhiteList();
+    bool changed = false;
+    bool updateSuccess = false;
+
+    //白名单现有设备
+    std::map<string, Json::Value> originWhiteDeviceMap;
+    qlibc::QData originWhiteListDevices = originWhiteList.getData("info").getData("devices");
+    size_t originWhiteListSize = originWhiteListDevices.size();
+    for(Json::ArrayIndex i = 0; i < originWhiteListSize; ++i){
+        qlibc::QData item = originWhiteListDevices.getArrayElement(i);
+        originWhiteDeviceMap.insert(std::make_pair(item.getString("category_code"), item.asValue()));
+    }
+
+    //删除蓝牙站点不存在的设备
+    for(auto pos = originWhiteDeviceMap.begin(); pos != originWhiteDeviceMap.end();){
+       if(pos->second["category_code"].asString() == "LIGHT"){
+           if(bleSiteDeviceMap.find(pos->first) == bleSiteDeviceMap.end()){
+               pos = originWhiteDeviceMap.erase(pos);
+               changed = true;
+           }else{
+               pos++;
+           }
+       }else{
+           pos++;
+       }
+    }
+
+    //添加蓝牙站点新增的设备
+    for(auto pos = bleSiteDeviceMap.begin(); pos != bleSiteDeviceMap.end();){
+        if(originWhiteDeviceMap.find(pos->first) == originWhiteDeviceMap.end()){
+            originWhiteDeviceMap.insert(std::make_pair(pos->first, pos->second));
+            changed = true;
         }
     }
 
-    configWhiteList.asValue()["info"]["devices"] = devices.asValue();
-    configParamUtil::getInstance()->saveWhiteListData(configWhiteList);
+    //如果白名单有更改，则更新白名单
+    if(changed){
+        qlibc::QData newDeviceList;
+        for(auto& item : originWhiteDeviceMap){
+            newDeviceList.append(item.second);
+        }
+        originWhiteList.asValue()["info"]["devices"] = newDeviceList.asValue();
+        originWhiteList.asValue()["timeStamp"] = std::to_string(time(nullptr));
 
-    qlibc::QData ret;
-    ret.setInt("code", 0);
-    ret.setString("msg", "success");
-    response.set_content(ret.toJsonString(), "text/json");
-
-    return 0;
-}
-
-int whiteList_delete_service_request_handler(const Request& request, Response& response){
-    LOG_HLIGHT << "==>whiteList_delete_service_request_handler";
-    qlibc::QData bleSiteDeviceList = qlibc::QData(request.body).getData("request").getData("device_list");
-    size_t bleSiteDeviceListSize = bleSiteDeviceList.size();
-
-    qlibc::QData configWhiteList = configParamUtil::getInstance()->getWhiteList();
-    qlibc::QData devices = configWhiteList.getData("info").getData("devices");
-
-    for(Json::ArrayIndex i = 0; i < bleSiteDeviceListSize; ++i){
-        qlibc::QData deviceItem = bleSiteDeviceList.getArrayElement(i);
-        string device_id = deviceItem.getString("device_id");
-        for(Json::ArrayIndex j = 0; j < devices.size(); ++j){
-            if(devices.getArrayElement(j).getString("device_sn") == device_id){
-                devices.deleteArrayItem(j);
+        //存储白名单
+        qlibc::QData whiteRequest, whiteResponse;
+        whiteRequest.setString("service_id", WHITELIST_SAVE_REQUEST_SERVICE_ID);
+        whiteRequest.putData("request", originWhiteList);
+        if(httpUtil::sitePostRequest("127.0.0.1", ConfigSitePort, whiteRequest, whiteResponse)){
+            if(whiteResponse.getInt("code") == 0){
+                updateSuccess = true;
             }
         }
     }
 
-    configWhiteList.asValue()["info"]["devices"] = devices.asValue();
-    configParamUtil::getInstance()->saveWhiteListData(configWhiteList);
-
-    qlibc::QData ret;
-    ret.setInt("code", 0);
-    ret.setString("msg", "success");
-    response.set_content(ret.toJsonString(), "text/json");
-
+    if(updateSuccess){
+        qlibc::QData ret;
+        ret.setInt("code", 0);
+        ret.setString("msg", "success");
+        response.set_content(ret.toJsonString(), "text/json");
+    }else{
+        qlibc::QData ret;
+        ret.setInt("code", -1);
+        ret.setString("msg", "failed");
+        response.set_content(ret.toJsonString(), "text/json");
+    }
     return 0;
 }
 
@@ -511,3 +529,92 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
 
     return 0;
 }
+
+#if 0
+int whiteList_update_service_request_handler(const Request& request, Response& response){
+    LOG_HLIGHT << "==>whiteList_update_service_request_handler";
+    //蓝牙站点所有设备
+    qlibc::QData bleSiteDeviceList = qlibc::QData(request.body).getData("request").getData("device_list");
+    size_t bleSiteDeviceListSize = bleSiteDeviceList.size();
+
+    //原有列表
+    qlibc::QData configWhiteList = configParamUtil::getInstance()->getWhiteList();
+    qlibc::QData devices = configWhiteList.getData("info").getData("devices");
+
+    for(Json::ArrayIndex i = 0; i < bleSiteDeviceListSize; ++i){
+        qlibc::QData deviceItem = bleSiteDeviceList.getArrayElement(i);
+        string device_id = deviceItem.getString("device_id");
+        string device_type = deviceItem.getString("device_type");
+        string device_typeCode = deviceItem.getString("device_typeCode");
+        string device_modelCode = deviceItem.getString("device_modelCode");
+        string room_name = deviceItem.getData("location").getString("room_name");
+        string room_no = deviceItem.getData("location").getString("room_no");
+
+        for(Json::ArrayIndex j = 0; j < devices.size(); ++j){
+            if(devices.getArrayElement(j).getString("device_sn") == device_id){
+                break;
+            }else if(devices.getArrayElement(j).getString("device_sn") != device_id && j == devices.size() -1){
+                qlibc::QData item;
+                item.setString("category_code", device_type);
+                item.setString("device_sn", device_id);
+                item.setString("device_type", device_typeCode);
+                item.setString("device_model", device_modelCode);
+                item.setString("room_name", room_name);
+                item.setString("room_no", room_no);
+                devices.append(item);
+                break;
+            }
+        }
+
+        if(devices.size() == 0){
+            qlibc::QData item;
+            item.setString("category_code", device_type);
+            item.setString("device_sn", device_id);
+            item.setString("device_type", device_typeCode);
+            item.setString("device_model", device_modelCode);
+            item.setString("room_name", room_name);
+            item.setString("room_no", room_no);
+            devices.append(item);
+        }
+    }
+
+    configWhiteList.asValue()["info"]["devices"] = devices.asValue();
+    configParamUtil::getInstance()->saveWhiteListData(configWhiteList);
+
+    qlibc::QData ret;
+    ret.setInt("code", 0);
+    ret.setString("msg", "success");
+    response.set_content(ret.toJsonString(), "text/json");
+
+    return 0;
+}
+
+int whiteList_delete_service_request_handler(const Request& request, Response& response){
+    LOG_HLIGHT << "==>whiteList_delete_service_request_handler";
+    qlibc::QData bleSiteDeviceList = qlibc::QData(request.body).getData("request").getData("device_list");
+    size_t bleSiteDeviceListSize = bleSiteDeviceList.size();
+
+    qlibc::QData configWhiteList = configParamUtil::getInstance()->getWhiteList();
+    qlibc::QData devices = configWhiteList.getData("info").getData("devices");
+
+    for(Json::ArrayIndex i = 0; i < bleSiteDeviceListSize; ++i){
+        qlibc::QData deviceItem = bleSiteDeviceList.getArrayElement(i);
+        string device_id = deviceItem.getString("device_id");
+        for(Json::ArrayIndex j = 0; j < devices.size(); ++j){
+            if(devices.getArrayElement(j).getString("device_sn") == device_id){
+                devices.deleteArrayItem(j);
+            }
+        }
+    }
+
+    configWhiteList.asValue()["info"]["devices"] = devices.asValue();
+    configParamUtil::getInstance()->saveWhiteListData(configWhiteList);
+
+    qlibc::QData ret;
+    ret.setInt("code", 0);
+    ret.setString("msg", "success");
+    response.set_content(ret.toJsonString(), "text/json");
+
+    return 0;
+}
+#endif
