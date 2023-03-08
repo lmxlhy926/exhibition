@@ -192,26 +192,26 @@ int main(int argc, char* argv[]) {
     threadPool_.enqueue([](){
         while(true){
             util::updateWhiteDeviceList();
-            std::this_thread::sleep_for(std::chrono::seconds(10));
+            std::this_thread::sleep_for(std::chrono::seconds(30));
         }
     });
 
 
     //白名单被app修改，将白名单配置的设备属性信息同步到蓝牙设备列表
-//    threadPool_.enqueue([&](){
-//        while(true){
-//            int code;
-//            std::vector<string> messageIdList;
-//            messageIdList.push_back(WHITELIST_MODIFIED_MESSAGE_ID);
-//            code = serviceSiteManager->subscribeMessage(LocalIp, ConfigPort, messageIdList);
-//            if (code == ServiceSiteManager::RET_CODE_OK) {
-//                printf("subscribeMessage whiteListModified ok.\n");
-//                break;
-//            }
-//            std::this_thread::sleep_for(std::chrono::seconds(3));
-//            LOG_RED << "subscribed whiteListModified failed....., start to subscribe in 3 seconds";
-//        }
-//    });
+    threadPool_.enqueue([&](){
+        while(true){
+            int code;
+            std::vector<string> messageIdList;
+            messageIdList.push_back(WHITELIST_MODIFIED_MESSAGE_ID);
+            code = serviceSiteManager->subscribeMessage(LocalIp, ConfigPort, messageIdList);
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                printf("subscribeMessage whiteListModified ok.\n");
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            LOG_RED << "subscribed whiteListModified failed....., start to subscribe in 10 seconds";
+        }
+    });
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){

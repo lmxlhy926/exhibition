@@ -98,6 +98,19 @@ void SiteRecord::removeSite(string siteName) {
     }
 }
 
+void SiteRecord::removeSitesNonExist(std::map<string, Json::Value>& sitesMap){
+    std::lock_guard<std::recursive_mutex> lg(rMutex);
+    for(auto pos = sites.begin(); pos != sites.end();){
+        if(sitesMap.find(pos->first) == sitesMap.end()){
+            pos->second.deleteClient();
+            pos = sites.erase(pos);
+        }else{
+            pos++;
+        }
+    }
+ }
+
+
 bool SiteRecord::sendRequest2Site(string siteName, qlibc::QData &request, qlibc::QData &response) {
     std::lock_guard<std::recursive_mutex> lg(rMutex);
     auto pos = sites.find(siteName);

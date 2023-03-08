@@ -395,6 +395,21 @@ namespace synergy {
         return 0;
     }
 
+    int getSiteNames_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->getSiteNames_service_handler...";
+        std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
+        qlibc::QData siteArray;
+        for(auto& siteName : siteNames){
+            siteArray.append(siteName);
+        }
+        qlibc::QData ret;
+        ret.setInt("code", 0);
+        ret.setString("msg", "success");
+        ret.putData("response", siteArray);
+        response.set_content(ret.toJsonString(), "text/json");
+        return 0;
+    }
+
 
     void sendRequest(const Request& request, Response& response){
         qlibc::QData requestData(request.body), responseData;
@@ -468,7 +483,7 @@ namespace synergy {
             qlibc::QData controlRequest, controlResponse;
             controlRequest.setString("service_id", "control_device");
             controlRequest.putData("request", qlibc::QData().putData("device_list", elem.second));
-            LOG_GREEN << elem.first << "controlRequest: " << controlRequest.toJsonString();
+            LOG_GREEN << elem.first << " controlRequest: " << controlRequest.toJsonString();
             SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
             LOG_BLUE << elem.first << " controlResponse: " << controlResponse.toJsonString();
         }
@@ -562,9 +577,29 @@ namespace synergy {
             qlibc::QData controlRequest, controlResponse;
             controlRequest.setString("service_id", "control_group");
             controlRequest.putData("request", qlibc::QData().putData("group_list", elem.second));
-            LOG_GREEN << elem.first << "controlRequest: " << controlRequest.toJsonString();
+            LOG_GREEN << elem.first << " controlRequest: " << controlRequest.toJsonString();
             SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
             LOG_BLUE << elem.first << " controlResponse: " << controlResponse.toJsonString();
+        }
+
+        //如果group_id含有FFFF
+        for(Json::ArrayIndex i = 0; i < size; ++i){
+            qlibc::QData item = controlGroupList.getArrayElement(i);
+            string group_id = item.getString("group_id");
+            smatch sm;
+            if(regex_match(group_id, sm,regex("FFFF>(.*)"))){
+                item.setString("group_id", "FFFF");
+                string siteName = sm.str(1);
+
+                qlibc::QData controlRequest, controlResponse;
+                qlibc::QData groupList;
+                groupList.append(item);
+                controlRequest.setString("service_id", "control_group");
+                controlRequest.putData("request", qlibc::QData().putData("group_list", groupList));
+                LOG_GREEN << siteName << " controlRequest: " << controlRequest.toJsonString();
+                SiteRecord::getInstance()->sendRequest2Site(siteName, controlRequest, controlResponse);
+                LOG_BLUE << siteName << " controlResponse: " << controlResponse.toJsonString();
+            }
         }
 
         response.set_content(okResponse.dump(), "text/json");

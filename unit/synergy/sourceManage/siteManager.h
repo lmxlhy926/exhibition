@@ -11,10 +11,15 @@ using namespace std;
 
 class siteManager {
 public:
-    //更新站点列表
+    /*
+     *  1. 获取所有站点列表，从中得到蓝牙、zigbee所在面板的IP
+     *  2. 获得ip后，访问相应面板的配置站点，从中获取面板信息
+     *  3. 删除不存在的站点
+     *  4. 存储新的站点
+     */
     static void updateSite();
 
-    static qlibc::QData updateSite__bak();
+    static void updateSite1();
 };
 
 

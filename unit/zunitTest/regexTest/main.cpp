@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <vector>
 #include "qlibc/QData.h"
+#include <set>
 using namespace std;
 
 //开关灯
@@ -209,10 +210,14 @@ void test(){
 
 
 int main(int argc, char* argv[]){
-   string str = "10.1.1.1:bl_site";
-   if(regex_match(str, regex(".*:ble_site"))){
-       std::cout << "match..." << std::endl;
-   }
+   std::set<string> vec;
+   vec.insert("hello");
+   vec.insert("hello");
+   std::cout << vec.size() << std::endl;
+
+
+
+
     return 0;
 }
 

@@ -40,6 +40,8 @@ static const string BleDeviceOperation_Service_ID   = "bleDeviceOperation";
 static const string UpdateWhiteList_Service_ID      = "updateWhiteList";
 static const string UpdateDeviceList_Service_ID     = "updateDeviceList";
 static const string UpdateGroupList_Service_ID      = "updateGroupList";
+static const string GetSiteNames_Service_ID         = "getSiteNames";
+
 
 
 //服务ID

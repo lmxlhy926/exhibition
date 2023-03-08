@@ -71,10 +71,10 @@ void voiceStringMatchControl::parseAndControl() {
     for(; p != end; p++){
         voiceString += p->str();
     }
-    LOG_INFO << "total: " << voiceString;
+    LOG_INFO << "0> total string: " << voiceString;
     ParsedItem parsedItem;
 
-    //确定房间，以及是否包含所有
+    //抽取房间名称，判断是否含有所有字段
     for(auto& room :roomList){
         smatch sm;
         if(regex_search(voiceString, sm, regex(room))){
@@ -88,7 +88,7 @@ void voiceStringMatchControl::parseAndControl() {
         voiceString.erase(allPos, string("所有").length());
         parsedItem.hasAll = true;
     }
-    LOG_INFO << "afterLocation: " << voiceString;
+    LOG_INFO << "1> after extracting room and all: " << voiceString;
 
     //确定动作
     for(auto& mr2acItem : matchRex2ActionCode){
@@ -108,17 +108,17 @@ void voiceStringMatchControl::parseAndControl() {
                             voiceString.erase(pos, elem.second);
                         }
                     }
-                    parsedItem.actionCode = code;
+                    parsedItem.actionCode = code;   //确定动作
                     break;
                 }
             }
         }
     }
-    LOG_INFO << "afterAction: " << voiceString;
+    LOG_INFO << "2> after extracting action: " << voiceString;
 
     //查找确定的设备、分组
     if(findDeviceIdOrGroupId(voiceString, parsedItem)){
-        LOG_INFO << "afterDevice: " << voiceString;
+        LOG_INFO << "3> after extracting device or group: " << voiceString;
     }else{
         LOG_RED << "vocieString matchResult: can not find device or group, match missed.....";
         return;
@@ -130,7 +130,7 @@ void voiceStringMatchControl::parseAndControl() {
         parsedItem.param = sm.str(1);
         voiceString.erase(sm.position(1), sm.length(1));
     }
-    LOG_INFO << "afterParam: " << voiceString;
+    LOG_INFO << "4> after extracting param: " << voiceString;
 
     printParsedItem(parsedItem);
 
@@ -163,20 +163,25 @@ string voiceStringMatchControl::code2Action(ActionCode code){
 }
 
 void voiceStringMatchControl::printParsedItem(struct ParsedItem& item){
+    qlibc::QData ids;
+    std::vector<string> idVec = item.devIdGrpId;
+    for(auto& elem : idVec){
+        ids.append(elem);
+    }
+
     qlibc::QData data;
     data.setString("roomName", item.roomName);
     data.setString("action", code2Action(item.actionCode));
     if(item.ctrlType == ControlType::Device){
-        data.setString("deviceId", item.devIdGrpId);
+        data.putData("deviceId", ids);
     }else if(item.ctrlType == ControlType::Group){
-        data.setString("groupId", item.devIdGrpId);
+        data.putData("groupId", ids);
     }else if(item.ctrlType == ControlType::Type){
-        data.setString("type", item.devIdGrpId);
+        data.putData("type", ids);
     }
     data.setString("deviceType", item.deviceType);
     data.setBool("hasAll", item.hasAll);
     data.setValue("param", item.param);
-    data.setString("sourceSite", item.sourceSite);
 
     LOG_PURPLE << "parseItem: " << data.toJsonString(true);
 }
@@ -187,26 +192,25 @@ void voiceStringMatchControl::action2Command(ParsedItem& parsedItem, CommandItem
     if(parsedItem.actionCode == ActionCode::powerOn){   //开
         commandItem.command_id = "power";
         commandItem.command_para = "on";
-        lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
 
     }else if(parsedItem.actionCode == ActionCode::powerOff){    //关
         commandItem.command_id = "power";
         commandItem.command_para = "off";
-        lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
 
     }else if(parsedItem.actionCode == ActionCode::luminance1 || parsedItem.actionCode == ActionCode::luminance2){   //设置亮度
         commandItem.command_id = "luminance";
         int luminanceValue = static_cast<int>(atoi(parsedItem.param.c_str()) * 2.55);
         commandItem.command_para = luminanceValue;
-        lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
 
     }else if(parsedItem.actionCode == ActionCode::color_temperature1 || parsedItem.actionCode == ActionCode::color_temperature2){   //设置色温
         commandItem.command_id = "color_temperature";
         int ctValue = static_cast<int>(atoi(parsedItem.param.c_str()) * 38 + 2700);
         commandItem.command_para = ctValue;
-        lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
 
-    }else if(parsedItem.actionCode == ActionCode::luminanceUp || parsedItem.actionCode == ActionCode::luminanceDown){   //亮一点、暗一点
+    }
+
+#if 0
+    else if(parsedItem.actionCode == ActionCode::luminanceUp || parsedItem.actionCode == ActionCode::luminanceDown){   //亮一点、暗一点
         commandItem.command_id = "luminance";
         if(lastModifyedDeviceOrGroup != parsedItem.devIdGrpId){
             tempLuminance = defaultLuminance;
@@ -252,10 +256,12 @@ void voiceStringMatchControl::action2Command(ParsedItem& parsedItem, CommandItem
         commandItem.command_para = valueInt;
         lastModifyedDeviceOrGroup = parsedItem.devIdGrpId;
     }
-
+#endif
 }
 
-bool voiceStringMatchControl::getSpecificDeviceId(qlibc::QData& deviceList, string& str, string& deviceId, string& sourceSite) {
+bool voiceStringMatchControl::getSpecificDeviceId(qlibc::QData& deviceList, string& str, std::vector<string>& deviceVec) {
+    //找到str中包含的设备名称
+    std::set<string> deviceNames;
     Json::ArrayIndex size = deviceList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = deviceList.getArrayElement(i);
@@ -263,33 +269,68 @@ bool voiceStringMatchControl::getSpecificDeviceId(qlibc::QData& deviceList, stri
         if(!str.empty() && !device_name.empty()){
             smatch sm;
             if(regex_search(str, sm, regex(device_name))){
-                deviceId = item.getString("device_id");
-                sourceSite = item.getString("sourceSite");
-                str.erase(sm.position(), sm.length());
-                return true;
+                deviceNames.insert(device_name);
+                deviceVec.push_back(item.getString("device_id"));
             }
         }
     }
-    return false;
+
+    //从str中剔除设备名字段
+    if(deviceVec.empty()){
+        return false;
+    }else{
+        for(auto& deviceName : deviceNames){
+            smatch sm;
+            if(regex_search(str, sm, regex(deviceName))){
+                str.erase(sm.position(), sm.length());
+            }
+        }
+    }
+    return true;
 }
 
 
-bool voiceStringMatchControl::getSpecificGroupId(qlibc::QData& groupList, string& str, string& groupId, string& sourceSite) {
+bool voiceStringMatchControl::getSpecificGroupId(qlibc::QData& groupList, string& str, std::vector<string>& groupVec) {
+    //找到str中包含的组名称字段
+    std::set<string> groupNames;
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = groupList.getArrayElement(i);
         string group_name = item.getString("group_name");
         if(!str.empty() && !group_name.empty()){
             smatch sm;
-            if(regex_search(str, sm,regex(group_name))){
-                groupId = item.getString("group_id");
-                sourceSite = item.getString("sourceSite");
-                str.erase(sm.position(), sm.length());
-                return true;
+            if(regex_search(str, sm, regex(group_name))){
+                groupNames.insert(group_name);
+                groupVec.push_back(item.getString("group_id"));
             }
         }
     }
-    return false;
+
+    //从str中剔除设备名字段
+    if(groupVec.empty()){
+        return false;
+    }else{
+        for(auto& groupName : groupNames){
+            smatch sm;
+            if(regex_search(str, sm, regex(groupName))){
+                str.erase(sm.position(), sm.length());
+            }
+        }
+    }
+    return true;
+}
+
+
+bool voiceStringMatchControl::getGroupIdFromRoomName(qlibc::QData& groupList, string& roomName, std::vector<string>& groupVec) {
+    Json::ArrayIndex size = groupList.size();
+    for(Json::ArrayIndex i = 0; i < size; ++i){
+        qlibc::QData item = groupList.getArrayElement(i);
+        string room_name = item.getData("location").getString("room_name");
+        if(room_name == roomName){
+            groupVec.push_back(item.getString("group_id"));
+        }
+    }
+    return !groupVec.empty();
 }
 
 bool voiceStringMatchControl::getDeviceType(string& str, string& deviceType){
@@ -306,56 +347,40 @@ bool voiceStringMatchControl::getDeviceType(string& str, string& deviceType){
     return false;
 }
 
-bool voiceStringMatchControl::getGroupIdFromRoomNameAndType(qlibc::QData& groupList, string& roomName, string& deviceType, string& groupId, string& sourceSite) {
-    Json::ArrayIndex size = groupList.size();
-    for(Json::ArrayIndex i = 0; i < size; ++i){
-        qlibc::QData item = groupList.getArrayElement(i);
-        string room_name = item.getData("location").getString("room_name");
-        string group_type = item.getString("group_type");
-        if(room_name == roomName){
-            groupId = item.getString("group_id");
-            sourceSite = item.getString("sourceSite");
-            return true;
-        }
-    }
-    return false;
-}
-
 bool voiceStringMatchControl::findDeviceIdOrGroupId(string& str, ParsedItem& parsedItem){
     qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
     qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
-    string deviceIdOrGroupId, sourceSite;
+    std::vector<string> deviceIdOrGroupIdVec;
     string deviceType;
     bool isMatch = false;
 
-    if(getSpecificDeviceId(deviceList, str, deviceIdOrGroupId, sourceSite)){   //具体设备名称
+    if(getSpecificDeviceId(deviceList, str, deviceIdOrGroupIdVec)){   //设备id列表
         parsedItem.ctrlType = ControlType::Device;
-        parsedItem.devIdGrpId = deviceIdOrGroupId;
-        parsedItem.sourceSite = sourceSite;
+        parsedItem.devIdGrpId = deviceIdOrGroupIdVec;
         isMatch = true;
 
-    }else if(getSpecificGroupId(groupList, str, deviceIdOrGroupId, sourceSite)){ //具体组ID
+    }else if(getSpecificGroupId(groupList, str, deviceIdOrGroupIdVec)){ //组列表
         parsedItem.ctrlType = ControlType::Group;
-        parsedItem.devIdGrpId = deviceIdOrGroupId;
-        parsedItem.sourceSite = sourceSite;
+        parsedItem.devIdGrpId = deviceIdOrGroupIdVec;
         isMatch = true;
 
     }else if(getDeviceType(str, deviceType)){   //<房间 + 类型> 确定组名
         if(!parsedItem.roomName.empty()){   //如果房间非空，控制该房间对应的分组
-            getGroupIdFromRoomNameAndType(groupList, parsedItem.roomName, deviceType, deviceIdOrGroupId, sourceSite);
-            parsedItem.ctrlType = ControlType::Group;
-            parsedItem.devIdGrpId = deviceIdOrGroupId;
-            parsedItem.sourceSite = sourceSite;
-            isMatch = true;
-
+            if(getGroupIdFromRoomName(groupList, parsedItem.roomName, deviceIdOrGroupIdVec)){
+                parsedItem.ctrlType = ControlType::Group;
+                parsedItem.devIdGrpId = deviceIdOrGroupIdVec;
+                isMatch = true;
+            }
         }else if(parsedItem.hasAll){    //发送到所有的蓝牙站点
             parsedItem.ctrlType = ControlType::Group;
-            parsedItem.devIdGrpId = "FFFF";
-            parsedItem.sourceSite = "ALL";
+            std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
+            for(auto& siteName : siteNames){
+                deviceIdOrGroupIdVec.push_back(string().append("FFFF").append(">").append(siteName));
+            }
+            parsedItem.devIdGrpId = deviceIdOrGroupIdVec;
             isMatch = true;
         }
     }
-
     return isMatch;
 }
 
@@ -363,68 +388,48 @@ void voiceStringMatchControl::controlByParsedItem(ParsedItem& parsedItem){
     qlibc::QData requestData, responseData;
     if(parsedItem.ctrlType == ControlType::Device){
         Json::Value command, commandList(Json::arrayValue), deviceItem, deviceList(Json::arrayValue);
+        //单个控制命令项
         CommandItem commandItem;
         action2Command(parsedItem, commandItem);
         command["command_id"] = commandItem.command_id;
         command["command_para"] = commandItem.command_para;
         commandList.append(command);
-        deviceItem["device_id"] = parsedItem.devIdGrpId;
-        deviceItem["command_list"] = commandList;
-        deviceList.append(deviceItem);
 
+        //控制命令列表
+        for(auto& deviceId : parsedItem.devIdGrpId){
+            deviceItem["device_id"] = deviceId;
+            deviceItem["command_list"] = commandList;
+            deviceList.append(deviceItem);
+        }
+
+        //将控制命令发送给设备管理站点
         requestData.setString("service_id", "control_device");
         requestData.putData("request", qlibc::QData().setValue("device_list", deviceList));
-        LOG_GREEN << "controlRequest: " << requestData.toJsonString();
-        if(parsedItem.sourceSite != "ALL"){
-            SiteRecord::getInstance()->sendRequest2Site(parsedItem.sourceSite, requestData, responseData);
-            LOG_BLUE << parsedItem.sourceSite << " controlResponse: " << responseData.toJsonString();
-        }else{
-            std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
-            smatch sm;
-            for(auto& elem : siteNameSet){
-                if(regex_match(elem, sm, regex("(.*):(.*)"))){
-                    string ip = sm.str(1);
-                    string siteID = sm.str(2);
-                    if(siteID == BleSiteID){
-                        SiteRecord::getInstance()->sendRequest2Site(sm.str(0), requestData, responseData);
-                        LOG_BLUE << sm.str(0) << " controlResponse: " << responseData.toJsonString();
-                    }
-                }
-            }
-        }
+        LOG_GREEN << "voice controlRequest: " << requestData.toJsonString();
+        httpUtil::sitePostRequest("127.0.0.1", 9007, requestData, responseData);
+        LOG_BLUE << "voice controlResponse: " << responseData.toJsonString();
 
     }else if(parsedItem.ctrlType == ControlType::Group){
         Json::Value command, commandList(Json::arrayValue), groupItem, group_list(Json::arrayValue);
+        //控制命令项
         CommandItem commandItem;
         action2Command(parsedItem, commandItem);
         command["command_id"] = commandItem.command_id;
         command["command_para"] = commandItem.command_para;
         commandList.append(command);
-        groupItem["group_id"] = parsedItem.devIdGrpId;
-        groupItem["command_list"] = commandList;
-        group_list.append(groupItem);
+
+        //控制命令列表
+        for(auto& groupId : parsedItem.devIdGrpId){
+            groupItem["group_id"] = groupId;
+            groupItem["command_list"] = commandList;
+            group_list.append(groupItem);
+        }
 
         requestData.setString("service_id", "control_group");
         requestData.putData("request", qlibc::QData().setValue("group_list", group_list));
-        LOG_GREEN << "controlRequest: " << requestData.toJsonString();
-        if(parsedItem.sourceSite != "ALL"){
-            SiteRecord::getInstance()->sendRequest2Site(parsedItem.sourceSite, requestData, responseData);
-            LOG_BLUE << parsedItem.sourceSite << " controlResponse: " << responseData.toJsonString();
-        }else{
-            std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
-            smatch sm;
-            for(auto& elem : siteNameSet){
-                if(regex_match(elem, sm, regex("(.*):(.*)"))){
-                    string ip = sm.str(1);
-                    string siteID = sm.str(2);
-                    if(siteID == BleSiteID){
-                        SiteRecord::getInstance()->sendRequest2Site(sm.str(0), requestData, responseData);
-                        LOG_BLUE <<  sm.str(0) << " controlResponse: " << responseData.toJsonString();
-                    }
-                }
-            }
-        }
+        LOG_GREEN << "voice controlRequest: " << requestData.toJsonString();
+        httpUtil::sitePostRequest("127.0.0.1", 9007, requestData, responseData);
+        LOG_BLUE << "voice controlResponse: " << responseData.toJsonString();
     }
-
 }
 

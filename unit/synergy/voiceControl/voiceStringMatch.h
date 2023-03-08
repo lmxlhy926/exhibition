@@ -38,12 +38,11 @@ enum ControlType{
 struct ParsedItem{
     string roomName;
     bool hasAll{false};
-    ActionCode actionCode = NoneAction;
-    ControlType ctrlType = NoneType;
-    string devIdGrpId;
+    ActionCode actionCode = NoneAction;     //控制动作码
+    ControlType ctrlType = NoneType;        //控制类型，单个设备or分组
+    std::vector<string> devIdGrpId;
     string deviceType;
     string param;
-    string sourceSite;
 };
 
 //单个控制命令项
@@ -86,17 +85,17 @@ private:
     //从解析项中提取控制命令项
     void action2Command(ParsedItem& parsedItem, CommandItem& commandItem);
 
-    //获取与设备名称相匹配的设备ID，站点来源
-    bool getSpecificDeviceId(qlibc::QData& deviceList, string& str, string& deviceId, string& sourceSite);
+    //获取与设备名称相匹配的设备ID
+    bool getSpecificDeviceId(qlibc::QData& deviceList, string& str, std::vector<string>& deviceVec);
 
-    //获取与组名称相匹配的组ID，站点来源
-    bool getSpecificGroupId(qlibc::QData& groupList, string& str, string& groupId, string& sourceSite);
+    //获取与组名称相匹配的组ID
+    bool getSpecificGroupId(qlibc::QData& groupList, string& str, std::vector<string>& groupVec);
+
+    //获取指定房间对应的组
+    bool getGroupIdFromRoomName(qlibc::QData& groupList, string& roomName, std::vector<string>& groupVec);
 
     //获取控制的类型
     bool getDeviceType(string& str, string& deviceType);
-
-    //获取指定房间的默认组ID，站点来源
-    bool getGroupIdFromRoomNameAndType(qlibc::QData& groupList, string& roomName, string& deviceType, string& groupId, string& sourceSite);
 
     //找到设备id或者组id，填充入解析项
     bool findDeviceIdOrGroupId(string& str, ParsedItem& parsedItem);

@@ -35,10 +35,15 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
 
 
 //-----------------------------------------------------------------------------------------------------------------
-//同步白名单
+/*
+ *  1. 从主从站点获取所有面板列表
+ *  2. 得到面板ip后，访问每个面板上的配置站点，获取其白名单
+ *  3. 比较得到最新的白名单
+ *  4. 将最新的白名单写回每个面板
+ */
 void whiteList_sync(string site_id, string getServiceId, string saveServiceId);
 
-//白名单同步保存，不对外开放
+//收到白名单后，和本地的进行比较。如果收到的比本地的新，则更新，并发送白名单更改消息
 int whiteList_sync_save_service_request_handler(const Request& request, Response& response);
 
 //获取白名单列表
@@ -56,7 +61,7 @@ int getSceneFile_service_request_handler(const Request& request, Response& respo
 //保存场景配置文件
 int saveSceneFile_service_request_handler(const Request& request, Response& response);
 
-//场景文件同步保存
+//收到场景文件后，和本地的进行比较。如果收到的为最新的，则保存
 int saveSceneFile_sync_service_request_handler(const Request& request, Response& response);
 
 //获取设备列表，返回给智慧安装app

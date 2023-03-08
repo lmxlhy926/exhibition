@@ -34,6 +34,9 @@ namespace synergy{
 //更新组列表
     int updateGroupList_service_handler(const Request& request, Response& response);
 
+//获取发现的蓝牙、zigbee站点
+    int getSiteNames_service_handler(const Request& request, Response& response);
+
 
 
 //重置网关

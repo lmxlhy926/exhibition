@@ -86,7 +86,11 @@ int main(int argc, char* argv[]) {
         return synergy::updateGroupList_service_handler(request, response);
     });
 
-
+    //获取站点名称
+    serviceSiteManager->registerServiceRequestHandler(GetSiteNames_Service_ID,
+                                                      [](const Request& request, Response& response)->int{
+        return synergy::getSiteNames_service_handler(request, response);
+    });
 
 
     //注册重置网关回调

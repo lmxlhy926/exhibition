@@ -53,6 +53,9 @@ public:
 
     void removeSite(string siteName);
 
+    //清除不存在的站点连接
+    void removeSitesNonExist(std::map<string, Json::Value>& sitesMap);
+
     bool sendRequest2Site(string siteName, qlibc::QData& request, qlibc::QData& response);
 
     void printMap();
