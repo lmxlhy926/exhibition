@@ -30,6 +30,7 @@ private:
     QData originWhiteListData;          //远端下发的原始白名单
     QData whiteListData;                //云端下发的转换后的白名单信息
     QData sceneConfigFile;              //场景配置文件
+    QData panelInfoData;                //面板配置信息
 
     static configParamUtil *instance;
     std::recursive_mutex mutex_;
@@ -85,6 +86,12 @@ public:
 
     //保存场景配置文件
     void saveSceneConfigFile(QData& data);
+
+    //获取面板信息
+    qlibc::QData getPanelInfo();
+
+    //设置面板信息
+    void setPanelInfo(qlibc::QData& data);
 };
 
 #endif //EXHIBITION_CONFIGPARAMUTIL_H

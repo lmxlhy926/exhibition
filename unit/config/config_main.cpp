@@ -146,21 +146,28 @@ int main(int argc, char* argv[]) {
     //获取灯控设备列表
     serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID,getAllDeviceList_service_request_handler);
 
+    //配置面板配置信息
+    serviceSiteManager->registerServiceRequestHandler(SETPANELINFO_REQUEST_SERVICE_ID,setPanelInfo_service_request_handler);
+
+    //获取面板配置信息
+    serviceSiteManager->registerServiceRequestHandler(GETPANELINFO_REQUEST_SERVICE_ID,getPanelInfo_service_request_handler);
+
 
     //set site supported subscribed message
     serviceSiteManager->registerMessageId(WHITELIST_MESSAGE_ID);                //发布白名单给第三方
     serviceSiteManager->registerMessageId(RECEIVED_WHITELIST_ID);               //发布消息，告知已接收到白名单
     serviceSiteManager->registerMessageId(WHITELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知白名单已被修改
     serviceSiteManager->registerMessageId(SCENELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知场景文件已被修改
+    serviceSiteManager->registerMessageId(PANELINFO_MODIFIED_MESSAGE_ID);       //发布消息，面板配置信息更改
 
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-            int code = serviceSiteManager->start();
+//            int code = serviceSiteManager->start();
             //注册启动方式
-//            int code = serviceSiteManager->startByRegister();
+            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 LOG_RED << "===>configSite startByRegister error, code = " << code;
                 LOG_RED << "===>configSite startByRegister in 3 seconds....";

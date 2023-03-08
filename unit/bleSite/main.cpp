@@ -217,9 +217,9 @@ int main(int argc, char* argv[]) {
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-            int code = serviceSiteManager->start();
+//            int code = serviceSiteManager->start();
             //注册启动方式
-//            int code = serviceSiteManager->startByRegister();
+            int code = serviceSiteManager->startByRegister();
             if(code != 0){
                 LOG_RED << "===>bleSite startByRegister error, code = " << code;
                 LOG_RED << "===>bleSite startByRegister in 3 seconds....";

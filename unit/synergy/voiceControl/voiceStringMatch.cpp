@@ -341,12 +341,13 @@ bool voiceStringMatchControl::findDeviceIdOrGroupId(string& str, ParsedItem& par
         isMatch = true;
 
     }else if(getDeviceType(str, deviceType)){   //<房间 + 类型> 确定组名
-        if(!parsedItem.roomName.empty()){
+        if(!parsedItem.roomName.empty()){   //如果房间非空，控制该房间对应的分组
             getGroupIdFromRoomNameAndType(groupList, parsedItem.roomName, deviceType, deviceIdOrGroupId, sourceSite);
             parsedItem.ctrlType = ControlType::Group;
             parsedItem.devIdGrpId = deviceIdOrGroupId;
             parsedItem.sourceSite = sourceSite;
             isMatch = true;
+
         }else if(parsedItem.hasAll){    //发送到所有的蓝牙站点
             parsedItem.ctrlType = ControlType::Group;
             parsedItem.devIdGrpId = "FFFF";

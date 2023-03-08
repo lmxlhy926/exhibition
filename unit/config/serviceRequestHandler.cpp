@@ -246,43 +246,43 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
     return 0;
 }
 
-void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
-    LOG_PURPLE << "start to sync " << site_id << " ......";
-    std::map<int, Json::Value> resultMap;
-    qlibc::QData app_site_list;
-    Json::ArrayIndex app_site_list_size  = 0;
 
-    //获取所有面板上的保存内容
+void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
+    LOG_PURPLE << "==>start to sync " << "<<" << site_id << ">>" << " to other site ......";
+    std::map<int, Json::Value> resultMap;
+    qlibc::QData node_list;
+    Json::ArrayIndex node_list_size  = 0;
+
+    //获取所有面板列表
     qlibc::QData request, response;
-    request.setString("service_id", "get_app_site_list");
+    request.setString("service_id", "get_all");
     request.putData("request", qlibc::QData());
     bool siteBool = httpUtil::sitePostRequest("127.0.0.1", 9012, request, response);
 
-    siteBool = true;
-    response.loadFromFile("/mnt/d/bywg/project/exhibition/unit/config/appSite.json");
-
+//    siteBool = true;
+//    response.loadFromFile("/mnt/d/bywg/project/exhibition/unit/config/nodeSite.json");
 
     if(siteBool){
-        app_site_list.setInitData(response.getData("response").getData("app_site_list"));
-        app_site_list_size = app_site_list.size();
-        for(Json::ArrayIndex i = 0; i < app_site_list_size; ++i){
-            qlibc::QData item = app_site_list.getArrayElement(i);
-            if(item.getString("site_id") == site_id){
-                qlibc::QData contentRequest, contentResponse;
-                contentRequest.setString("service_id", getServiceId);
-                contentRequest.putData("request", qlibc::QData());
-                string ip = item.getString("ip");
-                if(httpUtil::sitePostRequest(ip, 9006, contentRequest, contentResponse)){
-                    qlibc::QData content(contentResponse.getData("response"));
-                    if(!content.empty()){
-                        resultMap.insert(std::make_pair(atoi(content.getString("timeStamp").c_str()), content.asValue()));
-                    }
+        node_list.setInitData(response.getData("response").getData("node_list"));
+        node_list_size = node_list.size();
+        for(Json::ArrayIndex i = 0; i < node_list_size; ++i){
+            qlibc::QData item = node_list.getArrayElement(i);
+            string ip = item.getString("ip");
+            int port = 9006;
+            qlibc::QData contentRequest, contentResponse;
+            contentRequest.setString("service_id", getServiceId);
+            contentRequest.putData("request", qlibc::QData());
+            if(httpUtil::sitePostRequest(ip, port, contentRequest, contentResponse)){
+                qlibc::QData content(contentResponse.getData("response"));
+                if(!content.empty()){
+                    resultMap.insert(std::make_pair(atoi(content.getString("timeStamp").c_str()), content.asValue()));
                 }
             }
         }
     }
 
     if(resultMap.size() == 0){
+        LOG_PURPLE << "==>sync end.....";
         return;
     }
 
@@ -291,23 +291,25 @@ void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
     qlibc::QData newestContent(pos->second);
 
     //向所有站点更新内容
-    for(Json::ArrayIndex i = 0; i < app_site_list_size; ++i){
-        qlibc::QData item = app_site_list.getArrayElement(i);
-        if(item.getString("site_id") == site_id){
-            qlibc::QData contentSaveRequest, contentSaveResponse;
-            contentSaveRequest.setString("service_id", saveServiceId);
-            contentSaveRequest.putData("request", newestContent);
-            httpUtil::sitePostRequest(item.getString("ip"), 9006, contentSaveRequest, contentSaveResponse);
-        }
+    for(Json::ArrayIndex i = 0; i < node_list_size; ++i){
+        qlibc::QData item = node_list.getArrayElement(i);
+        string ip = item.getString("ip");
+        int port = 9006;
+        qlibc::QData contentSaveRequest, contentSaveResponse;
+        contentSaveRequest.setString("service_id", saveServiceId);
+        contentSaveRequest.putData("request", newestContent);
+        httpUtil::sitePostRequest(ip, 9006, contentSaveRequest, contentSaveResponse);
     }
+    LOG_PURPLE << "==>sync end.....";
 }
 
 
 int whiteList_sync_save_service_request_handler(const Request& request, Response& response){
-    LOG_INFO << "==>whiteList_sync_save_service_request_handler...";
+    LOG_PURPLE << "===>whiteList_sync_save_service_request_handler: start to compare...";
     qlibc::QData whiteListData = qlibc::QData(request.body).getData("request");
     qlibc::QData localWhiteList = configParamUtil::getInstance()->getWhiteList();
     if(atoi(localWhiteList.getString("timeStamp").c_str()) < atoi(whiteListData.getString("timeStamp").c_str())){
+        LOG_PURPLE << "===>update whiteList to the newest versiion....";
         configParamUtil::getInstance()->saveWhiteListData(whiteListData);
         //发布白名单修改信息
         qlibc::QData publishData;
@@ -315,6 +317,7 @@ int whiteList_sync_save_service_request_handler(const Request& request, Response
         publishData.putData("content", qlibc::QData());
         ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
     }
+    LOG_PURPLE << "===>whiteList_sync_save_service_request_handler: whiteList is the newest, noting needed to change....";
     return 0;
 }
 
@@ -334,7 +337,7 @@ int whiteList_service_request_handler(const Request& request, Response& response
 
 int whiteList_save_service_request_handler(const Request& request, Response& response){
     qlibc::QData data(request.body);
-    LOG_INFO << "==>whiteList_save_service_request_handler: " << data.toJsonString();
+    LOG_PURPLE << "==>whiteList_save_service_request_handler: " << data.toJsonString();
     qlibc::QData whiteListData = data.getData("request");
     configParamUtil::getInstance()->saveWhiteListData(whiteListData);
 
@@ -529,6 +532,89 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
 
     return 0;
 }
+
+//设置面板信息
+int setPanelInfo_service_request_handler(const Request& request, Response& response){
+    qlibc::QData requestData(request.body);
+    LOG_INFO << "==>setPanelInfo_service_request_handler: " << requestData.toJsonString();
+    qlibc::QData panelConfigData = requestData.getData("request");
+    configParamUtil::getInstance()->setPanelInfo(panelConfigData);
+
+    //发布面板配置信息改变
+    qlibc::QData publishData;
+    publishData.setString("message_id", PANELINFO_MODIFIED_MESSAGE_ID);
+    publishData.putData("content", panelConfigData);
+    ServiceSiteManager::getInstance()->publishMessage(PANELINFO_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+    LOG_INFO << "publish: " << publishData.toJsonString();
+
+    //将面板信息加入白名单中
+    string origin_device_mac = panelConfigData.getString("device_mac");
+    string device_mac;
+    regex sep("[:]+");
+    sregex_token_iterator end;
+    sregex_token_iterator p(origin_device_mac.cbegin(), origin_device_mac.cend(), sep, {-1});
+    for(; p != end; p++){
+        device_mac += p->str();
+    }
+
+    //构造设备项
+    qlibc::QData panelItem;
+    panelItem.setString("category_code", "panel");
+    panelItem.setString("device_sn", device_mac);
+    panelItem.setString("device_mac", device_mac);
+    panelItem.setString("device_name", panelConfigData.getString("device_name"));
+    panelItem.setString("room_name", panelConfigData.getData("location").getString("room_name"));
+    panelItem.setString("room_no", panelConfigData.getData("location").getString("room_no"));
+    panelItem.setString("device_type", "2");
+
+    //获取白名单
+    qlibc::QData whiteList = configParamUtil::getInstance()->getWhiteList();
+    qlibc::QData devices = whiteList.getData("info").getData("devices");
+    Json::ArrayIndex deviceSize = devices.size();
+    int elem2DelIndex = -1;
+    for(Json::ArrayIndex i = 0; i < deviceSize; ++i){
+        qlibc::QData item = devices.getArrayElement(i);
+        if(item.getString("device_mac") == device_mac){
+            elem2DelIndex = i;
+            break;
+        }
+    }
+
+    //删除原先的项
+    if(elem2DelIndex != -1){
+        devices.deleteArrayItem(elem2DelIndex);
+    }
+    devices.append(panelItem);
+
+    //保存白名单
+    whiteList.asValue()["info"]["devices"] = devices.asValue();
+    whiteList.setString("timeStamp", std::to_string(time(nullptr)));
+    qlibc::QData contentSaveRequest, contentSaveResponse;
+    contentSaveRequest.setString("service_id", WHITELIST_SAVE_REQUEST_SERVICE_ID);
+    contentSaveRequest.putData("request", whiteList);
+    httpUtil::sitePostRequest("127.0.0.1", 9006, contentSaveRequest, contentSaveResponse);
+
+    qlibc::QData data;
+    data.setInt("code", 0);
+    data.setString("error", "ok");
+    data.putData("response", qlibc::QData());
+    response.set_content(data.toJsonString(), "text/json");
+    return 0;
+}
+
+
+//获取面板信息
+int getPanelInfo_service_request_handler(const Request& request, Response& response){
+    LOG_INFO << "==>getPanelInfo_service_request_handler: " << qlibc::QData(request.body).toJsonString();
+    qlibc::QData data;
+    data.setInt("code", 0);
+    data.setString("error", "ok");
+    data.putData("response", configParamUtil::getInstance()->getPanelInfo());
+    response.set_content(data.toJsonString(), "text/json");
+    return 0;
+}
+
+
 
 #if 0
 int whiteList_update_service_request_handler(const Request& request, Response& response){

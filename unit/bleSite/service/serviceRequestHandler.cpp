@@ -565,7 +565,7 @@ void updateDeviceList(const Request& request){
     //获取本机配置站点白名单
     qlibc::QData whiteListRequest, whiteListResponse;
     whiteListRequest.setString("service_id", "whiteListRequest");
-    whiteListRequest.putData("request", qlibc::QData());
+    whiteListRequest.setValue("request", Json::Value("{}"));
     SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, whiteListRequest, whiteListResponse);
 
     if(whiteListResponse.getInt("code") == 0){

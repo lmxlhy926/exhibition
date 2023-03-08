@@ -7,22 +7,33 @@
 #include "../param.h"
 #include "log/Logging.h"
 
-void siteManager::updateSiteBak() {
+void siteManager::updateSite() {
     qlibc::QData request, response;
     request.setString("service_id", "site_localAreaNetworkSite");
     request.putData("request", qlibc::QData().setString("site_id", ""));
     if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){    //获取局域网内所有发现的站点
         qlibc::QData resBody = response.getData("response");
-        Json::Value::Members members = resBody.getMemberNames();
-        for(auto& elem : members){
-            qlibc::QData siteList = resBody.getData(elem);
+        Json::Value::Members ipMembers = resBody.getMemberNames();
+        for(auto& ip : ipMembers){
+            qlibc::QData siteList = resBody.getData(ip);
             Json::ArrayIndex size = siteList.size();
             for(Json::ArrayIndex i = 0; i < size; ++i){
                 qlibc::QData item = siteList.getArrayElement(i);
                 string site_id = item.getString("site_id");
                 if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){
-                    string ipSiteName = elem + ":" + site_id;   //ip:siteID
-                    SiteRecord::getInstance()->addSite(ipSiteName, elem, item.getInt("port"));  //记录选定的站点
+                    //从相应的配置站点获取mac
+                    string uid;
+                    qlibc::QData panelConfigRequest, panelConfigResponse;
+                    panelConfigRequest.setString("service_id", "get_self_info");
+                    panelConfigRequest.putData("request", qlibc::QData());
+                    if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
+                        uid = panelConfigResponse.getData("response").getString("device_id");
+                    }
+                    if(!uid.empty()){
+                        string siteName;
+                        siteName.append(uid).append(":").append(site_id);
+                        SiteRecord::getInstance()->addSite(siteName, ip, item.getInt("port"));  //记录选定的站点
+                    }
                 }
             }
         }
@@ -30,7 +41,8 @@ void siteManager::updateSiteBak() {
 }
 
 
-qlibc::QData siteManager::updateSite() {
+
+qlibc::QData siteManager::updateSite__bak() {
     qlibc::QData totalList;
     qlibc::QData appSiteRequest, nodeSiteRequest;
     appSiteRequest.setString("service_id", "get_app_site_list");
@@ -43,10 +55,10 @@ qlibc::QData siteManager::updateSite() {
     bool nodeBool = httpUtil::sitePostRequest("127.0.0.1", 9012, nodeSiteRequest, nodeSiteResponse);
 
 //测试-----------
-    siteBool = true;
-    nodeBool = true;
-    appSiteResponse.loadFromFile("/mnt/d/bywg/project/exhibition/unit/synergy/sourceManage/appSite.json");
-    nodeSiteResponse.loadFromFile("/mnt/d/bywg/project/exhibition/unit/synergy/sourceManage/nodeSite.json");
+//    siteBool = true;
+//    nodeBool = true;
+//    appSiteResponse.loadFromFile("/mnt/d/bywg/project/exhibition/unit/synergy/sourceManage/appSite.json");
+//    nodeSiteResponse.loadFromFile("/mnt/d/bywg/project/exhibition/unit/synergy/sourceManage/nodeSite.json");
 
 //测试-----------
     if(siteBool && nodeBool) {    //整合站点列表
@@ -78,7 +90,7 @@ qlibc::QData siteManager::updateSite() {
         }
     }
 
-//    SiteRecord::getInstance()->printMap();
+    SiteRecord::getInstance()->printMap();
 
     return totalList;
 }

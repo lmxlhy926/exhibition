@@ -62,4 +62,11 @@ int saveSceneFile_sync_service_request_handler(const Request& request, Response&
 //获取设备列表，返回给智慧安装app
 int getAllDeviceList_service_request_handler(const Request& request, Response& response);
 
+//设置面板信息
+int setPanelInfo_service_request_handler(const Request& request, Response& response);
+
+//获取面板信息
+int getPanelInfo_service_request_handler(const Request& request, Response& response);
+
+
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

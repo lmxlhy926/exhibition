@@ -46,7 +46,7 @@ struct ParsedItem{
     string sourceSite;
 };
 
-//单个控制项
+//单个控制命令项
 struct CommandItem{
     string command_id;
     Json::Value command_para;
@@ -77,28 +77,28 @@ public:
     void parseAndControl();
 
 private:
-    //控制码---> 控制动作
+    //动作控制码---> 控制动作字符串
     string code2Action(ActionCode code);
 
     //打印解析结构
     void printParsedItem(struct ParsedItem& item);
 
-    //控制动作转换为控制命令
+    //从解析项中提取控制命令项
     void action2Command(ParsedItem& parsedItem, CommandItem& commandItem);
 
-    //获取设备名称相匹配的设备ID
+    //获取与设备名称相匹配的设备ID，站点来源
     bool getSpecificDeviceId(qlibc::QData& deviceList, string& str, string& deviceId, string& sourceSite);
 
-    //获取组名称相匹配的组ID
+    //获取与组名称相匹配的组ID，站点来源
     bool getSpecificGroupId(qlibc::QData& groupList, string& str, string& groupId, string& sourceSite);
 
     //获取控制的类型
     bool getDeviceType(string& str, string& deviceType);
 
-    //获取房间的默认组ID
+    //获取指定房间的默认组ID，站点来源
     bool getGroupIdFromRoomNameAndType(qlibc::QData& groupList, string& roomName, string& deviceType, string& groupId, string& sourceSite);
 
-    //找到设备id或者组id
+    //找到设备id或者组id，填充入解析项
     bool findDeviceIdOrGroupId(string& str, ParsedItem& parsedItem);
 
     //依据解析项进行控制

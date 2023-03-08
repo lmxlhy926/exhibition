@@ -12,9 +12,9 @@ using namespace std;
 class siteManager {
 public:
     //更新站点列表
-    static void updateSiteBak();
+    static void updateSite();
 
-    static qlibc::QData updateSite();
+    static qlibc::QData updateSite__bak();
 };
 
 

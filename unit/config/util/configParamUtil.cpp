@@ -111,5 +111,19 @@ void configParamUtil::saveSceneConfigFile(QData& data){
     sceneConfigFile.saveToFile("/data/changhong/edge_midware/rules-config.txt", true);
 }
 
+//获取面板信息
+qlibc::QData configParamUtil::getPanelInfo(){
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    if(panelInfoData.empty())
+        panelInfoData.loadFromFile("/data/changhong/edge_midware/panelConfig.txt");
+    return panelInfoData;
+}
+
+//设置面板信息
+void configParamUtil::setPanelInfo(qlibc::QData& data){
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    panelInfoData.setInitData(data);
+    panelInfoData.saveToFile("/data/changhong/edge_midware/panelConfig.txt", true);
+}
 
 
