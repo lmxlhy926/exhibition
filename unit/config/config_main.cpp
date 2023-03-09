@@ -123,16 +123,13 @@ int main(int argc, char* argv[]) {
 
 
     //获取白名单列表
-    serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID,whiteList_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID,whiteList_get_service_request_handler);
 
     //保存白名单列表
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_SAVE_REQUEST_SERVICE_ID,whiteList_save_service_request_handler);
 
     //同步保存白名单
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID,whiteList_sync_save_service_request_handler);
-
-    //灯控设备同步到白名单
-    serviceSiteManager->registerServiceRequestHandler(WHITELIST_UPDATE_REQUEST_SERVICE_ID,whiteList_update_service_request_handler);
 
     //获取场景配置文件
     serviceSiteManager->registerServiceRequestHandler(GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, getSceneFile_service_request_handler);
@@ -159,6 +156,15 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageId(WHITELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知白名单已被修改
     serviceSiteManager->registerMessageId(SCENELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知场景文件已被修改
     serviceSiteManager->registerMessageId(PANELINFO_MODIFIED_MESSAGE_ID);       //发布消息，面板配置信息更改
+
+    //30秒同步一次白名单和场景文件
+    threadPool_.enqueue([&](){
+        while(true){
+            whiteList_sync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID);    //同步白名单
+            whiteList_sync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID);    //同步场景文件
+            std::this_thread::sleep_for(std::chrono::seconds(30));
+        }
+    });
 
 
     // 站点监听线程启动

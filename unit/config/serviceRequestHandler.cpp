@@ -298,7 +298,7 @@ void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
         qlibc::QData contentSaveRequest, contentSaveResponse;
         contentSaveRequest.setString("service_id", saveServiceId);
         contentSaveRequest.putData("request", newestContent);
-        httpUtil::sitePostRequest(ip, 9006, contentSaveRequest, contentSaveResponse);
+        httpUtil::sitePostRequest(ip, port, contentSaveRequest, contentSaveResponse);
     }
     LOG_PURPLE << "==>sync end.....";
 }
@@ -322,7 +322,7 @@ int whiteList_sync_save_service_request_handler(const Request& request, Response
 }
 
 
-int whiteList_service_request_handler(const Request& request, Response& response){
+int whiteList_get_service_request_handler(const Request& request, Response& response){
     LOG_INFO << "===>whiteList_service_request_handler: " << qlibc::QData(request.body).toJsonString();
 
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
@@ -354,89 +354,6 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
     ret.setString("msg", "success");
     response.set_content(ret.toJsonString(), "text/json");
 
-    return 0;
-}
-
-
-//增加新的设备、删除旧的设备
-int whiteList_update_service_request_handler(const Request& request, Response& response){
-    LOG_HLIGHT << "==>whiteList_update_service_request_handler";
-    //蓝牙站点所有设备
-    std::map<string, Json::Value> bleSiteDeviceMap;
-    qlibc::QData bleSiteDeviceList = qlibc::QData(request.body).getData("request").getData("device_list");
-    size_t bleSiteDeviceListSize = bleSiteDeviceList.size();
-    for(Json::ArrayIndex i = 0; i < bleSiteDeviceListSize; ++i){
-        qlibc::QData item = bleSiteDeviceList.getArrayElement(i);
-        bleSiteDeviceMap.insert(std::make_pair(item.getString("category_code"), item.asValue()));
-    }
-
-    //原有白名单列表
-    qlibc::QData originWhiteList = configParamUtil::getInstance()->getWhiteList();
-    bool changed = false;
-    bool updateSuccess = false;
-
-    //白名单现有设备
-    std::map<string, Json::Value> originWhiteDeviceMap;
-    qlibc::QData originWhiteListDevices = originWhiteList.getData("info").getData("devices");
-    size_t originWhiteListSize = originWhiteListDevices.size();
-    for(Json::ArrayIndex i = 0; i < originWhiteListSize; ++i){
-        qlibc::QData item = originWhiteListDevices.getArrayElement(i);
-        originWhiteDeviceMap.insert(std::make_pair(item.getString("category_code"), item.asValue()));
-    }
-
-    //删除蓝牙站点不存在的设备
-    for(auto pos = originWhiteDeviceMap.begin(); pos != originWhiteDeviceMap.end();){
-       if(pos->second["category_code"].asString() == "LIGHT"){
-           if(bleSiteDeviceMap.find(pos->first) == bleSiteDeviceMap.end()){
-               pos = originWhiteDeviceMap.erase(pos);
-               changed = true;
-           }else{
-               pos++;
-           }
-       }else{
-           pos++;
-       }
-    }
-
-    //添加蓝牙站点新增的设备
-    for(auto pos = bleSiteDeviceMap.begin(); pos != bleSiteDeviceMap.end();){
-        if(originWhiteDeviceMap.find(pos->first) == originWhiteDeviceMap.end()){
-            originWhiteDeviceMap.insert(std::make_pair(pos->first, pos->second));
-            changed = true;
-        }
-    }
-
-    //如果白名单有更改，则更新白名单
-    if(changed){
-        qlibc::QData newDeviceList;
-        for(auto& item : originWhiteDeviceMap){
-            newDeviceList.append(item.second);
-        }
-        originWhiteList.asValue()["info"]["devices"] = newDeviceList.asValue();
-        originWhiteList.asValue()["timeStamp"] = std::to_string(time(nullptr));
-
-        //存储白名单
-        qlibc::QData whiteRequest, whiteResponse;
-        whiteRequest.setString("service_id", WHITELIST_SAVE_REQUEST_SERVICE_ID);
-        whiteRequest.putData("request", originWhiteList);
-        if(httpUtil::sitePostRequest("127.0.0.1", ConfigSitePort, whiteRequest, whiteResponse)){
-            if(whiteResponse.getInt("code") == 0){
-                updateSuccess = true;
-            }
-        }
-    }
-
-    if(updateSuccess){
-        qlibc::QData ret;
-        ret.setInt("code", 0);
-        ret.setString("msg", "success");
-        response.set_content(ret.toJsonString(), "text/json");
-    }else{
-        qlibc::QData ret;
-        ret.setInt("code", -1);
-        ret.setString("msg", "failed");
-        response.set_content(ret.toJsonString(), "text/json");
-    }
     return 0;
 }
 

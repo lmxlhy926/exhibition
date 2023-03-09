@@ -421,9 +421,14 @@ namespace synergy {
                 SiteRecord::getInstance()->sendRequest2Site(siteName, requestData, responseData);
                 LOG_INFO << "responseData: " << responseData.toJsonString();
                 response.set_content(responseData.toJsonString(), "text/json");
-                break;
+                return;
             }
         }
+        qlibc::QData ret;
+        ret.setInt("code", -1);
+        ret.setString("msg", "need sourceSite to deliever!!!");
+        ret.putData("response", qlibc::QData());
+        response.set_content(ret.toJsonString(), "text/json");
     }
 
 

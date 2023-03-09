@@ -47,13 +47,10 @@ void whiteList_sync(string site_id, string getServiceId, string saveServiceId);
 int whiteList_sync_save_service_request_handler(const Request& request, Response& response);
 
 //获取白名单列表
-int whiteList_service_request_handler(const Request& request, Response& response);
+int whiteList_get_service_request_handler(const Request& request, Response& response);
 
 //保存白名单，并将白名单同步到每个配置站点
 int whiteList_save_service_request_handler(const Request& request, Response& response);
-
-//蓝牙设备列表对白名单进行更新, 不对外开放
-int whiteList_update_service_request_handler(const Request& request, Response& response);
 
 //获取场景配置文件
 int getSceneFile_service_request_handler(const Request& request, Response& response);
