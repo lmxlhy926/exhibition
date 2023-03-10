@@ -61,6 +61,8 @@ public:
     void printMap();
 
     std::set<string> getSiteName();
+
+    bool getSiteInfo(string& siteName, string& ip, int& port);
 };
 
 #endif //EXHIBITION_HTTPUTIL_H

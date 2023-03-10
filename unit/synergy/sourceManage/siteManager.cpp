@@ -6,6 +6,12 @@
 #include "common/httpUtil.h"
 #include "../param.h"
 #include "log/Logging.h"
+#include "siteService/service_site_manager.h"
+using namespace std;
+using namespace servicesite;
+using namespace httplib;
+using namespace std::placeholders;
+
 
 void siteManager::updateSite(){
     std::map<string, Json::Value> sitesMap;
@@ -46,8 +52,30 @@ void siteManager::updateSite(){
 
     //删除已经不存在的站点连接
     SiteRecord::getInstance()->removeSitesNonExist(sitesMap);
+    //加入新发现的连接
     for(auto& elem : sitesMap){
         SiteRecord::getInstance()->addSite(elem.first, elem.second["ip"].asString(), elem.second["port"].asInt());
+    }
+
+    //订阅蓝牙站点的消息
+    std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
+    for(auto& siteName : siteNames){
+        smatch sm;
+        if(regex_match(siteName, sm, regex("(.*):ble_light"))){
+            //订阅蓝牙站点消息
+            int code;
+            std::vector<string> messageIdList;
+            messageIdList.push_back(ScanResultMsg);
+            messageIdList.push_back(SingleDeviceBindSuccessMsg);
+            messageIdList.push_back(SingleDeviceUnbindSuccessMsg);
+            messageIdList.push_back(BindEndMsg);
+            messageIdList.push_back(Device_State_Changed);
+            code = ServiceSiteManager::getInstance()->subscribeMessage(LocalIp, ConfigPort, messageIdList);
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                printf("subscribeMessage whiteListModified ok.\n");
+                break;
+            }
+        }
     }
 }
 

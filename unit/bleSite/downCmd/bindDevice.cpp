@@ -82,8 +82,8 @@ void BindDevice::bind(QData &deviceArray) {
     qlibc::QData scanEndData(ScanEndString);
     DownUtility::parse2Send(scanEndData);
 
-    //更新配置站点的白名单
-    util::updateWhiteDeviceList();
+    //通知设备管理站点更新设备
+    util::updateDeviceList();
 
     //发布绑定结束消息
     qlibc::QData publishData;

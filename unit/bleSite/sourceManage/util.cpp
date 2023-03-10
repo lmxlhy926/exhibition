@@ -36,6 +36,27 @@ bool getSynergyInfo(string& ip, int& port){
 }
 
 
+void util::updateDeviceList(){
+    string ip;
+    int port;
+    if(getSynergyInfo(ip, port)){
+        qlibc::QData request, response;
+        request.setString("service_id", "updateDeviceList");
+        request.putData("request", qlibc::QData());
+        if(httpUtil::sitePostRequest(ip, port, request, response)){
+            if(response.getInt("code") == 0){
+                LOG_PURPLE << "==>notify synergy to updateDeviceList successfully.......";
+            }else{
+                LOG_RED << "==>notify synergy to updateDeviceList failed.......";
+            }
+        }else{
+            LOG_RED << "==>notify synergy to updateDeviceList failed, cangt access synergy site.......";
+        }
+    }else{
+        LOG_RED << "==>notify synergy to updateDeviceList failed, cannot get synergy site.......";
+    }
+}
+
 void util::updateWhiteDeviceList() {
     LOG_INFO << "==>notify synergy to updateWhiteDeviceList....";
     string ip;
@@ -55,27 +76,5 @@ void util::updateWhiteDeviceList() {
         }
     }else{
         LOG_RED << "==>synergy updateWhiteDeviceList failed, cannot get synergy site.......";
-    }
-}
-
-
-void util::updateDeviceList(){
-    string ip;
-    int port;
-    if(getSynergyInfo(ip, port)){
-        qlibc::QData request, response;
-        request.setString("service_id", "updateDeviceList");
-        request.putData("request", qlibc::QData());
-        if(httpUtil::sitePostRequest(ip, port, request, response)){
-            if(response.getInt("code") == 0){
-                LOG_PURPLE << "==>notify synergy to updateDeviceList successfully.......";
-            }else{
-                LOG_RED << "==>notify synergy to updateDeviceList failed.......";
-            }
-        }else{
-            LOG_RED << "==>notify synergy to updateDeviceList failed, cangt access synergy site.......";
-        }
-    }else{
-        LOG_RED << "==>notify synergy to updateDeviceList failed, cannot get synergy site.......";
     }
 }

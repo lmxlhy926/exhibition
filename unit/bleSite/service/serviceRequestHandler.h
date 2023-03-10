@@ -34,9 +34,9 @@ int get_device_list_byRoomName_service_handler(const Request& request, Response&
 //获取设备状态
 int get_device_state_service_handler(const Request& request, Response& response);
 
+
 //存储设备列表
 int save_deviceList_service_handler(const Request& request, Response& response);
-
 
 //二进制控制指令
 int BleDevice_command_test_service_handler(const Request& request, Response& response);

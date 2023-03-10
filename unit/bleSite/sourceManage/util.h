@@ -8,11 +8,13 @@
 
 class util {
 public:
+    //通知设备管理站点进行设备列表更新
+    static void updateDeviceList();
+
     //通知设备管理站点进行白名单更新
     static void updateWhiteDeviceList();
 
-    //通知设备管理站点进行设备列表更新
-    static void updateDeviceList();
+
 };
 
 

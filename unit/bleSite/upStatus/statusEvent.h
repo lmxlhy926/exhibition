@@ -321,7 +321,7 @@ public:
         LOG_PURPLE << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
 
         //更新config白名单列表
-        util::updateWhiteDeviceList();
+        util::updateDeviceList();
 
         //发布设备解绑消息
         qlibc::QData content, publishData;

@@ -184,18 +184,9 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(GetGroupList_Device_Service_ID, getGroupList_service_handler);
 
 
-    //注册白名单改变助理函数
+#if 0
+    //注册白名单改变处理函数
     serviceSiteManager->registerMessageHandler(WHITELIST_MODIFIED_MESSAGE_ID, updateDeviceList);
-
-
-    //提取蓝牙站点设备列表，定时配置站点白名单进行更新
-    threadPool_.enqueue([](){
-        while(true){
-            util::updateWhiteDeviceList();
-            std::this_thread::sleep_for(std::chrono::seconds(30));
-        }
-    });
-
 
     //白名单被app修改，将白名单配置的设备属性信息同步到蓝牙设备列表
     threadPool_.enqueue([&](){
@@ -212,6 +203,7 @@ int main(int argc, char* argv[]) {
             LOG_RED << "subscribed whiteListModified failed....., start to subscribe in 10 seconds";
         }
     });
+#endif
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
