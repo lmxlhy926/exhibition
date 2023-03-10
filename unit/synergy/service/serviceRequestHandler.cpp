@@ -299,6 +299,25 @@ namespace synergy {
             LOG_BLUE << elem.first << " controlResponse: " << controlResponse.toJsonString();
         }
 
+        //如果group_id含有FFFF
+        for(Json::ArrayIndex i = 0; i < size; ++i){
+            qlibc::QData item = controlGroupList.getArrayElement(i);
+            string group_id = item.getString("group_id");
+            if(group_id == "FFFF" || group_id == "ffff"){
+                std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
+                for(auto& siteName : siteNames){
+                    qlibc::QData controlRequest, controlResponse;
+                    qlibc::QData groupList;
+                    groupList.append(item);
+                    controlRequest.setString("service_id", "control_group");
+                    controlRequest.putData("request", qlibc::QData().putData("group_list", groupList));
+                    LOG_GREEN << siteName << " controlRequest: " << controlRequest.toJsonString();
+                    SiteRecord::getInstance()->sendRequest2Site(siteName, controlRequest, controlResponse);
+                    LOG_BLUE << siteName << " controlResponse: " << controlResponse.toJsonString();
+                }
+            }
+        }
+
         response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
