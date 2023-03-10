@@ -43,8 +43,10 @@ static const string GETPANELINFO_REQUEST_SERVICE_ID                 =     "get_s
 
 
 //消息发布ID
-static const string WHITELIST_MODIFIED_MESSAGE_ID   = "whiteListModified";    //白名单被app修改
-static const string SCENELIST_MODIFIED_MESSAGE_ID   = "sceneListModified";    //场景文件被app修改
-static const string PANELINFO_MODIFIED_MESSAGE_ID   = "self_info_update";     //面板配置信息更改
+static const string WHITELIST_MESSAGE_ID =  "whiteList";                           //通知白名单被修改
+static const string RECEIVED_WHITELIST_ID = "receivedWhiteList";                   //通知安装师傅app，收到了白名单
+static const string WHITELIST_MODIFIED_MESSAGE_ID       = "whiteListModified";     //白名单被app修改
+static const string SCENELIST_MODIFIED_MESSAGE_ID       = "sceneListModified";     //场景文件被app修改
+static const string PANELINFO_MODIFIED_MESSAGE_ID       = "self_info_update";      //面板配置信息更改
 
 #endif //EXHIBITION_PARAM_H

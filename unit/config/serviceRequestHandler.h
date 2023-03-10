@@ -41,7 +41,7 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
  *  3. 比较得到最新的白名单
  *  4. 将最新的白名单写回每个面板
  */
-void whiteList_sync(string site_id, string getServiceId, string saveServiceId);
+void fileSync(string site_id, string getServiceId, string saveServiceId, string message);
 
 //收到白名单后，和本地的进行比较。如果收到的比本地的新，则更新，并发送白名单更改消息
 int whiteList_sync_save_service_request_handler(const Request& request, Response& response);

@@ -8,6 +8,7 @@
 #include "siteService/service_site_manager.h"
 #include "configParamUtil.h"
 #include "log/Logging.h"
+#include "../param.h"
 
 using namespace qlibc;
 using namespace servicesite;
@@ -113,20 +114,23 @@ qlibc::QData mqttPayloadHandle::transform(const char* payloadReceive, int len){
 bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int len) {
     //转换白名单格式
     qlibc::QData payload = transform(payloadReceive, len);
+    if(payload.empty()){
+        return false;
+    }
     //存储转换后的白名单
     configParamUtil::getInstance()->saveWhiteListData(payload);
 
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     //发布白名单
     qlibc::QData publishData;
-    publishData.setString("message_id", "whiteList");
+    publishData.setString("message_id", WHITELIST_MESSAGE_ID);
     publishData.putData("content", payload);
     serviceSiteManager->publishMessage(WHITELIST_MESSAGE_ID, publishData.toJsonString());
     LOG_PURPLE << "......publish whiteList to third party............";
 
     //通知智慧安装app，收到了白名单
     qlibc::QData receivedData;
-    receivedData.setString("message_id", "receivedWhiteList");
+    receivedData.setString("message_id", RECEIVED_WHITELIST_ID);
     receivedData.putData("content", qlibc::QData());
     serviceSiteManager->publishMessage(RECEIVED_WHITELIST_ID, receivedData.toJsonString());
     LOG_PURPLE << "......publish to app, config site receivedWhiteList............";

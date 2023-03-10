@@ -23,6 +23,11 @@ int main(int argc, char* argv[]) {
     string path = "/data/changhong/edge_midware/lhy/configSiteLog.txt";
     muduo::logInitLogger(path);
 
+    for(int i = 0; i < argc; ++i){
+        LOG_PURPLE << "ARGPRINT......";
+        LOG_RED << argv[i];
+    }
+
     if(argc != 2 && argc !=3 ){
         LOG_RED << "Usage Error.....";
         LOG_PURPLE << "Try again with the format: [config <DirPath>], [config <DirPath> <--RK3308>]";
@@ -33,6 +38,8 @@ int main(int argc, char* argv[]) {
     if(argc == 3 && string(argv[2]) == "--RK3308"){
         ISRK3308 = true;
         LOG_PURPLE << "RK3308.........";
+    }else{
+        LOG_PURPLE << "SMART HOME......";
     }
 
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
@@ -160,8 +167,10 @@ int main(int argc, char* argv[]) {
     //30秒同步一次白名单和场景文件
     threadPool_.enqueue([&](){
         while(true){
-            whiteList_sync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID);    //同步白名单
-            whiteList_sync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID);    //同步场景文件
+            fileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID,
+                           "whiteList auto update...");    //同步白名单
+            fileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID,
+                     "sceneData auto update...");    //同步场景文件
             std::this_thread::sleep_for(std::chrono::seconds(30));
         }
     });

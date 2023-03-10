@@ -230,12 +230,12 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
     if(whiteListResponse.getInt("code") == 200){
         string payloadString = whiteListResponse.getData("data").toJsonString();
         qlibc::QData payload = mqttPayloadHandle::transform(payloadString.c_str(), payloadString.size());
-        configParamUtil::getInstance()->saveWhiteListData(payload);
-
+        if(!payload.empty()){
+            configParamUtil::getInstance()->saveWhiteListData(payload);
+        }
         data.setInt("code", 0);
         data.setString("error", whiteListResponse.getString("msg"));
         data.putData("response", payload);
-
     }else{
         data.setInt("code", 1);
         data.setString("error", whiteListResponse.getString("msg"));
@@ -247,9 +247,9 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
 }
 
 
-void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
-    LOG_PURPLE << "==>start to sync " << "<<" << site_id << ">>" << " to other site ......";
-    std::map<int, Json::Value> resultMap;
+void fileSync(string site_id, string getServiceId, string saveServiceId, string message){
+    LOG_PURPLE << "==>start to fileSync: " << message;
+    std::map<unsigned long long, Json::Value> resultMap;
     qlibc::QData node_list;
     Json::ArrayIndex node_list_size  = 0;
 
@@ -265,6 +265,8 @@ void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
     if(siteBool){
         node_list.setInitData(response.getData("response").getData("node_list"));
         node_list_size = node_list.size();
+        LOG_INFO << "node_list: " << node_list.toJsonString();
+
         for(Json::ArrayIndex i = 0; i < node_list_size; ++i){
             qlibc::QData item = node_list.getArrayElement(i);
             string ip = item.getString("ip");
@@ -275,14 +277,25 @@ void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
             if(httpUtil::sitePostRequest(ip, port, contentRequest, contentResponse)){
                 qlibc::QData content(contentResponse.getData("response"));
                 if(!content.empty()){
-                    resultMap.insert(std::make_pair(atoi(content.getString("timeStamp").c_str()), content.asValue()));
+                    unsigned long long timeStamp = 0;
+                    try{
+                        timeStamp = stoull(content.getString("timeStamp"), nullptr, 10);
+                    }catch(const std::exception& e){
+                        LOG_RED << "error in parse timeStamp....";
+                        timeStamp = -1;
+                    }
+                    if(timeStamp > 0){
+                        resultMap.insert(std::make_pair(timeStamp, content.asValue()));
+                    }
+                }else{
+                    LOG_RED << "===>content is empty.....";
                 }
             }
         }
     }
 
     if(resultMap.size() == 0){
-        LOG_PURPLE << "==>sync end.....";
+        LOG_RED << "==>sync end, dont find any effective data.....";
         return;
     }
 
@@ -300,24 +313,40 @@ void whiteList_sync(string site_id, string getServiceId, string saveServiceId){
         contentSaveRequest.putData("request", newestContent);
         httpUtil::sitePostRequest(ip, port, contentSaveRequest, contentSaveResponse);
     }
-    LOG_PURPLE << "==>sync end.....";
+    LOG_PURPLE << "==>sync completely.....";
 }
 
 
 int whiteList_sync_save_service_request_handler(const Request& request, Response& response){
-    LOG_PURPLE << "===>whiteList_sync_save_service_request_handler: start to compare...";
-    qlibc::QData whiteListData = qlibc::QData(request.body).getData("request");
+    LOG_PURPLE << "===>recevied sync whiteList, start to compare...";
     qlibc::QData localWhiteList = configParamUtil::getInstance()->getWhiteList();
-    if(atoi(localWhiteList.getString("timeStamp").c_str()) < atoi(whiteListData.getString("timeStamp").c_str())){
-        LOG_PURPLE << "===>update whiteList to the newest versiion....";
+    qlibc::QData whiteListData = qlibc::QData(request.body).getData("request");
+    if(localWhiteList.empty() || whiteListData.empty()){
+        LOG_RED << "===>localWhiteList or whiteListData is empty, dont save this data";
+        return 0;
+    }
+    unsigned long long localTime, otherTime;
+    try{
+        localTime = stoull(localWhiteList.getString("timeStamp"), nullptr, 10);
+        otherTime = stoull(whiteListData.getString("timeStamp"), nullptr, 10);
+    }catch(const std::exception& e){
+        LOG_RED << "==>error in transfering whiteListTime, dont save this data.......";
+        return 0;
+    }
+    LOG_PURPLE << "==>whiteListlocalTime:" << localTime << ", whiteListotherTime: " << otherTime;
+
+    if(localTime < otherTime){
         configParamUtil::getInstance()->saveWhiteListData(whiteListData);
+        LOG_PURPLE << "===>save whiteList to the newest versiion....";
         //发布白名单修改信息
         qlibc::QData publishData;
         publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
         publishData.putData("content", qlibc::QData());
         ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+    }else{
+        LOG_PURPLE << "===>whiteList is the newest, noting needed to save....";
     }
-    LOG_PURPLE << "===>whiteList_sync_save_service_request_handler: whiteList is the newest, noting needed to change....";
+
     return 0;
 }
 
@@ -336,12 +365,24 @@ int whiteList_get_service_request_handler(const Request& request, Response& resp
 }
 
 int whiteList_save_service_request_handler(const Request& request, Response& response){
+    //收到白名单后，先将其保存
     qlibc::QData data(request.body);
     LOG_PURPLE << "==>whiteList_save_service_request_handler: " << data.toJsonString();
     qlibc::QData whiteListData = data.getData("request");
+    if(whiteListData.empty()){
+        LOG_RED << "==>white list is empty, format error....";
+        qlibc::QData ret;
+        ret.setInt("code", -1);
+        ret.setString("msg", "white list is empty, format error....");
+        response.set_content(ret.toJsonString(), "text/json");
+        return 0;
+    }
+
     configParamUtil::getInstance()->saveWhiteListData(whiteListData);
 
-    whiteList_sync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID);    //同步白名单
+    //同步其它站点的白名单
+    fileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID,
+             "whiteListSaveHandler invoke....");    //同步白名单
 
     //发布白名单修改信息
     qlibc::QData publishData;
@@ -361,13 +402,11 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
 //获取场景配置文件
 int getSceneFile_service_request_handler(const Request& request, Response& response){
     LOG_INFO << "===>getConfigFile_service_request_handler: " << qlibc::QData(request.body).toJsonString();
-
     qlibc::QData payload = configParamUtil::getInstance()->getSceneConfigFile();
     qlibc::QData data;
     data.setInt("code", 0);
     data.setString("error", "ok");
     data.putData("response", payload);
-
     response.set_content(data.toJsonString(), "text/json");
     return 0;
 }
@@ -379,7 +418,15 @@ int saveSceneFile_service_request_handler(const Request& request, Response& resp
     qlibc::QData seceConfigFile = data.getData("request");
     configParamUtil::getInstance()->saveSceneConfigFile(seceConfigFile);
 
-    whiteList_sync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID);    //同步场景文件
+    //同步场景文件
+    fileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID,
+             "sceneConfigFile invoke...");    //同步场景文件
+
+    //发布场景文件被修改消息
+    qlibc::QData publishData;
+    publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
+    publishData.putData("content", qlibc::QData());
+    ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
 
     qlibc::QData ret;
     ret.setInt("code", 0);
@@ -389,15 +436,32 @@ int saveSceneFile_service_request_handler(const Request& request, Response& resp
 }
 
 int saveSceneFile_sync_service_request_handler(const Request& request, Response& response){
-    qlibc::QData data = qlibc::QData(request.body).getData("request");
+    qlibc::QData otherData = qlibc::QData(request.body).getData("request");
     qlibc::QData localData = configParamUtil::getInstance()->getSceneConfigFile();
-    if(atoi(localData.getString("timeStamp").c_str()) < atoi(data.getString("timeStamp").c_str())){
-        configParamUtil::getInstance()->saveSceneConfigFile(data);
+    if(localData.empty() || otherData.empty()){
+        LOG_RED << "===>localSceneData or otherSceneData is empty, dont save this data...";
+        return 0;
+    }
+    unsigned long long localTime, otherTime;
+    try{
+        localTime = stoull(localData.getString("timeStamp"), nullptr, 10);
+        otherTime = stoull(otherData.getString("timeStamp"), nullptr, 10);
+    }catch(const std::exception& e){
+        LOG_RED << "==>error in transfering sceneFileTime.......";
+        return 0;
+    }
+    LOG_PURPLE << "==>sceneLocalTime:" << localTime << ", sceneOtherTime: " << otherTime;
+
+    if(localTime < otherTime){
+        LOG_PURPLE << "===>update sceneFile to the newest versiion....";
+        configParamUtil::getInstance()->saveSceneConfigFile(otherData);
         //发布场景文件被修改消息
         qlibc::QData publishData;
         publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
         publishData.putData("content", qlibc::QData());
         ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+    }else{
+        LOG_PURPLE << "===>sceneFile is the newest, noting needed to change....";
     }
 
     return 0;
