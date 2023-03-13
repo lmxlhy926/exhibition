@@ -270,7 +270,7 @@ bool voiceStringMatchControl::getSpecificDeviceId(qlibc::QData& deviceList, stri
             smatch sm;
             if(regex_search(str, sm, regex(device_name))){
                 deviceNames.insert(device_name);
-                deviceVec.push_back(item.getString("device_id"));
+                deviceVec.push_back(item.getString("device_uid"));
             }
         }
     }
@@ -301,7 +301,7 @@ bool voiceStringMatchControl::getSpecificGroupId(qlibc::QData& groupList, string
             smatch sm;
             if(regex_search(str, sm, regex(group_name))){
                 groupNames.insert(group_name);
-                groupVec.push_back(item.getString("group_id"));
+                groupVec.push_back(item.getString("group_uid"));
             }
         }
     }
@@ -327,7 +327,7 @@ bool voiceStringMatchControl::getGroupIdFromRoomName(qlibc::QData& groupList, st
         qlibc::QData item = groupList.getArrayElement(i);
         string room_name = item.getData("location").getString("room_name");
         if(room_name == roomName){
-            groupVec.push_back(item.getString("group_id"));
+            groupVec.push_back(item.getString("group_uid"));
         }
     }
     return !groupVec.empty();

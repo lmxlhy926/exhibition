@@ -58,25 +58,25 @@ void siteManager::updateSite(){
     }
 
     //订阅蓝牙站点的消息
-    std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
-    for(auto& siteName : siteNames){
-        smatch sm;
-        if(regex_match(siteName, sm, regex("(.*):ble_light"))){
-            //订阅蓝牙站点消息
-            int code;
-            std::vector<string> messageIdList;
-            messageIdList.push_back(ScanResultMsg);
-            messageIdList.push_back(SingleDeviceBindSuccessMsg);
-            messageIdList.push_back(SingleDeviceUnbindSuccessMsg);
-            messageIdList.push_back(BindEndMsg);
-            messageIdList.push_back(Device_State_Changed);
-            code = ServiceSiteManager::getInstance()->subscribeMessage(LocalIp, ConfigPort, messageIdList);
-            if (code == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage whiteListModified ok.\n");
-                break;
-            }
-        }
-    }
+//    std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
+//    for(auto& siteName : siteNames){
+//        smatch sm;
+//        if(regex_match(siteName, sm, regex("(.*):ble_light"))){
+//            //订阅蓝牙站点消息
+//            int code;
+//            std::vector<string> messageIdList;
+//            messageIdList.push_back(ScanResultMsg);
+//            messageIdList.push_back(SingleDeviceBindSuccessMsg);
+//            messageIdList.push_back(SingleDeviceUnbindSuccessMsg);
+//            messageIdList.push_back(BindEndMsg);
+//            messageIdList.push_back(Device_State_Changed);
+//            code = ServiceSiteManager::subscribeMessage("127.0.0.1", 9001, messageIdList);
+//            if (code == ServiceSiteManager::RET_CODE_OK) {
+//                printf("subscribeMessage whiteListModified ok.\n");
+//                break;
+//            }
+//        }
+//    }
 }
 
 

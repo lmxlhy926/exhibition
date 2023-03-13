@@ -138,12 +138,13 @@ std::set<string> SiteRecord::getSiteName() {
 }
 
 bool SiteRecord::getSiteInfo(string& siteName, string& ip, int& port){
-    std::lock_guard<std::recursive_mutex> lg(rMutex);
-    auto pos = sites.find(siteName);
-    if(sites.find(siteName) != sites.end()){
-        ip =
-    }
+//    std::lock_guard<std::recursive_mutex> lg(rMutex);
+//    auto pos = sites.find(siteName);
+//    if(sites.find(siteName) != sites.end()){
+//        ip =
+//    }
 
+    return true;
 
  }
 

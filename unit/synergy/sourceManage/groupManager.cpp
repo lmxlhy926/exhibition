@@ -40,15 +40,15 @@ bool GroupManager::isInGroupList(string& group_id, string& inSourceSite, string&
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = groupList.getArrayElement(i);
-        string itemGrpId = item.getString("group_id");
-        string transGrpId = group_id;
+        string itemGroupUid = item.getString("group_uid");
+        string groupUid = group_id;
         if(!inSourceSite.empty()){
-            transGrpId.append(">").append(inSourceSite);
+            groupUid.append(">").append(inSourceSite);
         }
 
-        if(itemGrpId == transGrpId){
+        if(itemGroupUid == groupUid){
             smatch sm;
-            if(regex_match(itemGrpId, sm, regex("(.*)>(.*)"))){
+            if(regex_match(itemGroupUid, sm, regex("(.*)>(.*)"))){
                 outSourceSite = sm.str(2);
                 return true;
             }
@@ -104,7 +104,8 @@ qlibc::QData GroupManager::addGrpSourceTag(qlibc::QData groupList, string grpSou
         qlibc::QData item = groupList.getArrayElement(i);
         string group_id = item.getString("group_id");
         group_id.append(">").append(grpSource);
-        item.setString("group_id", group_id);
+        item.setString("sourceSite", grpSource);
+        item.setString("group_uid", group_id);
         newGroupList.append(item);
     }
     return newGroupList;

@@ -419,11 +419,13 @@ namespace synergy {
         for(auto& siteName : siteNames){
             if(siteName == sourceSite){
                 SiteRecord::getInstance()->sendRequest2Site(siteName, requestData, responseData);
-                LOG_INFO << "responseData: " << responseData.toJsonString();
+                LOG_BLUE << "responseData: " << responseData.toJsonString();
                 response.set_content(responseData.toJsonString(), "text/json");
                 return;
             }
         }
+
+        //没有找到对应的站点
         qlibc::QData ret;
         ret.setInt("code", -1);
         ret.setString("msg", "need sourceSite to deliever!!!");
@@ -591,9 +593,16 @@ namespace synergy {
         for(Json::ArrayIndex i = 0; i < size; ++i){
             qlibc::QData item = controlGroupList.getArrayElement(i);
             string group_id = item.getString("group_id");
+            string sourceSite = item.getString("sourceSite");
+            string group_uid = group_id;
+            if(!sourceSite.empty()){
+                group_uid.append(">").append(sourceSite);
+            }
+
             smatch sm;
-            if(regex_match(group_id, sm,regex("FFFF>(.*)"))){
+            if(regex_match(group_uid, sm,regex("FFFF>(.*)"))){
                 item.setString("group_id", "FFFF");
+                item.removeMember("sourceSite");
                 string siteName = sm.str(1);
 
                 qlibc::QData controlRequest, controlResponse;

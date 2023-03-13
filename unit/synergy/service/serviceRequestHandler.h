@@ -57,7 +57,7 @@ namespace synergy{
 //获取设备列表：ble, zigbee, tvAdapter
     int getDeviceList_service_handler(const Request& request, Response& response);
 
-//todo 获取设备状态
+//获取设备状态
     int get_device_state_service_handler(const Request& request, Response& response);
 
 //创建分组

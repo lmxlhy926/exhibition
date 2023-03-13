@@ -30,15 +30,15 @@ bool DeviceManager::isInDeviceList(string& device_id, string& inSourceSite, stri
     Json::ArrayIndex size = deviceList_.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = deviceList_.getArrayElement(i);
-        string itemDeviceId = item.getString("device_id");
-        string transDeviceId = device_id;
+        string itemDeviceUid = item.getString("device_uid");
+        string deviceUid = device_id;
         if(!inSourceSite.empty()){
-            transDeviceId.append(">").append(inSourceSite);
+            deviceUid.append(">").append(inSourceSite);
         }
 
-        if(itemDeviceId == transDeviceId){
+        if(itemDeviceUid == deviceUid){
             smatch sm;
-            if(regex_match(itemDeviceId, sm, regex("(.*)>(.*)"))){
+            if(regex_match(itemDeviceUid, sm, regex("(.*)>(.*)"))){
                 outSourceSite = sm.str(2);
                 return true;
             }
@@ -93,7 +93,8 @@ qlibc::QData DeviceManager::addMacSource(qlibc::QData deviceList, string sourceT
         qlibc::QData item = deviceList.getArrayElement(i);
         string device_id = item.getString("device_id");
         device_id.append(">").append(sourceTag);
-        item.setString("device_id", device_id);
+        item.setString("sourceSite", sourceTag);    //标记设备来源
+        item.setString("device_uid", device_id);    //device_uid是唯一的
         newDeviceList.append(item);
     }
     return newDeviceList;
