@@ -51,6 +51,9 @@ namespace synergy{
 //删除设备
     int del_device_service_handler(const Request& request, Response& response);
 
+//修改设备属性
+    int configProperty_device_service_handler(const Request& request, Response& response);
+
 //设备控制
     int deviceControl_service_handler(const Request& request, Response& response);
 
@@ -80,6 +83,9 @@ namespace synergy{
 
 //获取分组列表：ble, zigbee
     int getGroupList_service_handler(const Request& request, Response& response);
+
+//获取面板列表
+    int getPanelList_service_handler(const Request& request, Response& response);
 }
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

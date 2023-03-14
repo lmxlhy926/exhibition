@@ -117,6 +117,13 @@ int main(int argc, char* argv[]) {
         return synergy::del_device_service_handler(request, response);
     });
 
+    //注册设备属性修改回调
+    serviceSiteManager->registerServiceRequestHandler(ConfigProperty_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::configProperty_device_service_handler(request, response);
+    });
+
+
     //注册设备控制回调
     serviceSiteManager->registerServiceRequestHandler(Control_Device_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
@@ -170,6 +177,9 @@ int main(int argc, char* argv[]) {
 
     //获取分组列表
     serviceSiteManager->registerServiceRequestHandler(GetGroupList_Device_Service_ID, synergy::getGroupList_service_handler);
+
+    //获取面板列表
+    serviceSiteManager->registerServiceRequestHandler(GetPanelList_Service_ID, synergy::getPanelList_service_handler);
 
 
 #if 0

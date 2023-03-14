@@ -49,6 +49,7 @@ static const string Reset_Device_Service_ID               = "reset_device";     
 static const string Scan_Device_Service_ID                = "scan_device";                       //扫描设备结果
 static const string Add_Device_Service_ID                 = "add_device";                        //添加设备
 static const string Del_Device_Service_ID                 = "del_device";                        //删除设备
+static const string ConfigProperty_Service_ID             = "config_name_location";              //修改设备属性信息
 static const string Control_Device_Service_ID             = "control_device";                    //控制设备
 static const string Get_DeviceList_Service_ID             = "get_device_list";                   //获取设备列表
 static const string Get_DeviceState_Service_ID            = "get_device_state";                  //获取设备状态
@@ -61,6 +62,7 @@ static const string AddDevice2Group_Device_Service_ID           = "add_device_to
 static const string RemoveDeviceFromGroup_Device_Service_ID     = "remove_device_from_group";       //从分组删除设备
 static const string ControlGroup_Device_Service_ID              = "control_group";                  //控制分组
 static const string GetGroupList_Device_Service_ID              = "get_group_list";                 //获取分组列表
+static const string GetPanelList_Service_ID                     = "get_panelList";                  //获取面板列表
 
 //订阅消息ID
 static const string Site_OnOffLine_MessageID = "site_onoffline";

@@ -462,6 +462,13 @@ namespace synergy {
         return 0;
     }
 
+    int configProperty_device_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->configProperty_device_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+
 //设备控制
     int deviceControl_service_handler(const Request& request, Response& response){
         LOG_INFO << "synergy->deviceControl_service_handler: " << qlibc::QData(request.body).toJsonString();
@@ -632,6 +639,18 @@ namespace synergy {
         data.setString("error", "ok");
         data.putData("response", res);
 
+        response.set_content(data.toJsonString(), "text/json");
+        return 0;
+    }
+
+
+    int getPanelList_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->getPanelList_service_handler: " << qlibc::QData(request.body).toJsonString();
+        qlibc::QData panelList = siteManager::getPanelList();
+        qlibc::QData data;
+        data.setInt("code", 0);
+        data.setString("error", "ok");
+        data.putData("response", qlibc::QData().putData("panelList", panelList));
         response.set_content(data.toJsonString(), "text/json");
         return 0;
     }

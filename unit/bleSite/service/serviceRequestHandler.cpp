@@ -336,6 +336,9 @@ int device_config_service_handler(const Request& request, Response& response){
     }
     bleConfig::getInstance()->saveDeviceListData(qlibc::QData().putData("device_list", newDeviceList));
 
+    //通知设备管理站点更新设备列表
+    util::updateDeviceList();
+
     response.set_content(okResponse.dump(), "text/json");
     return 0;
 }

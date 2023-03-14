@@ -19,6 +19,9 @@ public:
      */
     static void updateSite();
 
+    //获取面板列表
+    static qlibc::QData getPanelList();
+
     static void updateSite1();
 };
 

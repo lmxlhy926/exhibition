@@ -41,7 +41,7 @@ int save_deviceList_service_handler(const Request& request, Response& response);
 //二进制控制指令
 int BleDevice_command_test_service_handler(const Request& request, Response& response);
 
-//修改设备信息
+//修改设备信息: 只能修改设备名称和位置
 int device_config_service_handler(const Request& request, Response& response);
 
 
