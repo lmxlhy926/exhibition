@@ -86,6 +86,10 @@ namespace synergy{
 
 //获取面板列表
     int getPanelList_service_handler(const Request& request, Response& response);
+
+//发布蓝牙站点消息
+    void messagePublish(const Request& request);
+
 }
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

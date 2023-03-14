@@ -181,6 +181,21 @@ int main(int argc, char* argv[]) {
     //获取面板列表
     serviceSiteManager->registerServiceRequestHandler(GetPanelList_Service_ID, synergy::getPanelList_service_handler);
 
+    //声明消息
+    serviceSiteManager->registerMessageId(ScanResultMsg);                  //扫描结果
+    serviceSiteManager->registerMessageId(SingleDeviceBindSuccessMsg);     //单个设备绑定结果
+    serviceSiteManager->registerMessageId(SingleDeviceUnbindSuccessMsg);   //单个设备解绑结果
+    serviceSiteManager->registerMessageId(BindEndMsg);                     //绑定结束
+    serviceSiteManager->registerMessageId(Device_State_Changed);           //设备状态改变
+
+    //注册消息处理函数
+    servicesite::ServiceSiteManager::registerMessageHandler(ScanResultMsg,                 synergy::messagePublish);
+    servicesite::ServiceSiteManager::registerMessageHandler(SingleDeviceBindSuccessMsg,    synergy::messagePublish);
+    servicesite::ServiceSiteManager::registerMessageHandler(SingleDeviceUnbindSuccessMsg,  synergy::messagePublish);
+    servicesite::ServiceSiteManager::registerMessageHandler(BindEndMsg,                    synergy::messagePublish);
+    servicesite::ServiceSiteManager::registerMessageHandler(Device_State_Changed,          synergy::messagePublish);
+
+
 
 #if 0
     serviceSiteManager->registerMessageHandler(Site_OnOffLine_MessageID, [](const Request& request){

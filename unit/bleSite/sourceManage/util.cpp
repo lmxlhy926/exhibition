@@ -8,6 +8,8 @@
 #include "log/Logging.h"
 #include "../parameter.h"
 
+string util::panelId;
+std::recursive_mutex util::rMutex;
 
 bool getSynergyInfo(string& ip, int& port){
     qlibc::QData appSiteRequest, appSiteResponse;
@@ -57,24 +59,34 @@ void util::updateDeviceList(){
     }
 }
 
-void util::updateWhiteDeviceList() {
-    LOG_INFO << "==>notify synergy to updateWhiteDeviceList....";
-    string ip;
-    int port;
-    if(getSynergyInfo(ip, port)){
-        qlibc::QData request, response;
-        request.setString("service_id", "updateWhiteList");
-        request.putData("request", qlibc::QData());
-        if(httpUtil::sitePostRequest(ip, port, request, response)){
-            if(response.getInt("code") == 0){
-                LOG_PURPLE << "==>synergy updateWhiteDeviceList successfully, " << response.getString("msg") << ".......";
-            }else{
-                LOG_RED << "==>synergy updateWhiteDeviceList failed, " << response.getString("msg") << ".......";
-            }
-        }else{
-            LOG_RED << "==>synergy updateWhiteDeviceList failed, cant access synergy site.......";
+
+string util::getSourceSite() {
+    if(panelId.empty()){
+        qlibc::QData panelConfigRequest, panelConfigResponse;
+        panelConfigRequest.setString("service_id", "get_self_info");
+        panelConfigRequest.putData("request", qlibc::QData());
+        if(httpUtil::sitePostRequest("127.0.0.1", 9006, panelConfigRequest, panelConfigResponse)){
+            std::lock_guard<std::recursive_mutex> lg(rMutex);
+            panelId = panelConfigResponse.getData("response").getString("device_id");
         }
+    }
+
+    if(!panelId.empty()){
+        return panelId + ":" + "ble_light";
     }else{
-        LOG_RED << "==>synergy updateWhiteDeviceList failed, cannot get synergy site.......";
+        return "unkow panel";
+    }
+}
+
+void util::modifyPanelProperty() {
+    qlibc::QData panelConfigRequest, panelConfigResponse;
+    panelConfigRequest.setString("service_id", "get_self_info");
+    panelConfigRequest.putData("request", qlibc::QData());
+    if(httpUtil::sitePostRequest("127.0.0.1", 9006, panelConfigRequest, panelConfigResponse)){
+        std::lock_guard<std::recursive_mutex> lg(rMutex);
+        panelId = panelConfigResponse.getData("response").getString("device_id");
+    }else{
+        std::lock_guard<std::recursive_mutex> lg(rMutex);
+        panelId.clear();
     }
 }

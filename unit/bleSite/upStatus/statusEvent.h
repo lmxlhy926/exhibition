@@ -326,6 +326,7 @@ public:
         //发布设备解绑消息
         qlibc::QData content, publishData;
         content.setString("device_id", deviceSn);
+        content.setString("sourceSite", util::getSourceSite());
         publishData.setString("message_id", SingleDeviceUnbindSuccessMsg);
         publishData.putData("content", content);
         ServiceSiteManager::getInstance()->publishMessage(SingleDeviceUnbindSuccessMsg, publishData.toJsonString());

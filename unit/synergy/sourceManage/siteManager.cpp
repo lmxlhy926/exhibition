@@ -100,13 +100,11 @@ qlibc::QData siteManager::getPanelList(){
                     panelConfigRequest.setString("service_id", "get_self_info");
                     panelConfigRequest.putData("request", qlibc::QData());
                     if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
-                        uid = panelConfigResponse.getData("response").getString("device_id");
-                    }
-                    if(!uid.empty()){
-                        Json::Value panelItem;
-                        panelItem["uid"] = uid;
-                        panelItem["siteId"] = site_id;
-                        panelArray.append(panelItem);
+                        qlibc::QData panelData = panelConfigResponse.getData("response");
+                        if(!panelData.empty()){
+                            panelData.setString("siteId", site_id);
+                            panelArray.append(panelData);
+                        }
                     }
                 }
             }

@@ -655,4 +655,12 @@ namespace synergy {
         return 0;
     }
 
+    void messagePublish(const Request& request){
+        qlibc::QData requestData(request.body);
+        LOG_INFO << "synergy->messagePublish: " << qlibc::QData(request.body).toJsonString();
+        string message_id = requestData.getString("message_id");
+        ServiceSiteManager::getInstance()->publishMessage(message_id, requestData.toJsonString());
+        return;
+    }
+
 }

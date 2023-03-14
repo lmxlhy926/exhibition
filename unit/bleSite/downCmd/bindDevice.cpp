@@ -88,7 +88,7 @@ void BindDevice::bind(QData &deviceArray) {
     //发布绑定结束消息
     qlibc::QData publishData;
     publishData.setString("message_id", BindEndMsg);
-    publishData.putData("content", qlibc::QData());
+    publishData.putData("content", qlibc::QData().setString("sourceSite", util::getSourceSite()));
     ServiceSiteManager::getInstance()->publishMessage(BindEndMsg, publishData.toJsonString());
 }
 
@@ -169,6 +169,7 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
             content.setString("device_id", deviceSn);
             content.setString("device_type", property.getString("device_type"));
             content.setString("device_model", property.getString("device_model"));
+            content.setString("sourceSite", util::getSourceSite());
             publishData.setString("message_id", SingleDeviceBindSuccessMsg);
             publishData.putData("content", content);
             ServiceSiteManager::getInstance()->publishMessage(SingleDeviceBindSuccessMsg, publishData.toJsonString());

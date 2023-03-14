@@ -101,6 +101,7 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
     }
 
     qlibc::QData scanedArray;
+    string sourceSite = util::getSourceSite();
     for(auto& elem : scanedMap){
         deviceArray.append(elem.second);
 
@@ -108,6 +109,7 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
         item.setString("device_id", elem.first);
         item.setString("device_type", elem.second["device_type"].asString());
         item.setString("device_model", elem.second["device_model"].asString());
+        item.setString("sourceSite", sourceSite);
         scanedArray.append(item);
     }
     LOG_GREEN << "===<SCAN>: deviceArray: " << deviceArray.toJsonString(true);
