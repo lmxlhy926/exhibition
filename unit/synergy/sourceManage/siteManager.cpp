@@ -84,7 +84,9 @@ qlibc::QData siteManager::getPanelList(){
     qlibc::QData request, response;
     request.setString("service_id", "site_localAreaNetworkSite");
     request.putData("request", qlibc::QData().setString("site_id", ""));
+    LOG_GREEN << "findAllSiteRequest: " << request.toJsonString();
     if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){    //获取局域网内所有发现的站点
+        LOG_BLUE << "findAllSiteResponse: " << response.toJsonString();
         qlibc::QData resBody = response.getData("response");
         Json::Value::Members ipMembers = resBody.getMemberNames();
         for(auto& ip : ipMembers){
@@ -99,7 +101,9 @@ qlibc::QData siteManager::getPanelList(){
                     qlibc::QData panelConfigRequest, panelConfigResponse;
                     panelConfigRequest.setString("service_id", "get_self_info");
                     panelConfigRequest.putData("request", qlibc::QData());
+                    LOG_GREEN << "getPanelInfoRequest: " << panelConfigRequest.toJsonString();
                     if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
+                        LOG_BLUE << "getPanelInfoResponse: " << panelConfigResponse.toJsonString();
                         qlibc::QData panelData = panelConfigResponse.getData("response");
                         if(!panelData.empty()){
                             panelData.setString("siteId", site_id);

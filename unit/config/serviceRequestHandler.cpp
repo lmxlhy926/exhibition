@@ -352,9 +352,9 @@ int whiteList_sync_save_service_request_handler(const Request& request, Response
 
 
 int whiteList_get_service_request_handler(const Request& request, Response& response){
-    LOG_INFO << "===>whiteList_service_request_handler: " << qlibc::QData(request.body).toJsonString();
-
+    LOG_GREEN << "===>whiteList_service_request_handler: " << qlibc::QData(request.body).toJsonString();
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
+    LOG_GREEN << "get whiteList....";
     qlibc::QData data;
     data.setInt("code", 0);
     data.setString("error", "ok");
