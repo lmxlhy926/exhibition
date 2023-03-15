@@ -14,7 +14,7 @@ using namespace servicesite;
 
 qlibc::QData mqttPayloadHandle::transform(const char* payloadReceive, int len){
     qlibc::QData payload(payloadReceive, len);
-    if(payload.type() == Json::nullValue){
+    if(payload.type() == Json::nullValue || payload.empty()){
         LOG_RED << "received mqttPayload is not a Json format.......";
         return qlibc::QData();
     }
@@ -113,6 +113,10 @@ qlibc::QData mqttPayloadHandle::transform(const char* payloadReceive, int len){
 bool mqttPayloadHandle::handle(const string &topic, char *payloadReceive, int len) {
     //转换白名单格式
     qlibc::QData payload = transform(payloadReceive, len);
+    if(payload.empty()){
+        LOG_RED << "==>mqtt payload is empty, not to save";
+        return true;
+    }
 
     //存储转换后的白名单
     configParamUtil::getInstance()->saveWhiteListData(payload);

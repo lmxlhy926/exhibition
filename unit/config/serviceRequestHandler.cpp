@@ -229,12 +229,17 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
     if(whiteListResponse.getInt("code") == 200){
         string payloadString = whiteListResponse.getData("data").toJsonString();
         qlibc::QData payload = mqttPayloadHandle::transform(payloadString.c_str(), payloadString.size());
-        configParamUtil::getInstance()->saveWhiteListData(payload);
-
-        data.setInt("code", 0);
-        data.setString("error", whiteListResponse.getString("msg"));
-        data.putData("response", payload);
-
+        if(payload.empty()){
+            LOG_RED << "===>get empty whiteList from cloud....";
+            data.setInt("code", 1);
+            data.setString("error", "empty whiteList....");
+            data.putData("response", qlibc::QData());
+        }else{
+            configParamUtil::getInstance()->saveWhiteListData(payload);
+            data.setInt("code", 0);
+            data.setString("error", whiteListResponse.getString("msg"));
+            data.putData("response", payload);
+        }
     }else{
         data.setInt("code", 1);
         data.setString("error", whiteListResponse.getString("msg"));
