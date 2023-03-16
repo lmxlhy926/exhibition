@@ -391,6 +391,9 @@ int create_group_service_handler(const Request& request, Response& response){
     qlibc::QData property = requestBody.getData("request");
     string groupId = GroupAddressMap::getInstance()->createGroup(property);
 
+    //更新分组列表
+    util::updateGroupList();
+
     qlibc::QData res;
     res.setInt("code", 0);
     res.setString("error", "success");
@@ -424,10 +427,11 @@ int delete_group_service_handler(const Request& request, Response& response, Log
             addRemoveGroupControl(DelDeviceFromGroup, group_id, deviceSn, lc);
         }
 
-        //todo 等待分组操作结束
-
         //删除分组
         GroupAddressMap::getInstance()->deleGroup(group_id);
+
+        //更新分组列表
+        util::updateGroupList();
     });
 
     response.set_content(okResponse.dump(), "text/json");
@@ -442,6 +446,10 @@ int rename_group_service_handler(const Request& request, Response& response){
     string groupId = requestBody.getData("request").getString("group_id");
     qlibc::QData property = requestBody.getData("request");
     bool ret = GroupAddressMap::getInstance()->reNameGroup(groupId, property);
+
+    //更新分组列表
+    util::updateGroupList();
+
     if(ret){
         response.set_content(okResponse.dump(), "text/json");
     }else{
@@ -469,6 +477,8 @@ int addDevice2Group_service_handler(const Request& request, Response& response, 
             string deviceSn = deviceList.getArrayElement(i).asValue().asString();
             addRemoveGroupControl(AddDevice2Group, group_id, deviceSn, lc);
         }
+        //更新分组列表
+        util::updateGroupList();
     });
 
     response.set_content(okResponse.dump(), "text/json");
@@ -522,6 +532,8 @@ int removeDeviceFromGroup_service_handler(const Request& request, Response& resp
             string deviceSn = deviceList.getArrayElement(i).asValue().asString();
             addRemoveGroupControl(DelDeviceFromGroup, group_id, deviceSn, lc);
         }
+        //更新分组列表
+        util::updateGroupList();
     });
 
     response.set_content(okResponse.dump(), "text/json");
@@ -559,72 +571,3 @@ int getGroupList_service_handler(const Request& request, Response& response){
     return 0;
 }
 
-/*
- * app修改设备属性信息后，需要更改设备列表信息
- */
-void updateDeviceList(const Request& request){
-    //获取白名单列表
-    LOG_INFO << "==>update deviceList property according to whiteList: " << request.body;
-    //获取本机配置站点白名单
-    qlibc::QData whiteListRequest, whiteListResponse;
-    whiteListRequest.setString("service_id", "whiteListRequest");
-    whiteListRequest.setValue("request", Json::Value("{}"));
-    SiteRecord::getInstance()->sendRequest2Site(ConfigSiteName, whiteListRequest, whiteListResponse);
-
-    if(whiteListResponse.getInt("code") == 0){
-        //提取出白名单设备列表
-        qlibc::QData configWhiteListDevices = whiteListResponse.getData("response").getData("info").getData("devices");
-        size_t configWhiteListDevicesSize = configWhiteListDevices.size();
-        if(0 == configWhiteListDevicesSize){
-            return;
-        }
-
-        //提取出白名单设备列表中的灯列表
-        qlibc::QData lightDevices;
-        for(int i = 0; i < configWhiteListDevicesSize; ++i){
-            qlibc::QData item = configWhiteListDevices.getArrayElement(i);
-            string category_code = item.getString("category_code");
-            if(category_code == "LIGHT" || category_code == "light"){
-                lightDevices.append(item);
-            }
-        }
-        ssize_t lightDeviceSize = lightDevices.size();
-        if(0 == lightDeviceSize){
-            return;
-        }
-
-        //提取蓝牙设备列表
-        qlibc::QData deviceList = bleConfig::getInstance()->getDeviceListData().getData("device_list");
-        size_t deviceListSize = deviceList.size();
-
-        qlibc::QData newDeviceList;
-        for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
-            qlibc::QData deviceItem =  deviceList.getArrayElement(i);
-            for(Json::ArrayIndex j = 0; j < lightDeviceSize; ++j){
-                qlibc::QData lightDevice = lightDevices.getArrayElement(j);
-                if(lightDevice.getString("device_sn") == deviceItem.getString("device_id")){
-                    //只更新设备列表的位置、名字信息
-                    qlibc::QData location;
-                    location.setString("room_name", lightDevice.getString("room_name"));
-                    location.setString("room_no", lightDevice.getString("room_no"));
-                    deviceItem.setString("device_name", lightDevice.getString("device_name"));
-                    deviceItem.putData("location", location);
-                    newDeviceList.append(deviceItem);
-                    break;
-                }
-
-                if(j == lightDeviceSize -1){
-                    newDeviceList.append(deviceItem);
-                }
-            }
-        }
-
-        //更新属性后，存储设备列表
-        qlibc::QData saveData;
-        saveData.putData("device_list", newDeviceList);
-        bleConfig::getInstance()->saveDeviceListData(saveData);
-
-        //通知设备管理站点，进行设备列表更新
-        util::updateDeviceList();
-    }
-}

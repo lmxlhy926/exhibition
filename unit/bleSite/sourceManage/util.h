@@ -17,6 +17,9 @@ public:
     //通知设备管理站点进行设备列表更新
     static void updateDeviceList();
 
+    //通知设备管理站点对组列表进行更新
+    static void updateGroupList();
+
     //获取面板信息
     static string getSourceSite();
 

@@ -61,7 +61,6 @@ qlibc::QData DeviceManager::restoreMac(qlibc::QData& item, string& inSourceSite)
 }
 
 void DeviceManager::updateDeviceList(){
-    siteManager::updateSite();
     qlibc::QData totalList;     //存储总列表
     std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
     smatch sm;

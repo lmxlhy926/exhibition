@@ -35,6 +35,7 @@ int main(int argc, char* argv[]) {
 
     //单例对象
     SiteRecord::getInstance()->addSite(SceneSiteID, RequestIp, SceneSitePort);  //加入场景站点
+    siteManager::getInstance();
     DeviceManager::getInstance();
     GroupManager::getInstance();
 
@@ -194,7 +195,6 @@ int main(int argc, char* argv[]) {
     servicesite::ServiceSiteManager::registerMessageHandler(SingleDeviceUnbindSuccessMsg,  synergy::messagePublish);
     servicesite::ServiceSiteManager::registerMessageHandler(BindEndMsg,                    synergy::messagePublish);
     servicesite::ServiceSiteManager::registerMessageHandler(Device_State_Changed,          synergy::messagePublish);
-
 
 
 #if 0

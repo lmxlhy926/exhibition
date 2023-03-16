@@ -11,13 +11,13 @@ using namespace httplib;
 using json = nlohmann::json;
 
 void messageHandler(const Request& request){
-    std::cout << request.body << std::endl;
+    LOG_INFO << request.body;
 }
 
 
 int main(int argc, char* argv[]) {
-    string path = "/data/changhong/edge_midware/lhy/siteScribe.txt";
-    muduo::logInitLogger(path);
+//    string path = "/data/changhong/edge_midware/lhy/siteScribe.txt";
+//    muduo::logInitLogger(path);
 
     httplib::ThreadPool threadPool_(10);
     // 创建 serviceSiteManager 对象, 单例
@@ -41,13 +41,13 @@ int main(int argc, char* argv[]) {
                     "singleDeviceUnbindSuccessMsg",
                     "device_state_changed"
             };
-            int code = serviceSiteManager->subscribeMessage("127.0.0.1", 9001, messageIdList);
+            int code = serviceSiteManager->subscribeMessage("192.168.137.55", 9007, messageIdList);
             if (code == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage ok.\n");
+                LOG_INFO << "subscribeMessage ok.";
                 break;
             }
             std::this_thread::sleep_for(std::chrono::seconds(3));
-            std::cout << "subscribed  failed....., start to subscribe in 3 seconds" << std::endl;
+            LOG_INFO << "subscribed  failed....., start to subscribe in 3 seconds";
         }
     });
 
@@ -58,24 +58,20 @@ int main(int argc, char* argv[]) {
             //自启动方式
             int code = serviceSiteManager->start();
             if(code != 0){
-                std::cout << "===>scribeSite startByRegister error, code = " << code << std::endl;
-                std::cout << "===>scribeSite startByRegister in 3 seconds...." << std::endl;
+                LOG_INFO << "===>scribeSite startByRegister error, code = ";
+                LOG_INFO << "===>scribeSite startByRegister in 3 seconds....";
                 std::this_thread::sleep_for(std::chrono::seconds(3));
             }else{
-                std::cout << "===>scribeSite startByRegister successfully....." << std::endl;
+                LOG_INFO << "===>scribeSite startByRegister successfully.....";
                 break;
             }
         }
     });
 
-    std::cout << "QUIT1..." << std::endl;
-    LOG_RED << "QUIT1...";
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(60 *10));
     }
-
-    std::cout << "QUIT2..." << std::endl;
 
     return 0;
 }

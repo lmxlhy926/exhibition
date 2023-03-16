@@ -69,8 +69,4 @@ int control_group_service_handler(const Request& request, Response& response, Lo
 //获取分组列表
 int getGroupList_service_handler(const Request& request, Response& response);
 
-//白名单里的蓝牙列表的属性被修改后，通过此接口，将属性同步到设备列表
-void updateDeviceList(const Request& request);
-
-
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

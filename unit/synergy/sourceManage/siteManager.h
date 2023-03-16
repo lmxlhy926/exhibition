@@ -10,7 +10,20 @@
 using namespace std;
 
 class siteManager {
+private:
+    static siteManager* Instance;
+    std::thread* updateSiteThread = nullptr;
+    siteManager(){
+        updateSite();
+        updateSiteThread = new thread([]{
+            while(true){
+                std::this_thread::sleep_for(std::chrono::seconds(10));
+                updateSite();
+            }
+        });
+    }
 public:
+    static siteManager* getInstance();
     /*
      *  1. 获取所有站点列表，从中得到蓝牙、zigbee所在面板的IP
      *  2. 获得ip后，访问相应面板的配置站点，从中获取面板信息

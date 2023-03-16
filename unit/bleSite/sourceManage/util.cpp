@@ -60,6 +60,29 @@ void util::updateDeviceList(){
 }
 
 
+void util::updateGroupList(){
+    string ip;
+    int port;
+    if(getSynergyInfo(ip, port)){
+        qlibc::QData request, response;
+        request.setString("service_id", "updateGroupList");
+        request.putData("request", qlibc::QData());
+        if(httpUtil::sitePostRequest(ip, port, request, response)){
+            if(response.getInt("code") == 0){
+                LOG_PURPLE << "==>notify synergy to updateGroupList successfully.......";
+            }else{
+                LOG_RED << "==>notify synergy to updateGroupList failed.......";
+            }
+        }else{
+            LOG_RED << "==>notify synergy to updateGroupList failed, cangt access synergy site.......";
+        }
+    }else{
+        LOG_RED << "==>notify synergy to updateGroupList failed, cannot get synergy site.......";
+    }
+
+}
+
+
 string util::getSourceSite() {
     if(panelId.empty()){
         qlibc::QData panelConfigRequest, panelConfigResponse;

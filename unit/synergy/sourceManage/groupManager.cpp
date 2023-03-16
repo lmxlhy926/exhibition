@@ -71,7 +71,6 @@ qlibc::QData GroupManager::restoreGrp(qlibc::QData& item, string& inSourceSite){
 }
 
 void GroupManager::updateGroupList(){
-    siteManager::updateSite();
     qlibc::QData totalList;
     std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
     smatch sm;

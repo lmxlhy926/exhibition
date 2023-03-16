@@ -137,14 +137,14 @@ std::set<string> SiteRecord::getSiteName() {
     return siteNameSet;
 }
 
-bool SiteRecord::getSiteInfo(string& siteName, string& ip, int& port){
-//    std::lock_guard<std::recursive_mutex> lg(rMutex);
-//    auto pos = sites.find(siteName);
-//    if(sites.find(siteName) != sites.end()){
-//        ip =
-//    }
-
-    return true;
-
+bool SiteRecord::getSiteInfo(const string& siteName, string& ip, int& port){
+    std::lock_guard<std::recursive_mutex> lg(rMutex);
+    auto pos = sites.find(siteName);
+    if(pos != sites.end()){
+        ip = pos->second.getSiteIp();
+        port = pos->second.getSitePort();
+        return true;
+    }
+    return false;
  }
 
