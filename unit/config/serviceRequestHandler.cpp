@@ -257,6 +257,7 @@ void fileSync(string site_id, string getServiceId, string saveServiceId, string 
     qlibc::QData request, response;
     request.setString("service_id", "get_all");
     request.putData("request", qlibc::QData());
+    LOG_GREEN << "get node_list: " << request.toJsonString();
     bool siteBool = httpUtil::sitePostRequest("127.0.0.1", 9012, request, response);
 
 //    siteBool = true;
@@ -265,7 +266,7 @@ void fileSync(string site_id, string getServiceId, string saveServiceId, string 
     if(siteBool){
         node_list.setInitData(response.getData("response").getData("node_list"));
         node_list_size = node_list.size();
-        LOG_INFO << "node_list: " << node_list.toJsonString();
+        LOG_BLUE << "node_list: " << node_list.toJsonString();
 
         for(Json::ArrayIndex i = 0; i < node_list_size; ++i){
             qlibc::QData item = node_list.getArrayElement(i);
@@ -274,7 +275,9 @@ void fileSync(string site_id, string getServiceId, string saveServiceId, string 
             qlibc::QData contentRequest, contentResponse;
             contentRequest.setString("service_id", getServiceId);
             contentRequest.putData("request", qlibc::QData());
+            LOG_GREEN << "contentRequest: " << contentRequest.toJsonString();
             if(httpUtil::sitePostRequest(ip, port, contentRequest, contentResponse)){
+                LOG_BLUE << "contentResponse";
                 qlibc::QData content(contentResponse.getData("response"));
                 if(!content.empty()){
                     unsigned long long timeStamp = 0;
