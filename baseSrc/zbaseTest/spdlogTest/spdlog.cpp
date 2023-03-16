@@ -2,6 +2,7 @@
 #include "spdlog/sinks/daily_file_sink.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
+#include "log/Logging.h"
 using namespace std;
 
 
@@ -64,6 +65,6 @@ void vector_example() {}
 #endif
 
 int main(int argc, char* argv[]){
-    vector_example();
+    LOG_RED << "HELLO";
     return 0;
 }

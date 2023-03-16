@@ -11,20 +11,11 @@ using namespace std;
 
 namespace muduo{
     std::vector<spdlog::sink_ptr> sinks;
-    std::shared_ptr<spdlog::logger> mylogger;
     std::shared_ptr<spdlog::logger> rotating_logger;
-
-    void logInit(string& path) {
-//        sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-        sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(path, 1024 * 1024 * 10, 1));
-        mylogger = std::make_shared<spdlog::logger>("mylog", std::begin(sinks), std::end(sinks));
-        mylogger->flush_on(spdlog::level::trace);   //设置出发err级别的消息时立即写入文件
-        spdlog::register_logger(mylogger);
-        spdlog::set_level(spdlog::level::trace);
-        spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%s %# %!][thread %t][%l] : %v");
-    }
+    bool setLoggerPath = false;
 
     void logInitLogger(string& path){
+        setLoggerPath = true;
         spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%s %# %!][thread %t][%l] : %v");
         rotating_logger = spdlog::rotating_logger_mt("rotating_logger", path, 1024 * 1024 * 10, 0);
         rotating_logger->flush_on(spdlog::level::trace);   //设置出发err级别的消息时立即写入文件
@@ -69,10 +60,12 @@ namespace muduo{
     Logger::~Logger() {
         impl_.finish();
         const LogStream::Buffer& buf(stream().buffer());
-        if(impl_.level_ == LogLevel::H_RED){
-            rotating_logger->error(string(buf.data(), buf.length() -1));
-        }else{
-            rotating_logger->info(string(buf.data(), buf.length() -1));
+        if(setLoggerPath){
+            if(impl_.level_ == LogLevel::H_RED){
+                rotating_logger->error(string(buf.data(), buf.length() -1));
+            }else{
+                rotating_logger->info(string(buf.data(), buf.length() -1));
+            }
         }
         defaultOutput(buf.data(), buf.length(), impl_.level_);
         if(g_output != nullptr){

@@ -1,94 +1,81 @@
-/*
- * 服务提供者示例程序
- *
- *  Created on: 2022年4月22日
- *      Author: van
- */
 
 #include <thread>
-#include <unistd.h>
-#include <atomic>
-#include <stdio.h>
-#include "http/httplib.h"
+#include "common/httpUtil.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 #include "log/Logging.h"
-#include "qlibc/QData.h"
-
 
 using namespace std;
 using namespace servicesite;
+using namespace httplib;
 using json = nlohmann::json;
 
-// test_message_id_1 消息处理函数
-void message_handler(const Request& request) {
-    // 消息的json字符串位于request.body
-    qlibc::QData data(request.body);
-    LOG_INFO << data.toJsonString();
+void messageHandler(const Request& request){
+    std::cout << request.body << std::endl;
 }
 
-
-// 标记线程错误
-std::atomic<bool> http_server_thread_end(false);
-
-void http_server_thread_func() {
-    int code;
-
-    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-
-    // 启动服务器，参数为端口， 可用于单独的开发调试
-    code = serviceSiteManager->start();
-
-    // 通过注册的方式启动服务器， 需要提供site_id, site_name, port
-//	code = serviceSiteManager->startByRegister(TEST_SITE_ID_1, TEST_SITE_NAME_1, 9001);
-
-    if (code != 0) {
-        printf("start error. code = %d\n", code);
-    }
-
-    http_server_thread_end = true;
-}
 
 int main(int argc, char* argv[]) {
+    string path = "/data/changhong/edge_midware/lhy/siteScribe.txt";
+    muduo::logInitLogger(path);
+
+    httplib::ThreadPool threadPool_(10);
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-    serviceSiteManager->setServerPort(60002);
+    serviceSiteManager->setServerPort(8999);
+    ServiceSiteManager::setSiteIdSummary("scribeSite", "订阅测试站点");
 
-    // 注册 Message 请求处理 handler
-//    serviceSiteManager->registerMessageHandler("scanResultMsg", message_handler);
-//    serviceSiteManager->registerMessageHandler("site_query_result", message_handler);
-    serviceSiteManager->registerMessageHandler("register2QuerySiteAgain", message_handler);
-//    serviceSiteManager->registerMessageHandler("site_query_result", message_handler);
+    //注册白名单改变处理函数
+    serviceSiteManager->registerMessageHandler( "scanResultMsg", messageHandler);
+    serviceSiteManager->registerMessageHandler( "singleDeviceBindSuccessMsg", messageHandler);
+    serviceSiteManager->registerMessageHandler( "bindEndMsg", messageHandler);
+    serviceSiteManager->registerMessageHandler( "singleDeviceUnbindSuccessMsg", messageHandler);
+    serviceSiteManager->registerMessageHandler( "device_state_changed", messageHandler);
 
-
-    // 订阅消息, 需要传入订阅站点的IP、端口号、消息ID列表
-    int code;
-    std::vector<string> messageIdList;
-//    messageIdList.push_back("site_query_result");
-    messageIdList.push_back("register2QuerySiteAgain");
-//    messageIdList.push_back("site_query_result");
-
-
-    code = serviceSiteManager->subscribeMessage("127.0.0.1", 9000, messageIdList);
-    if (code == ServiceSiteManager::RET_CODE_OK) {
-        printf("subscribeMessage ok.\n");
-    }else{
-        printf("subscribeMessage failed now.\n");
-    }
-
-    // 创建线程, 启动服务器
-    std::thread http_server_thread(http_server_thread_func);
-
-    while (true) {
-        sleep(1);
-
-        if (http_server_thread_end) {
-            printf("启动 http 服务器线程错误.\n");
-            break;
+    threadPool_.enqueue([&](){
+        while(true){
+            std::vector<string> messageIdList{
+                    "scanResultMsg",
+                    "singleDeviceBindSuccessMsg",
+                    "bindEndMsg",
+                    "singleDeviceUnbindSuccessMsg",
+                    "device_state_changed"
+            };
+            int code = serviceSiteManager->subscribeMessage("127.0.0.1", 9001, messageIdList);
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                printf("subscribeMessage ok.\n");
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            std::cout << "subscribed  failed....., start to subscribe in 3 seconds" << std::endl;
         }
+    });
+
+
+    // 站点监听线程启动
+    threadPool_.enqueue([&](){
+        while(true){
+            //自启动方式
+            int code = serviceSiteManager->start();
+            if(code != 0){
+                std::cout << "===>scribeSite startByRegister error, code = " << code << std::endl;
+                std::cout << "===>scribeSite startByRegister in 3 seconds...." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(3));
+            }else{
+                std::cout << "===>scribeSite startByRegister successfully....." << std::endl;
+                break;
+            }
+        }
+    });
+
+    std::cout << "QUIT1..." << std::endl;
+    LOG_RED << "QUIT1...";
+
+    while(true){
+        std::this_thread::sleep_for(std::chrono::seconds(60 *10));
     }
 
-    http_server_thread.join();
+    std::cout << "QUIT2..." << std::endl;
 
     return 0;
 }

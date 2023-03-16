@@ -47,7 +47,6 @@
 
 
 namespace muduo{
-    extern void logInit(string& path);          //初始化log文件路径
     extern void logInitLogger(string& path);    //初始化log文件路径
 
     /*
