@@ -184,26 +184,24 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(GetGroupList_Device_Service_ID, getGroupList_service_handler);
 
 
-#if 0
     //注册白名单改变处理函数
-    serviceSiteManager->registerMessageHandler(WHITELIST_MODIFIED_MESSAGE_ID, updateDeviceList);
-
-    //白名单被app修改，将白名单配置的设备属性信息同步到蓝牙设备列表
+    serviceSiteManager->registerMessageHandler(PanelProperty_MODIFIED_MESSAGE_ID, util::modifyPanelProperty);
+    //面板属性列表被修改
     threadPool_.enqueue([&](){
         while(true){
             int code;
             std::vector<string> messageIdList;
-            messageIdList.push_back(WHITELIST_MODIFIED_MESSAGE_ID);
+            messageIdList.push_back(PanelProperty_MODIFIED_MESSAGE_ID);
             code = serviceSiteManager->subscribeMessage(LocalIp, ConfigPort, messageIdList);
             if (code == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage whiteListModified ok.\n");
+                printf("subscribeMessage panelPropertyModified ok.\n");
                 break;
             }
             std::this_thread::sleep_for(std::chrono::seconds(10));
-            LOG_RED << "subscribed whiteListModified failed....., start to subscribe in 10 seconds";
+            LOG_RED << "subscribed panelPropertyModified failed....., start to subscribe in 10 seconds";
         }
     });
-#endif
+
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){

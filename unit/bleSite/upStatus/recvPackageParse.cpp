@@ -88,6 +88,10 @@ void RecvPackageParse::parse2Event(string& completePackageString) {
             rs.rollBack(6);
             LightBrightStatus(rs.remainingString()).postEvent();
 
+        }else if(opcode == "8266"){   //色温状态
+            rs.rollBack(6);
+            LightColorTemperature(rs.remainingString()).postEvent();
+
         }else if(opcode == "8260"){     //亮度、色温状态上报
             rs.rollBack(6);
             LightBrightColorTemperature(rs.remainingString()).postEvent();

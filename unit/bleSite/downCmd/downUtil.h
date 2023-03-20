@@ -269,7 +269,7 @@ public:
     string getBinaryString() override{
         string prefix = getCommandPrefix();
         string stringCmd;
-        stringCmd.append(prefix).append(address).append("8203");
+        stringCmd.append(prefix).append(address).append("8202");
         if(onOff == "on"){
             stringCmd.append("01");
         }else if(onOff == "off"){
@@ -315,10 +315,11 @@ public:
     string getBinaryString() override{
         string prefix = getCommandPrefix();
         stringstream ss;
-        ss << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << luminanceVal;
+        ss << "FF";
+        ss << std::setfill('0') << std::hex << std::uppercase << std::setw(2) << luminanceVal;
 
         string stringCmd;
-        stringCmd.append(prefix).append(address).append("824D").append(ss.str());
+        stringCmd.append(prefix).append(address).append("824C").append(ss.str());
         stringCmd.append("00");
         stringCmd.append(transTime);
         stringCmd.append("00");
@@ -364,7 +365,7 @@ public:
         string ctlTemperatureStr = ss.str();
 
         string stringCmd;
-        stringCmd.append(prefix).append(address).append("8265");
+        stringCmd.append(prefix).append(address).append("8264");
         stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
         stringCmd.append(deleteWhiteSpace("00 00"));
         stringCmd.append("00");
@@ -418,12 +419,13 @@ public:
         string prefix = getCommandPrefix();
         stringstream sscCtlTemperature, ssLuminanceVal;
         sscCtlTemperature << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
-        ssLuminanceVal << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << luminanceVal;
+        ssLuminanceVal << "FF";
+        ssLuminanceVal << std::setfill('0') << std::hex << std::uppercase << std::setw(2) << luminanceVal;
         string ctlTemperatureStr = sscCtlTemperature.str();
         string LuminanceValStr = ssLuminanceVal.str();
 
         string stringCmd;
-        stringCmd.append(prefix).append(address).append("825F");
+        stringCmd.append(prefix).append(address).append("825E");
         stringCmd.append(LuminanceValStr);
         stringCmd.append(ctlTemperatureStr.substr(2, 2)).append(ctlTemperatureStr.substr(0,2 ));
         stringCmd.append(deleteWhiteSpace("00 00"));

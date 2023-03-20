@@ -52,7 +52,7 @@ static const string Device_State_Changed            =   "device_state_changed"; 
 
 
 //站点订阅的消息
-static const string WHITELIST_MODIFIED_MESSAGE_ID   = "whiteListModified";    //白名单被app修改
+static const string PanelProperty_MODIFIED_MESSAGE_ID   = "self_info_update";    //面板属性被修改
 
 
 //扫描绑定指令

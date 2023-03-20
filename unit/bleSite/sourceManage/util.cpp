@@ -101,15 +101,11 @@ string util::getSourceSite() {
     }
 }
 
-void util::modifyPanelProperty() {
-    qlibc::QData panelConfigRequest, panelConfigResponse;
-    panelConfigRequest.setString("service_id", "get_self_info");
-    panelConfigRequest.putData("request", qlibc::QData());
-    if(httpUtil::sitePostRequest("127.0.0.1", 9006, panelConfigRequest, panelConfigResponse)){
-        std::lock_guard<std::recursive_mutex> lg(rMutex);
-        panelId = panelConfigResponse.getData("response").getString("device_id");
-    }else{
-        std::lock_guard<std::recursive_mutex> lg(rMutex);
-        panelId.clear();
+void util::modifyPanelProperty(const Request& request) {
+    qlibc::QData message(request.body);
+    string device_id = message.getData("content").getString("device_id");
+    std::lock_guard<std::recursive_mutex> lg(rMutex);
+    if(!device_id.empty()){
+        panelId = device_id;
     }
 }

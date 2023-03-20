@@ -7,6 +7,8 @@
 
 #include <string>
 #include <mutex>
+#include "http/httplib.h"
+using namespace httplib;
 using namespace std;
 
 class util {
@@ -23,8 +25,8 @@ public:
     //获取面板信息
     static string getSourceSite();
 
-    //修改
-    static void modifyPanelProperty();
+    //面板属性被修改
+    static void modifyPanelProperty(const Request& request);
 };
 
 
