@@ -28,12 +28,15 @@ void SiteTree::init(){
     //开启主机IP确认线程
     determineLocalIpThread = new thread([this]{
         while(true){
+            if(determineLocalIpInterval < 30){
+                determineLocalIpInterval *= 2;
+            }
             std::this_thread::sleep_for(std::chrono::seconds(determineLocalIpInterval));
             initLocalIp();
         }
     });
 
-    //开启主机发现线程
+    //开启主机发现线程，定时发送查询请求
     discoverThread = new thread([this]{
         while(true){
             std::this_thread::sleep_for(std::chrono::seconds(discoverPingInterval));
@@ -49,17 +52,17 @@ void SiteTree::init(){
         }
     });
 
-    //开启mdns服务线程
-    mdnsServiceThread = new thread([this]{
-        mdnsServiceStart();
-    });
-
     //本机站点ping计数递减线程
     localPingCoutDownThread = new thread([this]{
         while(true){
             std::this_thread::sleep_for(std::chrono::seconds(localPingInterval));
             localSitePingCountDown();
         }
+    });
+
+    //开启mdns服务线程
+    mdnsServiceThread = new thread([this]{
+        mdnsServiceStart();
     });
 
     initComplete.store(true);
@@ -175,15 +178,13 @@ void SiteTree::addNewFindSite(string& ip) {
     {
         std::lock_guard<std::recursive_mutex> lg(siteMutex);
         auto pos = ipMap.find(ip);
-        if(pos == ipMap.end()){
+        if(pos == ipMap.end()){     //不是本机自己回复
             flag = true;
         }
     }
 
     /*
-     * 1. 不处理第一次因确认本机IP接收到的返回，因此此时本机站点服务器尚未开启
-     * 2. 只处理非本机IP地址的节点
-     * 3. 获取相应主机下的站点信息，如果之前存在则更新，如果之前不存在则添加
+     * . 获取相应主机下的站点信息，如果之前存在则更新，如果之前不存在则添加
      */
     if(flag && initComplete.load()){
         qlibc::QData request, response;
@@ -393,10 +394,15 @@ int SiteTree::initLocalIp() {
                     std::lock_guard<std::recursive_mutex> lg(siteMutex);
                     auto pos = ipMap.find(string(addr.str));
                     if(pos != ipMap.end()){
-                        ipMap.erase(pos);
+                        if(pos->second != string(ifa->ifa_name)){
+                            ipMap.erase(pos);
+                            ipMap.insert(std::make_pair(string(addr.str), string(ifa->ifa_name)));
+                            LOG_PURPLE << "initLocalIp: " << string(addr.str) << " : " << string(ifa->ifa_name);
+                        }
+                    }else{
+                        ipMap.insert(std::make_pair(string(addr.str), string(ifa->ifa_name)));
+                        LOG_PURPLE << "initLocalIp: " << string(addr.str) << " : " << string(ifa->ifa_name);
                     }
-                    ipMap.insert(std::make_pair(string(addr.str), string(ifa->ifa_name)));
-                    LOG_PURPLE << "initLocalIp: " << string(addr.str) << " : " << string(ifa->ifa_name);
 
                     if(regex_search(string(ifa->ifa_name), regex("wlan")) || regex_search(string(ifa->ifa_name), regex("eth"))){
                         //如果本机IP值发生变化（一般是断网重连造成的），则删除旧的本地IP值
@@ -405,14 +411,14 @@ int SiteTree::initLocalIp() {
                             if(position != ipMap.end()){
                                 ipMap.erase(position);
                             }
-                            localIp = string(addr.str);   // 更新本机IP地址
+                            localIp = string(addr.str);       // 更新本机IP地址
                             updateLocalSiteIp();             // 更新本机站点信息中的Ip地址信息
+                            LOG_PURPLE << "localIp: " << localIp;
+
                             std::lock_guard<std::mutex> lgMdns(mdnsMutex);
                             ready2StartMdnsService = true;
                             cv.notify_one();     //通知mdns服务启动
                         }
-
-                        LOG_PURPLE << "localIp: " << localIp;
                         retFlag = 0;
                     }
                 }
@@ -522,8 +528,9 @@ void SiteTree::mdnsServiceStart(){
     string hostname = "smartHome";
     char hostname_buffer[256];
     size_t hostname_size = sizeof(hostname_buffer);
-    if (gethostname(hostname_buffer, hostname_size) == 0)
+    if (gethostname(hostname_buffer, hostname_size) == 0){
         hostname = hostname_buffer;
+    }
 
     //mdns服务器监听5353端口号，此处指定请求服务名以及返回的端口号
     string service = "edgeai.site_query._tcp.local.";
