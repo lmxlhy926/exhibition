@@ -68,13 +68,6 @@ int main(int argc, char* argv[]) {
         return synergy::bleDeviceOperation_service_handler(request, response);
     });
 
-
-    //请求白名单更新
-    serviceSiteManager->registerServiceRequestHandler(UpdateWhiteList_Service_ID,
-                                                      [](const Request& request, Response& response)->int{
-        return synergy::updateWhiteList_service_handler(request, response);
-    });
-
     //请求设备列表更新
     serviceSiteManager->registerServiceRequestHandler(UpdateDeviceList_Service_ID,
                                                       [](const Request& request, Response& response)->int{
@@ -224,6 +217,7 @@ int main(int argc, char* argv[]) {
         }
     });
 #endif
+
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){

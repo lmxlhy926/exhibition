@@ -11,15 +11,13 @@
 string util::panelId;
 std::recursive_mutex util::rMutex;
 
+//找到设备管理站点
 bool getSynergyInfo(string& ip, int& port){
     qlibc::QData appSiteRequest, appSiteResponse;
     appSiteRequest.setString("service_id", "get_app_site_list");
     appSiteRequest.setValue("request", Json::Value("{}"));
     bool siteBool = httpUtil::sitePostRequest("127.0.0.1", 9012, appSiteRequest, appSiteResponse);
     LOG_INFO << "appSiteResponse: " << appSiteResponse.toJsonString();
-
-//    siteBool = true;
-//    appSiteResponse.loadFromFile("/mnt/d/bywg/project/exhibition/unit/bleSite/sourceManage/appSite.json");
 
     if(siteBool) {
         qlibc::QData siteList = appSiteResponse.getData("response").getData("app_site_list");

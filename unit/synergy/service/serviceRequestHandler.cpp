@@ -81,6 +81,40 @@ namespace synergy {
         return httpUtil::sitePostRequest("127.0.0.1", 9001, requestData, responseData);
     }
 
+    bool bleGroupRegister2Cloud(){
+        qlibc::QData groupList = GroupManager::getInstance()->getBleGroupList();
+        Json::ArrayIndex size = groupList.size();
+        qlibc::QData deviceList;
+        for(Json::ArrayIndex i = 0; i < size; ++i){
+            qlibc::QData item = groupList.getArrayElement(i);
+            qlibc::QData data;
+            data.setString("categoryCode", "LIGHT");
+            data.setString("deviceCode", item.getString("group_uid"));
+            data.setString("deviceDid", item.getString("group_uid"));
+            data.setString("deviceSn", item.getString("group_uid"));
+            data.setString("deviceName", item.getString("group_name"));
+            data.setString("deviceDesc", item.getString("group_name"));
+            data.setString("deviceVender", "changhong");
+            data.setString("productNickname", item.getString("group_name"));
+            data.setString("productType", "LIGHT_SWITCH");
+            data.setString("roomNo", item.getData("location").getString("room_no"));
+            data.setString("roomType", item.getData("location").getString("room_name"));
+            data.setString("roomName", item.getData("location").getString("room_name"));
+            data.setInt("deviceSource", 1);
+            data.setInt("isGateway", 0);
+            deviceList.append(data);
+        }
+        qlibc::QData requestData, responseData;
+        requestData.setString("service_id", "postDeviceList");
+        requestData.putData("request", qlibc::QData().putData("deviceList", deviceList));
+        LOG_INFO << "requestData: " << requestData.toJsonString(true);
+
+//        if(httpUtil::sitePostRequest("127.0.0.1", 9006, requestData, responseData)){
+//           return true;
+//        }
+        return false;
+    }
+
 
     //软服针对样板间下发给mesh站点的控制指令
     void lightControlBleSite(const string& area, const qlibc::QData& requestData){
@@ -207,40 +241,11 @@ namespace synergy {
 
     int bleDeviceRegister_service_handler(const Request& request, Response& response){
         LOG_INFO << "bleDeviceRegister_service_handler: " << qlibc::QData(request.body).toJsonString();
-        qlibc::QData groupList = GroupManager::getInstance()->getBleGroupList();
-        Json::ArrayIndex size = groupList.size();
-        qlibc::QData deviceList;
-        for(Json::ArrayIndex i = 0; i < size; ++i){
-            qlibc::QData item = groupList.getArrayElement(i);
-            qlibc::QData data;
-            data.setString("categoryCode", "LIGHT");
-            data.setString("deviceCode", item.getString("group_id"));
-            data.setString("deviceDid", item.getString("group_id"));
-            data.setString("deviceSn", item.getString("group_name"));
-            data.setString("deviceName", item.getString("group_name"));
-            data.setString("deviceDesc", item.getString("group_name"));
-            data.setString("deviceVender", "changhong");
-            data.setString("productNickname", item.getString("group_name"));
-            data.setString("productType", "LIGHT_SWITCH");
-            data.setString("roomNo", item.getData("location").getString("room_no"));
-            data.setString("roomType", item.getData("location").getString("room_name"));
-            data.setString("roomName", item.getData("location").getString("room_name"));
-            data.setString("deviceSource", "1");
-            data.setInt("isGateway", 0);
-            deviceList.append(data);
+        if(bleGroupRegister2Cloud()){
+            response.set_content(okResponse.dump(), "text/json");
+        }else{
+            response.set_content(errResponse.dump(), "text/json");
         }
-        qlibc::QData requestData, responseData;
-        requestData.setString("service_id", "postDeviceList");
-        requestData.putData("request", qlibc::QData().putData("deviceList", deviceList));
-        LOG_INFO << "requestData: " << requestData.toJsonString(true);
-
-//        if(httpUtil::sitePostRequest("127.0.0.1", 9006, requestData, responseData)){
-//            response.set_content(okResponse.dump(), "text/json");
-//        }else{
-//            response.set_content(errResponse.dump(), "text/json");
-//        }
-
-        response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
 

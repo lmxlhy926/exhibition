@@ -13,13 +13,16 @@ namespace synergy{
 //判断站点是否在线（通过请求站点）
     bool isSiteOnline(const std::string& siteId);
 
+//蓝牙组注册到云大管理app上
+    bool bleGroupRegister2Cloud();
+
 //场景指令转换解析 + 设备控制（软服请求）
     int cloudCommand_service_handler(const Request& request, Response& response);
 
 //语音控制入口
     int voiceControl_service_handler(const Request& request, Response& response);
 
-//蓝牙设备注册
+//蓝牙组同步
     int bleDeviceRegister_service_handler(const Request& request, Response& response);
 
 //蓝牙设备操作
@@ -87,7 +90,7 @@ namespace synergy{
 //获取面板列表
     int getPanelList_service_handler(const Request& request, Response& response);
 
-//发布蓝牙站点消息
+//设备状态消息发布
     void messagePublish(const Request& request);
 
 }

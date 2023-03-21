@@ -37,7 +37,6 @@ static const string Control_Service_ID              = "cloudCommand";
 static const string VoiceControl_Service_ID         = "voiceControl";
 static const string BleGroupRegister_Service_ID     = "register_bleGroup";
 static const string BleDeviceOperation_Service_ID   = "bleDeviceOperation";
-static const string UpdateWhiteList_Service_ID      = "updateWhiteList";
 static const string UpdateDeviceList_Service_ID     = "updateDeviceList";
 static const string UpdateGroupList_Service_ID      = "updateGroupList";
 static const string GetSiteNames_Service_ID         = "getSiteNames";
