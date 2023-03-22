@@ -208,11 +208,14 @@ void SiteTree::addNewFindSite(string& ip) {
                 }
                 discoveredPingCountMap.insert(std::make_pair(ip, 1));
             }
-            //如果是新增节点则发布上线消息
+
+            //如果是新增节点则发布上线消息； 目前只关心本机站点的上下线
+#if 0
             if(isNewNode){
                 qlibc::QData siteList = response.getData("response").getData("siteList");
                 publishOnOffLineMessage(siteList, "online", false);
             }
+#endif
 
             //订阅节点消息通道，重复订阅也没有关系
             std::vector<string> messageIdList;

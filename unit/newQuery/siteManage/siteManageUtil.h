@@ -137,13 +137,13 @@ private:
      */
     void discoveredSitePingCountDown();
 
-    //发送mdns查询报文
+    //发送查询站点mdns查询报文
     void site_query();
 
     //开启mdns服务，接受查询报文
     void mdnsServiceStart();
 
-    //更新本机站点信息中的ip地址
+    //更新本机站点的ip地址
     void updateLocalSiteIp();
 
     //发布列表里站点的上下线消息

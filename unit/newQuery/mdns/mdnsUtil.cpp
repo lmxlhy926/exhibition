@@ -96,7 +96,7 @@ query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry
 //        printf("%.*s : %s %.*s PTR %.*s rclass 0x%x ttl %u length %d\n",
 //               MDNS_STRING_FORMAT(fromaddrstr), entrytype, MDNS_STRING_FORMAT(entrystr),
 //               MDNS_STRING_FORMAT(namestr), rclass, ttl, (int)record_length);
-        LOG_GREEN << string(fromaddrstr.str, fromaddrstr.length) << " : " << entrytype << " " << string(entrystr.str, entrystr.length)
+        LOG_YELLOW << string(fromaddrstr.str, fromaddrstr.length) << " : " << entrytype << " " << string(entrystr.str, entrystr.length)
                   << " PTR " << string(namestr.str, namestr.length) << " rclass " << rclass << " ttl " << ttl << " length " << record_length;
 
     } else if (rtype == MDNS_RECORDTYPE_SRV) {
@@ -106,7 +106,7 @@ query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry
 //               MDNS_STRING_FORMAT(fromaddrstr), entrytype, MDNS_STRING_FORMAT(entrystr),
 //               MDNS_STRING_FORMAT(srv.name), srv.priority, srv.weight, srv.port);
 
-        LOG_GREEN << string(fromaddrstr.str, fromaddrstr.length) << " : " << entrytype << " " << string(entrystr.str, entrystr.length)
+        LOG_YELLOW << string(fromaddrstr.str, fromaddrstr.length) << " : " << entrytype << " " << string(entrystr.str, entrystr.length)
                   << " SRV " << string(srv.name.str, srv.name.length) << " priority " << srv.priority << " weight " << srv.weight << " port " << srv.port;
 
 
@@ -121,7 +121,7 @@ query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry
                 ipv4_address_to_string(namebuffer, sizeof(namebuffer), &addr, sizeof(addr));
 //        printf("%.*s : %s %.*s A %.*s\n", MDNS_STRING_FORMAT(fromaddrstr), entrytype,
 //               MDNS_STRING_FORMAT(entrystr), MDNS_STRING_FORMAT(addrstr));
-        LOG_GREEN << string(fromaddrstr.str, fromaddrstr.length) << " : " << entrytype << " " << string(entrystr.str, entrystr.length)
+        LOG_YELLOW << string(fromaddrstr.str, fromaddrstr.length) << " : " << entrytype << " " << string(entrystr.str, entrystr.length)
                   << " A " << string(addrstr.str, addrstr.length);
     }
 
@@ -882,10 +882,11 @@ send_mdns_query(mdns_query_t* query, size_t count) {
     }
 //    printf("\n");
     for (int isock = 0; isock < num_sockets; ++isock) {
-        query_id[isock] =
-                mdns_multiquery_send(sockets[isock], query, count, buffer, capacity, 0);
-        if (query_id[isock] < 0)
-            printf("Failed to send mDNS query: %s\n", strerror(errno));
+        query_id[isock] = mdns_multiquery_send(sockets[isock], query, count, buffer, capacity, 0);
+        if (query_id[isock] < 0){
+//            printf("Failed to send mDNS query: %s\n", strerror(errno));
+            LOG_RED << "Failed to send mDNS query: " << strerror(errno);
+        }
     }
 
     // This is a simple implementation that loops for 5 seconds or as long as we get replies
@@ -894,7 +895,7 @@ send_mdns_query(mdns_query_t* query, size_t count) {
     LOG_GREEN << "Reading mDNS query replies";
     int records = 0;
     do {
-        struct timeval timeout;
+        struct timeval timeout{};
         timeout.tv_sec = 2;
         timeout.tv_usec = 0;
 

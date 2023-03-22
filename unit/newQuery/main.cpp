@@ -82,7 +82,7 @@ int main(int argc, char* argv[]){
     });
 
     //注册本站点发布的消息
-    serviceSiteManager->registerMessageId(Site_OnOff_Node2Node_MessageID);             //节点消息通道
+    serviceSiteManager->registerMessageId(Site_OnOff_Node2Node_MessageID);  //节点消息通道
     serviceSiteManager->registerMessageId(Site_OnOffLine_MessageID);        //上下线消息
     serviceSiteManager->registerMessageId(Site_RegisterAgain_MessageID);    //重新注册消息
     serviceSiteManager->registerMessageId(Site_Requery_Result_MessageID);   //站点查询结果消息
