@@ -33,10 +33,10 @@ private:
 public:
     static GroupManager* getInstance();
 
-    //获取设备列表
+    //获取组列表
     qlibc::QData getAllGroupList();
 
-    //获取蓝牙列表
+    //获取蓝牙组列表
     qlibc::QData getBleGroupList();
 
     //是否在组列表中

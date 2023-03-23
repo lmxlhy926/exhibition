@@ -5,6 +5,7 @@
 #include "deviceManager.h"
 #include "common/httpUtil.h"
 #include "../param.h"
+#include "log/Logging.h"
 
 DeviceManager* DeviceManager::instance = nullptr;
 
@@ -14,11 +15,6 @@ DeviceManager *DeviceManager::getInstance() {
     }
     return instance;
 }
-
-void DeviceManager::listChanged() {
-    changed.store(true);
-}
-
 
 qlibc::QData DeviceManager::getAllDeviceList() {
     std::lock_guard<std::recursive_mutex> lg(Mutex);
@@ -68,12 +64,12 @@ void DeviceManager::updateDeviceList(){
         if(regex_match(elem, sm, regex("(.*):(.*)"))){
             string uuid = sm.str(1);
             string siteID = sm.str(2);
-            if((siteID == BleSiteID || siteID == TvAdapterSiteID || siteID == ZigbeeSiteID)){
-                qlibc::QData deviceRequest;
+            if((siteID == BleSiteID || siteID == TvAdapterSiteID || siteID == ZigbeeSiteID)){   //设备类站点
+                qlibc::QData deviceRequest, deviceRes;
                 deviceRequest.setString("service_id", "get_device_list");
                 deviceRequest.setValue("request", Json::nullValue);
-                qlibc::QData deviceRes;
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), deviceRequest, deviceRes);       //获取设备列表
+                LOG_YELLOW << siteID << ": " << deviceRes.toJsonString();
                 qlibc::QData list = addMacSource(deviceRes.getData("response").getData("device_list"),
                                                  string().append(uuid).append(":").append(siteID));     //给列表条目加入来源标签
                 mergeList(list, totalList);

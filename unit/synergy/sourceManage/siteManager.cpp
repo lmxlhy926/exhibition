@@ -28,6 +28,7 @@ void siteManager::updateSite(){
     request.putData("request", qlibc::QData().setString("site_id", ""));
     if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){    //获取局域网内所有发现的站点
         qlibc::QData resBody = response.getData("response");
+        LOG_INFO << "site_localAreaNetworkSite response: " << response.toJsonString();
         Json::Value::Members ipMembers = resBody.getMemberNames();
         for(auto& ip : ipMembers){
             qlibc::QData siteList = resBody.getData(ip);
@@ -35,16 +36,18 @@ void siteManager::updateSite(){
             for(Json::ArrayIndex i = 0; i < size; ++i){
                 qlibc::QData item = siteList.getArrayElement(i);
                 string site_id = item.getString("site_id");
-                if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){
+                if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){    //只关心设备类站点
+                    LOG_PURPLE << "siteId: " << site_id;
                     //从相应的配置站点获取mac
                     string uid;
                     qlibc::QData panelConfigRequest, panelConfigResponse;
                     panelConfigRequest.setString("service_id", "get_self_info");
                     panelConfigRequest.putData("request", qlibc::QData());
-                    if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
+                    if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){   //获取面板配置信息
+                        LOG_INFO << "panelConfigResponse: " << panelConfigResponse.toJsonString();
                         uid = panelConfigResponse.getData("response").getString("device_id");
                     }
-                    if(!uid.empty()){
+                    if(!uid.empty()){   //构造站点信息
                         string siteName;
                         siteName.append(uid).append(":").append(site_id);
                         Json::Value siteItem;
@@ -65,8 +68,16 @@ void siteManager::updateSite(){
         SiteRecord::getInstance()->addSite(elem.first, elem.second["ip"].asString(), elem.second["port"].asInt());
     }
 
-    //订阅蓝牙站点的消息
+    //打印发现的设备站点
     std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
+    for(auto& siteName : siteNames){
+        string ip;
+        int port;
+        SiteRecord::getInstance()->getSiteInfo(siteName, ip, port);
+        LOG_PURPLE << siteName << ": <" << ip << ", " << port << ">...";
+    }
+
+    //订阅蓝牙站点的消息
     for(auto& siteName : siteNames){
         smatch sm;
         if(regex_match(siteName, sm, regex("(.*):ble_light"))){
@@ -81,10 +92,7 @@ void siteManager::updateSite(){
                 messageIdList.push_back(SingleDeviceUnbindSuccessMsg);
                 messageIdList.push_back(BindEndMsg);
                 messageIdList.push_back(Device_State_Changed);
-                int code = ServiceSiteManager::subscribeMessage(ip, port, messageIdList);
-                if (code == ServiceSiteManager::RET_CODE_OK) {
-                    LOG_PURPLE << siteName << ": <" << ip << ", " << port << "> subscribe successfully....";
-                }
+                ServiceSiteManager::subscribeMessage(ip, port, messageIdList);
             }
         }
     }
@@ -128,36 +136,3 @@ qlibc::QData siteManager::getPanelList(){
     return panelArray;
 }
 
-
-void siteManager::updateSite1() {
-    qlibc::QData request, response;
-    request.setString("service_id", "site_localAreaNetworkSite");
-    request.putData("request", qlibc::QData().setString("site_id", ""));
-    if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){    //获取局域网内所有发现的站点
-        qlibc::QData resBody = response.getData("response");
-        Json::Value::Members ipMembers = resBody.getMemberNames();
-        for(auto& ip : ipMembers){
-            qlibc::QData siteList = resBody.getData(ip);
-            Json::ArrayIndex size = siteList.size();
-            for(Json::ArrayIndex i = 0; i < size; ++i){
-                qlibc::QData item = siteList.getArrayElement(i);
-                string site_id = item.getString("site_id");
-                if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){
-                    //从相应的配置站点获取mac
-                    string uid;
-                    qlibc::QData panelConfigRequest, panelConfigResponse;
-                    panelConfigRequest.setString("service_id", "get_self_info");
-                    panelConfigRequest.putData("request", qlibc::QData());
-                    if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
-                        uid = panelConfigResponse.getData("response").getString("device_id");
-                    }
-                    if(!uid.empty()){
-                        string siteName;
-                        siteName.append(uid).append(":").append(site_id);
-                        SiteRecord::getInstance()->addSite(siteName, ip, item.getInt("port"));  //记录选定的站点
-                    }
-                }
-            }
-        }
-    }
-}

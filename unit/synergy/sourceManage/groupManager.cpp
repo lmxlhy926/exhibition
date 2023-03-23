@@ -79,10 +79,9 @@ void GroupManager::updateGroupList(){
             string uid = sm.str(1);
             string siteID = sm.str(2);
             if((siteID == BleSiteID || siteID == ZigbeeSiteID)){
-                qlibc::QData groupRequest;
+                qlibc::QData groupRequest, groupRes;
                 groupRequest.setString("service_id", "get_group_list");
                 groupRequest.setValue("request", Json::nullValue);
-                qlibc::QData groupRes;
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), groupRequest, groupRes);     //获取组列表
                 qlibc::QData list = addGrpSourceTag(groupRes.getData("response").getData("group_list"),
                                                  string().append(uid).append(":").append(siteID));    //给组条目添加标签

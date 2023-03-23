@@ -19,17 +19,11 @@ namespace synergy{
 //场景指令转换解析 + 设备控制（软服请求）
     int cloudCommand_service_handler(const Request& request, Response& response);
 
-//语音控制入口
-    int voiceControl_service_handler(const Request& request, Response& response);
-
-//蓝牙组同步
+//蓝牙组注册到云大管理app
     int bleDeviceRegister_service_handler(const Request& request, Response& response);
 
 //蓝牙设备操作
     int bleDeviceOperation_service_handler(const Request& request, Response& response);
-
-//请求更新白名单
-    int updateWhiteList_service_handler(const Request& request, Response& response);
 
 //更新设备列表
     int updateDeviceList_service_handler(const Request& request, Response& response);
@@ -37,8 +31,12 @@ namespace synergy{
 //更新组列表
     int updateGroupList_service_handler(const Request& request, Response& response);
 
-//获取发现的蓝牙、zigbee站点
+//获取注册站点名
     int getSiteNames_service_handler(const Request& request, Response& response);
+
+//获取面板列表
+    int getPanelList_service_handler(const Request& request, Response& response);
+
 
 
 
@@ -87,10 +85,10 @@ namespace synergy{
 //获取分组列表：ble, zigbee
     int getGroupList_service_handler(const Request& request, Response& response);
 
-//获取面板列表
-    int getPanelList_service_handler(const Request& request, Response& response);
+//语音控制入口
+    int voiceControl_service_handler(const Request& request, Response& response);
 
-//设备状态消息发布
+//蓝牙设备状态消息发布
     void messagePublish(const Request& request);
 
 }

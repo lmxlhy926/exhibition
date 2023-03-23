@@ -12,10 +12,9 @@ using namespace std;
 class siteManager {
 private:
     static siteManager* Instance;
-    std::thread* updateSiteThread = nullptr;
     siteManager(){
         updateSite();
-        updateSiteThread = new thread([]{
+        new thread([]{
             while(true){
                 std::this_thread::sleep_for(std::chrono::seconds(10));
                 updateSite();
@@ -32,10 +31,8 @@ public:
      */
     static void updateSite();
 
-    //获取面板列表
+    //获取设备类站点
     static qlibc::QData getPanelList();
-
-    static void updateSite1();
 };
 
 

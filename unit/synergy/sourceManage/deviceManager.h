@@ -28,13 +28,11 @@ private:
             }
         });
     }
+
     static DeviceManager* instance;
 
 public:
     static DeviceManager* getInstance();
-
-    //列表变更
-    void listChanged();
 
     //获取设备列表
     qlibc::QData getAllDeviceList();
