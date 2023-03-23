@@ -30,9 +30,6 @@ int site_getLocalAreaNetworkSiteInfo_service_handler(const Request& request, Res
 //获取局域网内本机外的所有站点信息
 int site_getLocalAreaNetworkSiteInfoExceptOwn_service_handler(const Request& request, Response& response);
 
-//获取本机ip信息
-int printIpAddress(const Request& request, Response& response);
-
 //面板之间传递上下线消息，用来更新站点列表
 void site_OnOff_node2node_message_handler(const Request& request);
 

@@ -20,7 +20,6 @@ static const string Site_Ping_Service_ID            = "site_ping";              
 static const string Site_LocalSite_Service_ID       = "site_localSite";                  //获取本机站点
 static const string Site_LocalAreaSite_Service_ID   = "site_localAreaNetworkSite";       //获取局域网发现的所有站点
 static const string Site_LocalAreaSiteExceptOwn_Service_ID = "site_localAreaNetworkSiteExceptLocal";   //获取局域网内，本机外的站点信息
-static const string Site_Print_IpAddress_ID         = "site_printIpAdress";              //打印Ip地址信息
 
 //订阅消息ID
 static const string Site_OnOff_Node2Node_MessageID  = "site_OnOff_node2node";       //节点消息通道

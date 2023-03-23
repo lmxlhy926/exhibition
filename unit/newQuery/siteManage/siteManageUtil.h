@@ -7,6 +7,7 @@
 
 #include <string>
 #include <mutex>
+#include <queue>
 #include <condition_variable>
 #include <unordered_map>
 #include <unordered_set>
@@ -31,33 +32,27 @@ using namespace std;
  */
 class SiteTree{
 private:
-    std::recursive_mutex siteMutex;                // 保护数据结构并发操作
     std::string localIp = "127.0.0.1";             // 默认IP地址
-    std::atomic<bool> initComplete{false};         // 初始化完成
+    const int determineLocalIpInterval = 2;        // 确定ip操作间隔时间
+    std::atomic<bool> isDertermineIp{false};       // 是否确认IP
+//本机及其它节点维护
+    std::unordered_map<string, Json::Value> localSiteMap;            // 本机站点全记录，<siteId, Json::Value>
+    std::unordered_map<string, Json::Value> discoveredSiteMap;       // 局域网内发现的其它站点，<主机ip, 对应主机上的所有站点信息>
+    std::unordered_map<string, int> localSitePingCountMap;           // 本机在线站点的ping计数，<=-3,自动清除。<siteId, int>
+    std::unordered_map<string, int> discoveredPingCountMap;          // 局域网内发现的节点ping计数，<=-3,自动清除。<主机ip, int>
+    const int localPingInterval{10};                                 // ping事时间间隔
+    const int discoverPingInterval{10};                              // 主动查询时间间隔
+    std::recursive_mutex mapRecursiveMutex;                          // 保护对map的操作
 
-//本机注册站点
-    std::unordered_map<string, Json::Value> localSiteMap;           // 本机站点全记录，<siteId, Json::Value>
-    std::unordered_map<string, int> localSitePingCountMap;          // 本机在线站点的ping计数，<=-3,自动清除。<siteId, int>
-    const int localPingInterval = 10;                               // ping事时间间隔
-    std::thread* localPingCoutDownThread;                           // 本机ping计数自减线程
-
-//局域网内其它主机发现、维护
-    std::unordered_map<string, Json::Value>  discoveredSiteMap;     // 局域网内发现的其它站点，<主机ip, 对应主机上的所有站点信息>
-    std::unordered_map<string, int> discoveredPingCountMap;         // 局域网内发现的节点ping计数，<=-3,自动清除。<主机ip, int>
-    int discoverPingInterval = 10;                                  // 主动查询时间间隔
-    std::thread* discoveredPingCountDownThread;                     // 发现节点ping计数自减线程
-    std::thread* discoverThread;                                    // 查询局域网内其它主机线程
-
-//本机ip确定
-    std::unordered_map<string, string> ipMap;      // 本机网卡信息, <ip, name>
-    int determineLocalIpInterval = 2;              // 确定ip操作间隔时间
-    std::thread* determineLocalIpThread;           // 确认本机IP线程
+//查询回复消息处理
+    std::mutex  queryQueMutex;                      // 查询回复队列保护锁
+    std::condition_variable queryQueueCv;           //
+    std::queue<Json::Value> queryResponseQueue;     //查询回复队列
 
 //启动mdns服务
     std::mutex mdnsMutex;
     std::condition_variable cv;
-    bool ready2StartMdnsService{false};
-    std::thread* mdnsServiceThread;                 //启动mdns服务线程
+    bool ready2StartMdnsService{false};    // 是否可以启动mdns服务。确认ip后启动mdns服务
 
     static SiteTree* Instance;
 
@@ -73,6 +68,9 @@ public:
 
     //站点注销
     void siteUnregister(string& siteId);
+
+    //插入响应回复
+    void insertQueryResponse2Queue(Json::Value& value);
 
     //提取本机站点信息条目
     qlibc::QData getLocalSiteInfo(string& siteId);
@@ -90,7 +88,7 @@ public:
      * 处理<查询站点mdns请求报文>返回, 依据返回的ip来判断是否是新的节点
      * 更新局域网主机信息、订阅节点之间通道消息
      */
-    void addNewFindSite(string& ip);
+    void addNewFindSite(string& panelIp);
 
     /*
      *  用其它主机的站点上下线消息，更新本地维护的其它主机的站点状态
@@ -109,15 +107,9 @@ public:
      */
     qlibc::QData getLocalAreaSiteExceptOwn(string& siteId);
 
-    //返回本地ip集合
-    qlibc::QData printIpAddress();
-
 private:
-    /*
-     *  获取本机网卡信息，记录所有网卡地址，选出合适的地址作为本机IP地址
-     *  确定ip地址后，通知mdns服务线程开始mdns服务
-     */
-     int initLocalIp();
+    //更新本机站点的ip地址
+    void updateLocalSiteIp();
 
     /*
      * 向本机注册查询站点
@@ -137,14 +129,17 @@ private:
      */
     void discoveredSitePingCountDown();
 
+    /*
+    *  获取本机网卡信息，记录所有网卡地址，选出合适的地址作为本机IP地址
+    *  确定ip地址后，通知mdns服务线程开始mdns服务
+    */
+    int initLocalIp();
+
     //发送查询站点mdns查询报文
     void site_query();
 
     //开启mdns服务，接受查询报文
     void mdnsServiceStart();
-
-    //更新本机站点的ip地址
-    void updateLocalSiteIp();
 
     //发布列表里站点的上下线消息
     void publishOnOffLineMessage(qlibc::QData& siteList, string onOffLine, bool is2Node);

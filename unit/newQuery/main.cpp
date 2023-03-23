@@ -75,11 +75,6 @@ int main(int argc, char* argv[]){
         return site_getLocalAreaNetworkSiteInfoExceptOwn_service_handler(request, response);
     });
 
-    //打印资源信息
-    serviceSiteManager->registerServiceRequestHandler(Site_Print_IpAddress_ID,
-                                                      [](const Request& request, Response& response) -> int{
-        return printIpAddress(request, response);
-    });
 
     //注册本站点发布的消息
     serviceSiteManager->registerMessageId(Site_OnOff_Node2Node_MessageID);  //节点消息通道
@@ -112,7 +107,7 @@ int main(int argc, char* argv[]){
     registerAgain.setString("message_id", Site_RegisterAgain_MessageID);
     registerAgain.putData("content", qlibc::QData(Json::Value(Json::objectValue)));
     serviceSiteManager->publishMessage(Site_RegisterAgain_MessageID, registerAgain.toJsonString());
-    LOG_PURPLE << "Notify all other sites to register again: " << registerAgain.toJsonString(true);
+    LOG_PURPLE << "Notify all other sites to register again ...";
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(60 *10));

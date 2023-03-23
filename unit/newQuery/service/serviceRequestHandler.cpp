@@ -125,12 +125,6 @@ int site_getLocalAreaNetworkSiteInfoExceptOwn_service_handler(const Request& req
     return 0;
 }
 
-int printIpAddress(const Request& request, Response& response){
-    qlibc::QData data = SiteTree::getInstance()->printIpAddress();
-    response.set_content(data.toJsonString(), "text/json");
-    return 0;
-}
-
 void site_OnOff_node2node_message_handler(const Request& request){
     qlibc::QData reqData(request.body);
     LOG_INFO << "Received node2node_message: " << reqData.toJsonString();
