@@ -43,11 +43,11 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
  */
 void fileSync(string site_id, string getServiceId, string saveServiceId, string message);
 
-//收到白名单后，和本地的进行比较。如果收到的比本地的新，则更新，并发送白名单更改消息
-int whiteList_sync_save_service_request_handler(const Request& request, Response& response);
-
 //获取白名单列表
 int whiteList_get_service_request_handler(const Request& request, Response& response);
+
+//收到白名单后，和本地的进行比较。如果收到的比本地的新，则更新，并发送白名单更改消息
+int whiteList_sync_save_service_request_handler(const Request& request, Response& response);
 
 //保存白名单，并将白名单同步到每个配置站点
 int whiteList_save_service_request_handler(const Request& request, Response& response);
@@ -55,20 +55,29 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
 //获取场景配置文件
 int getSceneFile_service_request_handler(const Request& request, Response& response);
 
-//保存场景配置文件
-int saveSceneFile_service_request_handler(const Request& request, Response& response);
-
 //收到场景文件后，和本地的进行比较。如果收到的为最新的，则保存
 int saveSceneFile_sync_service_request_handler(const Request& request, Response& response);
+
+//保存场景配置文件
+int saveSceneFile_service_request_handler(const Request& request, Response& response);
 
 //获取设备列表，返回给智慧安装app
 int getAllDeviceList_service_request_handler(const Request& request, Response& response);
 
+//获取面板信息
+int getPanelInfo_service_request_handler(const Request& request, Response& response);
+
 //设置面板信息
 int setPanelInfo_service_request_handler(const Request& request, Response& response);
 
-//获取面板信息
-int getPanelInfo_service_request_handler(const Request& request, Response& response);
+//获取语音面板列表
+int getAudioPanelList_service_request_handler(const Request& request, Response& response);
+
+//存储语音面板列表
+int saveAudioPanelList_service_request_handler(const Request& request, Response& response);
+
+//接收雷达数据
+void receiveRadarDevice_message_handler(const Request& request);
 
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

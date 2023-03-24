@@ -130,13 +130,13 @@ int main(int argc, char* argv[]) {
 
 
     //获取白名单列表
-    serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID,whiteList_get_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_REQUEST_SERVICE_ID, whiteList_get_service_request_handler);
 
     //保存白名单列表
-    serviceSiteManager->registerServiceRequestHandler(WHITELIST_SAVE_REQUEST_SERVICE_ID,whiteList_save_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_SAVE_REQUEST_SERVICE_ID, whiteList_save_service_request_handler);
 
     //同步保存白名单
-    serviceSiteManager->registerServiceRequestHandler(WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID,whiteList_sync_save_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID, whiteList_sync_save_service_request_handler);
 
     //获取场景配置文件
     serviceSiteManager->registerServiceRequestHandler(GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, getSceneFile_service_request_handler);
@@ -148,13 +148,19 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID, saveSceneFile_sync_service_request_handler);
 
     //获取灯控设备列表
-    serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID,getAllDeviceList_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID, getAllDeviceList_service_request_handler);
 
     //配置面板配置信息
-    serviceSiteManager->registerServiceRequestHandler(SETPANELINFO_REQUEST_SERVICE_ID,setPanelInfo_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(SETPANELINFO_REQUEST_SERVICE_ID, setPanelInfo_service_request_handler);
 
     //获取面板配置信息
-    serviceSiteManager->registerServiceRequestHandler(GETPANELINFO_REQUEST_SERVICE_ID,getPanelInfo_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(GETPANELINFO_REQUEST_SERVICE_ID, getPanelInfo_service_request_handler);
+
+    //保存语音面板设备
+    serviceSiteManager->registerServiceRequestHandler(SETAUDIOPANELLIST_REQUEST_SERVICE_ID, saveAudioPanelList_service_request_handler);
+
+    //获取语音面板设备
+    serviceSiteManager->registerServiceRequestHandler(GETAUDIOPANELLIST_REQUEST_SERVICE_ID, getAudioPanelList_service_request_handler);
 
 
     //set site supported subscribed message
@@ -163,6 +169,9 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageId(WHITELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知白名单已被修改
     serviceSiteManager->registerMessageId(SCENELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知场景文件已被修改
     serviceSiteManager->registerMessageId(PANELINFO_MODIFIED_MESSAGE_ID);       //发布消息，面板配置信息更改
+
+    //注册接收雷达设备回调
+    serviceSiteManager->registerMessageHandler(RADARDEVICE_RECEIVED_MESSAGE_ID, receiveRadarDevice_message_handler);
 
 
     // 站点监听线程启动
@@ -192,6 +201,22 @@ int main(int argc, char* argv[]) {
             fileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID,
                      "sceneData auto update...");    //同步场景文件
             std::this_thread::sleep_for(std::chrono::seconds(60));
+        }
+    });
+
+    //订阅新增雷达设备
+    threadPool_.enqueue([&](){
+        while(true){
+            int code;
+            std::vector<string> messageIdList;
+            messageIdList.push_back(RADARDEVICE_RECEIVED_MESSAGE_ID);
+            code = serviceSiteManager->subscribeMessage("127.0.0.1", 9010, messageIdList);
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                printf("subscribeMessage RADARDEVICE_RECEIVED_MESSAGE_ID ok.\n");
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            LOG_RED << "subscribed RADARDEVICE_RECEIVED_MESSAGE_ID failed....., start to subscribe in 10 seconds";
         }
     });
 

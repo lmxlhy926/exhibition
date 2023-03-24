@@ -260,9 +260,6 @@ void fileSync(string site_id, string getServiceId, string saveServiceId, string 
     LOG_GREEN << "get node_list: " << request.toJsonString();
     bool siteBool = httpUtil::sitePostRequest("127.0.0.1", 9012, request, response);
 
-//    siteBool = true;
-//    response.loadFromFile("/mnt/d/bywg/project/exhibition/unit/config/nodeSite.json");
-
     if(siteBool){
         node_list.setInitData(response.getData("response").getData("node_list"));
         node_list_size = node_list.size();
@@ -319,6 +316,18 @@ void fileSync(string site_id, string getServiceId, string saveServiceId, string 
     LOG_PURPLE << "==>sync completely.....";
 }
 
+int whiteList_get_service_request_handler(const Request& request, Response& response){
+    LOG_GREEN << "===>whiteList_service_request_handler: " << qlibc::QData(request.body).toJsonString();
+    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
+    LOG_GREEN << "get whiteList....";
+    qlibc::QData data;
+    data.setInt("code", 0);
+    data.setString("error", "ok");
+    data.putData("response", payload);
+
+    response.set_content(data.toJsonString(), "text/json");
+    return 0;
+}
 
 int whiteList_sync_save_service_request_handler(const Request& request, Response& response){
     LOG_PURPLE << "===>recevied sync whiteList, start to compare...";
@@ -350,20 +359,6 @@ int whiteList_sync_save_service_request_handler(const Request& request, Response
         LOG_PURPLE << "===>whiteList is the newest, noting needed to save....";
     }
 
-    return 0;
-}
-
-
-int whiteList_get_service_request_handler(const Request& request, Response& response){
-    LOG_GREEN << "===>whiteList_service_request_handler: " << qlibc::QData(request.body).toJsonString();
-    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
-    LOG_GREEN << "get whiteList....";
-    qlibc::QData data;
-    data.setInt("code", 0);
-    data.setString("error", "ok");
-    data.putData("response", payload);
-
-    response.set_content(data.toJsonString(), "text/json");
     return 0;
 }
 
@@ -414,30 +409,6 @@ int getSceneFile_service_request_handler(const Request& request, Response& respo
     return 0;
 }
 
-//保存场景配置文件
-int saveSceneFile_service_request_handler(const Request& request, Response& response){
-    qlibc::QData data(request.body);
-    LOG_INFO << "==>saveConfigFile_service_request_handler: " << data.toJsonString();
-    qlibc::QData seceConfigFile = data.getData("request");
-    configParamUtil::getInstance()->saveSceneConfigFile(seceConfigFile);
-
-    //同步场景文件
-    fileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID,
-             "sceneConfigFile invoke...");    //同步场景文件
-
-    //发布场景文件被修改消息
-    qlibc::QData publishData;
-    publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
-    publishData.putData("content", qlibc::QData());
-    ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-
-    qlibc::QData ret;
-    ret.setInt("code", 0);
-    ret.setString("msg", "success");
-    response.set_content(ret.toJsonString(), "text/json");
-    return 0;
-}
-
 int saveSceneFile_sync_service_request_handler(const Request& request, Response& response){
     qlibc::QData otherData = qlibc::QData(request.body).getData("request");
     qlibc::QData localData = configParamUtil::getInstance()->getSceneConfigFile();
@@ -469,6 +440,31 @@ int saveSceneFile_sync_service_request_handler(const Request& request, Response&
 
     return 0;
 }
+
+//保存场景配置文件
+int saveSceneFile_service_request_handler(const Request& request, Response& response){
+    qlibc::QData data(request.body);
+    LOG_INFO << "==>saveConfigFile_service_request_handler: " << data.toJsonString();
+    qlibc::QData seceConfigFile = data.getData("request");
+    configParamUtil::getInstance()->saveSceneConfigFile(seceConfigFile);
+
+    //同步场景文件
+    fileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID,
+             "sceneConfigFile invoke...");    //同步场景文件
+
+    //发布场景文件被修改消息
+    qlibc::QData publishData;
+    publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
+    publishData.putData("content", qlibc::QData());
+    ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+
+    qlibc::QData ret;
+    ret.setInt("code", 0);
+    ret.setString("msg", "success");
+    response.set_content(ret.toJsonString(), "text/json");
+    return 0;
+}
+
 
 int getAllDeviceList_service_request_handler(const Request& request, Response& response){
     //请求tvAdapter设备列表, 请求雷达、语音面板设备列表
@@ -517,6 +513,17 @@ int getAllDeviceList_service_request_handler(const Request& request, Response& r
     return 0;
 }
 
+//获取面板信息
+int getPanelInfo_service_request_handler(const Request& request, Response& response){
+    LOG_INFO << "==>getPanelInfo_service_request_handler: " << qlibc::QData(request.body).toJsonString();
+    qlibc::QData data;
+    data.setInt("code", 0);
+    data.setString("error", "ok");
+    data.putData("response", configParamUtil::getInstance()->getPanelInfo());
+    response.set_content(data.toJsonString(), "text/json");
+    return 0;
+}
+
 //设置面板信息
 int setPanelInfo_service_request_handler(const Request& request, Response& response){
     qlibc::QData requestData(request.body);
@@ -531,6 +538,7 @@ int setPanelInfo_service_request_handler(const Request& request, Response& respo
     ServiceSiteManager::getInstance()->publishMessage(PANELINFO_MODIFIED_MESSAGE_ID, publishData.toJsonString());
     LOG_INFO << "publish: " << publishData.toJsonString();
 
+#if 0
     //将面板信息加入白名单中
     string origin_device_mac = panelConfigData.getString("device_mac");
     string device_mac;
@@ -577,6 +585,7 @@ int setPanelInfo_service_request_handler(const Request& request, Response& respo
     contentSaveRequest.setString("service_id", WHITELIST_SAVE_REQUEST_SERVICE_ID);
     contentSaveRequest.putData("request", whiteList);
     httpUtil::sitePostRequest("127.0.0.1", 9006, contentSaveRequest, contentSaveResponse);
+#endif
 
     qlibc::QData data;
     data.setInt("code", 0);
@@ -586,17 +595,128 @@ int setPanelInfo_service_request_handler(const Request& request, Response& respo
     return 0;
 }
 
+int getAudioPanelList_service_request_handler(const Request& request, Response& response){
+    LOG_INFO << "getAudioPanelList_service_request_handler: " << qlibc::QData(request.body).toJsonString();
+    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
+    qlibc::QData deviceList = payload.getData("info").getData("devices");
+    qlibc::QData devices;
+    for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
+        qlibc::QData item = deviceList.getArrayElement(i);
+        if(item.getString("category_code") == "audiopanel"){
+            devices.append(item);
+        }
+    }
 
-//获取面板信息
-int getPanelInfo_service_request_handler(const Request& request, Response& response){
-    LOG_INFO << "==>getPanelInfo_service_request_handler: " << qlibc::QData(request.body).toJsonString();
     qlibc::QData data;
     data.setInt("code", 0);
     data.setString("error", "ok");
-    data.putData("response", configParamUtil::getInstance()->getPanelInfo());
+    data.putData("response", qlibc::QData().putData("devices", devices));
     response.set_content(data.toJsonString(), "text/json");
     return 0;
 }
+
+int saveAudioPanelList_service_request_handler(const Request& request, Response& response){
+    qlibc::QData requestData(request.body);
+    LOG_INFO << "saveAudioPanelList_service_request_handler: " << requestData.toJsonString();
+    qlibc::QData devices = requestData.getData("request").getData("devices");
+    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
+    for(Json::ArrayIndex i = 0; i < devices.size(); ++i){
+        qlibc::QData item = devices.getArrayElement(i);
+        bool hasItem{false};
+
+        qlibc::QData whiteListDevices(payload.getData("info").getData("devices"));
+        for(Json::ArrayIndex j = 0; j < whiteListDevices.size(); ++j){
+            qlibc::QData originItem = whiteListDevices.getArrayElement(j);
+            if(item.getString("device_sn") == originItem.getString("device_sn")){
+                hasItem = true;
+                break;
+            }
+        }
+
+        if(!hasItem){
+            payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
+        }
+    }
+    payload.setString("timeStamp", std::to_string(time(nullptr)));
+
+    //保存设备列表
+    qlibc::QData contentSaveRequest, contentSaveResponse;
+    contentSaveRequest.setString("service_id", WHITELIST_SAVE_REQUEST_SERVICE_ID);
+    contentSaveRequest.putData("request", payload);
+    httpUtil::sitePostRequest("127.0.0.1", 9006, contentSaveRequest, contentSaveResponse);
+
+    qlibc::QData data;
+    data.setInt("code", 0);
+    data.setString("error", "ok");
+    data.putData("response", qlibc::QData());
+    response.set_content(data.toJsonString(), "text/json");
+    return 0;
+}
+
+void receiveRadarDevice_message_handler(const Request& request){
+    qlibc::QData requestData(request.body);
+    LOG_INFO << "receiveRadarDevice_message_handler: " << requestData.toJsonString();
+    qlibc::QData devices = requestData.getData("content").getData("devices");
+    qlibc::QData doors = requestData.getData("content").getData("doors");
+    qlibc::QData rooms = requestData.getData("content").getData("rooms");
+    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
+
+    for(Json::ArrayIndex i = 0; i < devices.size(); ++i){
+        qlibc::QData item = devices.getArrayElement(i);
+        bool hasItem{false};
+        qlibc::QData whiteListDevices(payload.getData("info").getData("devices"));
+        for(Json::ArrayIndex j = 0; j < whiteListDevices.size(); ++j){
+            qlibc::QData originItem = whiteListDevices.getArrayElement(j);
+            if(item.getString("device_sn") == originItem.getString("device_sn")){
+                hasItem = true;
+                break;
+            }
+        }
+        if(!hasItem){
+            payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
+        }
+    }
+
+    for(Json::ArrayIndex i = 0; i < doors.size(); ++i){
+        qlibc::QData item = doors.getArrayElement(i);
+        bool hasItem{false};
+        qlibc::QData whiteListDoors(payload.getData("info").getData("doors"));
+        for(Json::ArrayIndex j = 0; j < whiteListDoors.size(); ++j){
+            qlibc::QData originItem = whiteListDoors.getArrayElement(j);
+            if(item.getString("id") == originItem.getString("id")){
+                hasItem = true;
+                break;
+            }
+        }
+        if(!hasItem){
+            payload.asValue()["info"]["doors"].append(doors.getArrayElement(i).asValue());
+        }
+    }
+
+    for(Json::ArrayIndex i = 0; i < rooms.size(); ++i){
+        qlibc::QData item = rooms.getArrayElement(i);
+        bool hasItem{false};
+        qlibc::QData whiteListRooms(payload.getData("info").getData("rooms"));
+        for(Json::ArrayIndex j = 0; j < whiteListRooms.size(); ++j){
+            qlibc::QData originItem = whiteListRooms.getArrayElement(j);
+            if(item.getString("roomNo") == originItem.getString("roomNo")){
+                hasItem = true;
+                break;
+            }
+        }
+        if(!hasItem){
+            payload.asValue()["info"]["rooms"].append(rooms.getArrayElement(i).asValue());
+        }
+    }
+    payload.setString("timeStamp", std::to_string(time(nullptr)));
+
+    //保存设备列表
+    qlibc::QData contentSaveRequest, contentSaveResponse;
+    contentSaveRequest.setString("service_id", WHITELIST_SAVE_REQUEST_SERVICE_ID);
+    contentSaveRequest.putData("request", payload);
+    httpUtil::sitePostRequest("127.0.0.1", 9006, contentSaveRequest, contentSaveResponse);
+}
+
 
 
 

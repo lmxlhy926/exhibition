@@ -37,8 +37,10 @@ static const string GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID         =    "getSce
 static const string SAVE_SCENECONFIG_FILE_REQUEST_SERVICE_ID        =    "saveSceneConfigFile";
 static const string SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID    =    "saveSceneConfigFileSync";
 static const string GETALLLIST_REQUEST_SERVICE_ID                   =    "get_all_device_list";
-static const string SETPANELINFO_REQUEST_SERVICE_ID                 =     "config_self_info";
-static const string GETPANELINFO_REQUEST_SERVICE_ID                 =     "get_self_info";
+static const string SETPANELINFO_REQUEST_SERVICE_ID                 =    "config_self_info";
+static const string GETPANELINFO_REQUEST_SERVICE_ID                 =    "get_self_info";
+static const string SETAUDIOPANELLIST_REQUEST_SERVICE_ID            =    "setAudioPanelList";
+static const string GETAUDIOPANELLIST_REQUEST_SERVICE_ID            =    "getAudioPanelList";
 
 
 //消息发布ID
@@ -47,5 +49,7 @@ static const string RECEIVED_WHITELIST_ID = "receivedWhiteList";                
 static const string WHITELIST_MODIFIED_MESSAGE_ID       = "whiteListModified";     //白名单被app修改
 static const string SCENELIST_MODIFIED_MESSAGE_ID       = "sceneListModified";     //场景文件被app修改
 static const string PANELINFO_MODIFIED_MESSAGE_ID       = "self_info_update";      //面板配置信息更改
+static const string RADARDEVICE_RECEIVED_MESSAGE_ID     = "radarDeviceRegister";   //接收雷达设备
+
 
 #endif //EXHIBITION_PARAM_H
