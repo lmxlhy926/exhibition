@@ -17,7 +17,7 @@ namespace muduo{
     void logInitLogger(string& path){
         setLoggerPath = true;
         spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%s %# %!][thread %t][%l] : %v");
-        rotating_logger = spdlog::rotating_logger_mt("rotating_logger", path, 1024 * 1024 * 10, 0);
+        rotating_logger = spdlog::rotating_logger_mt("rotating_logger", path, 1024 * 1024 * 3, 0);
         rotating_logger->flush_on(spdlog::level::trace);   //设置出发err级别的消息时立即写入文件
     }
 
