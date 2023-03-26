@@ -623,17 +623,23 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
     for(Json::ArrayIndex i = 0; i < devices.size(); ++i){
         qlibc::QData item = devices.getArrayElement(i);
         bool hasItem{false};
+        unsigned int deleteIndex = 0;
 
         qlibc::QData whiteListDevices(payload.getData("info").getData("devices"));
         for(Json::ArrayIndex j = 0; j < whiteListDevices.size(); ++j){
             qlibc::QData originItem = whiteListDevices.getArrayElement(j);
             if(item.getString("device_sn") == originItem.getString("device_sn")){
                 hasItem = true;
+                deleteIndex = j;
                 break;
             }
         }
 
         if(!hasItem){
+            payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
+        }else{
+            Json::Value removeValue;
+            payload.asValue()["info"]["devices"].removeIndex(deleteIndex, &removeValue);
             payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
         }
     }
@@ -664,15 +670,21 @@ void receiveRadarDevice_message_handler(const Request& request){
     for(Json::ArrayIndex i = 0; i < devices.size(); ++i){
         qlibc::QData item = devices.getArrayElement(i);
         bool hasItem{false};
+        unsigned deleteIndex = 0;
         qlibc::QData whiteListDevices(payload.getData("info").getData("devices"));
         for(Json::ArrayIndex j = 0; j < whiteListDevices.size(); ++j){
             qlibc::QData originItem = whiteListDevices.getArrayElement(j);
             if(item.getString("device_sn") == originItem.getString("device_sn")){
                 hasItem = true;
+                deleteIndex = j;
                 break;
             }
         }
         if(!hasItem){
+            payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
+        }else{
+            Json::Value removeValue;
+            payload.asValue()["info"]["devices"].removeIndex(deleteIndex, &removeValue);
             payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
         }
     }
@@ -680,15 +692,21 @@ void receiveRadarDevice_message_handler(const Request& request){
     for(Json::ArrayIndex i = 0; i < doors.size(); ++i){
         qlibc::QData item = doors.getArrayElement(i);
         bool hasItem{false};
+        unsigned int deleteIndex{0};
         qlibc::QData whiteListDoors(payload.getData("info").getData("doors"));
         for(Json::ArrayIndex j = 0; j < whiteListDoors.size(); ++j){
             qlibc::QData originItem = whiteListDoors.getArrayElement(j);
             if(item.getString("id") == originItem.getString("id")){
                 hasItem = true;
+                deleteIndex = j;
                 break;
             }
         }
         if(!hasItem){
+            payload.asValue()["info"]["doors"].append(doors.getArrayElement(i).asValue());
+        }else{
+            Json::Value removeValue;
+            payload.asValue()["info"]["doors"].removeIndex(deleteIndex, &removeValue);
             payload.asValue()["info"]["doors"].append(doors.getArrayElement(i).asValue());
         }
     }
@@ -696,15 +714,21 @@ void receiveRadarDevice_message_handler(const Request& request){
     for(Json::ArrayIndex i = 0; i < rooms.size(); ++i){
         qlibc::QData item = rooms.getArrayElement(i);
         bool hasItem{false};
+        unsigned int deleteIndex{0};
         qlibc::QData whiteListRooms(payload.getData("info").getData("rooms"));
         for(Json::ArrayIndex j = 0; j < whiteListRooms.size(); ++j){
             qlibc::QData originItem = whiteListRooms.getArrayElement(j);
             if(item.getString("roomNo") == originItem.getString("roomNo")){
                 hasItem = true;
+                deleteIndex = j;
                 break;
             }
         }
         if(!hasItem){
+            payload.asValue()["info"]["rooms"].append(rooms.getArrayElement(i).asValue());
+        }else{
+            Json::Value removeValue;
+            payload.asValue()["info"]["rooms"].removeIndex(deleteIndex, &removeValue);
             payload.asValue()["info"]["rooms"].append(rooms.getArrayElement(i).asValue());
         }
     }
