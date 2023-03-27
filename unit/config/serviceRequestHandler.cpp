@@ -643,7 +643,7 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
             payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
         }
     }
-    payload.setString("timeStamp", std::to_string(time(nullptr)));
+    payload.setString("timeStamp", requestData.getData("request").getString("timeStamp"));
 
     //保存设备列表
     qlibc::QData contentSaveRequest, contentSaveResponse;
@@ -665,6 +665,8 @@ void receiveRadarDevice_message_handler(const Request& request){
     qlibc::QData devices = requestData.getData("content").getData("devices");
     qlibc::QData doors = requestData.getData("content").getData("doors");
     qlibc::QData rooms = requestData.getData("content").getData("rooms");
+    qlibc::QData area_app = requestData.getData("content").getData("area_app");
+
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
 
     for(Json::ArrayIndex i = 0; i < devices.size(); ++i){
@@ -674,7 +676,7 @@ void receiveRadarDevice_message_handler(const Request& request){
         qlibc::QData whiteListDevices(payload.getData("info").getData("devices"));
         for(Json::ArrayIndex j = 0; j < whiteListDevices.size(); ++j){
             qlibc::QData originItem = whiteListDevices.getArrayElement(j);
-            if(item.getString("device_mac") == originItem.getString("device_mac")){
+            if(item.getString("device_sn") == originItem.getString("device_sn")){
                 hasItem = true;
                 deleteIndex = j;
                 break;
@@ -730,6 +732,28 @@ void receiveRadarDevice_message_handler(const Request& request){
             Json::Value removeValue;
             payload.asValue()["info"]["rooms"].removeIndex(deleteIndex, &removeValue);
             payload.asValue()["info"]["rooms"].append(rooms.getArrayElement(i).asValue());
+        }
+    }
+
+    for(Json::ArrayIndex i = 0; i < area_app.size(); ++i){
+        qlibc::QData item = area_app.getArrayElement(i);
+        bool hasItem{false};
+        unsigned int deleteIndex{0};
+        qlibc::QData whiteListAreaApp(payload.getData("info").getData("area_app"));
+        for(Json::ArrayIndex j = 0; j < whiteListAreaApp.size(); ++j){
+            qlibc::QData originItem = whiteListAreaApp.getArrayElement(j);
+            if(item.getString("area_id") == originItem.getString("area_id")){
+                hasItem = true;
+                deleteIndex = j;
+                break;
+            }
+        }
+        if(!hasItem){
+            payload.asValue()["info"]["area_app"].append(area_app.getArrayElement(i).asValue());
+        }else{
+            Json::Value removeValue;
+            payload.asValue()["info"]["area_app"].removeIndex(deleteIndex, &removeValue);
+            payload.asValue()["info"]["area_app"].append(area_app.getArrayElement(i).asValue());
         }
     }
     payload.setString("timeStamp", std::to_string(time(nullptr)));
