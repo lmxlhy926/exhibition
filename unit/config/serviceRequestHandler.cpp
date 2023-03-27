@@ -674,7 +674,7 @@ void receiveRadarDevice_message_handler(const Request& request){
         qlibc::QData whiteListDevices(payload.getData("info").getData("devices"));
         for(Json::ArrayIndex j = 0; j < whiteListDevices.size(); ++j){
             qlibc::QData originItem = whiteListDevices.getArrayElement(j);
-            if(item.getString("device_sn") == originItem.getString("device_sn")){
+            if(item.getString("device_mac") == originItem.getString("device_mac")){
                 hasItem = true;
                 deleteIndex = j;
                 break;
