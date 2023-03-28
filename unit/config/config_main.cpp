@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
     //保存场景配置文件
     serviceSiteManager->registerServiceRequestHandler(SAVESCENECONFIGFILE_REQUEST_SERVICE_ID, saveConfigFile_service_request_handler);
 
-    ServiceSiteManager::getInstance()->registerMessageHandler(FileSync_MESSAGE_ID, fileSync::updateFile);
+//    ServiceSiteManager::getInstance()->registerMessageHandler(FileSync_MESSAGE_ID, fileSync::updateFile);
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
