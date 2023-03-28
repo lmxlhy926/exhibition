@@ -888,8 +888,8 @@
 		[
 			"04D455971B30"
 		],
-		"group_name" : "区域1上",
 		"dongleId" : "1",
+		"group_name" : "区域1上",
 		"location" : 
 		{
 			"room_name" : "区域1上",
@@ -905,8 +905,8 @@
 			"0CD555971B30",
 			"E2E255971B30"
 		],
-		"group_name" : "区域1中",
 		"dongleId" : "1",
+		"group_name" : "区域1中",
 		"location" : 
 		{
 			"room_name" : "区域1中",
@@ -919,8 +919,8 @@
 		[
 			"00E655971B30"
 		],
-		"group_name" : "区域1下",
 		"dongleId" : "1",
+		"group_name" : "区域1下",
 		"location" : 
 		{
 			"room_name" : "区域1下",
@@ -938,8 +938,8 @@
 			"40A27B971B30",
 			"F4D355971B30"
 		],
-		"group_name" : "区域2射灯",
 		"dongleId" : "1",
+		"group_name" : "区域2射灯",
 		"location" : 
 		{
 			"room_name" : "区域2射灯",
@@ -952,8 +952,8 @@
 		[
 			"32D355971B30"
 		],
-		"group_name" : "区域2灯带",
 		"dongleId" : "1",
+		"group_name" : "区域2灯带",
 		"location" : 
 		{
 			"room_name" : "区域2灯带",
@@ -976,8 +976,8 @@
 			"5DD355971B30",
 			"ACDE55971B30"
 		],
-		"group_name" : "区域3射灯",
 		"dongleId" : "1",
+		"group_name" : "区域3射灯",
 		"location" : 
 		{
 			"room_name" : "区域3射灯",
@@ -993,8 +993,8 @@
 			"2ED355971B30",
 			"38D455971B30"
 		],
-		"group_name" : "区域3灯带",
 		"dongleId" : "1",
+		"group_name" : "区域3灯带",
 		"location" : 
 		{
 			"room_name" : "区域3灯带",
@@ -1015,8 +1015,8 @@
 			"E7E555971B30",
 			"09D655971B30"
 		],
-		"group_name" : "区域4射灯",
 		"dongleId" : "1",
+		"group_name" : "区域4射灯",
 		"location" : 
 		{
 			"room_name" : "区域4射灯",
@@ -1031,8 +1031,8 @@
 			"E9E255971B30",
 			"79E655971B30"
 		],
-		"group_name" : "区域4灯带",
 		"dongleId" : "1",
+		"group_name" : "区域4灯带",
 		"location" : 
 		{
 			"room_name" : "区域4灯带",
@@ -1048,8 +1048,8 @@
 			"5A8E7B971B30",
 			"F5D355971B30"
 		],
-		"group_name" : "区域5射灯",
 		"dongleId" : "1",
+		"group_name" : "区域5射灯",
 		"location" : 
 		{
 			"room_name" : "区域5射灯",
@@ -1065,8 +1065,8 @@
 			"41D355971B30",
 			"68E655971B30"
 		],
-		"group_name" : "区域5灯带",
 		"dongleId" : "1",
+		"group_name" : "区域5灯带",
 		"location" : 
 		{
 			"room_name" : "区域5灯带",
@@ -1085,8 +1085,8 @@
 			"048F7B971B30",
 			"71D555971B30"
 		],
-		"group_name" : "区域6射灯",
 		"dongleId" : "1",
+		"group_name" : "区域6射灯",
 		"location" : 
 		{
 			"room_name" : "区域6射灯",
@@ -1099,8 +1099,8 @@
 		[
 			"13CE55971B30"
 		],
-		"group_name" : "区域6灯带",
 		"dongleId" : "1",
+		"group_name" : "区域6灯带",
 		"location" : 
 		{
 			"room_name" : "区域6灯带",
@@ -1120,8 +1120,8 @@
 			"B4E955971B30",
 			"30D355971B30"
 		],
-		"group_name" : "区域7射灯",
 		"dongleId" : "1",
+		"group_name" : "区域7射灯",
 		"location" : 
 		{
 			"room_name" : "区域7射灯",
@@ -1135,8 +1135,8 @@
 			"47D355971B30",
 			"FEE555971B30"
 		],
-		"group_name" : "区域7灯带",
 		"dongleId" : "1",
+		"group_name" : "区域7灯带",
 		"location" : 
 		{
 			"room_name" : "区域7灯带",
@@ -1153,8 +1153,8 @@
 			"61977B971B30",
 			"42A27B971B30"
 		],
-		"group_name" : "区域8射灯",
 		"dongleId" : "1",
+		"group_name" : "区域8射灯",
 		"location" : 
 		{
 			"room_name" : "区域8射灯",
@@ -1168,8 +1168,8 @@
 			"0DD555971B30",
 			"B2D455971B30"
 		],
-		"group_name" : "区域8灯带",
 		"dongleId" : "1",
+		"group_name" : "区域8灯带",
 		"location" : 
 		{
 			"room_name" : "区域8灯带",
@@ -1188,8 +1188,8 @@
 			"85A27B971B30",
 			"B8E655971B30"
 		],
-		"group_name" : "区域9射灯",
 		"dongleId" : "1",
+		"group_name" : "区域9射灯",
 		"location" : 
 		{
 			"room_name" : "区域8射灯",
@@ -1202,8 +1202,8 @@
 		[
 			"1BD655971B30"
 		],
-		"group_name" : "区域9灯带",
 		"dongleId" : "1",
+		"group_name" : "区域9灯带",
 		"location" : 
 		{
 			"room_name" : "区域9灯带",
@@ -1218,8 +1218,8 @@
 			"78A27B971B30",
 			"F6A17B971B30"
 		],
-		"group_name" : "区域10射灯",
 		"dongleId" : "1",
+		"group_name" : "区域10射灯",
 		"location" : 
 		{
 			"room_name" : "区域10射灯",
@@ -1232,8 +1232,8 @@
 		[
 			"0EE955971B30"
 		],
-		"group_name" : "区域10灯带",
 		"dongleId" : "1",
+		"group_name" : "区域10灯带",
 		"location" : 
 		{
 			"room_name" : "区域10灯带",
