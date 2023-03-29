@@ -599,6 +599,8 @@ int getAudioPanelList_service_request_handler(const Request& request, Response& 
     LOG_INFO << "getAudioPanelList_service_request_handler: " << qlibc::QData(request.body).toJsonString();
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
     qlibc::QData deviceList = payload.getData("info").getData("devices");
+    qlibc::QData rooms = payload.getData("info").getData("rooms");
+
     qlibc::QData devices;
     for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
         qlibc::QData item = deviceList.getArrayElement(i);
@@ -607,10 +609,14 @@ int getAudioPanelList_service_request_handler(const Request& request, Response& 
         }
     }
 
+    qlibc::QData retData;
+    retData.putData("devices", devices);
+    retData.putData("rooms", rooms);
+
     qlibc::QData data;
     data.setInt("code", 0);
     data.setString("error", "ok");
-    data.putData("response", qlibc::QData().putData("devices", devices));
+    data.putData("response", retData);
     response.set_content(data.toJsonString(), "text/json");
     return 0;
 }
@@ -619,7 +625,9 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
     qlibc::QData requestData(request.body);
     LOG_INFO << "saveAudioPanelList_service_request_handler: " << requestData.toJsonString();
     qlibc::QData devices = requestData.getData("request").getData("devices");
+    qlibc::QData rooms = requestData.getData("request").getData("rooms");
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
+
     for(Json::ArrayIndex i = 0; i < devices.size(); ++i){
         qlibc::QData item = devices.getArrayElement(i);
         bool hasItem{false};
@@ -641,6 +649,29 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
             Json::Value removeValue;
             payload.asValue()["info"]["devices"].removeIndex(deleteIndex, &removeValue);
             payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
+        }
+    }
+
+    for(Json::ArrayIndex i = 0; i < rooms.size(); ++i){
+        qlibc::QData item = rooms.getArrayElement(i);
+        bool hasItem{false};
+        unsigned int deleteIndex{0};
+
+        qlibc::QData whiteListRooms(payload.getData("info").getData("rooms"));
+        for(Json::ArrayIndex j = 0; j < whiteListRooms.size(); ++j){
+            qlibc::QData originItem = whiteListRooms.getArrayElement(j);
+            if(item.getString("roomNo") == originItem.getString("roomNo")){
+                hasItem = true;
+                deleteIndex = j;
+                break;
+            }
+        }
+        if(!hasItem){
+            payload.asValue()["info"]["rooms"].append(rooms.getArrayElement(i).asValue());
+        }else{
+            Json::Value removeValue;
+            payload.asValue()["info"]["rooms"].removeIndex(deleteIndex, &removeValue);
+            payload.asValue()["info"]["rooms"].append(rooms.getArrayElement(i).asValue());
         }
     }
     payload.setString("timeStamp", requestData.getData("request").getString("timeStamp"));
