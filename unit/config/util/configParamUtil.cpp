@@ -4,6 +4,7 @@
 
 #include "configParamUtil.h"
 #include "qlibc/FileUtils.h"
+#include <regex>
 
 #include <utility>
 
@@ -124,6 +125,27 @@ void configParamUtil::setPanelInfo(qlibc::QData& data){
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     panelInfoData.setInitData(data);
     panelInfoData.saveToFile("/data/changhong/edge_midware/panelConfig.txt", true);
+}
+
+qlibc::QData configParamUtil::changePanelProperty(const qlibc::QData& data){
+    std::lock_guard<std::recursive_mutex> lg(mutex_);
+    string deviceMac;
+    string device_mac = panelInfoData.getString("device_mac");
+    //去除冒号
+    regex sep("[:]+");
+    sregex_token_iterator end;
+    sregex_token_iterator p(device_mac.cbegin(), device_mac.cend(), sep, {-1});
+    for(; p != end; p++){
+        deviceMac += p->str();
+    }
+    if(deviceMac == data.getString("device_sn")){
+        panelInfoData.setString("device_name", data.getString("device_name"));
+        panelInfoData.asValue()["location"]["room_name"] = data.getString("room_name");
+        panelInfoData.asValue()["location"]["room_no"] = data.getString("room_no");
+        panelInfoData.saveToFile("/data/changhong/edge_midware/panelConfig.txt", true);
+        return panelInfoData;
+    }
+    return qlibc::QData();
 }
 
 

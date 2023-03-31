@@ -92,6 +92,9 @@ public:
 
     //设置面板信息
     void setPanelInfo(qlibc::QData& data);
+
+    //更改面板配置属性
+    qlibc::QData changePanelProperty(const qlibc::QData& data);
 };
 
 #endif //EXHIBITION_CONFIGPARAMUTIL_H

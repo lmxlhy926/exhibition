@@ -650,6 +650,15 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
             payload.asValue()["info"]["devices"].removeIndex(deleteIndex, &removeValue);
             payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
         }
+
+        qlibc::QData panelConfigData = configParamUtil::getInstance()->changePanelProperty(devices.getArrayElement(i));
+        if(!panelConfigData.empty()){
+            qlibc::QData publishData;
+            publishData.setString("message_id", PANELINFO_MODIFIED_MESSAGE_ID);
+            publishData.putData("content", panelConfigData);
+            ServiceSiteManager::getInstance()->publishMessage(PANELINFO_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+            LOG_INFO << "publish: " << publishData.toJsonString();
+        }
     }
 
     for(Json::ArrayIndex i = 0; i < rooms.size(); ++i){
