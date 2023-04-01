@@ -90,6 +90,7 @@ void BindDevice::bind(QData &deviceArray) {
     publishData.setString("message_id", BindEndMsg);
     publishData.putData("content", qlibc::QData().setString("sourceSite", util::getSourceSite()));
     ServiceSiteManager::getInstance()->publishMessage(BindEndMsg, publishData.toJsonString());
+    LOG_YELLOW << "BindEndMsg: " << publishData.toJsonString();
 }
 
 
@@ -173,6 +174,7 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
             publishData.setString("message_id", SingleDeviceBindSuccessMsg);
             publishData.putData("content", content);
             ServiceSiteManager::getInstance()->publishMessage(SingleDeviceBindSuccessMsg, publishData.toJsonString());
+            LOG_YELLOW << "SingleDeviceBindSuccessMsg: " << publishData.toJsonString();
             return true;
         }else{
             LOG_RED << "<<: xxxxxxxxxBIND FAILEDxxxxxxxx";

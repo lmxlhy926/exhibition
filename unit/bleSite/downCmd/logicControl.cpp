@@ -50,7 +50,7 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
     time_t time_current = time(nullptr);
     int timeSeconds = param.getInt("timeSeconds");
     if(timeSeconds <= 0){
-        timeSeconds = 10;
+        timeSeconds = 5;
     }
 
     while(true){
@@ -120,5 +120,6 @@ void LogicControl::getScanedDevices(qlibc::QData& deviceArray, qlibc::QData& par
     publishData.setString("message_id", ScanResultMsg);
     publishData.putData("content", content);
     ServiceSiteManager::getInstance()->publishMessage(ScanResultMsg, publishData.toJsonString());
+    LOG_YELLOW << "ScanResultMsg: " << publishData.toJsonString();
 }
 

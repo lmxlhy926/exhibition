@@ -13,8 +13,11 @@ using namespace httplib;
 //重置网关
 int reset_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 
-//扫描设备
+//获取扫描结果
 int scan_device_service_handler(const Request& request, Response& response, LogicControl& lc);
+
+//发送扫描指令
+int scanDevice_service_handler(const Request& request, Response& response, LogicControl& lc);
 
 //添加设备
 int add_device_service_handler(const Request& request, Response& response, LogicControl& lc);

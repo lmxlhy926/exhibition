@@ -140,6 +140,25 @@ int scan_device_service_handler(const Request& request, Response& response, Logi
     return 0;
 }
 
+
+int scanDevice_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    bleConfig::getInstance()->enqueue([requestBody, &lc]{
+        qlibc::QData scanDeviceArray;
+        qlibc::QData param = requestBody.getData("request");
+        lc.getScanedDevices(scanDeviceArray, param);
+
+        //发送结束扫描指令
+        qlibc::QData scanEndCmd;
+        scanEndCmd.setString("command", SCANEND);
+        lc.parse(scanEndCmd);
+    });
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
+
 //添加设备：扫描、绑定
 int add_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);

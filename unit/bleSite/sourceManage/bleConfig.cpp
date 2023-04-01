@@ -12,7 +12,7 @@ bleConfig* bleConfig::instance = nullptr;
 
 bleConfig* bleConfig::getInstance() {
     if(instance == nullptr)
-        instance = new bleConfig(10);
+        instance = new bleConfig(30);
     return instance;
 }
 

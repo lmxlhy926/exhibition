@@ -172,7 +172,7 @@ public:
         if(!deviceSn.empty()){
             LOG_GREEN<< "<<===: scanResult Event, deviceSn = " << deviceSn;
             EventTable::getInstance()->scanResultEvent.putData(data);
-            EventTable::getInstance()->scanResultEvent.notify_one();
+            EventTable::getInstance()->scanResultEvent.notify_all();
         }
     }
 private:
@@ -312,7 +312,7 @@ public:
         bleConfig::getInstance()->deleteStatusItem(deviceSn);
         //从组列表中删除设备
         GroupAddressMap::getInstance()->removeDeviceFromAnyGroup(deviceSn);
-        LOG_PURPLE << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
+        LOG_YELLOW << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
 
         //更新config白名单列表
         util::updateDeviceList();
