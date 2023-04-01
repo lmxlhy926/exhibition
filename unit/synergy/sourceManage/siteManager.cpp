@@ -28,7 +28,6 @@ void siteManager::updateSite(){
     request.putData("request", qlibc::QData().setString("site_id", ""));
     if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){    //获取局域网内所有发现的站点
         qlibc::QData resBody = response.getData("response");
-        LOG_INFO << "site_localAreaNetworkSite response: " << response.toJsonString();
         Json::Value::Members ipMembers = resBody.getMemberNames();
         for(auto& ip : ipMembers){
             qlibc::QData siteList = resBody.getData(ip);
@@ -37,14 +36,12 @@ void siteManager::updateSite(){
                 qlibc::QData item = siteList.getArrayElement(i);
                 string site_id = item.getString("site_id");
                 if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){    //只关心设备类站点
-                    LOG_PURPLE << "siteId: " << site_id;
                     //从相应的配置站点获取mac
                     string uid;
                     qlibc::QData panelConfigRequest, panelConfigResponse;
                     panelConfigRequest.setString("service_id", "get_self_info");
                     panelConfigRequest.putData("request", qlibc::QData());
                     if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){   //获取面板配置信息
-                        LOG_INFO << "panelConfigResponse: " << panelConfigResponse.toJsonString();
                         uid = panelConfigResponse.getData("response").getString("device_id");
                     }
                     if(!uid.empty()){   //构造站点信息
@@ -74,7 +71,7 @@ void siteManager::updateSite(){
         string ip;
         int port;
         SiteRecord::getInstance()->getSiteInfo(siteName, ip, port);
-        LOG_PURPLE << siteName << ": <" << ip << ", " << port << ">...";
+        LOG_PURPLE << "ExistSite: " << siteName << ": <" << ip << ", " << port << ">...";
     }
 
     //订阅蓝牙站点的消息
@@ -103,9 +100,7 @@ qlibc::QData siteManager::getPanelList(){
     qlibc::QData request, response;
     request.setString("service_id", "site_localAreaNetworkSite");
     request.putData("request", qlibc::QData().setString("site_id", ""));
-    LOG_GREEN << "findAllSiteRequest: " << request.toJsonString();
     if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){    //获取局域网内所有发现的站点
-        LOG_BLUE << "findAllSiteResponse: " << response.toJsonString();
         qlibc::QData resBody = response.getData("response");
         Json::Value::Members ipMembers = resBody.getMemberNames();
         for(auto& ip : ipMembers){
