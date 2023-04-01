@@ -69,7 +69,7 @@ void DeviceManager::updateDeviceList(){
                 deviceRequest.setString("service_id", "get_device_list");
                 deviceRequest.setValue("request", Json::nullValue);
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), deviceRequest, deviceRes);       //获取设备列表
-                LOG_YELLOW << sm.str(0) << ": " << deviceRes.toJsonString();
+                LOG_YELLOW << sm.str(0) << ": deviceRes: " << deviceRes.toJsonString();
                 qlibc::QData list = addMacSource(deviceRes.getData("response").getData("device_list"),
                                                  string().append(uuid).append(":").append(siteID));     //给列表条目加入来源标签
                 mergeList(list, totalList);
