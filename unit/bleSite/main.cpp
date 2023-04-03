@@ -81,10 +81,16 @@ int main(int argc, char* argv[]) {
         return reset_device_service_handler(request, response, lc);
     });
 
-    //注册设备扫描回调
+    //发送扫描指令
     serviceSiteManager->registerServiceRequestHandler(Scan_Device_Service_ID,
                                                       [&lc](const Request& request, Response& response) -> int{
         return scanDevice_service_handler(request, response, lc);
+    });
+
+    //扫描结果服务
+    serviceSiteManager->registerServiceRequestHandler(Get_ScanDeviceResult_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return scan_device_service_handler(request, response, lc);
     });
 
     //注册设备绑定回调
