@@ -57,6 +57,7 @@ qlibc::QData DeviceManager::restoreMac(qlibc::QData& item, string& inSourceSite)
 }
 
 void DeviceManager::updateDeviceList(){
+    LOG_INFO << "START TO updateDeviceList.....";
     qlibc::QData totalList;     //存储总列表
     std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
     smatch sm;
@@ -68,6 +69,7 @@ void DeviceManager::updateDeviceList(){
                 qlibc::QData deviceRequest, deviceRes;
                 deviceRequest.setString("service_id", "get_device_list");
                 deviceRequest.setValue("request", Json::nullValue);
+                LOG_HLIGHT << "send getDevicerequest.....";
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), deviceRequest, deviceRes);       //获取设备列表
                 LOG_YELLOW << sm.str(0) << ": deviceRes: " << deviceRes.toJsonString();
                 qlibc::QData list = addMacSource(deviceRes.getData("response").getData("device_list"),
@@ -78,6 +80,7 @@ void DeviceManager::updateDeviceList(){
     }
     std::lock_guard<std::recursive_mutex> lg(Mutex);
     deviceList_ = totalList;
+    LOG_INFO << "updateDeviceList END.....";
 }
 
 

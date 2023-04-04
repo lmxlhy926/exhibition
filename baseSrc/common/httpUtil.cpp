@@ -22,25 +22,10 @@ SingleSite::SingleSite(string ip, int port) {
 }
 
 bool SingleSite::send(qlibc::QData &request, qlibc::QData &response) {
-    if(clientptr == nullptr){
-       clientptr = new Client(siteIp, sitePort);
-       clientptr->set_keep_alive(true);
-       clientptr->set_connection_timeout(1, 0);
-       clientptr->set_read_timeout(2, 0);
-    }
-
-    if(!clientptr->is_socket_open()){
-       clientptr->stop();
-       delete clientptr;
-       clientptr = nullptr;
-
-       clientptr = new Client(siteIp, sitePort);
-       clientptr->set_keep_alive(true);
-       clientptr->set_connection_timeout(1, 0);
-       clientptr->set_read_timeout(2, 0);
-    }
-
-    httplib::Result result =  clientptr->Post("/", request.toJsonString(), "text/json");
+    httplib::Client cli(siteIp, sitePort);
+    cli.set_connection_timeout(1, 0);
+    cli.set_read_timeout(2, 0);
+    httplib::Result result =  cli.Post("/", request.toJsonString(), "text/json");
     if(result != nullptr){
        response.setInitData(qlibc::QData(result.value().body));
        return true;
@@ -49,11 +34,6 @@ bool SingleSite::send(qlibc::QData &request, qlibc::QData &response) {
 }
 
 void SingleSite::deleteClient(){
-    if(clientptr != nullptr){
-        clientptr->stop();
-        delete clientptr;
-        clientptr = nullptr;
-    }
 }
 
 string SingleSite::getSiteIp(){
@@ -112,10 +92,18 @@ void SiteRecord::removeSitesNonExist(std::map<string, Json::Value>& sitesMap){
 
 
 bool SiteRecord::sendRequest2Site(string siteName, qlibc::QData &request, qlibc::QData &response) {
-    std::lock_guard<std::recursive_mutex> lg(rMutex);
-    auto pos = sites.find(siteName);
-    if(pos != sites.end()){
-        return pos->second.send(request, response);
+    bool canSend{false};
+    SingleSite site;
+    {
+        std::lock_guard<std::recursive_mutex> lg(rMutex);
+        auto pos = sites.find(siteName);
+        if(pos != sites.end()){
+            site = pos->second;
+            canSend = true;
+        }
+    }
+    if(canSend){
+        return site.send(request, response);
     }
     return false;
 }

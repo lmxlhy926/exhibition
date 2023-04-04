@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
                     "singleDeviceUnbindSuccessMsg",
                     "device_state_changed"
             };
-            int code = serviceSiteManager->subscribeMessage("192.168.137.55", 9007, messageIdList);
+            int code = serviceSiteManager->subscribeMessage("192.168.7.232", 9007, messageIdList);
             if (code == ServiceSiteManager::RET_CODE_OK) {
                 LOG_INFO << "subscribeMessage ok.";
                 break;

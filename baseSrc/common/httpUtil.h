@@ -23,10 +23,13 @@ public:
 class SingleSite{
 private:
     string siteIp;
-    int    sitePort;
-    Client* clientptr = nullptr;
+    int    sitePort{};
 public:
+    SingleSite() = default;
+
     explicit SingleSite(string ip, int port);
+
+    SingleSite& operator= (const SingleSite& other)= default;
 
     //向站点发送请求
     bool send(qlibc::QData& request, qlibc::QData& response);

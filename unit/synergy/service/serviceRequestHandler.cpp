@@ -299,6 +299,7 @@ namespace synergy {
         std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
         for(auto& siteName : siteNames){
             if(siteName == sourceSite){
+                LOG_GREEN << "requestData: " << requestData.toJsonString();
                 SiteRecord::getInstance()->sendRequest2Site(siteName, requestData, responseData);
                 LOG_BLUE << "responseData: " << responseData.toJsonString();
                 response.set_content(responseData.toJsonString(), "text/json");
