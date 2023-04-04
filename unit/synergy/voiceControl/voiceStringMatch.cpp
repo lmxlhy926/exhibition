@@ -207,6 +207,22 @@ void voiceStringMatchControl::action2Command(ParsedItem& parsedItem, CommandItem
         int ctValue = static_cast<int>(atoi(parsedItem.param.c_str()) * 38 + 2700);
         commandItem.command_para = ctValue;
 
+    }else if(parsedItem.actionCode == ActionCode::luminanceUp){   //亮一点
+        commandItem.command_id = "luminance_relative";
+        commandItem.command_para = 20;
+
+    }else if(parsedItem.actionCode == ActionCode::luminanceDown){   //暗一点
+        commandItem.command_id = "luminance_relative";
+        commandItem.command_para = -20;
+
+    }else if(parsedItem.actionCode == ActionCode::temperatureUp){   //色温高一点
+        commandItem.command_id = "color_temperature_relative";
+        commandItem.command_para = 20;
+
+    }else if(parsedItem.actionCode == ActionCode::temperatureDown){  //色温低一点
+        commandItem.command_id = "color_temperature_relative";
+        commandItem.command_para = -20;
+
     }
 
 #if 0
