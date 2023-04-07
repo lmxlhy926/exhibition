@@ -315,7 +315,11 @@ public:
     string getBinaryString() override{
         string prefix = getCommandPrefix();
         stringstream ss;
-        ss << "FF";
+        if(luminanceVal == 0){
+            ss << "00";
+        }else{
+            ss << "FF";
+        }
         ss << std::setfill('0') << std::hex << std::uppercase << std::setw(2) << luminanceVal;
 
         string stringCmd;
@@ -419,9 +423,15 @@ public:
         string prefix = getCommandPrefix();
         stringstream sscCtlTemperature, ssLuminanceVal;
         sscCtlTemperature << std::setfill('0') << std::hex << std::uppercase << std::setw(4) << ctlTemperature;
-        ssLuminanceVal << "FF";
-        ssLuminanceVal << std::setfill('0') << std::hex << std::uppercase << std::setw(2) << luminanceVal;
         string ctlTemperatureStr = sscCtlTemperature.str();
+
+        if(luminanceVal == 0){
+            ssLuminanceVal << "00";
+        }else{
+            ssLuminanceVal << "FF";
+        }
+        ssLuminanceVal << std::setfill('0') << std::hex << std::uppercase << std::setw(2) << luminanceVal;
+
         string LuminanceValStr = ssLuminanceVal.str();
 
         string stringCmd;

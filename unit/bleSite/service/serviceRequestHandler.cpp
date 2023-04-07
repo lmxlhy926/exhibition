@@ -43,11 +43,14 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
             continue;
         }
 
+        bool isGroup{false};
         string address;
         if(!device_id.empty())
             address = SnAddressMap::getInstance()->deviceSn2Address(device_id);
-        else
+        else{
             address = group_id;
+            isGroup = true;
+        }
 
         if(address.empty())
             continue;
@@ -63,16 +66,107 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
             cmdData.setString("command", command_id);
             cmdData.setInt("transTime", transTime);
 
-            if(command_id == POWER){
-                cmdData.setString("commandPara", commandItem.getString("command_para"));
+            if(command_id == POWER){    //开关
+                string powerOnOff = commandItem.getString("command_para");
+                cmdData.setString("commandPara", powerOnOff);
+                if(isGroup){
+                    if(powerOnOff == "on"){
+                        bleConfig::getInstance()->powerOn(address);
+                    }else if(powerOnOff == "off"){
+                        bleConfig::getInstance()->powerOff(address);
+                    }
+                }
 
-            }else if(command_id == LUMINANCE || command_id == COLORTEMPERATURE || command_id == LUMINANCERELATIVE ||
-                     command_id == COLORTEMPERATURERELATIVE || command_id == MODECONFIG){
-                cmdData.setInt("commandPara", commandItem.getInt("command_para"));
+            }else if(command_id == LUMINANCE){  //亮度
+                int luminance = commandItem.getInt("command_para");
+                if(luminance > 255){
+                    luminance = 255;
+                }else if(luminance < 0){
+                    luminance = 0;
+                }
+                cmdData.setInt("commandPara", luminance);
+                if(isGroup){
+                    bleConfig::getInstance()->storeGroupluminance(address, luminance);
+                }
 
-            }else if(command_id == LUMINANCECOLORTEMPERATURE){
-                cmdData.setInt("commandParaLuminance", commandItem.getInt("command_para_luminance"));
-                cmdData.setInt("commandParaColorTemperature", commandItem.getInt("command_para_color_temperature"));
+            }else if(command_id == COLORTEMPERATURE){   //色温
+                int colorTemperature = commandItem.getInt("command_para");
+                if(colorTemperature > 6500){
+                    colorTemperature = 6500;
+                }else if(colorTemperature < 2700){
+                    colorTemperature = 2700;
+                }
+                cmdData.setInt("commandPara", colorTemperature);
+                if(isGroup){
+                    bleConfig::getInstance()->storeGroupColorTemperature(address, colorTemperature);
+                }
+
+            }else if(command_id == LUMINANCERELATIVE){  //相对亮度
+                if(!isGroup){
+                    cmdData.setInt("commandPara", commandItem.getInt("command_para"));
+                }else{
+                    int relative = commandItem.getInt("command_para");
+                    int setLuminance{};
+                    if (bleConfig::getInstance()->getGroupLuminanceColorTemperature(address)["luminance"].empty()) {
+                        setLuminance = 128;
+                    } else {
+                        int currentLuminance = bleConfig::getInstance()->getGroupLuminanceColorTemperature(address)["luminance"].asInt();
+                        setLuminance = static_cast<int>(currentLuminance + 2.55 * relative);
+                        if (setLuminance > 255) {
+                            setLuminance = 255;
+                        } else if (setLuminance < 0) {
+                            setLuminance = 0;
+                        }
+                    }
+                    cmdData.setString("command", LUMINANCE);
+                    cmdData.setInt("commandPara", setLuminance);
+                    bleConfig::getInstance()->storeGroupluminance(address, setLuminance);
+                }
+
+            }else if(command_id == COLORTEMPERATURERELATIVE){   //相对色温
+                if(!isGroup){
+                    cmdData.setInt("commandPara", commandItem.getInt("command_para"));
+                }else{
+                    int relative = commandItem.getInt("command_para");
+                    int setColorTemperature{};
+                    if (bleConfig::getInstance()->getGroupLuminanceColorTemperature(address)["temperature"].empty()) {
+                        setColorTemperature = 4600;
+                    } else {
+                        int currentColorTemperature = bleConfig::getInstance()->getGroupLuminanceColorTemperature(address)["temperature"].asInt();
+                        setColorTemperature = currentColorTemperature + 38 * relative;
+                        if (setColorTemperature > 6500) {
+                            setColorTemperature = 6500;
+                        } else if (setColorTemperature < 2700) {
+                            setColorTemperature = 2700;
+                        }
+                    }
+                    cmdData.setString("command", COLORTEMPERATURE);
+                    cmdData.setInt("commandPara", setColorTemperature);
+                    bleConfig::getInstance()->storeGroupColorTemperature(address, setColorTemperature);
+                }
+
+            }else if(command_id == LUMINANCECOLORTEMPERATURE){  //亮度、色温联合控制
+                int luminance = commandItem.getInt("command_para_luminance");
+                if(luminance > 255){
+                    luminance = 255;
+                }else if(luminance < 0){
+                    luminance = 0;
+                }
+
+                int colorTemperature = commandItem.getInt("command_para_color_temperature");
+                if(colorTemperature > 6500){
+                    colorTemperature = 6500;
+                }else if(colorTemperature < 2700){
+                    colorTemperature = 2700;
+                }
+
+                cmdData.setInt("commandParaLuminance", luminance);
+                cmdData.setInt("commandParaColorTemperature", colorTemperature);
+
+                if(isGroup){
+                    bleConfig::getInstance()->storeGroupluminance(address, luminance);
+                    bleConfig::getInstance()->storeGroupColorTemperature(address, colorTemperature);
+                }
 
                 //打印控制信息
                 qlibc::QData groupList = bleConfig::getInstance()->getGroupListData();
@@ -85,6 +179,9 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                         break;
                     }
                 }
+
+            }else if(command_id == MODECONFIG){   //模式
+                cmdData.setInt("commandPara", commandItem.getInt("command_para"));
 
             }
 
@@ -203,7 +300,7 @@ int del_device_service_handler(const Request& request, Response& response, Logic
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);
-    LOG_INFO << "control_device_service_handler: " << requestBody.toJsonString();
+    LOG_INFO << "==>control_device_service_handler: " << requestBody.toJsonString();
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
@@ -562,6 +659,7 @@ int removeDeviceFromGroup_service_handler(const Request& request, Response& resp
 
 //控制分组
 int control_group_service_handler(const Request& request, Response& response, LogicControl& lc){
+    LOG_INFO << "==>control_group_service_handler: " << qlibc::QData(request.body).toJsonString();
     qlibc::QData requestBody(request.body);
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{

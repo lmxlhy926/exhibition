@@ -158,12 +158,10 @@ void test4(){
 }
 
 int main(int argc, char* argv[]){
-   qlibc::QData data;
-   data.loadFromFile(R"(D:\project\byjs\exhibition\baseSrc\qlibc\test\test.json)");
-    std::cout << data.toJsonString() << std::endl;
-
-
-
+   Json::Value value;
+   if(value["hello"].empty()){
+       std::cout << "ssss" << std::endl;
+   }
 
     return 0;
 }

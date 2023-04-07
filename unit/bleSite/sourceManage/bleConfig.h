@@ -14,16 +14,17 @@ using namespace qlibc;
 
 class bleConfig {
 private:
-    string dataDirPath;                         //配置文件路径
-    QData serialData;                           //串口配置数据
-    QData snAddressData;                        //蓝牙设备地址表
-    QData groupAddressData;                     //组地址数据
-    QData deviceListData;                       //蓝牙设备列表
-    QData statusListData;                       //状态列表
-    QData scanListData;                         //扫描设备列表
-    string netKey;                              //网络key
-    httplib::ThreadPool threadPool;             //线程池
-    static bleConfig* instance;                 //静态对象
+    string dataDirPath;                             //配置文件路径
+    QData serialData;                               //串口配置数据
+    QData snAddressData;                            //蓝牙设备地址表
+    QData groupAddressData;                         //组地址数据
+    QData deviceListData;                           //蓝牙设备列表
+    QData statusListData;                           //状态列表
+    QData scanListData;                             //扫描设备列表
+    std::map<string, Json::Value> groupValueMap;    //蓝牙组亮度、色温列表
+    string netKey;                                  //网络key
+    httplib::ThreadPool threadPool;                 //线程池
+    static bleConfig* instance;                     //静态对象
     std::recursive_mutex rMutex_;
 
     explicit bleConfig(size_t n) : threadPool(n){}
@@ -98,6 +99,21 @@ public:
 
     //获取网络key
     string getNetKey();
+
+    //存储蓝牙组亮度值
+    void storeGroupluminance(const string& groupId, int luminance);
+
+    //存储蓝牙组色温值
+    void storeGroupColorTemperature(const string& groupId, int temperature);
+
+    //获取蓝牙组亮度色温值
+    Json::Value getGroupLuminanceColorTemperature(const string& groupId);
+
+    //poweroff
+    void powerOff(const string& groupId);
+
+    //powerOn
+    void powerOn(const string& groupId);
 
 private:
     //产生设备的默认状态

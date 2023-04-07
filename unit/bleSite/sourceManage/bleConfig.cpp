@@ -289,6 +289,60 @@ string bleConfig::getNetKey(){
     return netKey;
 }
 
+void bleConfig::storeGroupluminance(const string& groupId, int luminance){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    auto pos = groupValueMap.find(groupId);
+    if(pos != groupValueMap.end()){
+        pos->second["luminance"] = luminance;
+        pos->second["tempLuminance"] = luminance;
+    }else{
+        Json::Value value;
+        value["luminance"] = luminance;
+        value["tempLuminance"] = luminance;
+        groupValueMap.insert(std::make_pair(groupId, value));
+    }
+}
+
+void bleConfig::storeGroupColorTemperature(const string& groupId, int temperature){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    auto pos = groupValueMap.find(groupId);
+    if(pos != groupValueMap.end()){
+        pos->second["temperature"] = temperature;
+        pos->second["tempTemperature"] = temperature;
+    }else{
+        Json::Value value;
+        value["temperature"] = temperature;
+        value["tempTemperature"] = temperature;
+        groupValueMap.insert(std::make_pair(groupId, value));
+    }
+}
+
+Json::Value bleConfig::getGroupLuminanceColorTemperature(const string& groupId){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    auto pos = groupValueMap.find(groupId);
+    if(pos != groupValueMap.end()){
+        return pos->second;
+    }
+    return {};
+}
+
+void bleConfig::powerOff(const string& groupId){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    auto pos = groupValueMap.find(groupId);
+    if(pos != groupValueMap.end()){
+        pos->second["luminance"] = 0;
+    }
+}
+
+void bleConfig::powerOn(const string& groupId){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    auto pos = groupValueMap.find(groupId);
+    if(pos != groupValueMap.end()){
+        pos->second["luminance"] = pos->second["tempLuminance"];
+    }
+}
+
+
 qlibc::QData bleConfig::defaultStatus() {
     qlibc::QData state_list;
 
