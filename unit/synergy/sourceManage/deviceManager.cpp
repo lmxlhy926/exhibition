@@ -57,7 +57,7 @@ qlibc::QData DeviceManager::restoreMac(qlibc::QData& item, string& inSourceSite)
 }
 
 void DeviceManager::updateDeviceList(){
-    LOG_INFO << "START TO updateDeviceList.....";
+    LOG_HLIGHT << "START TO updateDeviceList.....";
     qlibc::QData totalList;     //存储总列表
     std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
     smatch sm;
@@ -69,9 +69,8 @@ void DeviceManager::updateDeviceList(){
                 qlibc::QData deviceRequest, deviceRes;
                 deviceRequest.setString("service_id", "get_device_list");
                 deviceRequest.setValue("request", Json::nullValue);
-                LOG_HLIGHT << "send getDevicerequest.....";
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), deviceRequest, deviceRes);       //获取设备列表
-                LOG_YELLOW << sm.str(0) << ": deviceRes: " << deviceRes.toJsonString();
+                LOG_HLIGHT << sm.str(0) << ": deviceListSize: " << deviceRes.getData("response").getData("device_list").size();
                 qlibc::QData list = addMacSource(deviceRes.getData("response").getData("device_list"),
                                                  string().append(uuid).append(":").append(siteID));     //给列表条目加入来源标签
                 mergeList(list, totalList);
@@ -80,7 +79,7 @@ void DeviceManager::updateDeviceList(){
     }
     std::lock_guard<std::recursive_mutex> lg(Mutex);
     deviceList_ = totalList;
-    LOG_INFO << "updateDeviceList END.....";
+    LOG_HLIGHT << "updateDeviceList END.....";
 }
 
 

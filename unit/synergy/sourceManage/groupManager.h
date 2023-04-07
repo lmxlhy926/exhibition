@@ -16,18 +16,7 @@ private:
     std::atomic<bool> init{false};
     qlibc::QData groupList;
     std::mutex Mutex;
-    std::thread* updateListThread;
-    const int updateGroupListInterval = 10;
-    GroupManager(){
-        updateGroupList();
-        //开启线程定时更新组列表
-        updateListThread = new thread([this]{
-            while(true){
-                std::this_thread::sleep_for(std::chrono::seconds(updateGroupListInterval));
-                updateGroupList();
-            }
-        });
-    }
+    GroupManager(){}
     static GroupManager* instance;
 
 public:

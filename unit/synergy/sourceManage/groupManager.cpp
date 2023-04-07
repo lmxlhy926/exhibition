@@ -71,7 +71,7 @@ qlibc::QData GroupManager::restoreGrp(qlibc::QData& item, string& inSourceSite){
 }
 
 void GroupManager::updateGroupList(){
-    LOG_INFO << "START TO updateGroupList.....";
+    LOG_YELLOW << "START TO updateGroupList.....";
     qlibc::QData totalList;
     std::set<string> siteNameSet = SiteRecord::getInstance()->getSiteName();
     smatch sm;
@@ -83,9 +83,8 @@ void GroupManager::updateGroupList(){
                 qlibc::QData groupRequest, groupRes;
                 groupRequest.setString("service_id", "get_group_list");
                 groupRequest.setValue("request", Json::nullValue);
-                LOG_HLIGHT << "send getGrouprequest.....";
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), groupRequest, groupRes);     //获取组列表
-                LOG_YELLOW << sm.str(0) << ": groupRes: " << groupRes.toJsonString();
+                LOG_YELLOW << sm.str(0) << ": groupListSize: " << groupRes.getData("response").getData("group_list").size();
                 qlibc::QData list = addGrpSourceTag(groupRes.getData("response").getData("group_list"),
                                                  string().append(uid).append(":").append(siteID));    //给组条目添加标签
                 mergeList(list, totalList);
@@ -96,7 +95,7 @@ void GroupManager::updateGroupList(){
     std::lock_guard<std::mutex> lg(Mutex);
     groupList = totalList;
     init.store(true);
-    LOG_INFO << "updateGroupList END.....";
+    LOG_YELLOW << "updateGroupList END.....";
 }
 
 qlibc::QData GroupManager::addGrpSourceTag(qlibc::QData groupList, string grpSource){

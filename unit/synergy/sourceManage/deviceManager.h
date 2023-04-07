@@ -16,19 +16,7 @@ private:
     std::atomic<bool> changed{true};
     qlibc::QData deviceList_;
     std::recursive_mutex Mutex;
-    std::thread* updateListThread;
-    const int updateListInterval = 10;
-    DeviceManager(){
-        updateDeviceList();
-        //开启线程定时更新设备列表
-        updateListThread = new thread([this]{
-            while(true){
-                std::this_thread::sleep_for(std::chrono::seconds(updateListInterval));
-                updateDeviceList();
-            }
-        });
-    }
-
+    DeviceManager(){}
     static DeviceManager* instance;
 
 public:

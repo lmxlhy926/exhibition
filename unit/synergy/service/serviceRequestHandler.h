@@ -11,16 +11,16 @@ using namespace httplib;
 
 namespace synergy{
 //判断站点是否在线（通过请求站点）
-    bool isSiteOnline(const std::string& siteId);
+    bool isBleMeshSiteOnline();
 
-//蓝牙组注册到云大管理app上
+//蓝牙组注册到云端
     bool bleGroupRegister2Cloud();
+
+//蓝牙组注册到云大服务
+    int bleDeviceRegister_service_handler(const Request& request, Response& response);
 
 //场景指令转换解析 + 设备控制（软服请求）
     int cloudCommand_service_handler(const Request& request, Response& response);
-
-//蓝牙组注册到云大管理app
-    int bleDeviceRegister_service_handler(const Request& request, Response& response);
 
 //蓝牙设备操作
     int bleDeviceOperation_service_handler(const Request& request, Response& response);
@@ -31,12 +31,8 @@ namespace synergy{
 //更新组列表
     int updateGroupList_service_handler(const Request& request, Response& response);
 
-//获取注册站点名
-    int getSiteNames_service_handler(const Request& request, Response& response);
-
 //获取面板列表
     int getPanelList_service_handler(const Request& request, Response& response);
-
 
 
 

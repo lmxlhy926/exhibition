@@ -34,10 +34,9 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setSiteIdSummary(SynergySiteID, SynergySiteName);
 
     //单例对象
-    SiteRecord::getInstance()->addSite(SceneSiteID, RequestIp, SceneSitePort);  //加入场景站点
-    siteManager::getInstance();
     DeviceManager::getInstance();
     GroupManager::getInstance();
+    siteManager::getInstance();
 
     //站点请求管理
     serviceSiteManager->registerMessageId(Scene_Msg_MessageID);   //场景指令消息
@@ -80,11 +79,9 @@ int main(int argc, char* argv[]) {
         return synergy::updateGroupList_service_handler(request, response);
     });
 
-    //获取站点名称
-    serviceSiteManager->registerServiceRequestHandler(GetSiteNames_Service_ID,
-                                                      [](const Request& request, Response& response)->int{
-        return synergy::getSiteNames_service_handler(request, response);
-    });
+    //获取面板列表
+    serviceSiteManager->registerServiceRequestHandler(GetPanelList_Service_ID, synergy::getPanelList_service_handler);
+
 
 
     //注册重置网关回调
@@ -172,8 +169,7 @@ int main(int argc, char* argv[]) {
     //获取分组列表
     serviceSiteManager->registerServiceRequestHandler(GetGroupList_Device_Service_ID, synergy::getGroupList_service_handler);
 
-    //获取面板列表
-    serviceSiteManager->registerServiceRequestHandler(GetPanelList_Service_ID, synergy::getPanelList_service_handler);
+
 
     //声明消息
     serviceSiteManager->registerMessageId(ScanResultMsg);                  //扫描结果

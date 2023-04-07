@@ -7,6 +7,10 @@
 #include "../param.h"
 #include "log/Logging.h"
 #include "siteService/service_site_manager.h"
+#include "deviceManager.h"
+#include "groupManager.h"
+
+
 using namespace std;
 using namespace servicesite;
 using namespace httplib;
@@ -37,16 +41,16 @@ void siteManager::updateSite(){
                 string site_id = item.getString("site_id");
                 if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){    //只关心设备类站点
                     //从相应的配置站点获取mac
-                    string uid;
+                    string panelId;
                     qlibc::QData panelConfigRequest, panelConfigResponse;
                     panelConfigRequest.setString("service_id", "get_self_info");
                     panelConfigRequest.putData("request", qlibc::QData());
                     if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){   //获取面板配置信息
-                        uid = panelConfigResponse.getData("response").getString("device_id");
+                        panelId = panelConfigResponse.getData("response").getString("device_id");
                     }
-                    if(!uid.empty()){   //构造站点信息
+                    if(!panelId.empty()){   //构造站点信息
                         string siteName;
-                        siteName.append(uid).append(":").append(site_id);
+                        siteName.append(panelId).append(":").append(site_id);
                         Json::Value siteItem;
                         siteItem["siteName"] = siteName;
                         siteItem["ip"] = ip;
@@ -58,7 +62,7 @@ void siteManager::updateSite(){
         }
     }
 
-    //删除已经不存在的站点连接
+    //删除已经不存在的站点记录
     SiteRecord::getInstance()->removeSitesNonExist(sitesMap);
     //加入新发现的连接
     for(auto& elem : sitesMap){
@@ -66,13 +70,15 @@ void siteManager::updateSite(){
     }
 
     //打印发现的设备站点
+    LOG_INFO << "********";
     std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
     for(auto& siteName : siteNames){
         string ip;
         int port;
         SiteRecord::getInstance()->getSiteInfo(siteName, ip, port);
-        LOG_PURPLE << "ExistSite: " << siteName << ": <" << ip << ", " << port << ">...";
+        LOG_PURPLE << "     ExistSite: " << siteName << ": <" << ip << ", " << port << ">...";
     }
+    LOG_INFO << "********";
 
     //订阅蓝牙站点的消息
     for(auto& siteName : siteNames){
@@ -93,6 +99,12 @@ void siteManager::updateSite(){
             }
         }
     }
+
+    //更新设备列表
+    DeviceManager::getInstance()->updateDeviceList();
+
+    //更新组列表
+    GroupManager::getInstance()->updateGroupList();
 }
 
 qlibc::QData siteManager::getPanelList(){
@@ -110,8 +122,7 @@ qlibc::QData siteManager::getPanelList(){
                 qlibc::QData item = siteList.getArrayElement(i);
                 string site_id = item.getString("site_id");
                 if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){
-                    //从相应的配置站点获取mac
-                    string uid;
+                    //获取面板的配置信息
                     qlibc::QData panelConfigRequest, panelConfigResponse;
                     panelConfigRequest.setString("service_id", "get_self_info");
                     panelConfigRequest.putData("request", qlibc::QData());
@@ -119,7 +130,7 @@ qlibc::QData siteManager::getPanelList(){
                     if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
                         LOG_BLUE << "getPanelInfoResponse: " << panelConfigResponse.toJsonString();
                         qlibc::QData panelData = panelConfigResponse.getData("response");
-                        if(!panelData.empty()){
+                        if(!panelData.empty()){     //面板配置信息已设置
                             panelData.setString("siteId", site_id);
                             panelArray.append(panelData);
                         }

@@ -49,7 +49,7 @@ bool DownCommandData::fuzzyMatch(qlibc::QData& item) {
     string area = inParams.getString("area");   //区域
     string kind = inParams.getString("kind");   //zd, fd, all
 
-    //如果是灯设备
+    //灯设备：区域 + 名称
     if(code == "LIGHT" && (item_device_type == "LIGHT_SWITCH" || item_device_type == "LIGHT")){  //类型匹配
         if(area == "all" || area == item_room_no){      //区域匹配
             if(kind == "all" || kind.empty()){
@@ -62,7 +62,7 @@ bool DownCommandData::fuzzyMatch(qlibc::QData& item) {
         }
     }
 
-    //其它设备
+    //其它设备：区域匹配
     if(code == item_device_type){   //类型匹配
         if(area == "all" || area == item_room_no){  //类型匹配
             return true;
@@ -85,7 +85,7 @@ bool DownCommandData::match(qlibc::QData& item){
             return false;
         }
 
-    }else{  //通过区域、类型来判断
+    }else{  //类型 + 区域 + 名称
         return fuzzyMatch(item);
     }
 }

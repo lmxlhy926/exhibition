@@ -380,14 +380,14 @@ bool voiceStringMatchControl::findDeviceIdOrGroupId(string& str, ParsedItem& par
         parsedItem.devIdGrpId = deviceIdOrGroupIdVec;
         isMatch = true;
 
-    }else if(getDeviceType(str, deviceType)){   //<房间 + 类型> 确定组名
-        if(!parsedItem.roomName.empty()){   //如果房间非空，控制该房间对应的分组
+    }else if(getDeviceType(str, deviceType)){   //类型
+        if(!parsedItem.roomName.empty()){       //类型 + 房间
             if(getGroupIdFromRoomName(groupList, parsedItem.roomName, deviceIdOrGroupIdVec)){
                 parsedItem.ctrlType = ControlType::Group;
                 parsedItem.devIdGrpId = deviceIdOrGroupIdVec;
                 isMatch = true;
             }
-        }else if(parsedItem.hasAll){    //发送到所有的蓝牙站点
+        }else if(parsedItem.hasAll){    //类型 + 所有
             parsedItem.ctrlType = ControlType::Group;
             std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
             for(auto& siteName : siteNames){

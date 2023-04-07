@@ -56,11 +56,11 @@ namespace synergy {
 
 
     //构造关闭特定分组的控制指令
-    qlibc::QData buildControlCmd(string group_id){
+    qlibc::QData buildControlCmd(string group_id, int luminance, int colorTemperature){
         qlibc::QData command, commandList, deviceItem, deviceList;
         command.setString("command_id", "luminance_color_temperature");
-        command.setInt("command_para_luminance", 0);
-        command.setInt("command_para_color_temperature", 6500);
+        command.setInt("command_para_luminance", luminance);
+        command.setInt("command_para_color_temperature", colorTemperature);
         command.setInt("transTime", 0);
         commandList.append(command);
 
@@ -70,11 +70,10 @@ namespace synergy {
         qlibc::QData requestData;
         requestData.setString("service_id", "control_group");
         requestData.putData("request", qlibc::QData().putData("group_list", qlibc::QData().append(deviceItem)));
-
         return requestData;
     }
 
-    bool isSiteOnline(const std::string& siteId){
+    bool isBleMeshSiteOnline(){
         qlibc::QData requestData, responseData;
         requestData.setString("service_id", "get_message_list");
         requestData.putData("request", qlibc::QData());
@@ -109,25 +108,36 @@ namespace synergy {
         requestData.putData("request", qlibc::QData().putData("deviceList", deviceList));
         LOG_INFO << "requestData: " << requestData.toJsonString(true);
 
-//        if(httpUtil::sitePostRequest("127.0.0.1", 9006, requestData, responseData)){
-//           return true;
-//        }
+        if(httpUtil::sitePostRequest("127.0.0.1", 9006, requestData, responseData)){
+           return true;
+        }
+
         return false;
     }
 
+    int bleDeviceRegister_service_handler(const Request& request, Response& response){
+        LOG_INFO << "bleDeviceRegister_service_handler: " << qlibc::QData(request.body).toJsonString();
+        if(bleGroupRegister2Cloud()){
+            response.set_content(okResponse.dump(), "text/json");
+        }else{
+            response.set_content(errResponse.dump(), "text/json");
+        }
+        return 0;
+    }
 
     //软服针对样板间下发给mesh站点的控制指令
-    void lightControlBleSite(const string& area, const qlibc::QData& requestData){
-        if(area == "all"){      //关闭所有灯
-            qlibc::QData controlData = buildControlCmd("FFFF");
-            LOG_YELLOW << controlData.toJsonString();
-            qlibc::QData resData;
+    void lightControlBleSite(const string& area){
+        if(area == "all"){      //控制所有灯
+            qlibc::QData requestData = buildControlCmd("FFFF", 0, 6500);
+            qlibc::QData responseData;
             std::set<string> siteName = SiteRecord::getInstance()->getSiteName();
             for(auto& elem : siteName){
                 smatch sm;
                 if(regex_match(elem, sm, regex("(.*):(.*)"))){
                     if(sm.str(2) == BleSiteID){   //只控制蓝牙设备
-                        SiteRecord::getInstance()->sendRequest2Site(elem, controlData, resData);
+                        LOG_GREEN << elem << " requestData: " << requestData.toJsonString();
+                        SiteRecord::getInstance()->sendRequest2Site(elem, requestData, responseData);
+                        LOG_BLUE << elem << " responseData: " << responseData.toJsonString();
                     }
                 }
             }
@@ -139,22 +149,21 @@ namespace synergy {
         Json::ArrayIndex groupListSize = groupList.size();
         for(Json::ArrayIndex i = 0; i < groupListSize; ++i){
             qlibc::QData item = groupList.getArrayElement(i);
-            string room_no = item.getData("location").getString("room_no");
-            if(item.getBool("areaFullGroup") && area == room_no){   //控制某个指定房间的灯
+            string item_room_no = item.getData("location").getString("room_no");
+            string item_sourceSite = item.getString("sourceSite");
+            if(item.getBool("areaFullGroup") && area == item_room_no){   //控制某个指定房间的灯
                 string group_id = item.getString("group_id");
-                qlibc::QData controlData = buildControlCmd(group_id);
-                LOG_YELLOW << controlData.toJsonString();
-                qlibc::QData resData;
-                std::set<string> siteName = SiteRecord::getInstance()->getSiteName();
-                for(auto& elem : siteName){
-                    smatch sm;
-                    if(regex_match(elem, sm, regex("(.*):(.*)"))){
-                        if(sm.str(2) == BleSiteID){
-                            SiteRecord::getInstance()->sendRequest2Site(elem, controlData, resData);
-                        }
+                qlibc::QData requestData = buildControlCmd(group_id, 0, 6500);
+                qlibc::QData responseData;
+                smatch sm;
+                if(regex_match(item_sourceSite, sm, regex("(.*):(.*)"))){
+                    if(sm.str(2) == BleSiteID){
+                        LOG_GREEN << item_sourceSite << " requestData: " << requestData.toJsonString();
+                        SiteRecord::getInstance()->sendRequest2Site(item_sourceSite, requestData, responseData);
+                        LOG_BLUE << item_sourceSite << " responseData: " << responseData.toJsonString();
+                        break;
                     }
                 }
-                break;
             }
         }
     }
@@ -174,37 +183,42 @@ namespace synergy {
                 publishData.setString("message_id", Scene_Msg_MessageID);
                 publishData.putData("content", requestData.getData("request"));
                 ServiceSiteManager::getInstance()->publishMessage(Scene_Msg_MessageID, publishData.toJsonString());
+                LOG_INFO << "publish Scene_Msg_MessageID: " << publishData.toJsonString();
 
                 //进行格式转换，请求场景站点接口
                 qlibc::QData siteResponse;
                 SceneCommand sc(requestData);
-                bool flag = sc.sendCmd(siteResponse);
-                if(!flag){
+                if(!sc.sendCmd(siteResponse)){
                     response.set_content(errResponse.dump(), "text/json");
                     LOG_RED << "==>sceneCommand send failed, sitResponse: " << siteResponse.toJsonString();
                 }else{
-                    LOG_HLIGHT << "==>sceneCommand send sucessfully, sitResponse: " << siteResponse.toJsonString();
+                    LOG_BLUE << "==>sceneCommand send sucessfully, sitResponse: " << siteResponse.toJsonString();
                     response.set_content(siteResponse.toJsonString(), "text/json");
                 }
                 return 0;
             }
         }
 
-        //控制样板间的mesh灯，只控制关闭
+        /*
+         * 蓝牙灯和zigbee灯只会存在一种，优先判断是否是蓝牙灯的控制
+         * 控制蓝牙分组，只控制关闭
+         */
         if(code == "light"){
-            if(isSiteOnline(BleSiteID)){    //如果蓝牙站点在线，则走蓝牙站点控制
-                lightControlBleSite(area, requestData);     //关闭指定房间的灯，或关闭所有房间的灯
+            if(isBleMeshSiteOnline()){                      //如果蓝牙站点在线，则走蓝牙站点控制
+                LOG_PURPLE << "ble_site is online....";
+                lightControlBleSite(area);     //关闭指定房间的灯，或关闭所有房间的灯
+                response.set_content(okResponse.dump(), "text/json");
                 return 0;
             }
         }
 
-        //针对tvAdapter下挂的多媒体设备
-        qlibc::QData bleDeviceList, zigbeeDeviceList, tvAdapterList;
-        qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();     //获取所有列表
+
+        //单个设备控制：zigbee灯，空调，净化器，加湿器....
+        qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();         //获取所有列表
         qlibc::QData controlList = DownCommandData(requestData).getContorlData(deviceList); //得到控制列表
         Json::ArrayIndex controlListSize = controlList.size();
 
-        std::map<string, qlibc::QData> deviceListMap;
+        std::map<string, qlibc::QData> deviceListMap;   //依据来源分类的设备列表
         for(Json::ArrayIndex i = 0; i < controlListSize; ++i){
             //按来源归类设备控制命令
             qlibc::QData controlData = controlList.getArrayElement(i);
@@ -221,30 +235,21 @@ namespace synergy {
             qlibc::QData controlRequest, controlResponse;
             controlRequest.setString("service_id", "control_device");
             controlRequest.putData("request", qlibc::QData().putData("device_list", elem.second));
+            LOG_GREEN << elem.first << ": controlRequest: " << controlRequest.toJsonString();
             SiteRecord::getInstance()->sendRequest2Site(elem.first, controlRequest, controlResponse);
+            LOG_BLUE << elem.first << ": controlResponse: " << controlResponse.toJsonString();
         }
 
         response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
 
-
-    int bleDeviceRegister_service_handler(const Request& request, Response& response){
-        LOG_INFO << "bleDeviceRegister_service_handler: " << qlibc::QData(request.body).toJsonString();
-        if(bleGroupRegister2Cloud()){
-            response.set_content(okResponse.dump(), "text/json");
-        }else{
-            response.set_content(errResponse.dump(), "text/json");
-        }
-        return 0;
-    }
 
     int bleDeviceOperation_service_handler(const Request& request, Response& response){
         LOG_INFO << qlibc::QData(request.body).toJsonString(true);
         response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
-
 
     int updateDeviceList_service_handler(const Request& request, Response& response){
         LOG_INFO << "synergy->updateDeviceList_service_handler...";
@@ -266,20 +271,6 @@ namespace synergy {
         return 0;
     }
 
-    int getSiteNames_service_handler(const Request& request, Response& response){
-        LOG_INFO << "synergy->getSiteNames_service_handler...";
-        std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
-        qlibc::QData siteArray;
-        for(auto& siteName : siteNames){
-            siteArray.append(siteName);
-        }
-        qlibc::QData ret;
-        ret.setInt("code", 0);
-        ret.setString("msg", "success");
-        ret.putData("response", siteArray);
-        response.set_content(ret.toJsonString(), "text/json");
-        return 0;
-    }
 
     int getPanelList_service_handler(const Request& request, Response& response){
         LOG_INFO << "synergy->getPanelList_service_handler: " << qlibc::QData(request.body).toJsonString();

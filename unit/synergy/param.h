@@ -39,9 +39,7 @@ static const string BleGroupRegister_Service_ID     = "register_bleGroup";
 static const string BleDeviceOperation_Service_ID   = "bleDeviceOperation";
 static const string UpdateDeviceList_Service_ID     = "updateDeviceList";
 static const string UpdateGroupList_Service_ID      = "updateGroupList";
-static const string GetSiteNames_Service_ID         = "getSiteNames";
-
-
+static const string GetPanelList_Service_ID         = "get_panelList";                  //获取面板列表
 
 //服务ID
 static const string Reset_Device_Service_ID               = "reset_device";                      //重置网关
@@ -61,7 +59,7 @@ static const string AddDevice2Group_Device_Service_ID           = "add_device_to
 static const string RemoveDeviceFromGroup_Device_Service_ID     = "remove_device_from_group";       //从分组删除设备
 static const string ControlGroup_Device_Service_ID              = "control_group";                  //控制分组
 static const string GetGroupList_Device_Service_ID              = "get_group_list";                 //获取分组列表
-static const string GetPanelList_Service_ID                     = "get_panelList";                  //获取面板列表
+
 
 //订阅消息ID
 static const string Site_OnOffLine_MessageID = "site_onoffline";
