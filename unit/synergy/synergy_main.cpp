@@ -26,6 +26,12 @@ int main(int argc, char* argv[]) {
     string path = "/data/changhong/edge_midware/lhy/synergySiteLog.txt";
     muduo::logInitLogger(path);
 
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "---------------SYNERGY START-------------";
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "-----------------------------------------";
+
     httplib::ThreadPool threadPool_(5);
 
     // 创建 serviceSiteManager 对象, 单例
