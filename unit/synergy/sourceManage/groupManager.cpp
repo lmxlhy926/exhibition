@@ -84,6 +84,10 @@ void GroupManager::updateGroupList(){
                 groupRequest.setString("service_id", "get_group_list");
                 groupRequest.setValue("request", Json::nullValue);
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), groupRequest, groupRes);     //获取组列表
+                if(groupRes.getInt("code") != 0){
+                    LOG_PURPLE << "===>cant get groupList, dont sync....";
+                    return;
+                }
                 LOG_YELLOW << sm.str(0) << ": groupListSize: " << groupRes.getData("response").getData("group_list").size();
                 qlibc::QData list = addGrpSourceTag(groupRes.getData("response").getData("group_list"),
                                                  string().append(uid).append(":").append(siteID));    //给组条目添加标签

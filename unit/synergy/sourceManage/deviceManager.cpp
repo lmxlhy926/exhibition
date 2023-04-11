@@ -70,6 +70,10 @@ void DeviceManager::updateDeviceList(){
                 deviceRequest.setString("service_id", "get_device_list");
                 deviceRequest.setValue("request", Json::nullValue);
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), deviceRequest, deviceRes);       //获取设备列表
+                if(deviceRes.getInt("code") != 0){
+                    LOG_PURPLE << "===>cant get deviceList, dont sync....";
+                    return;
+                }
                 LOG_HLIGHT << sm.str(0) << ": deviceListSize: " << deviceRes.getData("response").getData("device_list").size();
                 qlibc::QData list = addMacSource(deviceRes.getData("response").getData("device_list"),
                                                  string().append(uuid).append(":").append(siteID));     //给列表条目加入来源标签
