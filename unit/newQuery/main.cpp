@@ -27,6 +27,12 @@ int main(int argc, char* argv[]){
     string path = "/data/changhong/edge_midware/lhy/querySiteLog.txt";
     muduo::logInitLogger(path);
 
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "---------------QUERY_SITE START----------";
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "-----------------------------------------";
+
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance(); // 创建 serviceSiteManager 对象, 单例
     serviceSiteManager->setServerPort(QuerySitePort);
     serviceSiteManager->setSiteIdSummary(QuerySiteID, QuerySiteName);

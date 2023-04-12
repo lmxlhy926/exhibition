@@ -23,6 +23,12 @@ int main(int argc, char* argv[]) {
     string path = "/data/changhong/edge_midware/lhy/configSiteLog.txt";
     muduo::logInitLogger(path);
 
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "---------------CONFIG_ITE START----------";
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "-----------------------------------------";
+
     for(int i = 0; i < argc; ++i){
         LOG_PURPLE << "ARGPRINT......";
         LOG_RED << argv[i];

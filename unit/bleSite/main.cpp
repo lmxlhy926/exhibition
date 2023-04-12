@@ -22,6 +22,12 @@ int main(int argc, char* argv[]) {
     string path = "/data/changhong/edge_midware/lhy/bleMeshSiteLog.txt";
     muduo::logInitLogger(path);
 
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "---------------MESH_SITE START-----------";
+    LOG_RED << "-----------------------------------------";
+    LOG_RED << "-----------------------------------------";
+
     httplib::ThreadPool threadPool_(10);
     //站点请求管理
     SiteRecord::getInstance()->addSite(ConfigSiteName, LocalIp, ConfigPort);

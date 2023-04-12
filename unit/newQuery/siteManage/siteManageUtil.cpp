@@ -209,38 +209,47 @@ void SiteTree::addNewFindSite(string& panelIp) {
         qlibc::QData request, response;
         request.setString("service_id", Site_LocalSite_Service_ID);
         request.putData("request", qlibc::QData());
-        if(httpUtil::sitePostRequest(panelIp, 9000, request, response)){
-            bool isNewNode = false;
-            {
-                std::lock_guard<std::recursive_mutex> lg(mapRecursiveMutex);
-                auto pos = discoveredSiteMap.find(panelIp);
-                if(pos != discoveredSiteMap.end()){
-                    discoveredSiteMap.erase(panelIp);
-                }else{  //为新增节点，要发布节点上线消息
-                    isNewNode = true;
-                }
-                discoveredSiteMap.insert(std::make_pair(panelIp, response.getData("response").getData("siteList").asValue()));
+        for(int tryCount = 0; tryCount < 3; ++tryCount){
+            LOG_GREEN << "getLocalSite from " << panelIp << " : " << request.toJsonString();
+            if(httpUtil::sitePostRequest(panelIp, 9000, request, response)){    //成功获取返回
+                LOG_BLUE << "getLocalSite response from " << panelIp << " : " << response.toJsonString();
+                bool isNewNode = false;
+                {
+                    std::lock_guard<std::recursive_mutex> lg(mapRecursiveMutex);
+                    auto pos = discoveredSiteMap.find(panelIp);
+                    if(pos != discoveredSiteMap.end()){
+                        discoveredSiteMap.erase(panelIp);
+                    }else{  //为新增节点，要发布节点上线消息
+                        isNewNode = true;
+                    }
+                    discoveredSiteMap.insert(std::make_pair(panelIp, response.getData("response").getData("siteList").asValue()));
 
-                auto pos1 = discoveredPingCountMap.find(panelIp);
-                if(pos1 != discoveredPingCountMap.end()){
-                    discoveredPingCountMap.erase(pos1);
+                    //站点计数归一
+                    auto pos1 = discoveredPingCountMap.find(panelIp);
+                    if(pos1 != discoveredPingCountMap.end()){
+                        discoveredPingCountMap.erase(pos1);
+                    }
+                    discoveredPingCountMap.insert(std::make_pair(panelIp, 1));
                 }
-                discoveredPingCountMap.insert(std::make_pair(panelIp, 1));
-            }
 
-            //如果是新增节点则发布上线消息； 目前只关心本机站点的上下线
+                //如果是新增节点则发布上线消息； 目前只关心本机站点的上下线
 #if 0
-            if(isNewNode){
+                if(isNewNode){
                 qlibc::QData siteList = response.getData("response").getData("siteList");
                 publishOnOffLineMessage(siteList, "online", false);
             }
 #endif
 
-            //订阅节点消息通道，重复订阅也没有关系
-            std::vector<string> messageIdList;
-            messageIdList.push_back(Site_OnOff_Node2Node_MessageID);
-            ServiceSiteManager::subscribeMessage(panelIp, 9000, messageIdList);
+                //订阅节点消息通道，重复订阅也没有关系
+                std::vector<string> messageIdList;
+                messageIdList.push_back(Site_OnOff_Node2Node_MessageID);
+                ServiceSiteManager::subscribeMessage(panelIp, 9000, messageIdList);
+
+                LOG_PURPLE << "find querysite successfully: " << "<" << panelIp << ">......";
+                return;
+            }
         }
+        LOG_RED << "getLocalSite from " << panelIp << " FAILED..........";
     }
 }
 

@@ -30,7 +30,9 @@ void siteManager::updateSite(){
     qlibc::QData request, response;
     request.setString("service_id", "site_localAreaNetworkSite");
     request.putData("request", qlibc::QData().setString("site_id", ""));
+    LOG_GREEN << "site_localAreaNetworkSite request: " << request.toJsonString();
     if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){    //获取局域网内所有发现的站点
+        LOG_BLUE << "site_localAreaNetworkSite response: " << response.toJsonString();
         qlibc::QData resBody = response.getData("response");
         Json::Value::Members ipMembers = resBody.getMemberNames();
         for(auto& ip : ipMembers){
@@ -41,12 +43,21 @@ void siteManager::updateSite(){
                 string site_id = item.getString("site_id");
                 if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){    //只关心设备类站点
                     //从相应的配置站点获取mac
-                    string panelId;
+                    string panelId{};
                     qlibc::QData panelConfigRequest, panelConfigResponse;
                     panelConfigRequest.setString("service_id", "get_self_info");
                     panelConfigRequest.putData("request", qlibc::QData());
-                    if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){   //获取面板配置信息
-                        panelId = panelConfigResponse.getData("response").getString("device_id");
+                    for(int tryCount = 0; tryCount < 3; ++tryCount){
+                        LOG_GREEN << "get_self_info request: " << panelConfigRequest.toJsonString();
+                        if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
+                            LOG_BLUE << "get_self_info response: " << panelConfigResponse.toJsonString();
+                            panelId = panelConfigResponse.getData("response").getString("device_id");
+                            if(!panelId.empty()){
+                               break;
+                            }
+                        }else{
+                            LOG_RED << "get_self_info response: " << "failed......";
+                        }
                     }
                     if(!panelId.empty()){   //构造站点信息
                         string siteName;
@@ -112,7 +123,9 @@ qlibc::QData siteManager::getPanelList(){
     qlibc::QData request, response;
     request.setString("service_id", "site_localAreaNetworkSite");
     request.putData("request", qlibc::QData().setString("site_id", ""));
+    LOG_GREEN << "site_localAreaNetworkSite request: " << request.toJsonString();
     if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){    //获取局域网内所有发现的站点
+        LOG_BLUE << "site_localAreaNetworkSite response: " << response.toJsonString();
         qlibc::QData resBody = response.getData("response");
         Json::Value::Members ipMembers = resBody.getMemberNames();
         for(auto& ip : ipMembers){
@@ -121,18 +134,23 @@ qlibc::QData siteManager::getPanelList(){
             for(Json::ArrayIndex i = 0; i < size; ++i){
                 qlibc::QData item = siteList.getArrayElement(i);
                 string site_id = item.getString("site_id");
-                if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){
+                if(site_id == BleSiteID || site_id == ZigbeeSiteID){
                     //获取面板的配置信息
                     qlibc::QData panelConfigRequest, panelConfigResponse;
                     panelConfigRequest.setString("service_id", "get_self_info");
                     panelConfigRequest.putData("request", qlibc::QData());
-                    LOG_GREEN << "getPanelInfoRequest: " << panelConfigRequest.toJsonString();
-                    if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
-                        LOG_BLUE << "getPanelInfoResponse: " << panelConfigResponse.toJsonString();
-                        qlibc::QData panelData = panelConfigResponse.getData("response");
-                        if(!panelData.empty()){     //面板配置信息已设置
-                            panelData.setString("siteId", site_id);
-                            panelArray.append(panelData);
+                    for(int tryCount = 0; tryCount < 3; ++tryCount){
+                        LOG_GREEN << "getPanelInfoRequest: " << panelConfigRequest.toJsonString();
+                        if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
+                            LOG_BLUE << "getPanelInfoResponse: " << panelConfigResponse.toJsonString();
+                            qlibc::QData panelData = panelConfigResponse.getData("response");
+                            if(!panelData.empty()){     //面板配置信息已设置
+                                panelData.setString("siteId", site_id);
+                                panelArray.append(panelData);
+                                break;
+                            }
+                        }else{
+                            LOG_RED << "getPanelInfoResponse: request failed.....";
                         }
                     }
                 }
