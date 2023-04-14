@@ -1,0 +1,141 @@
+{
+	"device_list" : 
+	[
+		{
+			"device_id" : "23D755971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "门厅分组",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "87DE55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "门厅分组",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "A0DE55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "客厅电视周边",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "04D555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "客厅电视周边",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "69DB55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "客厅背景光",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "F0E555971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "客厅背景光",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "4BD455971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "04C0",
+			"group_name" : "厨房6",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "86DE55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "05C0",
+			"group_name" : "厨房7",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "221546971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "65DB55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		}
+	]
+}
