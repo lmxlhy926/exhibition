@@ -530,6 +530,7 @@ void SiteTree::mdnsServiceStart(){
         std::unique_lock<std::mutex> ul(mdnsMutex);
         cv.wait(ul, [this]{return this->ready2StartMdnsService;});
     }
+    std::this_thread::sleep_for(std::chrono::seconds(10));  //网络建立好后，10秒后创建服务器
     LOG_BLUE << "START MDNS SERVICE.....";
 
     string hostname = "smartHome";
