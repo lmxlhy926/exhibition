@@ -76,6 +76,9 @@ int getAudioPanelList_service_request_handler(const Request& request, Response& 
 //存储语音面板列表
 int saveAudioPanelList_service_request_handler(const Request& request, Response& response);
 
+//雷达数据请求接口：app存入雷达数据
+int setRadarDevice_service_request_handler(const Request& request, Response& response);
+
 //接收雷达数据
 void receiveRadarDevice_message_handler(const Request& request);
 

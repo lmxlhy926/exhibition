@@ -158,10 +158,14 @@ void test4(){
 }
 
 int main(int argc, char* argv[]){
+
    Json::Value value;
-   if(value["hello"].empty()){
-       std::cout << "ssss" << std::endl;
-   }
+   value["id"] = 11;
+
+   string str = qlibc::QData(value).getString("id");
+   std::cout << str << std::endl;
+
+
 
     return 0;
 }

@@ -41,6 +41,8 @@ static const string SETPANELINFO_REQUEST_SERVICE_ID                 =    "config
 static const string GETPANELINFO_REQUEST_SERVICE_ID                 =    "get_self_info";
 static const string SETAUDIOPANELLIST_REQUEST_SERVICE_ID            =    "setAudioPanelList";
 static const string GETAUDIOPANELLIST_REQUEST_SERVICE_ID            =    "getAudioPanelList";
+static const string SETRADARLIST_REQUEST_SERVICE_ID                 =    "setRadarPanelList";
+
 
 
 //消息发布ID

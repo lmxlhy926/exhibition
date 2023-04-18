@@ -168,6 +168,10 @@ int main(int argc, char* argv[]) {
     //获取语音面板设备
     serviceSiteManager->registerServiceRequestHandler(GETAUDIOPANELLIST_REQUEST_SERVICE_ID, getAudioPanelList_service_request_handler);
 
+    //设置雷达信息
+    serviceSiteManager->registerServiceRequestHandler(SETRADARLIST_REQUEST_SERVICE_ID, setRadarDevice_service_request_handler);
+
+
 
     //set site supported subscribed message
     serviceSiteManager->registerMessageId(WHITELIST_MESSAGE_ID);                //发布白名单给第三方
