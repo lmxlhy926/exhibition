@@ -30,6 +30,7 @@ bool SingleSite::send(qlibc::QData &request, qlibc::QData &response) {
        response.setInitData(qlibc::QData(result.value().body));
        return true;
     }
+    LOG_RED << "-->http Error: " << to_string(result.error());
     return false;
 }
 

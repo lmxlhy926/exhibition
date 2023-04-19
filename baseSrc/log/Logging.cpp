@@ -62,9 +62,9 @@ namespace muduo{
         const LogStream::Buffer& buf(stream().buffer());
         if(setLoggerPath){
             if(impl_.level_ == LogLevel::H_RED){
-                rotating_logger->error(string(buf.data(), buf.length() -1));
+                rotating_logger->error(string(buf.data() + 28, buf.length() -29));
             }else{
-                rotating_logger->info(string(buf.data(), buf.length() -1));
+                rotating_logger->info(string(buf.data() + 28, buf.length() -29));
             }
         }
         defaultOutput(buf.data(), buf.length(), impl_.level_);
