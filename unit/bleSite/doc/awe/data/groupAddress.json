@@ -6,11 +6,11 @@
 			"23D755971B30",
 			"87DE55971B30"
 		],
-		"group_name" : "门厅分组",
+		"group_name" : "玄关组",
 		"location" : 
 		{
-			"room_name" : "门厅",
-			"room_no" : "1"
+			"room_name" : "玄关",
+			"room_no" : "6"
 		},
 		"sourceSite" : "EDGE_DC_97_58_43_2C_BB:ble_light"
 	},
@@ -21,11 +21,12 @@
 			"A0DE55971B30",
 			"04D555971B30"
 		],
-		"group_name" : "客厅电视周边",
+		"group_name" : "电视周边组",
 		"location" : 
 		{
 			"room_name" : "客厅",
-			"room_no" : "1"
+			"room_no" : "1",
+			"room_no_slaves" : "100"
 		},
 		"sourceSite" : "EDGE_DC_97_58_43_2C_BB:ble_light"
 	},
@@ -36,7 +37,7 @@
 			"69DB55971B30",
 			"F0E555971B30"
 		],
-		"group_name" : "客厅背景光",
+		"group_name" : "客厅背景光组",
 		"location" : 
 		{
 			"room_name" : "客厅",
@@ -50,11 +51,12 @@
 		[
 			"4BD455971B30"
 		],
-		"group_name" : "厨房6",
+		"group_name" : "厨房分组6",
 		"location" : 
 		{
 			"room_name" : "厨房",
-			"room_no" : "1"
+			"room_no" : "5",
+			"room_no_slaves" : "101"
 		},
 		"sourceSite" : "EDGE_DC_97_58_43_2C_BB:ble_light"
 	},
@@ -64,11 +66,12 @@
 		[
 			"86DE55971B30"
 		],
-		"group_name" : "厨房7",
+		"group_name" : "厨房分组7",
 		"location" : 
 		{
 			"room_name" : "厨房",
-			"room_no" : "1"
+			"room_no" : "5",
+			"room_no_slaves" : "101"
 		},
 		"sourceSite" : "EDGE_DC_97_58_43_2C_BB:ble_light"
 	},
@@ -78,11 +81,11 @@
 		[
 			"221546971B30"
 		],
-		"group_name" : "厨房8",
+		"group_name" : "厨房分组8",
 		"location" : 
 		{
 			"room_name" : "厨房",
-			"room_no" : "1"
+			"room_no" : "5"
 		},
 		"sourceSite" : "EDGE_DC_97_58_43_2C_BB:ble_light"
 	}
