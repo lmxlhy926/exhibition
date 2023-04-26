@@ -41,7 +41,8 @@
 		"location" : 
 		{
 			"room_name" : "客厅",
-			"room_no" : "1"
+			"room_no" : "1",
+			"room_no_slaves" : "100"
 		},
 		"sourceSite" : "EDGE_DC_97_58_43_2C_BB:ble_light"
 	},

@@ -34,6 +34,8 @@ namespace synergy{
 //获取面板列表
     int getPanelList_service_handler(const Request& request, Response& response);
 
+//获取设备站点
+    int getDeviceSiteList_service_handler(const Request& request, Response& response);
 
 
 //重置网关

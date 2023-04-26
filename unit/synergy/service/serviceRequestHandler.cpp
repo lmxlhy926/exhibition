@@ -283,6 +283,21 @@ namespace synergy {
         return 0;
     }
 
+    int getDeviceSiteList_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->getDeviceSiteList_service_handler: " << qlibc::QData(request.body).toJsonString();
+        std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
+        qlibc::QData siteArray;
+        for(auto& siteName : siteNames){
+            siteArray.append(siteName);
+        }
+        qlibc::QData data;
+        data.setInt("code", 0);
+        data.setString("error", "ok");
+        data.putData("response", qlibc::QData().putData("siteArray", siteArray));
+        response.set_content(data.toJsonString(), "text/json");
+        return 0;
+    }
+
     void sendRequest(const Request& request, Response& response){
         qlibc::QData requestData(request.body), responseData;
         string sourceSite = requestData.getData("request").getString("sourceSite");
