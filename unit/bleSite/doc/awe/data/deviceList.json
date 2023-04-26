@@ -2,20 +2,6 @@
 	"device_list" : 
 	[
 		{
-			"device_id" : "23D755971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"group_address" : "01C0",
-			"group_name" : "门厅分组",
-			"location" : 
-			{
-				"room_name" : "客厅",
-				"room_no" : "1"
-			}
-		},
-		{
 			"device_id" : "87DE55971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
@@ -30,17 +16,29 @@
 			}
 		},
 		{
-			"device_id" : "A0DE55971B30",
+			"device_id" : "65DB55971B30",
 			"device_model" : "双色灯带",
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
-			"group_address" : "02C0",
-			"group_name" : "客厅电视周边",
 			"location" : 
 			{
 				"room_name" : "客厅",
 				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "23D755971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "01C0",
+			"group_name" : "玄关组",
+			"location" : 
+			{
+				"room_name" : "玄关",
+				"room_no" : "6"
 			}
 		},
 		{
@@ -50,7 +48,35 @@
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
 			"group_address" : "02C0",
-			"group_name" : "客厅电视周边",
+			"group_name" : "电视周边组",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "221546971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "02C0",
+			"group_name" : "电视周边组",
+			"location" : 
+			{
+				"room_name" : "客厅",
+				"room_no" : "1"
+			}
+		},
+		{
+			"device_id" : "A0DE55971B30",
+			"device_model" : "双色灯带",
+			"device_modelCode" : "27",
+			"device_type" : "LIGHT",
+			"device_typeCode" : "7",
+			"group_address" : "03C0",
+			"group_name" : "客厅背景光组",
 			"location" : 
 			{
 				"room_name" : "客厅",
@@ -64,7 +90,7 @@
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
 			"group_address" : "03C0",
-			"group_name" : "客厅背景光",
+			"group_name" : "客厅背景光组",
 			"location" : 
 			{
 				"room_name" : "客厅",
@@ -77,8 +103,8 @@
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
-			"group_address" : "03C0",
-			"group_name" : "客厅背景光",
+			"group_address" : "04C0",
+			"group_name" : "厨房分组6",
 			"location" : 
 			{
 				"room_name" : "客厅",
@@ -91,8 +117,8 @@
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
-			"group_address" : "04C0",
-			"group_name" : "厨房6",
+			"group_address" : "05C0",
+			"group_name" : "厨房分组7",
 			"location" : 
 			{
 				"room_name" : "客厅",
@@ -105,32 +131,8 @@
 			"device_modelCode" : "27",
 			"device_type" : "LIGHT",
 			"device_typeCode" : "7",
-			"group_address" : "05C0",
-			"group_name" : "厨房7",
-			"location" : 
-			{
-				"room_name" : "客厅",
-				"room_no" : "1"
-			}
-		},
-		{
-			"device_id" : "221546971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
-			"location" : 
-			{
-				"room_name" : "客厅",
-				"room_no" : "1"
-			}
-		},
-		{
-			"device_id" : "65DB55971B30",
-			"device_model" : "双色灯带",
-			"device_modelCode" : "27",
-			"device_type" : "LIGHT",
-			"device_typeCode" : "7",
+			"group_address" : "06C0",
+			"group_name" : "厨房分组8",
 			"location" : 
 			{
 				"room_name" : "客厅",

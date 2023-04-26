@@ -18,8 +18,8 @@
 	{
 		"device_list" : 
 		[
-			"A0DE55971B30",
-			"04D555971B30"
+			"04D555971B30",
+			"221546971B30"
 		],
 		"group_name" : "电视周边组",
 		"location" : 
@@ -34,8 +34,8 @@
 	{
 		"device_list" : 
 		[
-			"69DB55971B30",
-			"F0E555971B30"
+			"A0DE55971B30",
+			"69DB55971B30"
 		],
 		"group_name" : "客厅背景光组",
 		"location" : 
@@ -50,7 +50,7 @@
 	{
 		"device_list" : 
 		[
-			"4BD455971B30"
+			"F0E555971B30"
 		],
 		"group_name" : "厨房分组6",
 		"location" : 
@@ -65,7 +65,7 @@
 	{
 		"device_list" : 
 		[
-			"86DE55971B30"
+			"4BD455971B30"
 		],
 		"group_name" : "厨房分组7",
 		"location" : 
@@ -80,7 +80,7 @@
 	{
 		"device_list" : 
 		[
-			"221546971B30"
+			"86DE55971B30"
 		],
 		"group_name" : "厨房分组8",
 		"location" : 
