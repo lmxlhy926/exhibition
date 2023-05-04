@@ -12,8 +12,12 @@
 #include <vector>
 #include "qlibc/QData.h"
 #include <set>
+#include <unistd.h>
+#include "log/Logging.h"
 using namespace std;
 
+
+#if 0
 //开关灯
 regex voice_expr_power_on("(.*)(灯)(.*)(开)(.*)");
 regex voice_expr_power_on_1("(.*)(开)(.*)(灯)(.*)");
@@ -208,16 +212,17 @@ void test(){
     printParsedItem(parsedItem);
 }
 
+#endif
 
 int main(int argc, char* argv[]){
-   std::set<string> vec;
-   vec.insert("hello");
-   vec.insert("hello");
-   std::cout << vec.size() << std::endl;
-
-
-
-
+    string path = "/data/changhong/edge_midware/lhy/regexLog.txt";
+    muduo::logInitLogger(path);
+   
+    if(isatty(STDOUT_FILENO) == 1){
+        LOG_INFO << "--- A TERMIANL----";
+    }else{
+        LOG_INFO << "--NOT A TERMINAL----";
+    }
     return 0;
 }
 

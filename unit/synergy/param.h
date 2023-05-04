@@ -16,6 +16,10 @@ static const string ZigbeeSiteID = "zigbee_light";
 static const string ZigbeeSiteName = "ZigBee灯控";
 static const int ZigbeeSitePort = 9002;
 
+static const string BtDeviceSiteID = "bt_device";
+static const string BtDeviceSiteName = "蓝牙设备";
+static const int BtDeviceSitePort = 9014;
+
 static const string TvAdapterSiteID = "tv_adapter";
 static const string TvAdapterSiteName = "智汇家adapter";
 static const int TvAdapterSitePort = 9008;

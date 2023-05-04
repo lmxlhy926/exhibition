@@ -65,7 +65,7 @@ void DeviceManager::updateDeviceList(){
         if(regex_match(elem, sm, regex("(.*):(.*)"))){
             string uuid = sm.str(1);
             string siteID = sm.str(2);
-            if((siteID == BleSiteID || siteID == TvAdapterSiteID || siteID == ZigbeeSiteID)){   //设备类站点
+            if((siteID == BleSiteID || siteID == TvAdapterSiteID || siteID == ZigbeeSiteID || siteID == BtDeviceSiteID)){   //设备类站点
                 qlibc::QData deviceRequest, deviceRes;
                 deviceRequest.setString("service_id", "get_device_list");
                 deviceRequest.setValue("request", Json::nullValue);

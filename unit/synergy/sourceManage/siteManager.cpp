@@ -41,7 +41,7 @@ void siteManager::updateSite(){
             for(Json::ArrayIndex i = 0; i < size; ++i){
                 qlibc::QData item = siteList.getArrayElement(i);
                 string site_id = item.getString("site_id");
-                if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID){    //只关心设备类站点
+                if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID || site_id == BtDeviceSiteID){    //只关心设备类站点
                     //从相应的配置站点获取mac
                     string panelId{};
                     qlibc::QData panelConfigRequest, panelConfigResponse;
