@@ -1,12 +1,7 @@
-.idea
-/unit/paramData
+.vscode
 /out
-/cmake-build-debug_cygwin
-/cmake-build-debug_wsl
-/cmake-build-minsizerel_android_armeabi-v7a
-/cmake-build-minsizerel_arm64-v8a
 /unit/mdm/data
-/cmake-build-wsl_debug
-/cmake-build-cygwin_debug
 /unit/bleSite/data
-/cmake-build-arm64
+/build_android
+/build_arm64
+/build_X86_64
