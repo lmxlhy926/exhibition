@@ -360,6 +360,7 @@ int whiteList_sync_save_service_request_handler(const Request& request, Response
         publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
         publishData.putData("content", receivedWhiteListData);
         ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+        LOG_INFO << "publish: " << publishData.toJsonString();
     }else{
         LOG_PURPLE << "===>whiteList is the newest, or receivedWhites is not correct, noting needed to save....";
     }
@@ -392,6 +393,7 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
     publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
     publishData.putData("content", whiteListData);
     ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+    LOG_INFO << "publish: " << publishData.toJsonString();
 
     qlibc::QData ret;
     ret.setInt("code", 0);
@@ -447,6 +449,7 @@ int saveSceneFile_sync_service_request_handler(const Request& request, Response&
         publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
         publishData.putData("content", receivedSceneConfigFile);
         ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+        LOG_INFO << "publish: " << publishData.toJsonString();
     }else{
         LOG_PURPLE << "===>sceneFile is the newest or localSceneConfigFile is not correct, nothing needed to change....";
     }
@@ -471,6 +474,7 @@ int saveSceneFile_service_request_handler(const Request& request, Response& resp
     publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
     publishData.putData("content", seceConfigFile);
     ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+    LOG_INFO << "publish: " << publishData.toJsonString();
 
     qlibc::QData ret;
     ret.setInt("code", 0);
