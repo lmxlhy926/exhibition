@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 
-if [ $1 == "all" ]
+if [ $1 == "allbin" ]
 then
      /mnt/d/adb/adb.exe push /home/lhy/smarthome/exhibition/out/arm64/query_site /data/changhong/edge_midware
      /mnt/d/adb/adb.exe push /home/lhy/smarthome/exhibition/out/arm64/config_site /data/changhong/edge_midware
@@ -22,9 +22,15 @@ else
         elif [  $site == "ble_site" ]
         then
             /mnt/d/adb/adb.exe push /home/lhy/smarthome/exhibition/out/arm64/ble_site /data/changhong/edge_midware
-        elif [  $site == "query_site" ]
+        elif [  $site == "synergy_site" ]
         then
-            /mnt/d/adb/adb.exe push /home/lhy/smarthome/exhibition/out/arm64/query_site /data/changhong/edge_midware
+            /mnt/d/adb/adb.exe push /home/lhy/smarthome/exhibition/out/arm64/synergy_site /data/changhong/edge_midware
+        elif [ $site == "start_edge_midware.sh" ]
+        then
+            /mnt/d/adb/adb.exe push /home/lhy/smarthome/exhibition/out/arm64/start_edge_midware.sh /data/changhong/edge_midware
+        elif [ $site == "wpa_supplicant.conf" ]
+        then
+            /mnt/d/adb/adb.exe push /home/lhy/smarthome/exhibition/out/arm64/wpa_supplicant.conf /data/changhong/edge_midware
         fi
     done
 fi
