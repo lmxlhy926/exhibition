@@ -180,10 +180,7 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageId(SCENELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知场景文件已被修改
     serviceSiteManager->registerMessageId(PANELINFO_MODIFIED_MESSAGE_ID);       //发布消息，面板配置信息更改
 
-    //注册接收雷达设备回调
-    serviceSiteManager->registerMessageHandler(RADARDEVICE_RECEIVED_MESSAGE_ID, receiveRadarDevice_message_handler);
-
-
+   
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){
@@ -214,6 +211,8 @@ int main(int argc, char* argv[]) {
         }
     });
 
+
+#if 0
     //订阅新增雷达设备
     threadPool_.enqueue([&](){
         while(true){
@@ -229,6 +228,7 @@ int main(int argc, char* argv[]) {
             LOG_RED << "subscribed RADARDEVICE_RECEIVED_MESSAGE_ID failed....., start to subscribe in 10 seconds";
         }
     });
+#endif
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(60 *10));

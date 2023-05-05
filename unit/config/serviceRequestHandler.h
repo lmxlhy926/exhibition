@@ -46,7 +46,13 @@ void fileSync(string site_id, string getServiceId, string saveServiceId, string 
 //获取白名单列表
 int whiteList_get_service_request_handler(const Request& request, Response& response);
 
-//收到白名单后，和本地的进行比较。如果收到的比本地的新，则更新，并发送白名单更改消息
+
+/*
+    收到白名单后，和本地的进行比较。
+        1. 如果本地没有白名单
+        2. 收到的白名单比本地的新
+        则更新本地白名单，并发送白名单更改消息
+*/
 int whiteList_sync_save_service_request_handler(const Request& request, Response& response);
 
 //保存白名单，并将白名单同步到每个配置站点
@@ -73,14 +79,11 @@ int setPanelInfo_service_request_handler(const Request& request, Response& respo
 //获取语音面板列表
 int getAudioPanelList_service_request_handler(const Request& request, Response& response);
 
-//存储语音面板列表
+//app存储语音面板列表全集
 int saveAudioPanelList_service_request_handler(const Request& request, Response& response);
 
-//雷达数据请求接口：app存入雷达数据
+//app存储雷达设备全集
 int setRadarDevice_service_request_handler(const Request& request, Response& response);
-
-//接收雷达数据
-void receiveRadarDevice_message_handler(const Request& request);
 
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H
