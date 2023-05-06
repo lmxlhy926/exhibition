@@ -24,6 +24,7 @@ static const string Scan_Device_Service_ID                = "scan_device";      
 static const string Get_ScanDeviceResult_Service_ID       = "getScanResult";                     //获取扫描结果
 static const string Add_Device_Service_ID                 = "add_device";                        //添加设备
 static const string Del_Device_Service_ID                 = "del_device";                        //删除设备
+static const string Del_Device_Force_Service_ID           = "del_device_force";                  //强制删除设备
 static const string Control_Device_Service_ID             = "control_device";                    //控制设备
 static const string Config_Device_Property_Service_ID     = "config_name_location";              //配置设备属性
 static const string Get_DeviceList_Service_ID             = "get_device_list";                   //获取设备列表
@@ -61,6 +62,7 @@ static const string PanelProperty_MODIFIED_MESSAGE_ID   = "self_info_update";   
 #define SCANEND                     "scanEnd"
 #define BIND                        "bind"
 #define UNBIND                      "unbind"
+#define UNBINDFORCE                 "unbindforce"
 #define CONNECT                     "connect"
 #define NETVERIFY                   "netVerify"
 #define ASSIGN_GATEWAY_ADDRESS      "assignGateWayAddress"

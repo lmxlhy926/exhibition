@@ -297,6 +297,28 @@ int del_device_service_handler(const Request& request, Response& response, Logic
     return 0;
 }
 
+//强制删除设备
+int del_device_force_service_handler(const Request& request, Response& response, LogicControl& lc){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    if(requestBody.type() != Json::nullValue){
+        bleConfig::getInstance()->enqueue([requestBody, &lc]{
+            qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
+            size_t deviceListSize = deviceList.size();
+            for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+                qlibc::QData cmdData;
+                cmdData.setString("command", UNBINDFORCE);
+                cmdData.putData("deviceSn", deviceList.getArrayElement(i));
+                lc.parse(cmdData);
+            }
+        });
+        response.set_content(okResponse.dump(), "text/json");
+    }else{
+        response.set_content(errResponse.dump(), "text/json");
+    }
+    return 0;
+}
+
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     qlibc::QData requestBody(request.body);

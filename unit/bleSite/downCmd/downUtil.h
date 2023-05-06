@@ -14,6 +14,9 @@
 #include "sourceManage/groupAddressMap.h"
 #include "../parameter.h"
 #include "sourceManage/bleConfig.h"
+#include "log/Logging.h"
+#include "sourceManage/util.h"
+#include "siteService/service_site_manager.h"
 
 using namespace std;
 
@@ -152,6 +155,45 @@ public:
         return binaryString;
     }
 };
+
+
+//设备强制解绑
+class LightUnBindForce : public BuildBinaryString{
+private:
+    string deviceSn;
+public:
+    explicit LightUnBindForce(string& sn) : deviceSn(sn){}
+
+    string getBinaryString() override{
+        string deviceAddress = SnAddressMap::getInstance()->deviceSn2Address(deviceSn);
+        if(deviceAddress.empty()){
+            return "";
+        }
+
+        //从设备列表删除该设备
+        bleConfig::getInstance()->deleteDeviceItem(deviceSn);
+        //从状态列表移除该设备
+        bleConfig::getInstance()->deleteStatusItem(deviceSn);
+        //从组列表中删除设备
+        GroupAddressMap::getInstance()->removeDeviceFromAnyGroup(deviceSn);
+        LOG_YELLOW << "<<===: unbind device<" << deviceSn <<  "> operation forced.....";
+
+        //通知设备管理站点进行设备列表更新
+        util::updateDeviceList();
+
+        //发布设备解绑消息
+        qlibc::QData content, publishData;
+        content.setString("device_id", deviceSn);
+        content.setString("sourceSite", util::getSourceSite());
+        publishData.setString("message_id", SingleDeviceUnbindSuccessMsg);
+        publishData.putData("content", content);
+        servicesite::ServiceSiteManager::getInstance()->publishMessage(SingleDeviceUnbindSuccessMsg, publishData.toJsonString());
+
+        string binaryString = "E8FF000000000203" + deviceAddress + "804901";
+        return binaryString;
+    }
+};
+
 
 //设备分组
 class LightAdd2Group : public BuildBinaryString{

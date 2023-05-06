@@ -52,6 +52,10 @@ string DownUtility::cmdData2BinaryCommandString(QData &cmdData) {
         string deviceSn = cmdData.getString("deviceSn");
         return LightUnBind(deviceSn).getBinaryString();
 
+    }else if(command == UNBINDFORCE){   //强制解绑
+        string deviceSn = cmdData.getString("deviceSn");
+        return LightUnBindForce(deviceSn).getBinaryString();
+
     }else if(command == AddDevice2Group){     //分组
         string deviceSn = cmdData.getString("deviceSn");
         string group_id = cmdData.getString("group_id");

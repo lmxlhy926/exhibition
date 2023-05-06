@@ -314,7 +314,7 @@ public:
         GroupAddressMap::getInstance()->removeDeviceFromAnyGroup(deviceSn);
         LOG_YELLOW << "<<===: unbind device<" << deviceSn <<  "> operation success.....";
 
-        //更新config白名单列表
+        //通知设备管理站点进行设备列表更新
         util::updateDeviceList();
 
         //发布设备解绑消息

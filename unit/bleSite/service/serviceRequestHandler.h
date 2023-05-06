@@ -25,6 +25,9 @@ int add_device_service_handler(const Request& request, Response& response, Logic
 //删除设备
 int del_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 
+//强制删除设备
+int del_device_force_service_handler(const Request& request, Response& response, LogicControl& lc);
+
 //控制设备
 int control_device_service_handler(const Request& request, Response& response, LogicControl& lc);
 

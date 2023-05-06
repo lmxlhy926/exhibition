@@ -5,3 +5,5 @@ target_link_libraries(downCmd PUBLIC qlibc)
 target_link_libraries(downCmd PUBLIC serial)
 target_link_libraries(downCmd PUBLIC log)
 target_link_libraries(downCmd PUBLIC sourceManage)
+target_link_libraries(downCmd PUBLIC siteService)
+

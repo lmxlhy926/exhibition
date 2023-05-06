@@ -111,6 +111,12 @@ int main(int argc, char* argv[]) {
         return del_device_service_handler(request, response, lc);
     });
 
+    //注册设备强制解绑回调
+    serviceSiteManager->registerServiceRequestHandler(Del_Device_Force_Service_ID,
+                                                      [&lc](const Request& request, Response& response) -> int{
+        return del_device_force_service_handler(request, response, lc);
+    });
+
     //注册设备控制回调
     serviceSiteManager->registerServiceRequestHandler(Control_Device_Service_ID,
                                                       [&lc](const Request& request, Response& response) -> int{
