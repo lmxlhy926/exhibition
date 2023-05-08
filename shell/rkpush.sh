@@ -37,6 +37,6 @@ fi
 
 echo "---------------------------------------------------------------------------------"
 /mnt/d/adb/adb.exe shell ls -lht /data/changhong/edge_midware/query_site /data/changhong/edge_midware/config_site /data/changhong/edge_midware/ble_site /data/changhong/edge_midware/synergy_site
-echo "---------------------------------------------------------------------------------"
-/mnt/d/adb/adb.exe shell ps -ef|grep site
-echo "---------------------------------------------------------------------------------"
+# echo "---------------------------------------------------------------------------------"
+# /mnt/d/adb/adb.exe shell ps -ef|grep site
+# echo "---------------------------------------------------------------------------------"
