@@ -91,10 +91,10 @@ void siteManager::updateSite(){
     }
     LOG_INFO << "********";
 
-    //订阅蓝牙站点的消息
+    
     for(auto& siteName : siteNames){
         smatch sm;
-        if(regex_match(siteName, sm, regex("(.*):ble_light"))){
+        if(regex_match(siteName, sm, regex("(.*):ble_light"))){     //订阅蓝牙站点的消息
             //获取ip，端口号
             string ip;
             int port;
@@ -106,6 +106,17 @@ void siteManager::updateSite(){
                 messageIdList.push_back(SingleDeviceUnbindSuccessMsg);
                 messageIdList.push_back(BindEndMsg);
                 messageIdList.push_back(Device_State_Changed);
+                ServiceSiteManager::subscribeMessage(ip, port, messageIdList);
+            }
+            
+        }else if(regex_match(siteName, sm, regex("(.*):zigbee_light"))){   //订阅zigbee站点消息
+            //获取ip，端口号
+            string ip;
+            int port;
+            if(SiteRecord::getInstance()->getSiteInfo(siteName, ip, port)){
+                //订阅蓝牙站点消息
+                std::vector<string> messageIdList;
+                messageIdList.push_back(DeviceOnOffLine);
                 ServiceSiteManager::subscribeMessage(ip, port, messageIdList);
             }
         }

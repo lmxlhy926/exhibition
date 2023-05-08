@@ -343,6 +343,13 @@ namespace synergy {
         return 0;
     }
 
+//添加zigbee设备
+    int addZigbee_device_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->addZigbee_device_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
 //删除设备
     int del_device_service_handler(const Request& request, Response& response){
         LOG_INFO << "synergy->del_device_service_handler: " << qlibc::QData(request.body).toJsonString();

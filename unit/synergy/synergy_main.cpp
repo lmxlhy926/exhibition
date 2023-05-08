@@ -108,6 +108,12 @@ int main(int argc, char* argv[]) {
         return synergy::add_device_service_handler(request, response);
     });
 
+    //添加zigbee设备
+    serviceSiteManager->registerServiceRequestHandler(AddZigbee_Device_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::addZigbee_device_service_handler(request, response);
+    });
+
     //注册设备解绑回调
     serviceSiteManager->registerServiceRequestHandler(Del_Device_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
@@ -183,6 +189,7 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageId(SingleDeviceUnbindSuccessMsg);   //单个设备解绑结果
     serviceSiteManager->registerMessageId(BindEndMsg);                     //绑定结束
     serviceSiteManager->registerMessageId(Device_State_Changed);           //设备状态改变
+    serviceSiteManager->registerMessageId(DeviceOnOffLine);                //设备上下线
 
     //注册消息处理函数
     servicesite::ServiceSiteManager::registerMessageHandler(ScanResultMsg,                 synergy::messagePublish);
@@ -190,6 +197,7 @@ int main(int argc, char* argv[]) {
     servicesite::ServiceSiteManager::registerMessageHandler(SingleDeviceUnbindSuccessMsg,  synergy::messagePublish);
     servicesite::ServiceSiteManager::registerMessageHandler(BindEndMsg,                    synergy::messagePublish);
     servicesite::ServiceSiteManager::registerMessageHandler(Device_State_Changed,          synergy::messagePublish);
+    servicesite::ServiceSiteManager::registerMessageHandler(DeviceOnOffLine,               synergy::messagePublish);
 
 
 #if 0
@@ -225,7 +233,7 @@ int main(int argc, char* argv[]) {
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-//            int code = serviceSiteManager->start();
+            // int code = serviceSiteManager->start();
             //注册启动方式
             int code = serviceSiteManager->startByRegister();
             if(code != 0){

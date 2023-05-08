@@ -49,6 +49,7 @@ static const string GetPanelList_Service_ID         = "get_panelList";          
 static const string Reset_Device_Service_ID               = "reset_device";                      //重置网关
 static const string Scan_Device_Service_ID                = "scan_device";                       //扫描设备结果
 static const string Add_Device_Service_ID                 = "add_device";                        //添加设备
+static const string AddZigbee_Device_Service_ID           = "allow_device_join";                 //添加zigbee设备
 static const string Del_Device_Service_ID                 = "del_device";                        //删除设备
 static const string ConfigProperty_Service_ID             = "config_name_location";              //修改设备属性信息
 static const string Control_Device_Service_ID             = "control_device";                    //控制设备
@@ -73,6 +74,7 @@ static const string SingleDeviceBindSuccessMsg      =   "singleDeviceBindSuccess
 static const string SingleDeviceUnbindSuccessMsg    =   "singleDeviceUnbindSuccessMsg";      //单个设备解绑成功
 static const string BindEndMsg                      =   "bindEndMsg";                        //绑定结束
 static const string Device_State_Changed            =   "device_state_changed";              //设备状态改变
+static const string DeviceOnOffLine                 =   "device_on_off_line";                //设备上下线
 
 
 //发布消息ID

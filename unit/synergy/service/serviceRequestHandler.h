@@ -47,6 +47,9 @@ namespace synergy{
 //添加设备
     int add_device_service_handler(const Request& request, Response& response);
 
+//添加zigbee设备
+    int addZigbee_device_service_handler(const Request& request, Response& response);
+
 //删除设备
     int del_device_service_handler(const Request& request, Response& response);
 
