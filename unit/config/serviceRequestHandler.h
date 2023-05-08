@@ -46,7 +46,6 @@ void fileSync(string site_id, string getServiceId, string saveServiceId, string 
 //获取白名单列表
 int whiteList_get_service_request_handler(const Request& request, Response& response);
 
-
 /*
     收到白名单后，和本地的进行比较。
         1. 如果本地没有白名单
@@ -62,7 +61,7 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
 int getSceneFile_service_request_handler(const Request& request, Response& response);
 
 //收到场景文件后，和本地的进行比较。如果收到的为最新的，则保存
-int saveSceneFile_sync_service_request_handler(const Request& request, Response& response);
+int saveSceneFile_sync_save_service_request_handler(const Request& request, Response& response);
 
 //保存场景配置文件
 int saveSceneFile_service_request_handler(const Request& request, Response& response);
