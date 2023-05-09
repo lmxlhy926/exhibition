@@ -200,35 +200,6 @@ int main(int argc, char* argv[]) {
     servicesite::ServiceSiteManager::registerMessageHandler(DeviceOnOffLine,               synergy::messagePublish);
 
 
-#if 0
-    serviceSiteManager->registerMessageHandler(Site_OnOffLine_MessageID, [](const Request& request){
-        //每次站点上线都会触发重新获取设备列表、组列表
-        qlibc::QData data(request.body);
-        string site_status = data.getData("content").getString("site_status");
-        if(site_status == "online"){    //站点上线时，重新获取列表
-            DeviceManager::getInstance()->listChanged();
-            GroupManager::getInstance()->listChanged();
-        }
-    });
-
-    threadPool_.enqueue([&](){
-        while(true){
-            int code;
-            std::vector<string> messageIdList;
-            messageIdList.push_back(Site_OnOffLine_MessageID);
-            code = serviceSiteManager->subscribeMessage(RequestIp, QuerySitePort, messageIdList);
-            if (code == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage Site_OnOffLine_MessageID ok....\n");
-                break;
-            }
-
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-            printf("subscribed Site_OnOffLine_MessageID failed....., start to subscribe in 3 seconds\n");
-        }
-    });
-#endif
-
-
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){

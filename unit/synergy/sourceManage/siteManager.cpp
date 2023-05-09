@@ -25,6 +25,15 @@ siteManager *siteManager::getInstance() {
     return Instance;
 }
 
+/*
+    1. 获取局域网内的所有站点
+    2. 收集其中的设备类站点，构成设备站点记录
+    3. SiteRecord中删除不存在的站点记录，加入新发现的站点记录
+    4. 打印SiteRecord中所有的设备类站点条目
+    5. 订阅ble-mesh站点蓝牙设备站点的消息
+    6. 更新设备列表
+    7. 更新组列表
+*/
 void siteManager::updateSite(){
     std::map<string, Json::Value> sitesMap;
     qlibc::QData request, response;
@@ -42,11 +51,12 @@ void siteManager::updateSite(){
                 qlibc::QData item = siteList.getArrayElement(i);
                 string site_id = item.getString("site_id");
                 if(site_id == BleSiteID || site_id == TvAdapterSiteID || site_id == ZigbeeSiteID || site_id == BtDeviceSiteID){    //只关心设备类站点
-                    //从相应的配置站点获取mac
+                    //获取设备类站点所在的面板的配置信息
                     string panelId{};
                     qlibc::QData panelConfigRequest, panelConfigResponse;
                     panelConfigRequest.setString("service_id", "get_self_info");
                     panelConfigRequest.putData("request", qlibc::QData());
+
                     for(int tryCount = 0; tryCount < 3; ++tryCount){
                         LOG_GREEN << "get_self_info request: " << panelConfigRequest.toJsonString();
                         if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
@@ -59,7 +69,8 @@ void siteManager::updateSite(){
                             LOG_RED << "get_self_info response: " << "failed......";
                         }
                     }
-                    if(!panelId.empty()){   //构造站点信息
+
+                    if(!panelId.empty()){   //构造设备类站点条目
                         string siteName;
                         siteName.append(panelId).append(":").append(site_id);
                         Json::Value siteItem;
@@ -71,6 +82,9 @@ void siteManager::updateSite(){
                 }
             }
         }
+    }else{
+        LOG_RED << "site_localAreaNetworkSite request send failed, finish update this time.....";
+        return;
     }
 
     //删除已经不存在的站点记录
@@ -135,6 +149,7 @@ qlibc::QData siteManager::getPanelList(){
     request.setString("service_id", "site_localAreaNetworkSite");
     request.putData("request", qlibc::QData().setString("site_id", ""));
     LOG_GREEN << "site_localAreaNetworkSite request: " << request.toJsonString();
+
     if(httpUtil::sitePostRequest("127.0.0.1", 9000, request, response)){    //获取局域网内所有发现的站点
         LOG_BLUE << "site_localAreaNetworkSite response: " << response.toJsonString();
         qlibc::QData resBody = response.getData("response");
@@ -145,11 +160,12 @@ qlibc::QData siteManager::getPanelList(){
             for(Json::ArrayIndex i = 0; i < size; ++i){
                 qlibc::QData item = siteList.getArrayElement(i);
                 string site_id = item.getString("site_id");
-                if(site_id == BleSiteID || site_id == ZigbeeSiteID){
-                    //获取面板的配置信息
+                if(site_id == BleSiteID || site_id == ZigbeeSiteID){    //一个面板有且仅有一个ble-mesh站点或者zigbee站点
+                    //获取站点对应的面板的配置信息
                     qlibc::QData panelConfigRequest, panelConfigResponse;
                     panelConfigRequest.setString("service_id", "get_self_info");
                     panelConfigRequest.putData("request", qlibc::QData());
+
                     for(int tryCount = 0; tryCount < 3; ++tryCount){
                         LOG_GREEN << "getPanelInfoRequest: " << panelConfigRequest.toJsonString();
                         if(httpUtil::sitePostRequest(ip, 9006, panelConfigRequest, panelConfigResponse)){
@@ -168,6 +184,7 @@ qlibc::QData siteManager::getPanelList(){
             }
         }
     }
+
     return panelArray;
 }
 

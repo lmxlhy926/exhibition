@@ -15,6 +15,7 @@ class DeviceManager {
 private:
     std::atomic<bool> changed{true};
     qlibc::QData deviceList_;
+    std::map<string, qlibc::QData> siteDeviceListMap;   //按站点保存的设备列表
     std::recursive_mutex Mutex;
     DeviceManager(){}
     static DeviceManager* instance;
@@ -40,6 +41,9 @@ private:
 
     //站点拼接
     void mergeList(qlibc::QData& list, qlibc::QData& totalList);
+
+    //更新设备map
+    void updateSiteDeviceListMap(string siteName, qlibc::QData deviceListData);
 };
 
 

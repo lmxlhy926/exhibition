@@ -12,6 +12,8 @@ using namespace std;
 class siteManager {
 private:
     static siteManager* Instance;
+
+    //自动更新信息
     siteManager(){
         updateSite();
         new thread([]{
@@ -23,11 +25,10 @@ private:
     }
 public:
     static siteManager* getInstance();
+
     /*
-     *  1. 获取所有站点列表，从中得到蓝牙、zigbee所在面板的IP
-     *  2. 获得ip后，访问相应面板的配置站点，从中获取面板信息
-     *  3. 删除不存在的站点
-     *  4. 存储新的站点
+        1. 更新siteRecord
+        2. 更新设备列表，跟新组列表
      */
     static void updateSite();
 

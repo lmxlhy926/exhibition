@@ -70,6 +70,7 @@ qlibc::QData GroupManager::restoreGrp(qlibc::QData& item, string& inSourceSite){
     return item;
 }
 
+//获取到站点的组列表则使用最新的，没有获取到则使用上一次的组列表直到站点下线
 void GroupManager::updateGroupList(){
     LOG_YELLOW << "START TO updateGroupList.....";
     qlibc::QData totalList;
@@ -85,13 +86,19 @@ void GroupManager::updateGroupList(){
                 groupRequest.setValue("request", Json::nullValue);
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), groupRequest, groupRes);     //获取组列表
                 if(groupRes.getInt("code") != 0){
-                    LOG_PURPLE << "===>cant get groupList, dont sync....";
-                    return;
+                    LOG_RED << "===>cant get groupList from <" << sm.str(0) << ">.........";
+                    std::lock_guard<mutex> lg(Mutex);
+                    auto pos = siteGroupListMap.find(sm.str(0));
+                    if(pos != siteGroupListMap.end()){
+                        qlibc::QData list = pos->second;
+                        mergeList(list, totalList);
+                    }
+                }else{
+                    LOG_YELLOW << sm.str(0) << ": groupListSize: " << groupRes.getData("response").getData("group_list").size();
+                    updateSiteGroupListMap(sm.str(0), groupRes.getData("response").getData("group_list"));
+                    qlibc::QData list = addGrpSourceTag(groupRes.getData("response").getData("group_list"), sm.str(0));    //给组条目添加标签
+                    mergeList(list, totalList);
                 }
-                LOG_YELLOW << sm.str(0) << ": groupListSize: " << groupRes.getData("response").getData("group_list").size();
-                qlibc::QData list = addGrpSourceTag(groupRes.getData("response").getData("group_list"),
-                                                 string().append(uid).append(":").append(siteID));    //给组条目添加标签
-                mergeList(list, totalList);
             }
         }
     }
@@ -120,5 +127,15 @@ void GroupManager::mergeList(qlibc::QData &list, qlibc::QData &totalList) {
     for(Json::ArrayIndex i = 0; i < list.size(); ++i){
         qlibc::QData item = list.getArrayElement(i);
         totalList.append(item);
+    }
+}
+
+void GroupManager::updateSiteGroupListMap(string siteName, qlibc::QData groupListData){
+    std::lock_guard<mutex> lg(Mutex);
+    auto pos = siteGroupListMap.find(siteName);
+    if(pos != siteGroupListMap.end()){
+        pos->second = groupListData;
+    }else{
+        siteGroupListMap.insert(std::make_pair(siteName, groupListData));
     }
 }

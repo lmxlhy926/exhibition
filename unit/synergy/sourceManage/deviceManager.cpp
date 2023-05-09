@@ -56,6 +56,8 @@ qlibc::QData DeviceManager::restoreMac(qlibc::QData& item, string& inSourceSite)
     return item;
 }
 
+
+//获取到设备列表则用最新的列表，获取不到设备列表则暂时使用上一次的列表直到该设备站点下线
 void DeviceManager::updateDeviceList(){
     LOG_HLIGHT << "START TO updateDeviceList.....";
     qlibc::QData totalList;     //存储总列表
@@ -71,16 +73,24 @@ void DeviceManager::updateDeviceList(){
                 deviceRequest.setValue("request", Json::nullValue);
                 SiteRecord::getInstance()->sendRequest2Site(sm.str(0), deviceRequest, deviceRes);       //获取设备列表
                 if(deviceRes.getInt("code") != 0){
-                    LOG_PURPLE << "===>cant get deviceList, dont sync....";
-                    return;
+                    LOG_RED << "===>filed to get deviceList from <" << sm.str(0) << ">.......";
+                    std::lock_guard<std::recursive_mutex> lg(Mutex);
+                    auto pos = siteDeviceListMap.find(sm.str(0));
+                    if(pos != siteDeviceListMap.end()){
+                        qlibc::QData list = pos->second;
+                        mergeList(list, totalList);
+                    }
+                }else{
+                    LOG_HLIGHT << sm.str(0) << ": deviceListSize: " << deviceRes.getData("response").getData("device_list").size();
+                    updateSiteDeviceListMap(sm.str(0), deviceRes.getData("response").getData("device_list"));
+                    qlibc::QData list = addMacSource(deviceRes.getData("response").getData("device_list"), sm.str(0));  //给列表条目加入来源标签
+                    mergeList(list, totalList);
                 }
-                LOG_HLIGHT << sm.str(0) << ": deviceListSize: " << deviceRes.getData("response").getData("device_list").size();
-                qlibc::QData list = addMacSource(deviceRes.getData("response").getData("device_list"),
-                                                 string().append(uuid).append(":").append(siteID));     //给列表条目加入来源标签
-                mergeList(list, totalList);
             }
         }
     }
+
+    //存储新获取到的设备列表
     std::lock_guard<std::recursive_mutex> lg(Mutex);
     deviceList_ = totalList;
     LOG_HLIGHT << "updateDeviceList END.....";
@@ -109,7 +119,12 @@ void DeviceManager::mergeList(qlibc::QData &list, qlibc::QData &totalList) {
     }
 }
 
-
-
-
-
+void DeviceManager::updateSiteDeviceListMap(string siteName, qlibc::QData deviceListData){
+    std::lock_guard<recursive_mutex> lg(Mutex);
+    auto pos = siteDeviceListMap.find(siteName);
+    if(pos != siteDeviceListMap.end()){
+        pos->second = deviceListData;
+    }else{
+        siteDeviceListMap.insert(std::make_pair(siteName, deviceListData));
+    }
+}

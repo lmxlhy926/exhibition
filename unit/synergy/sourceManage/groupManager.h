@@ -15,6 +15,7 @@ class GroupManager {
 private:
     std::atomic<bool> init{false};
     qlibc::QData groupList;
+    std::map<string, qlibc::QData> siteGroupListMap;   //按站点保存的组列表
     std::mutex Mutex;
     GroupManager(){}
     static GroupManager* instance;
@@ -43,6 +44,9 @@ public:
 
     //站点拼接
     void mergeList(qlibc::QData& list, qlibc::QData& totalList);
+
+    //更新组列表map
+    void updateSiteGroupListMap(string siteName, qlibc::QData groupListData);
 };
 
 #endif //EXHIBITION_GROUPMANAGER_H
