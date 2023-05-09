@@ -333,6 +333,24 @@ int whiteList_get_service_request_handler(const Request& request, Response& resp
     return 0;
 }
 
+//找到本面板对应的账号手机号
+void addPhone2PanelConfig(qlibc::QData& devices){
+    Json::ArrayIndex deviceListSize = devices.size();
+    string panelSn = configParamUtil::getInstance()->getPanelInfo().getString("device_mac");
+    for(int i = 0; i < deviceListSize; ++i){
+        qlibc::QData item = devices.getArrayElement(i);
+        if(item.getString("device_sn") == panelSn){
+            string phone = item.getString("phone");
+            if(!phone.empty()){
+                qlibc::QData panelConfig = configParamUtil::getInstance()->getPanelInfo();
+                panelConfig.setString("phone", phone);
+                configParamUtil::getInstance()->setPanelInfo(panelConfig);
+                break;
+            }
+        }
+    }
+}
+
 int whiteList_sync_save_service_request_handler(const Request& request, Response& response){
     LOG_INFO << "===>recevied sync whiteList, start to compare...";
     qlibc::QData localWhiteList = configParamUtil::getInstance()->getWhiteList();
@@ -360,8 +378,15 @@ int whiteList_sync_save_service_request_handler(const Request& request, Response
     bool syncBoolContition2 = localWhiteListTimeParsed && receivedWhiteListTimeParsed && (localTime < otherTime);
     if(syncBoolCondition1 || syncBoolContition2){
         LOG_INFO << "==>whiteListlocalTime:" << localTime << ", whiteListotherTime: " << otherTime;
+
+        //保存手机号到panelConfig文件中
+        qlibc::QData devices = receivedWhiteListData.getData("info").getData("devices");
+        addPhone2PanelConfig(devices);
+
+        //保存白名单到本地
         configParamUtil::getInstance()->saveWhiteListData(receivedWhiteListData);
         LOG_PURPLE << "===>whiteList_sync_save: change whiteList to the newest version....";
+
         //发布白名单修改信息
         qlibc::QData publishData;
         publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
@@ -390,8 +415,13 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
         return 0;
     }
 
+    //保存手机号到panelConfig文件中
+    qlibc::QData devices = whiteListData.getData("info").getData("devices");
+    addPhone2PanelConfig(devices);
+
     //将白名单存储到本机
     configParamUtil::getInstance()->saveWhiteListData(whiteListData);
+
     //同步其它站点的白名单
     fileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID,
              "whiteListSaveHandler invoke");  
@@ -655,6 +685,17 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
     LOG_INFO << "saveAudioPanelList_service_request_handler: " << requestData.toJsonString();
     qlibc::QData devices = requestData.getData("request").getData("devices");
     qlibc::QData rooms = requestData.getData("request").getData("rooms");
+    
+    string timeStamp = requestData.getData("request").getString("timeStamp");
+    if(timeStamp.empty()){
+        LOG_RED << "timeStamp is empty, failed to saveAudioPanelList....";
+        qlibc::QData data;
+        data.setInt("code", -1);
+        data.setString("error", "ok");
+        data.putData("response", qlibc::QData());
+        response.set_content(data.toJsonString(), "text/json");
+        return 0;
+    }
 
     //从白名单中删除不存在的设备
     removePanelList(devices);
@@ -716,7 +757,7 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
         }
     }
 
-    payload.setString("timeStamp", requestData.getData("request").getString("timeStamp"));
+    payload.setString("timeStamp", timeStamp);
 
     //保存白名单
     qlibc::QData contentSaveRequest, contentSaveResponse;
@@ -809,6 +850,17 @@ int setRadarDevice_service_request_handler(const Request& request, Response& res
     qlibc::QData doors = requestData.getData("request").getData("doors");
     qlibc::QData rooms = requestData.getData("request").getData("rooms");
     qlibc::QData area_app = requestData.getData("request").getData("area_app");
+
+    string timeStamp = requestData.getData("request").getString("timeStamp");
+    if(timeStamp.empty()){
+        LOG_RED << "timeStamp is empty, failed to setRadarDevice....";
+        qlibc::QData data;
+        data.setInt("code", -1);
+        data.setString("error", "ok");
+        data.putData("response", qlibc::QData());
+        response.set_content(data.toJsonString(), "text/json");
+        return 0;
+    }
 
     //从白名单中删除不存在的雷达设备、门、区域
     removeNonExist(devices, doors, rooms, area_app);
@@ -903,7 +955,7 @@ int setRadarDevice_service_request_handler(const Request& request, Response& res
         }
     }
 
-    payload.setString("timeStamp", requestData.getData("request").getString("timeStamp"));
+    payload.setString("timeStamp", timeStamp);
 
     //保存设备列表
     qlibc::QData contentSaveRequest, contentSaveResponse;
