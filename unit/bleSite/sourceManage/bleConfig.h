@@ -43,6 +43,9 @@ public:
     //获取mac-address信息
     QData getSnAddrData();
 
+    //清除sn_address对应表
+    void clearSnAddressData();
+
     //存储mac-address信息
     void saveSnAddrData(qlibc::QData& data);
 
@@ -61,6 +64,9 @@ public:
     //从设备列表中删除解绑的设备
     void deleteDeviceItem(string& deviceID);
 
+    //清除设备列表
+    void clearDeviceList();
+
     //存储设备列表
     void saveDeviceListData(qlibc::QData& data);
 
@@ -76,11 +82,17 @@ public:
     //收到设备状态上报后，更新设备状态列表
     void updateStatusListData(qlibc::QData& data);
 
+    //清除状态列表
+    void clearStatusList();
+
     //存储设备状态列表
     void saveStatusListData(qlibc::QData& data);
 
     //获取组地址列表
     QData getGroupListData();
+
+    //清除组地址列表
+    void clearGroupList();
 
     //保存组地址列表
     void saveGroupListData(qlibc::QData& data);

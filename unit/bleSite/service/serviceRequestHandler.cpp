@@ -192,10 +192,18 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
 
 int reset_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     LOG_INFO << "reset_device_service_handler: " << qlibc::QData(request.body).toJsonString();
+    //向网关发送重置指令
     string command = "E9FF02";
     string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
     TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
     telinkDonglePtr->write2Seria(command);
+
+    //清楚网关的设备数据
+    bleConfig::getInstance()->clearSnAddressData();
+    bleConfig::getInstance()->clearDeviceList();
+    bleConfig::getInstance()->clearGroupList();
+    bleConfig::getInstance()->clearStatusList();
+    
     response.set_content(okResponse.dump(), "text/json");
     return 0;
 }

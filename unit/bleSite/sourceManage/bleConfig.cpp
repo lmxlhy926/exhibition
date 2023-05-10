@@ -44,6 +44,13 @@ QData bleConfig::getSnAddrData() {
     return snAddressData;
 }
 
+void bleConfig::clearSnAddressData(){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData emptyData;
+    snAddressData.setInitData(emptyData);
+    snAddressData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/snAddress.json"), true);
+}
+
 void bleConfig::saveSnAddrData(qlibc::QData& data) {
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     snAddressData.setInitData(data);
@@ -155,6 +162,12 @@ void bleConfig::deleteDeviceItem(string& deviceID){
     saveDeviceListData(saveData);
 }
 
+void bleConfig::clearDeviceList(){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData emptyData;
+    deviceListData.setInitData(emptyData);
+    deviceListData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/deviceList.json"), true);
+}
 
 void bleConfig::saveDeviceListData(qlibc::QData& data){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
@@ -239,6 +252,12 @@ void bleConfig::updateStatusListData(qlibc::QData& data){
     saveStatusListData(saveData);
 }
 
+void bleConfig::clearStatusList(){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData emptyData;
+    statusListData.setInitData(emptyData);
+    statusListData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/statusList.json"), true);
+}
 
 void bleConfig::saveStatusListData(qlibc::QData& data){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
@@ -254,6 +273,12 @@ QData bleConfig::getGroupListData(){
     return groupAddressData;
 }
 
+ void bleConfig::clearGroupList(){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData emptyData;
+    groupAddressData.setInitData(emptyData);
+    groupAddressData.saveToFile(FileUtils::contactFileName(dataDirPath, "data/groupAddress.json"), true);
+ }
 
 void bleConfig::saveGroupListData(qlibc::QData& data){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
