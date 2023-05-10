@@ -1012,44 +1012,64 @@ qlibc::QData phoneDeviceMap2DeviceData(PhoneDeviceMapType& phoneDeviceMap){
     return deviceListData;
 }
 
+//清除特定类型的设备
+void clearDevicesWithSpecificType(std::map<string, Json::Value>& devicesMap, string deviceType){
+    for(auto position = devicesMap.begin(); position != devicesMap.end();){
+            if(position->second["category_code"] == deviceType){
+                position = devicesMap.erase(position);
+            }else{
+                ++position;
+            }
+        }
+}
+
+//清除相等的元素
+void clearElementInReference(std::map<string, Json::Value>& referenceMap, std::map<string, Json::Value>& actualMap){
+    for(auto pos = referenceMap.begin(); pos != referenceMap.end(); ++pos){
+        if(actualMap.find(pos->first) != actualMap.end()){
+            actualMap.erase(pos->first);
+        }
+    }
+}
+
+//复制设备到指定的设备map中
+void copyDeviceElem(std::map<string, Json::Value>& source, std::map<string, Json::Value>& desination){
+    for(auto pos = source.begin(); pos != source.end(); ++pos){
+        desination.insert(*pos);
+    }
+}
+
+
 //获取经过处理的设备map
-PhoneDeviceMapType getHandledDeviceMap(PhoneDeviceMapType& phoneDevicesMap, PhoneDeviceMapType& phoneLocalDevicesMap){
-    //先清除
+PhoneDeviceMapType getHandledDeviceMap(PhoneDeviceMapType& phoneDevicesMap, PhoneDeviceMapType& phoneLocalDevicesMap, string deviceType){
     for(auto phonePos = phoneDevicesMap.begin(); phonePos != phoneDevicesMap.end(); ++phonePos){
         string phone = phonePos->first;
         std::map<string, Json::Value>& devicesMap = phonePos->second;
-        for(auto phoneLocalPos = phoneLocalDevicesMap.begin(); phoneLocalPos != phoneLocalDevicesMap.end(); ++phoneLocalPos){
-            if(phoneLocalPos->first != phone){
-                std::map<string, Json::Value>& localDevicesMap = phoneLocalPos->second;
-                for(auto devicePos = devicesMap.begin(); devicePos != devicesMap.end(); ++devicePos){
-                    string deviceSn = devicePos->first;
-                    if(localDevicesMap.find(deviceSn) != localDevicesMap.end()){
-                        localDevicesMap.erase(deviceSn);
-                    }
-                }
+        
+        auto phoneLocalPos = phoneLocalDevicesMap.find(phone);
+        if(phoneLocalPos != phoneLocalDevicesMap.end()){
+            clearDevicesWithSpecificType(phoneLocalPos->second, deviceType);
+            copyDeviceElem(devicesMap, phoneLocalPos->second);
+        }else{
+            phoneLocalDevicesMap.insert(std::make_pair(phone, devicesMap));
+        }
+        
+        //删除相同的元素
+        for(auto position = phoneLocalDevicesMap.begin(); position != phoneLocalDevicesMap.end(); ++position){
+            if(position->first != phone){
+                clearElementInReference(devicesMap, position->second);
             }
         }
     }
-
-    //再替换
-    for(auto phonePos = phoneDevicesMap.begin(); phonePos != phoneDevicesMap.end(); ++phonePos){
-        for(auto phoneLocalPos = phoneLocalDevicesMap.begin(); phoneLocalPos != phoneLocalDevicesMap.end(); ++phoneLocalPos){
-            if(phoneLocalPos->first == phonePos->first){
-                phoneLocalPos->second = phonePos->second;
-                break;
-            }
-        }
-    }
-
     return phoneLocalDevicesMap;
 }
 
 
 //获取处理后的设备数据列表
-qlibc::QData getHandledDeviceData(qlibc::QData& devices, qlibc::QData& localDevices){
+qlibc::QData getHandledDeviceData(qlibc::QData& devices, qlibc::QData& localDevices, string deviceType){
     PhoneDeviceMapType phoneDevicesMap = deviceData2PhoneDeviceMap(devices);
     PhoneDeviceMapType phoneLocalDevicesMap = deviceData2PhoneDeviceMap(localDevices);
-    PhoneDeviceMapType handledDeviceMap = getHandledDeviceMap(phoneDevicesMap, phoneLocalDevicesMap);
+    PhoneDeviceMapType handledDeviceMap = getHandledDeviceMap(phoneDevicesMap, phoneLocalDevicesMap, deviceType);
     return phoneDeviceMap2DeviceData(handledDeviceMap);
 }
 
@@ -1124,7 +1144,7 @@ int saveAudioPanelList_service_request_handler_bak(const Request& request, Respo
     qlibc::QData localDevices = payload.getData("info").getData("devices");
     qlibc::QData localRooms = payload.getData("info").getData("rooms");
 
-    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices).asValue();
+    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices, "audiopanel").asValue();
     payload.asValue()["info"]["rooms"] = getSubstitudeRoomsData(rooms, localRooms).asValue();
     payload.setString("timeStamp", timeStamp);
 
@@ -1166,7 +1186,7 @@ int setRadarDevice_service_request_handler_bak(const Request& request, Response&
     qlibc::QData localDevices = payload.getData("info").getData("devices");
     qlibc::QData localRooms = payload.getData("info").getData("rooms");
 
-    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices).asValue();
+    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices, "radar").asValue();
     payload.asValue()["info"]["rooms"] = getSubstitudeRoomsData(rooms, localRooms).asValue();
     payload.asValue()["info"]["doors"] = doors.asValue();
     payload.asValue()["info"]["area_app"] = area_app.asValue();

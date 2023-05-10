@@ -163,13 +163,13 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(GETPANELINFO_REQUEST_SERVICE_ID, getPanelInfo_service_request_handler);
 
     //保存语音面板设备
-    serviceSiteManager->registerServiceRequestHandler(SETAUDIOPANELLIST_REQUEST_SERVICE_ID, saveAudioPanelList_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(SETAUDIOPANELLIST_REQUEST_SERVICE_ID, saveAudioPanelList_service_request_handler_bak);
 
     //获取语音面板设备
     serviceSiteManager->registerServiceRequestHandler(GETAUDIOPANELLIST_REQUEST_SERVICE_ID, getAudioPanelList_service_request_handler);
 
     //设置雷达信息
-    serviceSiteManager->registerServiceRequestHandler(SETRADARLIST_REQUEST_SERVICE_ID, setRadarDevice_service_request_handler);
+    serviceSiteManager->registerServiceRequestHandler(SETRADARLIST_REQUEST_SERVICE_ID, setRadarDevice_service_request_handler_bak);
 
 
 
@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
     threadPool_.enqueue([&](){
         while(true){
             //自启动方式
-//            int code = serviceSiteManager->start();
+        //    int code = serviceSiteManager->start();
             //注册启动方式
             int code = serviceSiteManager->startByRegister();
             if(code != 0){
@@ -210,25 +210,6 @@ int main(int argc, char* argv[]) {
             std::this_thread::sleep_for(std::chrono::seconds(60));
         }
     });
-
-
-#if 0
-    //订阅新增雷达设备
-    threadPool_.enqueue([&](){
-        while(true){
-            int code;
-            std::vector<string> messageIdList;
-            messageIdList.push_back(RADARDEVICE_RECEIVED_MESSAGE_ID);
-            code = serviceSiteManager->subscribeMessage("127.0.0.1", 9010, messageIdList);
-            if (code == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage RADARDEVICE_RECEIVED_MESSAGE_ID ok.\n");
-                break;
-            }
-            std::this_thread::sleep_for(std::chrono::seconds(10));
-            LOG_RED << "subscribed RADARDEVICE_RECEIVED_MESSAGE_ID failed....., start to subscribe in 10 seconds";
-        }
-    });
-#endif
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(60 *10));
