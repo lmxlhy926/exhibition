@@ -140,6 +140,7 @@ qlibc::QData configParamUtil::changePanelProperty(const qlibc::QData& data){
     }
     if(deviceMac == data.getString("device_sn")){
         panelInfoData.setString("device_name", data.getString("device_name"));
+        panelInfoData.setString("phone", data.getString("phone"));
         panelInfoData.asValue()["location"]["room_name"] = data.getString("room_name");
         panelInfoData.asValue()["location"]["room_no"] = data.getString("room_no");
         panelInfoData.saveToFile("/data/changhong/edge_midware/panelConfig.txt", true);
