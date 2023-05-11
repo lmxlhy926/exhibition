@@ -129,16 +129,16 @@ void configParamUtil::setPanelInfo(qlibc::QData& data){
 
 qlibc::QData configParamUtil::changePanelProperty(const qlibc::QData& data){
     std::lock_guard<std::recursive_mutex> lg(mutex_);
-    string deviceMac;
-    string device_mac = panelInfoData.getString("device_mac");
-    //去除冒号
-    regex sep("[:]+");
-    sregex_token_iterator end;
-    sregex_token_iterator p(device_mac.cbegin(), device_mac.cend(), sep, {-1});
-    for(; p != end; p++){
-        deviceMac += p->str();
-    }
-    if(deviceMac == data.getString("device_sn")){
+    // string deviceMac;
+    // string device_mac = panelInfoData.getString("device_mac");
+    // regex sep("[:]+");
+    // sregex_token_iterator end;
+    // sregex_token_iterator p(device_mac.cbegin(), device_mac.cend(), sep, {-1});
+    // for(; p != end; p++){
+    //     deviceMac += p->str();
+    // }
+
+    if(panelInfoData.getString("device_mac") == data.getString("device_sn")){
         panelInfoData.setString("device_name", data.getString("device_name"));
         panelInfoData.setString("phone", data.getString("phone"));
         panelInfoData.asValue()["location"]["room_name"] = data.getString("room_name");

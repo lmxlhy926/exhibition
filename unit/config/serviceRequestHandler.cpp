@@ -642,338 +642,6 @@ int getAudioPanelList_service_request_handler(const Request& request, Response& 
     return 0;
 }
 
-//数组转换为map
-std::map<string, Json::Value> array2Map(qlibc::QData& array, string key){
-    std::map<string, Json::Value> map;
-    Json::ArrayIndex arrySize = array.size();
-    for(Json::ArrayIndex i = 0; i < arrySize; ++i){
-        qlibc::QData item = array.getArrayElement(i);
-        map.insert(std::make_pair(item.getString(key), item.asValue()));
-    }
-    return map;
-}
-
-//删除白名单中不存在的语音面板列表
-void removePanelList(qlibc::QData& setDevices){
-    std::map<string, Json::Value> setDevicesMap = array2Map(setDevices, "device_sn");
-    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
-    qlibc::QData originDevices  = payload.getData("info").getData("devices");
-    std::map<string, Json::Value> originDevicesMap = array2Map(originDevices, "device_sn");
-
-    //语音面板设备处理
-    for(auto pos = originDevicesMap.begin(); pos != originDevicesMap.end();){
-        if(pos->second["category_code"] == "audiopanel"){
-            if(setDevicesMap.find(pos->first) == setDevicesMap.end()){
-                pos = originDevicesMap.erase(pos);
-            }else{
-                ++pos;
-            }
-        }else{
-            ++pos;
-        }
-    }
-
-    //构造白名单
-    Json::Value newDevices;
-    for(auto& elem : originDevicesMap){
-        newDevices.append(elem.second);
-    }
-    payload.asValue()["info"]["devices"] = newDevices;
-    configParamUtil::getInstance()->saveWhiteListData(payload);
-}
-
-
-int saveAudioPanelList_service_request_handler(const Request& request, Response& response){
-    qlibc::QData requestData(request.body);
-    LOG_INFO << "saveAudioPanelList_service_request_handler: " << requestData.toJsonString();
-    qlibc::QData devices = requestData.getData("request").getData("devices");
-    qlibc::QData rooms = requestData.getData("request").getData("rooms");
-    
-    string timeStamp = requestData.getData("request").getString("timeStamp");
-    if(timeStamp.empty()){
-        LOG_RED << "timeStamp is empty, failed to saveAudioPanelList....";
-        qlibc::QData data;
-        data.setInt("code", -1);
-        data.setString("error", "ok");
-        data.putData("response", qlibc::QData());
-        response.set_content(data.toJsonString(), "text/json");
-        return 0;
-    }
-
-    //从白名单中删除不存在的设备
-    removePanelList(devices);
-
-    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
-    for(Json::ArrayIndex i = 0; i < devices.size(); ++i){
-        qlibc::QData item = devices.getArrayElement(i);
-        bool hasItem{false};
-        unsigned int deleteIndex = 0;
-
-        qlibc::QData whiteListDevices(payload.getData("info").getData("devices"));
-        for(Json::ArrayIndex j = 0; j < whiteListDevices.size(); ++j){
-            qlibc::QData localItem = whiteListDevices.getArrayElement(j);
-            if(item.getString("device_sn") == localItem.getString("device_sn")){
-                hasItem = true;
-                deleteIndex = j;
-                break;
-            }
-        }
-
-        if(!hasItem){
-            payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
-        }else{
-            Json::Value removeValue;
-            payload.asValue()["info"]["devices"].removeIndex(deleteIndex, &removeValue);
-            payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
-        }
-
-        qlibc::QData panelConfigData = configParamUtil::getInstance()->changePanelProperty(devices.getArrayElement(i));
-        if(!panelConfigData.empty()){
-            qlibc::QData publishData;
-            publishData.setString("message_id", PANELINFO_MODIFIED_MESSAGE_ID);
-            publishData.putData("content", panelConfigData);
-            ServiceSiteManager::getInstance()->publishMessage(PANELINFO_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-            LOG_INFO << "publish: " << publishData.toJsonString();
-        }
-    }
-
-    for(Json::ArrayIndex i = 0; i < rooms.size(); ++i){
-        qlibc::QData item = rooms.getArrayElement(i);
-        bool hasItem{false};
-        unsigned int deleteIndex{0};
-
-        qlibc::QData whiteListRooms(payload.getData("info").getData("rooms"));
-        for(Json::ArrayIndex j = 0; j < whiteListRooms.size(); ++j){
-            qlibc::QData localItem = whiteListRooms.getArrayElement(j);
-            if(item.getString("roomNo") == localItem.getString("roomNo")){
-                hasItem = true;
-                deleteIndex = j;
-                break;
-            }
-        }
-        if(!hasItem){
-            payload.asValue()["info"]["rooms"].append(rooms.getArrayElement(i).asValue());
-        }else{
-            Json::Value removeValue;
-            payload.asValue()["info"]["rooms"].removeIndex(deleteIndex, &removeValue);
-            payload.asValue()["info"]["rooms"].append(rooms.getArrayElement(i).asValue());
-        }
-    }
-
-    payload.setString("timeStamp", timeStamp);
-
-    //保存白名单
-    qlibc::QData contentSaveRequest, contentSaveResponse;
-    contentSaveRequest.setString("service_id", WHITELIST_SAVE_REQUEST_SERVICE_ID);
-    contentSaveRequest.putData("request", payload);
-    httpUtil::sitePostRequest("127.0.0.1", 9006, contentSaveRequest, contentSaveResponse);
-
-    qlibc::QData data;
-    data.setInt("code", 0);
-    data.setString("error", "ok");
-    data.putData("response", qlibc::QData());
-    response.set_content(data.toJsonString(), "text/json");
-    return 0;
-}
-
-
-//删除原有白名单中不存在的属性信息
-void removeNonExist(qlibc::QData& setDevices, qlibc::QData& setDoors, qlibc::QData& setRooms, qlibc::QData& set_area_app){
-    std::map<string, Json::Value> setDevicesMap = array2Map(setDevices, "device_sn");
-    std::map<string, Json::Value> setDoorsMap   = array2Map(setDoors, "id");
-    std::map<string, Json::Value> setAreaAppMap = array2Map(set_area_app, "area_id");
-
-    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
-    qlibc::QData originDevices  = payload.getData("info").getData("devices");
-    qlibc::QData originDoors    = payload.getData("info").getData("doors");
-    qlibc::QData originAreaApp  = payload.getData("info").getData("area_app");
-
-    std::map<string, Json::Value> originDevicesMap = array2Map(originDevices, "device_sn");
-    std::map<string, Json::Value> originDoorsMap   = array2Map(originDoors, "id");
-    std::map<string, Json::Value> originAreaAppMap = array2Map(originAreaApp, "area_id");
-
-    //雷达设备处理
-    for(auto pos = originDevicesMap.begin(); pos != originDevicesMap.end();){
-        if(pos->second["category_code"] == "radar"){
-            if(setDevicesMap.find(pos->first) == setDevicesMap.end()){
-               pos = originDevicesMap.erase(pos);
-            }else{
-                ++pos;
-            }
-        }else{
-            ++pos;
-        }
-    }
-
-    //门处理
-    for(auto pos = originDoorsMap.begin(); pos != originDoorsMap.end();){
-        if(setDoorsMap.find(pos->first) == setDoorsMap.end()){
-            pos = originDoorsMap.erase(pos);
-        }else{
-            ++pos;
-        }
-    }
-
-    //区域处理
-    for(auto pos = originAreaAppMap.begin(); pos != originAreaAppMap.end();){
-        if(setAreaAppMap.find(pos->first) == setAreaAppMap.end()){
-            pos = originAreaAppMap.erase(pos);
-        }else{
-            ++pos;
-        }
-    }
-
-    //构造白名单
-    Json::Value newDevices, newDoors, newRooms, newAreaApps;
-    for(auto& elem : originDevicesMap){
-        newDevices.append(elem.second);
-    }
-    for(auto& elem : originDoorsMap){
-        newDoors.append(elem.second);
-    }
-    for(auto& elem : originAreaAppMap){
-        newAreaApps.append(elem.second);
-    }
-    payload.asValue()["info"]["devices"] = newDevices;
-    payload.asValue()["info"]["doors"] = newDoors;
-    payload.asValue()["info"]["area_app"] = newAreaApps;
-    configParamUtil::getInstance()->saveWhiteListData(payload);
-}
-
-
-/*
- * 无则增加
- * 有则修改
- * 不存在则删除
- */
-int setRadarDevice_service_request_handler(const Request& request, Response& response){
-    qlibc::QData requestData(request.body);
-    LOG_INFO << "setRadarDevice_service_request_handler: " << requestData.toJsonString();
-    qlibc::QData devices = requestData.getData("request").getData("devices");
-    qlibc::QData doors = requestData.getData("request").getData("doors");
-    qlibc::QData rooms = requestData.getData("request").getData("rooms");
-    qlibc::QData area_app = requestData.getData("request").getData("area_app");
-
-    string timeStamp = requestData.getData("request").getString("timeStamp");
-    if(timeStamp.empty()){
-        LOG_RED << "timeStamp is empty, failed to setRadarDevice....";
-        qlibc::QData data;
-        data.setInt("code", -1);
-        data.setString("error", "ok");
-        data.putData("response", qlibc::QData());
-        response.set_content(data.toJsonString(), "text/json");
-        return 0;
-    }
-
-    //从白名单中删除不存在的雷达设备、门、区域
-    removeNonExist(devices, doors, rooms, area_app);
-
-    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
-
-    for(Json::ArrayIndex i = 0; i < devices.size(); ++i){
-        qlibc::QData item = devices.getArrayElement(i);
-        bool hasItem{false};
-        unsigned deleteIndex = 0;
-        qlibc::QData whiteListDevices(payload.getData("info").getData("devices"));
-        for(Json::ArrayIndex j = 0; j < whiteListDevices.size(); ++j){
-            qlibc::QData originItem = whiteListDevices.getArrayElement(j);
-            if(item.getString("device_sn") == originItem.getString("device_sn")){
-                hasItem = true;
-                deleteIndex = j;
-                break;
-            }
-        }
-        if(!hasItem){
-            payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
-        }else{
-            Json::Value removeValue;
-            payload.asValue()["info"]["devices"].removeIndex(deleteIndex, &removeValue);
-            payload.asValue()["info"]["devices"].append(devices.getArrayElement(i).asValue());
-        }
-    }
-
-    for(Json::ArrayIndex i = 0; i < doors.size(); ++i){
-        qlibc::QData item = doors.getArrayElement(i);
-        bool hasItem{false};
-        unsigned int deleteIndex{0};
-        qlibc::QData whiteListDoors(payload.getData("info").getData("doors"));
-        for(Json::ArrayIndex j = 0; j < whiteListDoors.size(); ++j){
-            qlibc::QData originItem = whiteListDoors.getArrayElement(j);
-            if(item.getString("id") == originItem.getString("id")){
-                hasItem = true;
-                deleteIndex = j;
-                break;
-            }
-        }
-        if(!hasItem){
-            payload.asValue()["info"]["doors"].append(doors.getArrayElement(i).asValue());
-        }else{
-            Json::Value removeValue;
-            payload.asValue()["info"]["doors"].removeIndex(deleteIndex, &removeValue);
-            payload.asValue()["info"]["doors"].append(doors.getArrayElement(i).asValue());
-        }
-    }
-
-    for(Json::ArrayIndex i = 0; i < rooms.size(); ++i){
-        qlibc::QData item = rooms.getArrayElement(i);
-        bool hasItem{false};
-        unsigned int deleteIndex{0};
-        qlibc::QData whiteListRooms(payload.getData("info").getData("rooms"));
-        for(Json::ArrayIndex j = 0; j < whiteListRooms.size(); ++j){
-            qlibc::QData originItem = whiteListRooms.getArrayElement(j);
-            if(item.getString("roomNo") == originItem.getString("roomNo")){
-                hasItem = true;
-                deleteIndex = j;
-                break;
-            }
-        }
-        if(!hasItem){
-            payload.asValue()["info"]["rooms"].append(rooms.getArrayElement(i).asValue());
-        }else{
-            Json::Value removeValue;
-            payload.asValue()["info"]["rooms"].removeIndex(deleteIndex, &removeValue);
-            payload.asValue()["info"]["rooms"].append(rooms.getArrayElement(i).asValue());
-        }
-    }
-
-    for(Json::ArrayIndex i = 0; i < area_app.size(); ++i){
-        qlibc::QData item = area_app.getArrayElement(i);
-        bool hasItem{false};
-        unsigned int deleteIndex{0};
-        qlibc::QData whiteListAreaApp(payload.getData("info").getData("area_app"));
-        for(Json::ArrayIndex j = 0; j < whiteListAreaApp.size(); ++j){
-            qlibc::QData originItem = whiteListAreaApp.getArrayElement(j);
-            if(item.getString("area_id") == originItem.getString("area_id")){
-                hasItem = true;
-                deleteIndex = j;
-                break;
-            }
-        }
-        if(!hasItem){
-            payload.asValue()["info"]["area_app"].append(area_app.getArrayElement(i).asValue());
-        }else{
-            Json::Value removeValue;
-            payload.asValue()["info"]["area_app"].removeIndex(deleteIndex, &removeValue);
-            payload.asValue()["info"]["area_app"].append(area_app.getArrayElement(i).asValue());
-        }
-    }
-
-    payload.setString("timeStamp", timeStamp);
-
-    //保存设备列表
-    qlibc::QData contentSaveRequest, contentSaveResponse;
-    contentSaveRequest.setString("service_id", WHITELIST_SAVE_REQUEST_SERVICE_ID);
-    contentSaveRequest.putData("request", payload);
-    httpUtil::sitePostRequest("127.0.0.1", 9006, contentSaveRequest, contentSaveResponse);
-
-    qlibc::QData data;
-    data.setInt("code", 0);
-    data.setString("error", "ok");
-    data.putData("response", qlibc::QData());
-    response.set_content(data.toJsonString(), "text/json");
-    return 0;
-}
-
 
 using PhoneDeviceMapType = std::map<string, std::map<string, Json::Value>>;
 using PropertyMapType = std::map<string, Json::Value>;
@@ -988,12 +656,12 @@ PhoneDeviceMapType deviceData2PhoneDeviceMap(qlibc::QData& devices){
         string deviceSn = item.getString("device_sn");
         if(!phone.empty() && !deviceSn.empty()){
             auto pos = devicesMap.find(phone);
-            if(pos != devicesMap.end()){
+            if(pos != devicesMap.end()){    //有则只添加数据
                 pos->second.insert(std::make_pair(deviceSn, item.asValue()));
             }else{
                 std::map<string, Json::Value> entry;
                 entry.insert(std::make_pair(deviceSn, item.asValue()));
-                devicesMap.insert(std::make_pair(phone, entry));
+                devicesMap.insert(std::make_pair(phone, entry));    //无则创建条目
             }
         }
     }
@@ -1041,23 +709,31 @@ void copyDeviceElem(std::map<string, Json::Value>& source, std::map<string, Json
 
 
 //获取经过处理的设备map
-PhoneDeviceMapType getHandledDeviceMap(PhoneDeviceMapType& phoneDevicesMap, PhoneDeviceMapType& phoneLocalDevicesMap, string deviceType){
-    for(auto phonePos = phoneDevicesMap.begin(); phonePos != phoneDevicesMap.end(); ++phonePos){
-        string phone = phonePos->first;
-        std::map<string, Json::Value>& devicesMap = phonePos->second;
-        
+PhoneDeviceMapType getHandledDeviceMap(PhoneDeviceMapType& phoneDevicesMap, PhoneDeviceMapType& phoneLocalDevicesMap, string deviceType, string phone){
+    //如果phoneDevicesMap为空
+    if(phoneDevicesMap.empty() && !phone.empty()){  //清除该手机号下的所有指定类型设备
         auto phoneLocalPos = phoneLocalDevicesMap.find(phone);
         if(phoneLocalPos != phoneLocalDevicesMap.end()){
             clearDevicesWithSpecificType(phoneLocalPos->second, deviceType);
-            copyDeviceElem(devicesMap, phoneLocalPos->second);
-        }else{
-            phoneLocalDevicesMap.insert(std::make_pair(phone, devicesMap));
         }
-        
-        //删除相同的元素
-        for(auto position = phoneLocalDevicesMap.begin(); position != phoneLocalDevicesMap.end(); ++position){
-            if(position->first != phone){
-                clearElementInReference(devicesMap, position->second);
+    }else{
+        for(auto phonePos = phoneDevicesMap.begin(); phonePos != phoneDevicesMap.end(); ++phonePos){
+            string phone = phonePos->first;
+            std::map<string, Json::Value>& devicesMap = phonePos->second;
+            
+            auto phoneLocalPos = phoneLocalDevicesMap.find(phone);
+            if(phoneLocalPos != phoneLocalDevicesMap.end()){
+                clearDevicesWithSpecificType(phoneLocalPos->second, deviceType);
+                copyDeviceElem(devicesMap, phoneLocalPos->second);
+            }else{
+                phoneLocalDevicesMap.insert(std::make_pair(phone, devicesMap));
+            }
+            
+            //删除相同的元素
+            for(auto position = phoneLocalDevicesMap.begin(); position != phoneLocalDevicesMap.end(); ++position){
+                if(position->first != phone){
+                    clearElementInReference(devicesMap, position->second);
+                }
             }
         }
     }
@@ -1066,10 +742,10 @@ PhoneDeviceMapType getHandledDeviceMap(PhoneDeviceMapType& phoneDevicesMap, Phon
 
 
 //获取处理后的设备数据列表
-qlibc::QData getHandledDeviceData(qlibc::QData& devices, qlibc::QData& localDevices, string deviceType){
+qlibc::QData getHandledDeviceData(qlibc::QData& devices, qlibc::QData& localDevices, string deviceType, string phone){
     PhoneDeviceMapType phoneDevicesMap = deviceData2PhoneDeviceMap(devices);
     PhoneDeviceMapType phoneLocalDevicesMap = deviceData2PhoneDeviceMap(localDevices);
-    PhoneDeviceMapType handledDeviceMap = getHandledDeviceMap(phoneDevicesMap, phoneLocalDevicesMap, deviceType);
+    PhoneDeviceMapType handledDeviceMap = getHandledDeviceMap(phoneDevicesMap, phoneLocalDevicesMap, deviceType, phone);
     return phoneDeviceMap2DeviceData(handledDeviceMap);
 }
 
@@ -1083,7 +759,7 @@ PropertyMapType properyData2PropertyMap(qlibc::QData& data, string key){
         string value = item.getString(key);
         if(!value.empty()){
             auto pos = dataMap.find(value);
-            if(pos == dataMap.end()){
+            if(pos == dataMap.end()){   //沒有则添加，有则保持原数据
                 dataMap.insert(std::make_pair(value, item.asValue()));
             }
         }
@@ -1105,11 +781,11 @@ qlibc::QData propertyMap2PropertyData(PropertyMapType& propertyMap){
 //有则替换，无则添加
 PropertyMapType getSubstitudeRoomsMap(PropertyMapType& roomsMap, PropertyMapType& localRoomsMap){
     for(auto pos = roomsMap.begin(); pos != roomsMap.end(); ++pos){
-        if(localRoomsMap.find(pos->first) != localRoomsMap.end()){
+        if(localRoomsMap.find(pos->first) != localRoomsMap.end()){  //有则替换
             localRoomsMap.erase(pos->first);
             localRoomsMap.insert(*pos);
         }else{
-            localRoomsMap.insert(*pos);
+            localRoomsMap.insert(*pos); //无则添加
         }
     }
     return localRoomsMap;
@@ -1123,7 +799,7 @@ qlibc::QData getSubstitudeRoomsData(qlibc::QData& rooms, qlibc::QData& localRoom
 }
 
 
-int saveAudioPanelList_service_request_handler_bak(const Request& request, Response& response){
+int saveAudioPanelList_service_request_handler(const Request& request, Response& response){
     qlibc::QData requestData(request.body);
     LOG_INFO << "saveAudioPanelList_service_request_handler: " << requestData.toJsonString();
     string timeStamp = requestData.getData("request").getString("timeStamp");
@@ -1137,6 +813,7 @@ int saveAudioPanelList_service_request_handler_bak(const Request& request, Respo
         return 0;
     }
 
+    string phone = requestData.getData("request").getString("phone");
     qlibc::QData devices = requestData.getData("request").getData("devices");
     qlibc::QData rooms = requestData.getData("request").getData("rooms"); 
 
@@ -1144,7 +821,7 @@ int saveAudioPanelList_service_request_handler_bak(const Request& request, Respo
     qlibc::QData localDevices = payload.getData("info").getData("devices");
     qlibc::QData localRooms = payload.getData("info").getData("rooms");
 
-    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices, "audiopanel").asValue();
+    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices, "audiopanel", phone).asValue();
     payload.asValue()["info"]["rooms"] = getSubstitudeRoomsData(rooms, localRooms).asValue();
     payload.setString("timeStamp", timeStamp);
 
@@ -1163,7 +840,7 @@ int saveAudioPanelList_service_request_handler_bak(const Request& request, Respo
 }
 
 
-int setRadarDevice_service_request_handler_bak(const Request& request, Response& response){
+int setRadarDevice_service_request_handler(const Request& request, Response& response){
      qlibc::QData requestData(request.body);
     LOG_INFO << "setRadarDevice_service_request_handler: " << requestData.toJsonString();
     string timeStamp = requestData.getData("request").getString("timeStamp");
@@ -1177,6 +854,7 @@ int setRadarDevice_service_request_handler_bak(const Request& request, Response&
         return 0;
     }
 
+    string phone = requestData.getData("request").getString("phone");
     qlibc::QData devices = requestData.getData("request").getData("devices");
     qlibc::QData rooms = requestData.getData("request").getData("rooms");
     qlibc::QData doors = requestData.getData("request").getData("doors");
@@ -1186,7 +864,7 @@ int setRadarDevice_service_request_handler_bak(const Request& request, Response&
     qlibc::QData localDevices = payload.getData("info").getData("devices");
     qlibc::QData localRooms = payload.getData("info").getData("rooms");
 
-    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices, "radar").asValue();
+    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices, "radar", phone).asValue();
     payload.asValue()["info"]["rooms"] = getSubstitudeRoomsData(rooms, localRooms).asValue();
     payload.asValue()["info"]["doors"] = doors.asValue();
     payload.asValue()["info"]["area_app"] = area_app.asValue();

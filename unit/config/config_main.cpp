@@ -163,13 +163,13 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(GETPANELINFO_REQUEST_SERVICE_ID, getPanelInfo_service_request_handler);
 
     //保存语音面板设备
-    serviceSiteManager->registerServiceRequestHandler(SETAUDIOPANELLIST_REQUEST_SERVICE_ID, saveAudioPanelList_service_request_handler_bak);
+    serviceSiteManager->registerServiceRequestHandler(SETAUDIOPANELLIST_REQUEST_SERVICE_ID, saveAudioPanelList_service_request_handler);
 
     //获取语音面板设备
     serviceSiteManager->registerServiceRequestHandler(GETAUDIOPANELLIST_REQUEST_SERVICE_ID, getAudioPanelList_service_request_handler);
 
     //设置雷达信息
-    serviceSiteManager->registerServiceRequestHandler(SETRADARLIST_REQUEST_SERVICE_ID, setRadarDevice_service_request_handler_bak);
+    serviceSiteManager->registerServiceRequestHandler(SETRADARLIST_REQUEST_SERVICE_ID, setRadarDevice_service_request_handler);
 
 
 

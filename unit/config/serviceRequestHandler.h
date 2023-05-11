@@ -78,18 +78,11 @@ int setPanelInfo_service_request_handler(const Request& request, Response& respo
 //获取语音面板列表
 int getAudioPanelList_service_request_handler(const Request& request, Response& response);
 
-//app存储语音面板列表全集
+//app推送账户下的语音面板全集
 int saveAudioPanelList_service_request_handler(const Request& request, Response& response);
 
-//app存储雷达设备全集
-int setRadarDevice_service_request_handler(const Request& request, Response& response);
-
-
-//app推送账户下的语音面板全集
-int saveAudioPanelList_service_request_handler_bak(const Request& request, Response& response);
-
 //app推送账号下的所有雷达设备全集
-int setRadarDevice_service_request_handler_bak(const Request& request, Response& response);
+int setRadarDevice_service_request_handler(const Request& request, Response& response);
 
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H
