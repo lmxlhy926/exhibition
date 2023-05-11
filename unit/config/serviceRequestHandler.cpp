@@ -11,6 +11,9 @@
 #include <algorithm>
 using namespace servicesite;
 
+static std::mutex audioRadarServiceMutex;
+static std::mutex syncSaveMutex;
+
 int test_service_request_handler(const Request& request, Response& response) {
     // HTTP库已判断字符串能否转成 JSON
 
@@ -248,6 +251,7 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
 
 
 void fileSync(string site_id, string getServiceId, string saveServiceId, string message){
+    std::lock_guard<std::mutex> lg(syncSaveMutex);
     LOG_PURPLE << "==>fileSync start: " << message << "---------------";
     std::map<unsigned long long, Json::Value> resultMap;
     qlibc::QData node_list;
@@ -800,6 +804,7 @@ qlibc::QData getSubstitudeRoomsData(qlibc::QData& rooms, qlibc::QData& localRoom
 
 
 int saveAudioPanelList_service_request_handler(const Request& request, Response& response){
+    std::lock_guard<std::mutex> lg(audioRadarServiceMutex);
     qlibc::QData requestData(request.body);
     LOG_INFO << "saveAudioPanelList_service_request_handler: " << requestData.toJsonString();
     string timeStamp = requestData.getData("request").getString("timeStamp");
@@ -841,6 +846,7 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
 
 
 int setRadarDevice_service_request_handler(const Request& request, Response& response){
+    std::lock_guard<std::mutex> lg(audioRadarServiceMutex);
      qlibc::QData requestData(request.body);
     LOG_INFO << "setRadarDevice_service_request_handler: " << requestData.toJsonString();
     string timeStamp = requestData.getData("request").getString("timeStamp");
