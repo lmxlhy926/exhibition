@@ -82,8 +82,8 @@ void DeviceManager::updateDeviceList(){
                     }
                 }else{
                     LOG_HLIGHT << sm.str(0) << ": deviceListSize: " << deviceRes.getData("response").getData("device_list").size();
-                    updateSiteDeviceListMap(sm.str(0), deviceRes.getData("response").getData("device_list"));
                     qlibc::QData list = addMacSource(deviceRes.getData("response").getData("device_list"), sm.str(0));  //给列表条目加入来源标签
+                    updateSiteDeviceListMap(sm.str(0), list);
                     mergeList(list, totalList);
                 }
             }

@@ -95,8 +95,8 @@ void GroupManager::updateGroupList(){
                     }
                 }else{
                     LOG_YELLOW << sm.str(0) << ": groupListSize: " << groupRes.getData("response").getData("group_list").size();
-                    updateSiteGroupListMap(sm.str(0), groupRes.getData("response").getData("group_list"));
                     qlibc::QData list = addGrpSourceTag(groupRes.getData("response").getData("group_list"), sm.str(0));    //给组条目添加标签
+                    updateSiteGroupListMap(sm.str(0), list);
                     mergeList(list, totalList);
                 }
             }
