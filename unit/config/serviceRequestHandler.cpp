@@ -647,13 +647,13 @@ int getAudioPanelList_service_request_handler(const Request& request, Response& 
 }
 
 
-using PhoneDeviceMapType = std::map<string, std::map<string, Json::Value>>;
+using CategoryKeyMapType = std::map<string, std::map<string, Json::Value>>;
 using PropertyMapType = std::map<string, Json::Value>;
 
 //设备列表转换为设备map
 //std::map<phone, std::map<deviceSn, Json::Value>>
-PhoneDeviceMapType deviceData2PhoneDeviceMap(qlibc::QData& devices, string category, string uniqueKey){
-    PhoneDeviceMapType devicesMap;
+CategoryKeyMapType JsonData2CategoryKeyMap(qlibc::QData& devices, string category, string uniqueKey){
+    CategoryKeyMapType devicesMap;
     for(Json::ArrayIndex i = 0; i < devices.size(); ++i){
         qlibc::QData item = devices.getArrayElement(i);
         string phone = item.getString(category);
@@ -673,7 +673,7 @@ PhoneDeviceMapType deviceData2PhoneDeviceMap(qlibc::QData& devices, string categ
 }
 
 //设备map转换为设备列表
-qlibc::QData phoneDeviceMap2DeviceData(PhoneDeviceMapType& phoneDeviceMap){
+qlibc::QData categoryKeyMap2JsonData(CategoryKeyMapType& phoneDeviceMap){
     qlibc::QData deviceListData;
     for(auto pos = phoneDeviceMap.begin(); pos != phoneDeviceMap.end(); ++pos){
         std::map<string, Json::Value>& deviceMap = pos->second;
@@ -713,7 +713,7 @@ void copyDeviceElem(std::map<string, Json::Value>& source, std::map<string, Json
 
 
 //获取经过处理的设备map
-PhoneDeviceMapType getHandledDeviceMap(PhoneDeviceMapType& phoneDevicesMap, PhoneDeviceMapType& phoneLocalDevicesMap, string deviceType, string phone){
+CategoryKeyMapType getHandledDeviceMap(CategoryKeyMapType& phoneDevicesMap, CategoryKeyMapType& phoneLocalDevicesMap, string deviceType, string phone){
     //如果phoneDevicesMap为空
     if(phoneDevicesMap.empty() && !phone.empty()){  //清除该手机号下的所有指定类型设备
         auto phoneLocalPos = phoneLocalDevicesMap.find(phone);
@@ -748,10 +748,10 @@ PhoneDeviceMapType getHandledDeviceMap(PhoneDeviceMapType& phoneDevicesMap, Phon
 
 //获取处理后的设备数据列表
 qlibc::QData getHandledDeviceData(qlibc::QData& devices, qlibc::QData& localDevices, string deviceType, string phone){
-    PhoneDeviceMapType phoneDevicesMap = deviceData2PhoneDeviceMap(devices, "phone", "device_sn");
-    PhoneDeviceMapType phoneLocalDevicesMap = deviceData2PhoneDeviceMap(localDevices, "phone", "device_sn");
-    PhoneDeviceMapType handledDeviceMap = getHandledDeviceMap(phoneDevicesMap, phoneLocalDevicesMap, deviceType, phone);
-    return phoneDeviceMap2DeviceData(handledDeviceMap);
+    CategoryKeyMapType phoneDevicesMap = JsonData2CategoryKeyMap(devices, "phone", "device_sn");
+    CategoryKeyMapType phoneLocalDevicesMap = JsonData2CategoryKeyMap(localDevices, "phone", "device_sn");
+    CategoryKeyMapType handledDeviceMap = getHandledDeviceMap(phoneDevicesMap, phoneLocalDevicesMap, deviceType, phone);
+    return categoryKeyMap2JsonData(handledDeviceMap);
 }
 
 //获取指定账号下的雷达列表
@@ -767,7 +767,7 @@ std::vector<string> getRadarVec(qlibc::QData& devices, string phone){
     return radarVec;
 }
 
-PhoneDeviceMapType getHandledDoorsAreasMap(PhoneDeviceMapType& radarSnKeyMap, PhoneDeviceMapType& radarSnLocalKeyMap, std::vector<string>& radarSnVec){
+CategoryKeyMapType getHandledDoorsAreasMap(CategoryKeyMapType& radarSnKeyMap, CategoryKeyMapType& radarSnLocalKeyMap, std::vector<string>& radarSnVec){
     //如果phoneDevicesMap为空
     if(radarSnKeyMap.empty()){  
         //清除该账号下的雷达下的门和区域信息
@@ -793,18 +793,18 @@ PhoneDeviceMapType getHandledDoorsAreasMap(PhoneDeviceMapType& radarSnKeyMap, Ph
 
 //获取门数据
 qlibc::QData getHandledDoorsData(qlibc::QData& doors, qlibc::QData& localDoors, std::vector<string>& radarSnVec){
-    PhoneDeviceMapType radarSnDoorsMap = deviceData2PhoneDeviceMap(doors, "radarSn", "id");
-    PhoneDeviceMapType radarSnLocalDoorsMap = deviceData2PhoneDeviceMap(localDoors, "radarSn", "id");
-    PhoneDeviceMapType handledDoorsMap = getHandledDoorsAreasMap(radarSnDoorsMap, radarSnLocalDoorsMap, radarSnVec);
-    return phoneDeviceMap2DeviceData(handledDoorsMap);
+    CategoryKeyMapType radarSnDoorsMap = JsonData2CategoryKeyMap(doors, "radarSn", "id");
+    CategoryKeyMapType radarSnLocalDoorsMap = JsonData2CategoryKeyMap(localDoors, "radarSn", "id");
+    CategoryKeyMapType handledDoorsMap = getHandledDoorsAreasMap(radarSnDoorsMap, radarSnLocalDoorsMap, radarSnVec);
+    return categoryKeyMap2JsonData(handledDoorsMap);
 }
 
 //获取点位数据
 qlibc::QData getHandledAreaData(qlibc::QData& doors, qlibc::QData& localDoors, std::vector<string>& radarSnVec){
-    PhoneDeviceMapType radarSnAreaMap = deviceData2PhoneDeviceMap(doors, "radarSn", "area_id");
-    PhoneDeviceMapType radarSnLocalAreaMap = deviceData2PhoneDeviceMap(localDoors, "radarSn", "area_id");
-    PhoneDeviceMapType handledAreaMap = getHandledDoorsAreasMap(radarSnAreaMap, radarSnLocalAreaMap, radarSnVec);
-    return phoneDeviceMap2DeviceData(handledAreaMap);
+    CategoryKeyMapType radarSnAreaMap = JsonData2CategoryKeyMap(doors, "radarSn", "area_id");
+    CategoryKeyMapType radarSnLocalAreaMap = JsonData2CategoryKeyMap(localDoors, "radarSn", "area_id");
+    CategoryKeyMapType handledAreaMap = getHandledDoorsAreasMap(radarSnAreaMap, radarSnLocalAreaMap, radarSnVec);
+    return categoryKeyMap2JsonData(handledAreaMap);
 }
 
 //属性列表转换为属性map
