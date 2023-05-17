@@ -793,7 +793,7 @@ CategoryKeyMapType getHandledDoorsAreasMap(CategoryKeyMapType& radarSnKeyMap, Ca
 
 //获取门数据
 qlibc::QData getHandledDoorsData(qlibc::QData& doors, qlibc::QData& localDoors, std::vector<string>& radarSnVec){
-    CategoryKeyMapType radarSnDoorsMap = JsonData2CategoryKeyMap(doors, "radarSn", "id");
+    CategoryKeyMapType radarSnDoorsMap = JsonData2CategoryKeyMap(doors, "radarsn", "id");
     CategoryKeyMapType radarSnLocalDoorsMap = JsonData2CategoryKeyMap(localDoors, "radarSn", "id");
     CategoryKeyMapType handledDoorsMap = getHandledDoorsAreasMap(radarSnDoorsMap, radarSnLocalDoorsMap, radarSnVec);
     return categoryKeyMap2JsonData(handledDoorsMap);
@@ -801,8 +801,8 @@ qlibc::QData getHandledDoorsData(qlibc::QData& doors, qlibc::QData& localDoors, 
 
 //获取点位数据
 qlibc::QData getHandledAreaData(qlibc::QData& doors, qlibc::QData& localDoors, std::vector<string>& radarSnVec){
-    CategoryKeyMapType radarSnAreaMap = JsonData2CategoryKeyMap(doors, "radarSn", "area_id");
-    CategoryKeyMapType radarSnLocalAreaMap = JsonData2CategoryKeyMap(localDoors, "radarSn", "area_id");
+    CategoryKeyMapType radarSnAreaMap = JsonData2CategoryKeyMap(doors, "radarsn", "area_id");
+    CategoryKeyMapType radarSnLocalAreaMap = JsonData2CategoryKeyMap(localDoors, "radarsn", "area_id");
     CategoryKeyMapType handledAreaMap = getHandledDoorsAreasMap(radarSnAreaMap, radarSnLocalAreaMap, radarSnVec);
     return categoryKeyMap2JsonData(handledAreaMap);
 }
