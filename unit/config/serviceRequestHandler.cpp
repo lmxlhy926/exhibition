@@ -436,7 +436,7 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
     //发布白名单修改信息
     qlibc::QData publishData;
     publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
-    publishData.putData("content", whiteListData);
+    publishData.putData("content", configParamUtil::getInstance()->getWhiteList());     //发布最新的白名单
     ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
     LOG_INFO << "publish: " << publishData.toJsonString();
 
@@ -947,4 +947,148 @@ int setRadarDevice_service_request_handler(const Request& request, Response& res
     return 0;
 }
 
+qlibc::QData getDevicesAfterhandleRadarDevice(CategoryKeyMapType& devices, CategoryKeyMapType& localDevices, string& option){
+    if(option == "update"){     //更新雷达设备
+        for(auto pos = devices.begin(); pos != devices.end(); ++pos){
+            //提取一条数据
+            string phone = pos->first;
+            std::map<string, Json::Value> radarDeviceMap = pos->second;
 
+            //添加该条数据
+            auto localPos = localDevices.find(phone);
+            if(localPos != localDevices.end()){     //存在该账号
+                std::map<string, Json::Value>& localRadarDeviceMap = localPos->second;
+                for(auto& radarDevice : radarDeviceMap){
+                    auto findPos = localRadarDeviceMap.find(radarDevice.first);
+                    if(findPos != localRadarDeviceMap.end()){   //有则替换
+                        localRadarDeviceMap.erase(findPos);
+                        localRadarDeviceMap.insert(radarDevice);
+                    }else{  //无则添加
+                        localRadarDeviceMap.insert(radarDevice);
+                    }
+                }
+            }else{
+                localDevices.insert(*pos);
+            }
+
+            //删除重复设备
+            for(auto position = localDevices.begin(); position != localDevices.end(); ++position){
+                if(position->first != phone){
+                    clearElementInReference(radarDeviceMap, position->second);
+                }
+            }
+        }
+    }else if(option == "delete"){   //删除雷达设备
+         for(auto pos = devices.begin(); pos != devices.end(); ++pos){
+            //提取一条数据
+            string phone = pos->first;
+            std::map<string, Json::Value> radarDeviceMap = pos->second;
+
+            //在相同账号下搜索进行删除
+            auto localPos = localDevices.find(phone);
+            if(localPos != localDevices.end()){     //存在该账号
+                std::map<string, Json::Value>& localRadarDeviceMap = localPos->second;
+                for(auto& radarDevice : radarDeviceMap){
+                    auto findPos = localRadarDeviceMap.find(radarDevice.first);
+                    if(findPos != localRadarDeviceMap.end()){   //有则删除
+                        localRadarDeviceMap.erase(findPos);
+                    }
+                }
+            }
+
+            //在不同账号下搜索进行删除
+            for(auto position = localDevices.begin(); position != localDevices.end(); ++position){
+                if(position->first != phone){
+                    clearElementInReference(radarDeviceMap, position->second);
+                }
+            }
+        }
+    }
+
+    return categoryKeyMap2JsonData(localDevices);
+}
+
+
+//添加删除雷达设备时，门和区域处理
+qlibc::QData getDoorAreasAfterHandleRadarDevice(CategoryKeyMapType& radarSnKeyMap, CategoryKeyMapType& radarSnLocalKeyMap,
+                                                const string& option){
+    if(option == "update"){
+        for(auto pos = radarSnKeyMap.begin(); pos != radarSnKeyMap.end(); ++pos){
+            string radarSn = pos->first;
+            auto position = radarSnLocalKeyMap.find(radarSn);
+            if(position != radarSnLocalKeyMap.end()){
+                position->second = pos->second;
+            }else{
+                radarSnLocalKeyMap.insert(std::make_pair(radarSn, pos->second));
+            }
+        }
+    }else if(option == "delete"){
+        std::vector<string> radarSnVec;
+        for(auto radarDevice : radarSnKeyMap){
+            radarSnVec.push_back(radarDevice.first);
+        }
+
+        for(auto& radarSn : radarSnVec){
+            auto position = radarSnLocalKeyMap.find(radarSn);
+            if(position != radarSnLocalKeyMap.end()){
+                radarSnLocalKeyMap.erase(position);
+            }
+        }
+    }
+
+    return categoryKeyMap2JsonData(radarSnLocalKeyMap);
+}
+
+
+void radarMessageReceivedHandler(const Request& request){
+    qlibc::QData receivedData(request.body);
+    LOG_INFO << "radarMessageReceivedHandler: " << receivedData.toJsonString();
+    //接收到的数据
+    qlibc::QData devices = receivedData.getData("content").getData("info").getData("devices");
+    qlibc::QData area_app = receivedData.getData("content").getData("info").getData("area_app");
+    qlibc::QData doors = receivedData.getData("content").getData("info").getData("doors");
+    qlibc::QData rooms = receivedData.getData("content").getData("info").getData("rooms");
+    string option = receivedData.getData("content").getString("op");
+    
+    //本地数据
+    qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
+    qlibc::QData localDevices = payload.getData("info").getData("devices");
+    qlibc::QData localAreas = payload.getData("info").getData("area_app");
+    qlibc::QData localDoors = payload.getData("info").getData("doors");
+    qlibc::QData localRooms = payload.getData("info").getData("rooms");
+    string localTimeStampStr = payload.getString("timeStamp");
+    unsigned long long localTime;
+    try{
+        localTime = stoull(localTimeStampStr, nullptr, 10);
+    }catch(const std::exception& e){
+        localTime = 1580572800;     //2020-02-02 00:00:00
+    }
+    
+    //接收数据转换
+    CategoryKeyMapType phoneRadarMap = JsonData2CategoryKeyMap(devices, "phone", "device_sn");
+    CategoryKeyMapType areaRadarMap = JsonData2CategoryKeyMap(area_app, "radarsn", "area_id");
+    CategoryKeyMapType doorsRadarMap = JsonData2CategoryKeyMap(doors, "radarsn", "id");
+
+    //本地数据转换
+    CategoryKeyMapType localPhoneRadarMap = JsonData2CategoryKeyMap(localDevices, "phone", "device_sn");
+    CategoryKeyMapType localAreaRadarMap = JsonData2CategoryKeyMap(localAreas, "radarsn", "area_id");
+    CategoryKeyMapType localDoorsRadarMap = JsonData2CategoryKeyMap(localDoors, "radarsn", "id");
+
+    //获得最终数据
+    qlibc::QData finalAreas = getDoorAreasAfterHandleRadarDevice(areaRadarMap, localAreaRadarMap, option);
+    qlibc::QData finalDoors = getDoorAreasAfterHandleRadarDevice(doorsRadarMap, localDoorsRadarMap, option);
+    qlibc::QData finalDevices = getDevicesAfterhandleRadarDevice(phoneRadarMap, localPhoneRadarMap, option);
+    qlibc::QData finalRooms = getSubstitudeRoomsData(rooms, localRooms);
+    
+    payload.asValue()["info"]["devices"] = finalDevices.asValue();
+    payload.asValue()["info"]["area_app"] = finalAreas.asValue();
+    payload.asValue()["info"]["doors"] = finalDoors.asValue();
+    payload.asValue()["info"]["rooms"] = finalRooms.asValue();
+    payload.setString("timeStamp", std::to_string(localTime + 1));
+
+    //保存设备列表
+    qlibc::QData contentSaveRequest, contentSaveResponse;
+    contentSaveRequest.setString("service_id", WHITELIST_SAVE_REQUEST_SERVICE_ID);
+    contentSaveRequest.putData("request", payload);
+    httpUtil::sitePostRequest("127.0.0.1", 9006, contentSaveRequest, contentSaveResponse);
+}

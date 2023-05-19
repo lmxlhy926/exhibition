@@ -84,5 +84,7 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
 //app推送账号下的所有雷达设备全集
 int setRadarDevice_service_request_handler(const Request& request, Response& response);
 
+//订阅雷达消息
+void radarMessageReceivedHandler(const Request& request);
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H

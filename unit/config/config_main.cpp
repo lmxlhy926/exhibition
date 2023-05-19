@@ -171,6 +171,8 @@ int main(int argc, char* argv[]) {
     //设置雷达信息
     serviceSiteManager->registerServiceRequestHandler(SETRADARLIST_REQUEST_SERVICE_ID, setRadarDevice_service_request_handler);
 
+    //雷达消息处理函数
+    serviceSiteManager->registerMessageHandler(RADARDEVICE_RECEIVED_MESSAGE_ID, radarMessageReceivedHandler);
 
 
     //set site supported subscribed message
@@ -196,6 +198,22 @@ int main(int argc, char* argv[]) {
                 LOG_RED << "===>configSite startByRegister successfully.....";
                 break;
             }
+        }
+    });
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    //订阅雷达消息
+    threadPool_.enqueue([&](){
+        while(true){
+            std::vector<string> messageIdList;
+            messageIdList.push_back(RADARDEVICE_RECEIVED_MESSAGE_ID);
+            if(!ServiceSiteManager::subscribeMessage("127.0.0.1", 9010, messageIdList)){
+                LOG_RED << "subscribe southSite failed, subscribe again in 10 seconds.....";
+            }else{
+                LOG_PURPLE << "subscribe southSite successfully.....";
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(10));
         }
     });
 
