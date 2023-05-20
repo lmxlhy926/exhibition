@@ -226,14 +226,16 @@ qlibc::QData getHandledAreasDoorsDataAfterRadarService(qlibc::QData& devices, ql
                 string radarsn = position->first;
                 string state = position->second["state"].asString();
                 if(state == "ok"){
+                    std::map<string, Json::Value> doorsMap;
                     auto findPosition = radarSnDoorsMap.find(radarsn);
-                    if(findPosition != radarSnDoorsMap.end()){  //推送下来的有数据
-                        auto findLocalPosition = radarSnLocalDoorsMap.find(radarsn);
-                        if(findLocalPosition != radarSnLocalDoorsMap.end()){   //本地存在则替换
-                            findLocalPosition->second = findPosition->second;
-                        }else{  //本地不存在则添加
-                            radarSnLocalDoorsMap.insert(*findPosition);   
-                        }
+                    if(findPosition != radarSnDoorsMap.end()){
+                        doorsMap = findPosition->second;
+                    }
+                    auto findLocalPosition = radarSnLocalDoorsMap.find(radarsn);
+                    if(findLocalPosition != radarSnLocalDoorsMap.end()){   //本地存在则替换
+                        findLocalPosition->second = doorsMap;
+                    }else{  //本地不存在则添加
+                        radarSnLocalDoorsMap.insert(std::make_pair(radarsn, doorsMap));   
                     }
                 }else if(state == "error"){
                     if(radarSnLocalDoorsMap.find(radarsn) != radarSnDoorsMap.end()){
