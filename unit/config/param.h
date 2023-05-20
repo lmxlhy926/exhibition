@@ -32,10 +32,8 @@ static const string WHITELISTCLOUD_REQUEST_SERVICE_ID       =    "whiteListReque
 
 static const string WHITELIST_REQUEST_SERVICE_ID                    =    "whiteListRequest";
 static const string WHITELIST_SAVE_REQUEST_SERVICE_ID               =    "whiteListSaveRequest";
-static const string WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID          =    "whiteListSyncSaveRequest";
 static const string GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID         =    "getSceneConfigFile";
 static const string SAVE_SCENECONFIG_FILE_REQUEST_SERVICE_ID        =    "saveSceneConfigFile";
-static const string SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID    =    "saveSceneConfigFileSync";
 static const string GETALLLIST_REQUEST_SERVICE_ID                   =    "get_all_device_list";
 static const string SETPANELINFO_REQUEST_SERVICE_ID                 =    "config_self_info";
 static const string GETPANELINFO_REQUEST_SERVICE_ID                 =    "get_self_info";

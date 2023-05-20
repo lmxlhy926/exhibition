@@ -38,33 +38,21 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
 /*
  *  1. 从主从站点获取所有面板列表
  *  2. 得到面板ip后，访问每个面板上的配置站点，获取其白名单
- *  3. 比较得到最新的白名单
- *  4. 将最新的白名单写回每个面板
+ *  3. 白名单按照从旧到新，叠加覆盖删除
  */
 void whiteListFileSync(string site_id, string getServiceId, string message);
 
-//文件覆盖同步
-void fileSync(string site_id, string getServiceId, string saveServiceId, string message);
+//场景文件同步：比较时间戳，最新的覆盖旧的
+void sceneFileSync(string site_id, string getServiceId, string message);
 
 //获取白名单列表
 int whiteList_get_service_request_handler(const Request& request, Response& response);
-
-/*
-    收到白名单后，和本地的进行比较。
-        1. 如果本地没有白名单
-        2. 收到的白名单比本地的新
-        则更新本地白名单，并发送白名单更改消息
-*/
-int whiteList_sync_save_service_request_handler(const Request& request, Response& response);
 
 //保存白名单，并将白名单同步到每个配置站点
 int whiteList_save_service_request_handler(const Request& request, Response& response);
 
 //获取场景配置文件
 int getSceneFile_service_request_handler(const Request& request, Response& response);
-
-//收到场景文件后，和本地的进行比较。如果收到的为最新的，则保存
-int saveSceneFile_sync_save_service_request_handler(const Request& request, Response& response);
 
 //保存场景配置文件
 int saveSceneFile_service_request_handler(const Request& request, Response& response);

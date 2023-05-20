@@ -141,17 +141,11 @@ int main(int argc, char* argv[]) {
     //保存白名单列表
     serviceSiteManager->registerServiceRequestHandler(WHITELIST_SAVE_REQUEST_SERVICE_ID, whiteList_save_service_request_handler);
 
-    //同步保存白名单
-    serviceSiteManager->registerServiceRequestHandler(WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID, whiteList_sync_save_service_request_handler);
-
     //获取场景配置文件
     serviceSiteManager->registerServiceRequestHandler(GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, getSceneFile_service_request_handler);
 
     //保存场景配置文件
     serviceSiteManager->registerServiceRequestHandler(SAVE_SCENECONFIG_FILE_REQUEST_SERVICE_ID, saveSceneFile_service_request_handler);
-
-    //同步场景配置文件
-    serviceSiteManager->registerServiceRequestHandler(SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID, saveSceneFile_sync_save_service_request_handler);
 
     //获取灯控设备列表
     serviceSiteManager->registerServiceRequestHandler(GETALLLIST_REQUEST_SERVICE_ID, getAllDeviceList_service_request_handler);
@@ -202,9 +196,8 @@ int main(int argc, char* argv[]) {
     std::this_thread::sleep_for(std::chrono::seconds(2));
     threadPool_.enqueue([&](){
         while(true){
-            whiteListFileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, "whiteList auto update");    //同步白名单
-            fileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID,
-                     "sceneData auto update");    //同步场景文件
+            whiteListFileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, "whiteList auto update");          //同步白名单
+            sceneFileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, "sceneData auto update");   //同步场景文件
             std::this_thread::sleep_for(std::chrono::seconds(60));
         }
     });
