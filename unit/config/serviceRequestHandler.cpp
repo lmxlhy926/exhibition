@@ -9,6 +9,7 @@
 #include "util/mqttPayloadHandle.h"
 #include "log/Logging.h"
 #include <algorithm>
+#include "whiteListUtil.h"
 using namespace servicesite;
 
 static std::mutex audioRadarServiceMutex;
@@ -250,7 +251,153 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
 }
 
 
+void whiteListFileSync(string site_id, string getServiceId, string message){
+    std::lock_guard<std::mutex> lg(syncSaveMutex);
+    LOG_PURPLE << "==>fileSync start: " << message << "---------------";
+    std::map<unsigned long long, Json::Value> resultMap;
+    qlibc::QData node_list;
+    Json::ArrayIndex node_list_size  = 0;
+
+    //获取所有面板列表
+    qlibc::QData request, response;
+    request.setString("service_id", "get_all");
+    request.putData("request", qlibc::QData());
+    LOG_GREEN << "get node_list: " << request.toJsonString();
+    bool siteBool = httpUtil::sitePostRequest("127.0.0.1", 9012, request, response);
+
+    if(siteBool){
+        node_list.setInitData(response.getData("response").getData("node_list"));
+        node_list_size = node_list.size();
+        LOG_BLUE << "node_list: " << node_list.toJsonString();
+
+        for(Json::ArrayIndex i = 0; i < node_list_size; ++i){
+            qlibc::QData item = node_list.getArrayElement(i);
+            string ip = item.getString("ip");
+            int port = 9006;
+            qlibc::QData contentRequest, contentResponse;
+            contentRequest.setString("service_id", getServiceId);
+            contentRequest.putData("request", qlibc::QData());
+            LOG_GREEN << "contentRequest: " << contentRequest.toJsonString();
+            if(httpUtil::sitePostRequest(ip, port, contentRequest, contentResponse)){
+                qlibc::QData content(contentResponse.getData("response"));
+                if(!content.empty()){
+                    unsigned long long timeStamp = 0;
+                    try{
+                        timeStamp = stoull(content.getString("timeStamp"), nullptr, 10);
+                    }catch(const std::exception& e){
+                        LOG_RED << "contentResponse has error in parse timeStamp....";
+                        timeStamp = 0;
+                    }
+                    if(timeStamp > 0){
+                        resultMap.insert(std::make_pair(timeStamp, content.asValue()));
+                        LOG_BLUE << "contentResponse is inserted to map....";
+                    }
+                }else{
+                    LOG_RED << "===>contentResponse is empty.....";
+                }
+            }else{
+                LOG_RED << "contentRequest send filed....";
+            }
+        }
+    }else{
+        LOG_RED << "get node_list failed....." ;
+    }
+
+    if(resultMap.size() == 0){
+        LOG_RED << "==>sync end, dont find any effective data-----------";
+    }else if(resultMap.size() == 1){
+        LOG_PURPLE << "==>only get ownWhiteList, no need to merge.....";
+    }else{
+        LOG_PURPLE << "==>start to merge.....";
+        qlibc::QData finalWhiteList = getMergeWhiteList(resultMap);
+        configParamUtil::getInstance()->saveWhiteListData(finalWhiteList);
+        //发布白名单改变消息
+        qlibc::QData publishData;
+        publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
+        publishData.putData("content", finalWhiteList);     
+        ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
+        LOG_INFO << "publish: " << publishData.toJsonString();
+        LOG_PURPLE << "==>merge completely.....";
+    }
+    LOG_PURPLE << "==>sync completely.....";
+}
+
 void fileSync(string site_id, string getServiceId, string saveServiceId, string message){
+    std::lock_guard<std::mutex> lg(syncSaveMutex);
+    LOG_PURPLE << "==>fileSync start: " << message << "---------------";
+    std::map<unsigned long long, Json::Value> resultMap;
+    qlibc::QData node_list;
+    Json::ArrayIndex node_list_size  = 0;
+
+    //获取所有面板列表
+    qlibc::QData request, response;
+    request.setString("service_id", "get_all");
+    request.putData("request", qlibc::QData());
+    LOG_GREEN << "get node_list: " << request.toJsonString();
+    bool siteBool = httpUtil::sitePostRequest("127.0.0.1", 9012, request, response);
+
+    if(siteBool){
+        node_list.setInitData(response.getData("response").getData("node_list"));
+        node_list_size = node_list.size();
+        LOG_BLUE << "node_list: " << node_list.toJsonString();
+
+        for(Json::ArrayIndex i = 0; i < node_list_size; ++i){
+            qlibc::QData item = node_list.getArrayElement(i);
+            string ip = item.getString("ip");
+            int port = 9006;
+            qlibc::QData contentRequest, contentResponse;
+            contentRequest.setString("service_id", getServiceId);
+            contentRequest.putData("request", qlibc::QData());
+            LOG_GREEN << "contentRequest: " << contentRequest.toJsonString();
+            if(httpUtil::sitePostRequest(ip, port, contentRequest, contentResponse)){
+                qlibc::QData content(contentResponse.getData("response"));
+                if(!content.empty()){
+                    unsigned long long timeStamp = 0;
+                    try{
+                        timeStamp = stoull(content.getString("timeStamp"), nullptr, 10);
+                    }catch(const std::exception& e){
+                        LOG_RED << "contentResponse has error in parse timeStamp....";
+                        timeStamp = 0;
+                    }
+                    if(timeStamp > 0){
+                        resultMap.insert(std::make_pair(timeStamp, content.asValue()));
+                        LOG_BLUE << "contentResponse is inserted to map....";
+                    }
+                }else{
+                    LOG_RED << "===>contentResponse is empty.....";
+                }
+            }else{
+                LOG_RED << "contentRequest send filed....";
+            }
+        }
+    }else{
+        LOG_RED << "get node_list failed....." ;
+    }
+
+    if(resultMap.size() == 0){
+        LOG_RED << "==>sync end, dont find any effective data-----------";
+        return;
+    }
+
+    //获得最新的内容
+    auto pos = max_element(resultMap.begin(), resultMap.end());
+    qlibc::QData newestContent(pos->second);
+
+    LOG_INFO << "start to update data to all site.....";
+    //向所有站点更新内容
+    for(Json::ArrayIndex i = 0; i < node_list_size; ++i){
+        qlibc::QData item = node_list.getArrayElement(i);
+        string ip = item.getString("ip");
+        int port = 9006;
+        qlibc::QData contentSaveRequest, contentSaveResponse;
+        contentSaveRequest.setString("service_id", saveServiceId);
+        contentSaveRequest.putData("request", newestContent);
+        httpUtil::sitePostRequest(ip, port, contentSaveRequest, contentSaveResponse);
+    }
+    LOG_PURPLE << "==>sync completely.....";
+}
+
+void sceneFileSync(string site_id, string getServiceId, string saveServiceId, string message){
     std::lock_guard<std::mutex> lg(syncSaveMutex);
     LOG_PURPLE << "==>fileSync start: " << message << "---------------";
     std::map<unsigned long long, Json::Value> resultMap;
@@ -429,16 +576,15 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
     //将白名单存储到本机
     configParamUtil::getInstance()->saveWhiteListData(whiteListData);
 
-    //同步其它站点的白名单
-    fileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID,
-             "whiteListSaveHandler invoke");  
-
     //发布白名单修改信息
     qlibc::QData publishData;
     publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
     publishData.putData("content", configParamUtil::getInstance()->getWhiteList());     //发布最新的白名单
     ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
     LOG_INFO << "publish: " << publishData.toJsonString();
+
+    //同步其它站点的白名单
+    whiteListFileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, "whiteListSaveHandler invoke");  
 
     qlibc::QData ret;
     ret.setInt("code", 0);
@@ -521,16 +667,16 @@ int saveSceneFile_service_request_handler(const Request& request, Response& resp
 
     //保存场景配置信息
     configParamUtil::getInstance()->saveSceneConfigFile(seceConfigFile);
-    //同步场景文件
-    fileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID,
-             "sceneConfigFile invoke");   
-
     //发布场景文件被修改消息
     qlibc::QData publishData;
     publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
     publishData.putData("content", seceConfigFile);
     ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
     LOG_INFO << "publish: " << publishData.toJsonString();
+
+    //同步场景文件
+    fileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID,
+             "sceneConfigFile invoke");   
 
     qlibc::QData ret;
     ret.setInt("code", 0);
@@ -647,215 +793,6 @@ int getAudioPanelList_service_request_handler(const Request& request, Response& 
 }
 
 
-using CategoryKeyMapType = std::map<string, std::map<string, Json::Value>>;
-using PropertyMapType = std::map<string, Json::Value>;
-
-//设备列表转换为设备map
-//std::map<phone, std::map<deviceSn, Json::Value>>
-CategoryKeyMapType JsonData2CategoryKeyMap(qlibc::QData& devices, string category, string uniqueKey){
-    CategoryKeyMapType devicesMap;
-    for(Json::ArrayIndex i = 0; i < devices.size(); ++i){
-        qlibc::QData item = devices.getArrayElement(i);
-        string phone = item.getString(category);
-        string deviceSn = item.getString(uniqueKey);
-        if(!phone.empty() && !deviceSn.empty()){
-            auto pos = devicesMap.find(phone);
-            if(pos != devicesMap.end()){    //有则只添加数据
-                pos->second.insert(std::make_pair(deviceSn, item.asValue()));
-            }else{
-                std::map<string, Json::Value> entry;
-                entry.insert(std::make_pair(deviceSn, item.asValue()));
-                devicesMap.insert(std::make_pair(phone, entry));    //无则创建条目
-            }
-        }
-    }
-    return devicesMap;
-}
-
-//设备map转换为设备列表
-qlibc::QData categoryKeyMap2JsonData(CategoryKeyMapType& phoneDeviceMap){
-    qlibc::QData deviceListData;
-    for(auto pos = phoneDeviceMap.begin(); pos != phoneDeviceMap.end(); ++pos){
-        std::map<string, Json::Value>& deviceMap = pos->second;
-        for(auto position = deviceMap.begin(); position != deviceMap.end(); ++position){
-            deviceListData.append(position->second);
-        }
-    }
-    return deviceListData;
-}
-
-//清除特定类型的设备
-void clearDevicesWithSpecificType(std::map<string, Json::Value>& devicesMap, string deviceType){
-    for(auto position = devicesMap.begin(); position != devicesMap.end();){
-            if(position->second["category_code"] == deviceType){
-                position = devicesMap.erase(position);
-            }else{
-                ++position;
-            }
-        }
-}
-
-//清除相等的元素
-void clearElementInReference(std::map<string, Json::Value>& referenceMap, std::map<string, Json::Value>& actualMap){
-    for(auto pos = referenceMap.begin(); pos != referenceMap.end(); ++pos){
-        if(actualMap.find(pos->first) != actualMap.end()){
-            actualMap.erase(pos->first);
-        }
-    }
-}
-
-//复制设备到指定的设备map中
-void copyDeviceElem(std::map<string, Json::Value>& source, std::map<string, Json::Value>& desination){
-    for(auto pos = source.begin(); pos != source.end(); ++pos){
-        desination.insert(*pos);
-    }
-}
-
-
-//获取经过处理的设备map
-CategoryKeyMapType getHandledDeviceMap(CategoryKeyMapType& phoneDevicesMap, CategoryKeyMapType& phoneLocalDevicesMap, string deviceType, string phone){
-    //如果phoneDevicesMap为空
-    if(phoneDevicesMap.empty() && !phone.empty()){  //清除该手机号下的所有指定类型设备
-        auto phoneLocalPos = phoneLocalDevicesMap.find(phone);
-        if(phoneLocalPos != phoneLocalDevicesMap.end()){
-            //清除该手机号下的所有语音面板或者雷达
-            clearDevicesWithSpecificType(phoneLocalPos->second, deviceType);
-        }
-    }else{
-        for(auto phonePos = phoneDevicesMap.begin(); phonePos != phoneDevicesMap.end(); ++phonePos){
-            string phone = phonePos->first;
-            std::map<string, Json::Value>& devicesMap = phonePos->second;
-            
-            auto phoneLocalPos = phoneLocalDevicesMap.find(phone);
-            if(phoneLocalPos != phoneLocalDevicesMap.end()){
-                clearDevicesWithSpecificType(phoneLocalPos->second, deviceType);
-                copyDeviceElem(devicesMap, phoneLocalPos->second);
-            }else{
-                phoneLocalDevicesMap.insert(std::make_pair(phone, devicesMap));
-            }
-            
-            //删除相同的元素
-            for(auto position = phoneLocalDevicesMap.begin(); position != phoneLocalDevicesMap.end(); ++position){
-                if(position->first != phone){
-                    clearElementInReference(devicesMap, position->second);
-                }
-            }
-        }
-    }
-    return phoneLocalDevicesMap;
-}
-
-
-//获取处理后的设备数据列表
-qlibc::QData getHandledDeviceData(qlibc::QData& devices, qlibc::QData& localDevices, string deviceType, string phone){
-    CategoryKeyMapType phoneDevicesMap = JsonData2CategoryKeyMap(devices, "phone", "device_sn");
-    CategoryKeyMapType phoneLocalDevicesMap = JsonData2CategoryKeyMap(localDevices, "phone", "device_sn");
-    CategoryKeyMapType handledDeviceMap = getHandledDeviceMap(phoneDevicesMap, phoneLocalDevicesMap, deviceType, phone);
-    return categoryKeyMap2JsonData(handledDeviceMap);
-}
-
-//获取指定账号下的雷达列表
-std::vector<string> getRadarVec(qlibc::QData& devices, string phone){
-    std::vector<string> radarVec;
-    Json::ArrayIndex size = devices.size();
-    for(Json::ArrayIndex i = 0; i < size; ++i){
-        qlibc::QData item = devices.getArrayElement(i);
-        if(item.getString("phone") == phone && item.getString("category_code") == "radar" && !item.getString("device_sn").empty()){
-            radarVec.push_back(item.getString("device_sn"));
-        }
-    }
-    return radarVec;
-}
-
-CategoryKeyMapType getHandledDoorsAreasMap(CategoryKeyMapType& radarSnKeyMap, CategoryKeyMapType& radarSnLocalKeyMap, std::vector<string>& radarSnVec){
-    //如果phoneDevicesMap为空
-    if(radarSnKeyMap.empty()){  
-        //清除该账号下的雷达下的门和区域信息
-        for(auto& radarSn : radarSnVec){
-            if(radarSnLocalKeyMap.find(radarSn) != radarSnLocalKeyMap.end()){
-                radarSnLocalKeyMap.erase(radarSn);
-            }
-        }
-    }else{
-        //对应替换
-        for(auto pos = radarSnKeyMap.begin(); pos != radarSnKeyMap.end(); ++pos){
-            string radarSn = pos->first;
-            auto position = radarSnLocalKeyMap.find(radarSn);
-            if(position != radarSnLocalKeyMap.end()){
-                position->second = pos->second;
-            }else{
-                radarSnLocalKeyMap.insert(std::make_pair(radarSn, pos->second));
-            }
-        }
-    }
-    return radarSnLocalKeyMap;
-}
-
-//获取门数据
-qlibc::QData getHandledDoorsData(qlibc::QData& doors, qlibc::QData& localDoors, std::vector<string>& radarSnVec){
-    CategoryKeyMapType radarSnDoorsMap = JsonData2CategoryKeyMap(doors, "radarsn", "id");
-    CategoryKeyMapType radarSnLocalDoorsMap = JsonData2CategoryKeyMap(localDoors, "radarSn", "id");
-    CategoryKeyMapType handledDoorsMap = getHandledDoorsAreasMap(radarSnDoorsMap, radarSnLocalDoorsMap, radarSnVec);
-    return categoryKeyMap2JsonData(handledDoorsMap);
-}
-
-//获取点位数据
-qlibc::QData getHandledAreaData(qlibc::QData& doors, qlibc::QData& localDoors, std::vector<string>& radarSnVec){
-    CategoryKeyMapType radarSnAreaMap = JsonData2CategoryKeyMap(doors, "radarsn", "area_id");
-    CategoryKeyMapType radarSnLocalAreaMap = JsonData2CategoryKeyMap(localDoors, "radarsn", "area_id");
-    CategoryKeyMapType handledAreaMap = getHandledDoorsAreasMap(radarSnAreaMap, radarSnLocalAreaMap, radarSnVec);
-    return categoryKeyMap2JsonData(handledAreaMap);
-}
-
-//属性列表转换为属性map
-//std::map<keyID, Json::Value>
-PropertyMapType properyData2PropertyMap(qlibc::QData& data, string key){
-    std::map<string, Json::Value> dataMap;
-    for(Json::ArrayIndex i = 0; i < data.size(); ++i){
-        qlibc::QData item = data.getArrayElement(i);
-        string value = item.getString(key);
-        if(!value.empty()){
-            auto pos = dataMap.find(value);
-            if(pos == dataMap.end()){   //沒有则添加，有则保持原数据
-                dataMap.insert(std::make_pair(value, item.asValue()));
-            }
-        }
-    }
-    return dataMap;
-}
-
-//属性map转换为属性列表
-qlibc::QData propertyMap2PropertyData(PropertyMapType& propertyMap){
-    qlibc::QData propertyData;
-    for(auto pos = propertyMap.begin(); pos != propertyMap.end(); ++pos){
-        propertyData.append(pos->second);
-    }
-    return propertyData;
-}
-
-
-//获取roomMap
-//有则替换，无则添加
-PropertyMapType getSubstitudeRoomsMap(PropertyMapType& roomsMap, PropertyMapType& localRoomsMap){
-    for(auto pos = roomsMap.begin(); pos != roomsMap.end(); ++pos){
-        if(localRoomsMap.find(pos->first) != localRoomsMap.end()){  //有则替换
-            localRoomsMap.erase(pos->first);
-            localRoomsMap.insert(*pos);
-        }else{
-            localRoomsMap.insert(*pos); //无则添加
-        }
-    }
-    return localRoomsMap;
-}
-
-qlibc::QData getSubstitudeRoomsData(qlibc::QData& rooms, qlibc::QData& localRooms){
-    PropertyMapType roomsMap = properyData2PropertyMap(rooms, "roomNo");
-    PropertyMapType localRoomsMap = properyData2PropertyMap(localRooms, "roomNo");
-    PropertyMapType handledRoomsMap = getSubstitudeRoomsMap(roomsMap, localRoomsMap);
-    return propertyMap2PropertyData(handledRoomsMap);
-}
-
-
 int saveAudioPanelList_service_request_handler(const Request& request, Response& response){
     std::lock_guard<std::mutex> lg(audioRadarServiceMutex);
     qlibc::QData requestData(request.body);
@@ -879,7 +816,7 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
     qlibc::QData localDevices = payload.getData("info").getData("devices");
     qlibc::QData localRooms = payload.getData("info").getData("rooms");
 
-    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices, "audiopanel", phone).asValue();
+    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices).asValue();
     payload.asValue()["info"]["rooms"] = getSubstitudeRoomsData(rooms, localRooms).asValue();
     payload.setString("timeStamp", timeStamp);
 
@@ -926,11 +863,10 @@ int setRadarDevice_service_request_handler(const Request& request, Response& res
     qlibc::QData localDoors = payload.getData("info").getData("doors");
     qlibc::QData localAreas = payload.getData("info").getData("area_app");
 
-
-    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices, "radar", phone).asValue();
+    payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices).asValue();
     payload.asValue()["info"]["rooms"] = getSubstitudeRoomsData(rooms, localRooms).asValue();
-    payload.asValue()["info"]["doors"] = getHandledDoorsData(doors, localDoors, radarVec).asValue();
-    payload.asValue()["info"]["area_app"] = getHandledAreaData(area_app, localAreas, radarVec).asValue();
+    payload.asValue()["info"]["doors"] = getHandledAreasDoorsDataAfterRadarService(devices, doors, localDoors, "radarsn", "id").asValue();
+    payload.asValue()["info"]["area_app"] = getHandledAreasDoorsDataAfterRadarService(devices, area_app, localAreas, "radarsn", "area_id").asValue();
     payload.setString("timeStamp", timeStamp);
 
     //保存设备列表
@@ -947,6 +883,8 @@ int setRadarDevice_service_request_handler(const Request& request, Response& res
     return 0;
 }
 
+
+#if 0
 qlibc::QData getDevicesAfterhandleRadarDevice(CategoryKeyMapType& devices, CategoryKeyMapType& localDevices, string& option){
     if(option == "update"){     //更新雷达设备
         for(auto pos = devices.begin(); pos != devices.end(); ++pos){
@@ -1092,3 +1030,4 @@ void radarMessageReceivedHandler(const Request& request){
     contentSaveRequest.putData("request", payload);
     httpUtil::sitePostRequest("127.0.0.1", 9006, contentSaveRequest, contentSaveResponse);
 }
+#endif

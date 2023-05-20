@@ -171,9 +171,6 @@ int main(int argc, char* argv[]) {
     //设置雷达信息
     serviceSiteManager->registerServiceRequestHandler(SETRADARLIST_REQUEST_SERVICE_ID, setRadarDevice_service_request_handler);
 
-    //雷达消息处理函数
-    serviceSiteManager->registerMessageHandler(RADARDEVICE_RECEIVED_MESSAGE_ID, radarMessageReceivedHandler);
-
 
     //set site supported subscribed message
     serviceSiteManager->registerMessageId(WHITELIST_MESSAGE_ID);                //发布白名单给第三方
@@ -201,28 +198,11 @@ int main(int argc, char* argv[]) {
         }
     });
 
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    //订阅雷达消息
-    threadPool_.enqueue([&](){
-        while(true){
-            std::vector<string> messageIdList;
-            messageIdList.push_back(RADARDEVICE_RECEIVED_MESSAGE_ID);
-            if(!ServiceSiteManager::subscribeMessage("127.0.0.1", 9010, messageIdList)){
-                LOG_RED << "subscribe southSite failed, subscribe again in 10 seconds.....";
-            }else{
-                LOG_PURPLE << "subscribe southSite successfully.....";
-                break;
-            }
-            std::this_thread::sleep_for(std::chrono::seconds(10));
-        }
-    });
-
     //30秒同步一次白名单和场景文件
     std::this_thread::sleep_for(std::chrono::seconds(2));
     threadPool_.enqueue([&](){
         while(true){
-            fileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, WHITELIST_SYNC_SAVE_REQUEST_SERVICE_ID,
-                     "whiteList auto update");    //同步白名单
+            whiteListFileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, "whiteList auto update");    //同步白名单
             fileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, SAVE_SYNC_SCENECONFIGFILE_REQUEST_SERVICE_ID,
                      "sceneData auto update");    //同步场景文件
             std::this_thread::sleep_for(std::chrono::seconds(60));

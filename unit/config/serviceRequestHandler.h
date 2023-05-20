@@ -41,6 +41,9 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
  *  3. 比较得到最新的白名单
  *  4. 将最新的白名单写回每个面板
  */
+void whiteListFileSync(string site_id, string getServiceId, string message);
+
+//文件覆盖同步
 void fileSync(string site_id, string getServiceId, string saveServiceId, string message);
 
 //获取白名单列表
@@ -84,7 +87,9 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
 //app推送账号下的所有雷达设备全集
 int setRadarDevice_service_request_handler(const Request& request, Response& response);
 
+#if 0
 //订阅雷达消息
 void radarMessageReceivedHandler(const Request& request);
+#endif
 
 #endif //EXHIBITION_SERVICEREQUESTHANDLER_H
