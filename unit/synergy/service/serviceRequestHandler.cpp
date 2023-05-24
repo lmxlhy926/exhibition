@@ -308,7 +308,15 @@ namespace synergy {
                 LOG_GREEN << "requestData: " << requestData.toJsonString();
                 SiteRecord::getInstance()->sendRequest2Site(siteName, requestData, responseData);
                 LOG_BLUE << "responseData: " << responseData.toJsonString();
-                response.set_content(responseData.toJsonString(), "text/json");
+                if(responseData.empty()){
+                    qlibc::QData ret;
+                    ret.setInt("code", -1);
+                    ret.setString("msg", "response is empty");
+                    ret.putData("response", qlibc::QData());
+                    response.set_content(ret.toJsonString(), "text/json");
+                }else{
+                    response.set_content(responseData.toJsonString(), "text/json");
+                }
                 return;
             }
         }
