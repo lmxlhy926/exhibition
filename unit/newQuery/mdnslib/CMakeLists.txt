@@ -9,6 +9,6 @@ elseif(ANDROID_ARM32)
 elseif(LINUX_ARM64)
     target_link_libraries(mdns INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/lib/arm64/libmdns.a)
 endif()
-# target_link_libraries(mdns INTERFACE siteManage)
-# target_link_libraries(mdns INTERFACE log)
+target_link_libraries(mdns INTERFACE siteManage)
+target_link_libraries(mdns INTERFACE log)
 
