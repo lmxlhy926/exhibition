@@ -172,8 +172,13 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageId(WHITELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知白名单已被修改
     serviceSiteManager->registerMessageId(SCENELIST_MODIFIED_MESSAGE_ID);       //发布消息，告知场景文件已被修改
     serviceSiteManager->registerMessageId(PANELINFO_MODIFIED_MESSAGE_ID);       //发布消息，面板配置信息更改
+    serviceSiteManager->registerMessageId(WHITELIST_MERGE_MESSAGE_ID);          //发布消息，通知面板进行白名单合并
+    serviceSiteManager->registerMessageId(SCENEFILE_UPDATE_MESSAGE_ID);         //发布消息，通知面板进行白名单更新
 
-   
+    servicesite::ServiceSiteManager::registerMessageHandler(WHITELIST_MERGE_MESSAGE_ID, messageTrigger);
+    servicesite::ServiceSiteManager::registerMessageHandler(SCENEFILE_UPDATE_MESSAGE_ID, messageTrigger);
+
+
     // 站点监听线程启动
     threadPool_.enqueue([&](){
         while(true){
@@ -196,11 +201,18 @@ int main(int argc, char* argv[]) {
     std::this_thread::sleep_for(std::chrono::seconds(2));
     threadPool_.enqueue([&](){
         while(true){
+            //订阅消息
+            std::vector<string> messageIdList;
+            messageIdList.push_back(WHITELIST_MERGE_MESSAGE_ID);
+            messageIdList.push_back(SCENEFILE_UPDATE_MESSAGE_ID);
+            subscribeFromAllConfigSite(messageIdList);
+            //更新文件
             whiteListFileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, "whiteList auto update");          //同步白名单
             sceneFileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, "sceneData auto update");   //同步场景文件
-            std::this_thread::sleep_for(std::chrono::seconds(60));
+            std::this_thread::sleep_for(std::chrono::seconds(30));
         }
     });
+
 
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(60 *10));

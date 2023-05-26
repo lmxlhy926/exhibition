@@ -35,6 +35,10 @@ int getWhiteListFromCloud_service_request_handler(mqttClient& mc, const Request&
 
 
 //-----------------------------------------------------------------------------------------------------------------
+
+//订阅所有面板的配置站点
+void subscribeFromAllConfigSite(std::vector<string>& messageIdList);
+
 /*
  *  1. 从主从站点获取所有面板列表
  *  2. 得到面板ip后，访问每个面板上的配置站点，获取其白名单
@@ -74,6 +78,9 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
 
 //app推送账号下的所有雷达设备全集
 int setRadarDevice_service_request_handler(const Request& request, Response& response);
+
+//消息触发更新
+void messageTrigger(const Request& request);
 
 #if 0
 //订阅雷达消息
