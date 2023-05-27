@@ -121,11 +121,11 @@ public:
     //获取蓝牙组亮度色温值
     Json::Value getGroupLuminanceColorTemperature(const string& groupId);
 
-    //poweroff
-    void powerOff(const string& groupId);
+    //组控关闭时更改组状态
+    void storeGroupluminance_powerOff(const string& groupId);
 
-    //powerOn
-    void powerOn(const string& groupId);
+    //组控打开时更改组状态
+    void storeGroupluminance_powerOn(const string& groupId);
 
 private:
     //产生设备的默认状态

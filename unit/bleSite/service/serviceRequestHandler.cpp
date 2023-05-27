@@ -69,11 +69,11 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
             if(command_id == POWER){    //开关
                 string powerOnOff = commandItem.getString("command_para");
                 cmdData.setString("commandPara", powerOnOff);
-                if(isGroup){
+                if(isGroup){    //组控开、闭时记录状态
                     if(powerOnOff == "on"){
-                        bleConfig::getInstance()->powerOn(address);
+                        bleConfig::getInstance()->storeGroupluminance_powerOn(address);
                     }else if(powerOnOff == "off"){
-                        bleConfig::getInstance()->powerOff(address);
+                        bleConfig::getInstance()->storeGroupluminance_powerOff(address);
                     }
                 }
 
@@ -85,7 +85,7 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                     luminance = 0;
                 }
                 cmdData.setInt("commandPara", luminance);
-                if(isGroup){
+                if(isGroup){    //组控设置亮度时记录状态
                     bleConfig::getInstance()->storeGroupluminance(address, luminance);
                 }
 
@@ -97,14 +97,14 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                     colorTemperature = 2700;
                 }
                 cmdData.setInt("commandPara", colorTemperature);
-                if(isGroup){
+                if(isGroup){    //组控设置色温时记录状态
                     bleConfig::getInstance()->storeGroupColorTemperature(address, colorTemperature);
                 }
 
             }else if(command_id == LUMINANCERELATIVE){  //相对亮度
                 if(!isGroup){
                     cmdData.setInt("commandPara", commandItem.getInt("command_para"));
-                }else{
+                }else{  //组控设置相对亮度时记录状态
                     int relative = commandItem.getInt("command_para");
                     int setLuminance{};
                     if (bleConfig::getInstance()->getGroupLuminanceColorTemperature(address)["luminance"].empty()) {
@@ -126,7 +126,7 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
             }else if(command_id == COLORTEMPERATURERELATIVE){   //相对色温
                 if(!isGroup){
                     cmdData.setInt("commandPara", commandItem.getInt("command_para"));
-                }else{
+                }else{  //组控设置相对色温时记录状态
                     int relative = commandItem.getInt("command_para");
                     int setColorTemperature{};
                     if (bleConfig::getInstance()->getGroupLuminanceColorTemperature(address)["temperature"].empty()) {
@@ -163,7 +163,7 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                 cmdData.setInt("commandParaLuminance", luminance);
                 cmdData.setInt("commandParaColorTemperature", colorTemperature);
 
-                if(isGroup){
+                if(isGroup){    //组控联合控制亮度、色温时记录状态
                     bleConfig::getInstance()->storeGroupluminance(address, luminance);
                     bleConfig::getInstance()->storeGroupColorTemperature(address, colorTemperature);
                 }

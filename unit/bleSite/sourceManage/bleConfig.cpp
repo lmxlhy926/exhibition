@@ -351,7 +351,7 @@ Json::Value bleConfig::getGroupLuminanceColorTemperature(const string& groupId){
     return {};
 }
 
-void bleConfig::powerOff(const string& groupId){
+void bleConfig::storeGroupluminance_powerOff(const string& groupId){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     auto pos = groupValueMap.find(groupId);
     if(pos != groupValueMap.end()){
@@ -359,7 +359,7 @@ void bleConfig::powerOff(const string& groupId){
     }
 }
 
-void bleConfig::powerOn(const string& groupId){
+void bleConfig::storeGroupluminance_powerOn(const string& groupId){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
     auto pos = groupValueMap.find(groupId);
     if(pos != groupValueMap.end()){
