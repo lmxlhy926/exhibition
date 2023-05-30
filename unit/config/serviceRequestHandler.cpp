@@ -663,8 +663,8 @@ int getAudioPanelList_service_request_handler(const Request& request, Response& 
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
     qlibc::QData deviceList = payload.getData("info").getData("devices");
     qlibc::QData rooms = payload.getData("info").getData("rooms");
-    // qlibc::QData area_app = payload.getData("info").getData("area_app");
-    // qlibc::QData doors = payload.getData("info").getData("doors");
+    qlibc::QData area_app = payload.getData("info").getData("area_app");
+    qlibc::QData doors = payload.getData("info").getData("doors");
 
     qlibc::QData devices;
     for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
@@ -677,8 +677,8 @@ int getAudioPanelList_service_request_handler(const Request& request, Response& 
     qlibc::QData retData;
     retData.putData("devices", devices);
     retData.putData("rooms", rooms);
-    // retData.putData("area_app", area_app);
-    // retData.putData("doors", doors);
+    retData.putData("area_app", area_app);
+    retData.putData("doors", doors);
 
     qlibc::QData data;
     data.setInt("code", 0);
