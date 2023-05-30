@@ -360,7 +360,7 @@ void whiteListFileSync(string site_id, string getServiceId, string message){
         publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
         publishData.putData("content", finalWhiteList);     
         ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-        LOG_INFO << "publish whiteListMessage: " << publishData.toJsonString();
+        LOG_PURPLE << "publish whiteList ....";
         LOG_PURPLE << "==>merge completely.....";
     }
     LOG_PURPLE << "==>sync completely.....";
@@ -434,7 +434,7 @@ void sceneFileSync(string site_id, string getServiceId, string message){
         publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
         publishData.putData("content", newestSceneFileData);
         ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-        LOG_INFO << "publish sceneListModifiedMessage: " << publishData.toJsonString();
+        LOG_PURPLE << "publish sceneListModifiedMessage.....";
     }
     LOG_PURPLE << "==>sync completely.....";
 }
@@ -663,6 +663,8 @@ int getAudioPanelList_service_request_handler(const Request& request, Response& 
     qlibc::QData payload = configParamUtil::getInstance()->getWhiteList();
     qlibc::QData deviceList = payload.getData("info").getData("devices");
     qlibc::QData rooms = payload.getData("info").getData("rooms");
+    // qlibc::QData area_app = payload.getData("info").getData("area_app");
+    // qlibc::QData doors = payload.getData("info").getData("doors");
 
     qlibc::QData devices;
     for(Json::ArrayIndex i = 0; i < deviceList.size(); ++i){
@@ -675,6 +677,8 @@ int getAudioPanelList_service_request_handler(const Request& request, Response& 
     qlibc::QData retData;
     retData.putData("devices", devices);
     retData.putData("rooms", rooms);
+    // retData.putData("area_app", area_app);
+    // retData.putData("doors", doors);
 
     qlibc::QData data;
     data.setInt("code", 0);

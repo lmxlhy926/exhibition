@@ -24,15 +24,13 @@ using json = nlohmann::json;
 
 static const string CONFIG_SITE_ID = "test";
 static const string CONFIG_SITE_ID_NAME = "测试站点";
-
-
 const string TEST_MESSAGE_ID = "register2QuerySiteAgain";
+
 
 void publish_message(void){
     qlibc::QData data;
     data.setString("message_id", "register2QuerySiteAgain");
     data.putData("content", qlibc::QData());
-
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
     serviceSiteManager->publishMessage(TEST_MESSAGE_ID, data.toJsonString());
     std::cout << "---publish---" << std::endl;
@@ -50,6 +48,10 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setSiteIdSummary(CONFIG_SITE_ID, CONFIG_SITE_ID_NAME);
 
     serviceSiteManager->registerMessageId(TEST_MESSAGE_ID);
+
+    serviceSiteManager->registerMessageHandler( "register2QuerySiteAgain", [](const Request& request){
+        LOG_INFO << "received: " << request.body;
+    });
 
     // 站点监听线程启动
     threadPool_.enqueue([&](){
@@ -69,10 +71,32 @@ int main(int argc, char* argv[]) {
         }
     });
 
+    //订阅自己
+    threadPool_.enqueue([&](){
+        while(true){
+            std::vector<string> messageIdList{
+                    "register2QuerySiteAgain",
+            };
+            int code = serviceSiteManager->subscribeMessage("172.29.90.147", 60003, messageIdList);
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                LOG_INFO << "subscribeMessage ok.";
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            LOG_INFO << "subscribed  failed....., start to subscribe in 3 seconds";
+        }
+    });
+
+    threadPool_.enqueue([&](){
+        while(true){
+            sleep(10);
+            publish_message();
+        }
+    });
+
 
     while(true){
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        publish_message();
+        std::this_thread::sleep_for(std::chrono::seconds(30));
     }
 
     return 0;
