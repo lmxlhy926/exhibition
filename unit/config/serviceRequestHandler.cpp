@@ -294,7 +294,9 @@ void addPhone2PanelConfig(qlibc::QData& devices){
 
 void whiteListFileSync(string site_id, string getServiceId, string message){
     std::lock_guard<std::mutex> lg(syncSaveMutex);
-    LOG_PURPLE << "==>fileSync start: " << message << "---------------";
+    LOG_INFO << "***************************************************************";
+    LOG_INFO << "***************************************************************";
+    LOG_PURPLE << "==>whiteList fileSync start: " << message << "---------------";
     std::map<unsigned long long, Json::Value> resultMap;
     qlibc::QData node_list;
     Json::ArrayIndex node_list_size  = 0;
@@ -349,7 +351,7 @@ void whiteListFileSync(string site_id, string getServiceId, string message){
     }else if(resultMap.size() == 1 && !configParamUtil::getInstance()->getWhiteList().empty()){
         LOG_PURPLE << "==>only get ownWhiteList, no need to merge.....";
     }else{
-        LOG_PURPLE << "==>start to merge.....";
+        LOG_PURPLE << "==>start to merge whiteList.....";
         qlibc::QData finalWhiteList = getMergeWhiteList(resultMap);
         configParamUtil::getInstance()->saveWhiteListData(finalWhiteList);
         //更新本地面板panelConfig信息
@@ -360,15 +362,20 @@ void whiteListFileSync(string site_id, string getServiceId, string message){
         publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
         publishData.putData("content", finalWhiteList);     
         ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-        LOG_PURPLE << "publish whiteList ....";
-        LOG_PURPLE << "==>merge completely.....";
+        LOG_PURPLE << "==>publish whiteList ....";
+        LOG_PURPLE << "==>whiteList merge completely.....";
     }
-    LOG_PURPLE << "==>sync completely.....";
+    LOG_PURPLE << "==>whiteList fileSync end: " << message << "---------------";
+    LOG_INFO << "***************************************************************";
+    LOG_INFO << "***************************************************************";
 }
+
 
 void sceneFileSync(string site_id, string getServiceId, string message){
     std::lock_guard<std::mutex> lg(syncSaveMutex);
-    LOG_PURPLE << "==>fileSync start: " << message << "---------------";
+    LOG_INFO << "***************************************************************";
+    LOG_INFO << "***************************************************************";
+    LOG_PURPLE << "==>sceneFile fileSync start: " << message << "---------------";
     std::map<unsigned long long, Json::Value> resultMap;
     qlibc::QData node_list;
     Json::ArrayIndex node_list_size  = 0;
@@ -424,7 +431,7 @@ void sceneFileSync(string site_id, string getServiceId, string message){
     }else if(resultMap.size() == 1 && !configParamUtil::getInstance()->getSceneConfigFile().empty()){
         LOG_PURPLE << "==>only get ownSceneFile, no need to update.....";
     }else{
-        LOG_PURPLE << "==>start to update.....";
+        LOG_PURPLE << "==>sceneFile start to update.....";
         auto pos = max_element(resultMap.begin(), resultMap.end());
         qlibc::QData newestSceneFileData(pos->second);
         //保存最新的场景文件
@@ -434,9 +441,12 @@ void sceneFileSync(string site_id, string getServiceId, string message){
         publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
         publishData.putData("content", newestSceneFileData);
         ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-        LOG_PURPLE << "publish sceneListModifiedMessage.....";
+        LOG_PURPLE << "publish sceneFile.....";
+        LOG_PURPLE << "==>sceneFile update completely.....";
     }
-    LOG_PURPLE << "==>sync completely.....";
+    LOG_PURPLE << "==>sceneFile fileSync end: " << message << "---------------";
+    LOG_INFO << "***************************************************************";
+    LOG_INFO << "***************************************************************";
 }
 
 int whiteList_get_service_request_handler(const Request& request, Response& response){
@@ -455,7 +465,7 @@ int whiteList_get_service_request_handler(const Request& request, Response& resp
 int whiteList_save_service_request_handler(const Request& request, Response& response){
     //收到白名单后，先将其保存
     qlibc::QData data(request.body);
-    LOG_INFO << "==>whiteList_save_service_request_handler: " << data.toJsonString();
+    LOG_INFO << "==>whiteList_save_service_request_handler......";
     qlibc::QData whiteListData = data.getData("request");
     if(whiteListData.empty()){
         LOG_RED << "==>whiteList is empty, format error....";
@@ -490,17 +500,14 @@ int whiteList_save_service_request_handler(const Request& request, Response& res
     publishData.setString("message_id", WHITELIST_MODIFIED_MESSAGE_ID);
     publishData.putData("content", configParamUtil::getInstance()->getWhiteList());     //发布最新的白名单
     ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-    LOG_INFO << "publish whiteListMessage: " << publishData.toJsonString();
-
-    //全局比对更新
-    whiteListFileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, "whiteListSaveHandler invoke");  
+    LOG_PURPLE << "==>publish whiteList......";
 
     //通知其它面板进行白名单合并
     qlibc::QData whiteListMerge;
     whiteListMerge.setString("message_id", WHITELIST_MERGE_MESSAGE_ID);
     whiteListMerge.putData("content", qlibc::QData());     //发布最新的白名单
     ServiceSiteManager::getInstance()->publishMessage(WHITELIST_MERGE_MESSAGE_ID, whiteListMerge.toJsonString());
-    LOG_PURPLE << "publish whiteListMergeMessage: " << whiteListMerge.toJsonString();
+    LOG_PURPLE << "==>publish whiteListMergeMessage: " << whiteListMerge.toJsonString();
 
     qlibc::QData ret;
     ret.setInt("code", 0);
@@ -558,10 +565,7 @@ int saveSceneFile_service_request_handler(const Request& request, Response& resp
     publishData.setString("message_id", SCENELIST_MODIFIED_MESSAGE_ID);
     publishData.putData("content", seceConfigFile);
     ServiceSiteManager::getInstance()->publishMessage(SCENELIST_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-    LOG_INFO << "publish sceneListModifiedMessage: " << publishData.toJsonString();
-
-    //同步场景文件
-    sceneFileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, "sceneConfigFile invoke");   
+    LOG_INFO << "publish sceneFile......";
 
     //通知其它面板进行场景文件合并
     qlibc::QData sceneFileUpdateData;
@@ -786,9 +790,9 @@ void messageTrigger(const Request& request){
     LOG_INFO << "messageTrigger: " << qlibc::QData(request.body).toJsonString();
     string message_id = requestData.getString("message_id");
     if(message_id == WHITELIST_MERGE_MESSAGE_ID){
-        whiteListFileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, "whiteList messagetrigger update"); 
+        whiteListFileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, "messagetrigger update"); 
     }else if(message_id == SCENEFILE_UPDATE_MESSAGE_ID){
-        sceneFileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, "sceneData messagetrigger update");
+        sceneFileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, "messagetrigger update");
     }
     return;
 }

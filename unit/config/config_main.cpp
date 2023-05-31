@@ -207,8 +207,8 @@ int main(int argc, char* argv[]) {
             messageIdList.push_back(SCENEFILE_UPDATE_MESSAGE_ID);
             subscribeFromAllConfigSite(messageIdList);
             //更新文件
-            whiteListFileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, "whiteList auto update");          //同步白名单
-            sceneFileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, "sceneData auto update");   //同步场景文件
+            whiteListFileSync(CONFIG_SITE_ID, WHITELIST_REQUEST_SERVICE_ID, "auto update");          //同步白名单
+            sceneFileSync(CONFIG_SITE_ID, GET_SCENECONFIG_FILE_REQUEST_SERVICE_ID, "auto update");   //同步场景文件
             std::this_thread::sleep_for(std::chrono::seconds(30));
         }
     });
