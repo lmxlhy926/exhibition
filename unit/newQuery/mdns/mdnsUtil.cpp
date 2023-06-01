@@ -205,10 +205,14 @@ service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_ent
     //判断请求的是否是注册的站点
     string reqDomainName = string(name.str, name.length);
     smatch sm;
-    bool ret = regex_match(reqDomainName, sm, regex(R"(_edgeai.(.*)._tcp.local.)"));
-    if(ret) {
-        string siteId = sm[1].str();
+    string siteId{};
+    if(regex_match(reqDomainName, sm, regex(R"(_edgeai.(.*)._tcp.local.)"))){
+        siteId = sm[1].str();
+    }else if(regex_match(reqDomainName, sm, regex(R"((.*)._tcp.local.)"))){
+        siteId = sm[1].str().substr(1);
+    }
 
+    if(!siteId.empty()) {
 //        if(entry == MDNS_ENTRYTYPE_ANSWER && siteId == "site_query"){
 //            LOG_PURPLE << "Answer: " << record_name << " " << string(name.str, name.length);
 //            if(!ipAddress.empty())
