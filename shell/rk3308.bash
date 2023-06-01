@@ -38,12 +38,35 @@ pushSite2Panel(){
     fi
 }
 
-#param1：面板地址, param2: 存储目录
-pullConfigLog(){
+pullQuerySiteLog(){
+	address=$1	#面板ip地址
+	destDir=$2	#存储目录
+    fromPath=/data/changhong/edge_midware/lhy/querySiteLog.txt
+    destPath="${destDir}\querySiteLog_${address}.txt"
+    /mnt/d/adb/adb.exe -s ${address} pull ${fromPath} ${destPath}
+}
+
+pullConfigSiteLog(){
     address=$1
     fromPath=/data/changhong/edge_midware/lhy/configSiteLog.txt
     destDir=$2
     destPath="${destDir}\configSiteLog_${address}.txt"
+    /mnt/d/adb/adb.exe -s ${address} pull ${fromPath} ${destPath}
+}
+
+pullBleSiteLog(){
+	address=$1
+    fromPath=/data/changhong/edge_midware/lhy/bleMeshSiteLog.txt
+    destDir=$2
+    destPath="${destDir}\bleMeshSiteLog_${address}.txt"
+    /mnt/d/adb/adb.exe -s ${address} pull ${fromPath} ${destPath}
+}
+
+pullSynergySiteLog(){
+	address=$1
+    fromPath=/data/changhong/edge_midware/lhy/synergySiteLog.txt
+    destDir=$2
+    destPath="${destDir}\synergySiteLog_${address}.txt"
     /mnt/d/adb/adb.exe -s ${address} pull ${fromPath} ${destPath}
 }
 
@@ -55,14 +78,23 @@ then
 	for target in ${targets[*]}
 	do
 		buildTargets ${target}
+		echo "**************build target: ${target}**************"
 	done
 
-elif [ $1 == "push" ]
+elif [ $1 == "connect" ]
+then
+	read -p "panel address: " -a panelAddressArray
+	for panelAddress in ${panelAddressArray[*]}
+	do
+		/mnt/d/adb/adb.exe connect ${panelAddress}
+	done
+
+elif [ $1 == "push" ]	#推送站点
 then
 	/mnt/d/adb/adb.exe devices
 	echo "--------------------------"
-    read -p "panel address: " -a panelAddressArray
-	read -p "sites: " -a sites
+    read -p "panel to push: " -a panelAddressArray
+	read -p "sites to push: " -a sites
     for panelAddress in ${panelAddressArray}
     do
         /mnt/d/adb/adb.exe connect ${panelAddress}
@@ -72,20 +104,35 @@ then
         done 
     done
 
-elif [ $1 == "pull" ]
+elif [ $1 == "pull" ]	#拉取log
 then
 	/mnt/d/adb/adb.exe devices
 	echo "--------------------------"
-    read -p "panel address: " -a panelAddressArray
-	read -p "pull file: configLog? " file
-	if [ ${file} == "configLog" ]
-	then
-		for panelAddress in ${panelAddressArray[*]}
+    read -p "panel to pull: " -a panelAddressArray
+	read -p "files to pull:" fileArray
+	for panelAddress in ${panelAddressArray[*]}
+	do
+		/mnt/d/adb/adb.exe connect ${panelAddress}
+		for file in ${fileArray[*]}
 		do
-			/mnt/d/adb/adb.exe connect ${panelAddress}
-			pullConfigLog ${panelAddress} "D:\bywg\debug_3308"
+			if [ ${file} == "qlog" -o ${file} == "clog" -o ${file} == "blog" -o ${file} == "slog" ]
+			then
+				if [ ${file} == "qlog" ]
+				then
+					pullQuerySiteLog ${panelAddress} "D:\bywg\debug_3308"
+				elif [ ${file} == "clog" ]
+				then
+					pullConfigSiteLog ${panelAddress} "D:\bywg\debug_3308"
+				elif [ ${file} == "blog" ]
+				then
+					pullBleSiteLog ${panelAddress} "D:\bywg\debug_3308"
+				elif [ ${file} == "slog" ]
+				then
+					pullSynergySiteLog ${panelAddress} "D:\bywg\debug_3308"
+				fi
+			fi
 		done
-	fi
+	done
 
 elif [ $1 == "shell" ]
 then
@@ -100,5 +147,3 @@ then
 	echo "copy sites to /mnt/d/bywg/outbin/arm64 .........";
 	cp /home/lhy/smarthome/exhibition/out/arm64/*site /mnt/d/bywg/outbin/arm64/
 fi
-
-
