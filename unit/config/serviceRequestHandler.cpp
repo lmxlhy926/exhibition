@@ -719,6 +719,7 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
     payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices).asValue();
     payload.asValue()["info"]["rooms"] = getSubstitudeRoomsData(rooms, localRooms).asValue();
     payload.setString("timeStamp", timeStamp);
+    payload.setString("phone", phone);
 
     //保存白名单
     qlibc::QData contentSaveRequest, contentSaveResponse;
@@ -768,6 +769,7 @@ int setRadarDevice_service_request_handler(const Request& request, Response& res
     payload.asValue()["info"]["doors"] = getHandledAreasDoorsDataAfterRadarService(devices, doors, localDoors, "radarsn", "id").asValue();
     payload.asValue()["info"]["area_app"] = getHandledAreasDoorsDataAfterRadarService(devices, area_app, localAreas, "radarsn", "area_id").asValue();
     payload.setString("timeStamp", timeStamp);
+    payload.setString("phone", phone);
 
     //保存设备列表
     qlibc::QData contentSaveRequest, contentSaveResponse;
