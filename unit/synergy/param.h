@@ -74,7 +74,8 @@ static const string SingleDeviceBindSuccessMsg      =   "singleDeviceBindSuccess
 static const string SingleDeviceUnbindSuccessMsg    =   "singleDeviceUnbindSuccessMsg";      //单个设备解绑成功
 static const string BindEndMsg                      =   "bindEndMsg";                        //绑定结束
 static const string Device_State_Changed            =   "device_state_changed";              //设备状态改变
-static const string DeviceOnOffLine                 =   "device_on_off_line";                //设备上下线
+static const string DeviceOnOffLineMsg              =   "device_on_off_line";                //设备上下线
+static const string TriggerSceneMsg                 =   "trigger_scene";                     //场景触发
 
 
 //发布消息ID

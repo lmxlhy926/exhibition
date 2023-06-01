@@ -189,7 +189,9 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageId(SingleDeviceUnbindSuccessMsg);   //单个设备解绑结果
     serviceSiteManager->registerMessageId(BindEndMsg);                     //绑定结束
     serviceSiteManager->registerMessageId(Device_State_Changed);           //设备状态改变
-    serviceSiteManager->registerMessageId(DeviceOnOffLine);                //设备上下线
+    serviceSiteManager->registerMessageId(DeviceOnOffLineMsg);             //设备上下线
+    serviceSiteManager->registerMessageId(TriggerSceneMsg);                //场景触发消息
+
 
     //注册消息处理函数
     servicesite::ServiceSiteManager::registerMessageHandler(ScanResultMsg,                 synergy::messagePublish);
@@ -197,7 +199,8 @@ int main(int argc, char* argv[]) {
     servicesite::ServiceSiteManager::registerMessageHandler(SingleDeviceUnbindSuccessMsg,  synergy::messagePublish);
     servicesite::ServiceSiteManager::registerMessageHandler(BindEndMsg,                    synergy::messagePublish);
     servicesite::ServiceSiteManager::registerMessageHandler(Device_State_Changed,          synergy::messagePublish);
-    servicesite::ServiceSiteManager::registerMessageHandler(DeviceOnOffLine,               synergy::messagePublish);
+    servicesite::ServiceSiteManager::registerMessageHandler(DeviceOnOffLineMsg,            synergy::messagePublish);
+    servicesite::ServiceSiteManager::registerMessageHandler(TriggerSceneMsg,               synergy::messagePublish);
 
 
     // 站点监听线程启动

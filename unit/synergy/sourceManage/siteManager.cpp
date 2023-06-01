@@ -130,7 +130,8 @@ void siteManager::updateSite(){
             if(SiteRecord::getInstance()->getSiteInfo(siteName, ip, port)){
                 //订阅蓝牙站点消息
                 std::vector<string> messageIdList;
-                messageIdList.push_back(DeviceOnOffLine);
+                messageIdList.push_back(DeviceOnOffLineMsg);
+                messageIdList.push_back(TriggerSceneMsg);
                 ServiceSiteManager::subscribeMessage(ip, port, messageIdList);
             }
         }
