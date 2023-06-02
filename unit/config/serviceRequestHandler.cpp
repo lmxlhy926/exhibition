@@ -275,6 +275,10 @@ void subscribeFromAllConfigSite(std::vector<string>& messageIdList){
 void addPhone2PanelConfig(qlibc::QData& devices){
     Json::ArrayIndex deviceListSize = devices.size();
     string panelSn = configParamUtil::getInstance()->getPanelInfo().getString("device_mac");
+    if(panelSn.empty() || deviceListSize == 0){
+        return;
+    }
+
     for(int i = 0; i < deviceListSize; ++i){
         qlibc::QData item = devices.getArrayElement(i);
         if(item.getString("device_sn") == panelSn){
@@ -285,7 +289,7 @@ void addPhone2PanelConfig(qlibc::QData& devices){
                 publishData.setString("message_id", PANELINFO_MODIFIED_MESSAGE_ID);
                 publishData.putData("content", panelConfigData);
                 ServiceSiteManager::getInstance()->publishMessage(PANELINFO_MODIFIED_MESSAGE_ID, publishData.toJsonString());
-                LOG_INFO << "publish: " << publishData.toJsonString();
+                LOG_INFO << "publish self_info_update message: " << publishData.toJsonString();
                 break;
             }
         }
