@@ -717,7 +717,7 @@ int saveAudioPanelList_service_request_handler(const Request& request, Response&
     qlibc::QData localRooms = payload.getData("info").getData("rooms");
 
     payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices).asValue();
-    payload.asValue()["info"]["rooms"] = getSubstitudeRoomsData(rooms, localRooms).asValue();
+    payload.asValue()["info"]["rooms"] = rooms.asValue();
     payload.setString("timeStamp", timeStamp);
     payload.setString("phone", phone);
 
@@ -765,7 +765,6 @@ int setRadarDevice_service_request_handler(const Request& request, Response& res
     qlibc::QData localAreas = payload.getData("info").getData("area_app");
 
     payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices).asValue();
-    payload.asValue()["info"]["rooms"] = getSubstitudeRoomsData(rooms, localRooms).asValue();
     payload.asValue()["info"]["doors"] = getHandledAreasDoorsDataAfterRadarService(devices, doors, localDoors, "radarsn", "id").asValue();
     payload.asValue()["info"]["area_app"] = getHandledAreasDoorsDataAfterRadarService(devices, area_app, localAreas, "radarsn", "area_id").asValue();
     payload.setString("timeStamp", timeStamp);

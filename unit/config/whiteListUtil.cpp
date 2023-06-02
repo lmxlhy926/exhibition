@@ -254,7 +254,7 @@ void whiteListMerge(qlibc::QData& oldWhiteList, qlibc::QData& newWhiteList){
     qlibc::QData rooms = newWhiteList.getData("info").getData("rooms");
     qlibc::QData doors = newWhiteList.getData("info").getData("doors");
     qlibc::QData area_app = newWhiteList.getData("info").getData("area_app");
-
+    
     qlibc::QData localDevices = oldWhiteList.getData("info").getData("devices");
     qlibc::QData localRooms = oldWhiteList.getData("info").getData("rooms");
     qlibc::QData localDoors = oldWhiteList.getData("info").getData("doors");
@@ -262,10 +262,12 @@ void whiteListMerge(qlibc::QData& oldWhiteList, qlibc::QData& newWhiteList){
 
     qlibc::QData payload;
     payload.asValue()["info"]["devices"] = getHandledDeviceData(devices, localDevices).asValue();
-    payload.asValue()["info"]["rooms"] = getSubstitudeRoomsData(rooms, localRooms).asValue();
+    payload.asValue()["info"]["rooms"] = rooms.asValue();
     payload.asValue()["info"]["doors"] = getHandledAreasDoorsDataAfterRadarService(devices, doors, localDoors, "radarsn", "id").asValue();
     payload.asValue()["info"]["area_app"] = getHandledAreasDoorsDataAfterRadarService(devices, area_app, localAreas, "radarsn", "area_id").asValue();
     payload.setString("timeStamp", newWhiteList.getString("timeStamp"));
+    payload.setString("phone", newWhiteList.getString("phone"));
+
 
     oldWhiteList.setInitData(payload);
 }
