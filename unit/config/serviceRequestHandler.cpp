@@ -370,8 +370,8 @@ void whiteListFileSync(string site_id, string getServiceId, string message){
         LOG_PURPLE << "==>whiteList merge completely.....";
     }
     LOG_PURPLE << "==>whiteList fileSync end: " << message << "---------------";
-    LOG_INFO << "***************************************************************";
-    LOG_INFO << "***************************************************************";
+    LOG_INFO << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    LOG_INFO << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 }
 
 
@@ -449,8 +449,8 @@ void sceneFileSync(string site_id, string getServiceId, string message){
         LOG_PURPLE << "==>sceneFile update completely.....";
     }
     LOG_PURPLE << "==>sceneFile fileSync end: " << message << "---------------";
-    LOG_INFO << "***************************************************************";
-    LOG_INFO << "***************************************************************";
+    LOG_INFO << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    LOG_INFO << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 }
 
 int whiteList_get_service_request_handler(const Request& request, Response& response){
