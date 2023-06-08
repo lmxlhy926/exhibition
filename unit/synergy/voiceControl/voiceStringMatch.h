@@ -15,7 +15,9 @@ using namespace std;
 enum ActionCode{
     NoneAction = 0,
     powerOn,
+    powerOn1,
     powerOff,
+    powerOff1,
     luminance1,
     luminance2,
     color_temperature1,

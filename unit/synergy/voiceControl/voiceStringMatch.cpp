@@ -38,12 +38,14 @@ voiceStringMatchControl::voiceStringMatchControl(string& ctrlStr)   :
         {"灯", "LIGHT"}
     }),
     matchRex2ActionCode({
-        {".*(打开).*", ActionCode::powerOn},
-        {".*(关闭).*", ActionCode::powerOff},
-        {".*(亮一点).*",ActionCode::luminanceUp},
-        {".*(暗一点).*", ActionCode::luminanceDown},
-        {".*(白一点).*", ActionCode::temperatureUp},
-        {".*(黄一点).*", ActionCode::temperatureDown},
+        {".*(打开).*",    ActionCode::powerOn},
+        {".*(开).*",      ActionCode::powerOn1},
+        {".*(关闭).*",    ActionCode::powerOff},
+        {".*(关).*",      ActionCode::powerOff1},
+        {".*(亮一点).*",  ActionCode::luminanceUp},
+        {".*(暗一点).*",  ActionCode::luminanceDown},
+        {".*(白一点).*",  ActionCode::temperatureUp},
+        {".*(黄一点).*",  ActionCode::temperatureDown},
         {".*((调|变|换|设)(到|成|为|置)).*(亮度).*", ActionCode::luminance1},
         {".*(亮度).*((调|变|换|设)(到|成|为|置)).*", ActionCode::luminance2},
         {".*((调|变|换|设)(到|成|为|置)).*(色温).*", ActionCode::color_temperature1},
@@ -51,7 +53,9 @@ voiceStringMatchControl::voiceStringMatchControl(string& ctrlStr)   :
     }),
     actionCodeCaptureGroup({
         {ActionCode::powerOn, {1}},
+        {ActionCode::powerOn1, {1}},
         {ActionCode::powerOff, {1}},
+        {ActionCode::powerOff1, {1}},
         {ActionCode::luminanceUp, {1}},
         {ActionCode::luminanceDown, {1}},
         {ActionCode::temperatureUp, {1}},
@@ -142,9 +146,9 @@ string voiceStringMatchControl::code2Action(ActionCode code){
     string action;
     if(code == ActionCode::NoneAction){
         action = "NoneAction";
-    }else if(code == ActionCode::powerOn){
+    }else if(code == ActionCode::powerOn || code == ActionCode::powerOn1){
         action = "powerOn";
-    }else if(code == ActionCode::powerOff){
+    }else if(code == ActionCode::powerOff || code == ActionCode::powerOff1){
         action = "powerOff";
     }else if (code == ActionCode::luminance1 || code == ActionCode::luminance2){
         action = "set luminance";
@@ -189,11 +193,11 @@ void voiceStringMatchControl::printParsedItem(struct ParsedItem& item){
 void voiceStringMatchControl::action2Command(ParsedItem& parsedItem, CommandItem& commandItem){
     std::lock_guard<std::mutex> lg(Mutex);
 
-    if(parsedItem.actionCode == ActionCode::powerOn){   //开
+    if(parsedItem.actionCode == ActionCode::powerOn || parsedItem.actionCode == ActionCode::powerOn1){   //开
         commandItem.command_id = "power";
         commandItem.command_para = "on";
 
-    }else if(parsedItem.actionCode == ActionCode::powerOff){    //关
+    }else if(parsedItem.actionCode == ActionCode::powerOff || parsedItem.actionCode == ActionCode::powerOff1){    //关
         commandItem.command_id = "power";
         commandItem.command_para = "off";
 
