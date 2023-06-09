@@ -191,6 +191,7 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerMessageId(Device_State_Changed);           //设备状态改变
     serviceSiteManager->registerMessageId(DeviceOnOffLineMsg);             //设备上下线
     serviceSiteManager->registerMessageId(TriggerSceneMsg);                //场景触发消息
+    serviceSiteManager->registerMessageId(DeviceGroupList_Update_Message); //设备列表、组列表变更
 
 
     //注册消息处理函数

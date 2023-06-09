@@ -142,6 +142,13 @@ void siteManager::updateSite(){
 
     //更新组列表
     GroupManager::getInstance()->updateGroupList();
+
+    //发布列表变更消息
+    qlibc::QData deviceGroupUpdate;
+    deviceGroupUpdate.setString("message_id", DeviceGroupList_Update_Message);
+    deviceGroupUpdate.putData("content", qlibc::QData());
+    ServiceSiteManager::getInstance()->publishMessage(DeviceGroupList_Update_Message, deviceGroupUpdate.toJsonString());
+    LOG_PURPLE << "==>" << DeviceGroupList_Update_Message << ": " << deviceGroupUpdate.toJsonString();
 }
 
 qlibc::QData siteManager::getPanelList(){

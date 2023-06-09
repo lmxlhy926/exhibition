@@ -67,18 +67,19 @@ static const string GetGroupList_Device_Service_ID              = "get_group_lis
 
 
 //订阅消息ID
-static const string Site_OnOffLine_MessageID = "site_onoffline";
+static const string Site_OnOffLine_MessageID        =   "site_onoffline";
 //订阅蓝牙站点的消息
 static const string ScanResultMsg                   =   "scanResultMsg";                     //扫描结果消息
 static const string SingleDeviceBindSuccessMsg      =   "singleDeviceBindSuccessMsg";        //单个设备绑定成功
 static const string SingleDeviceUnbindSuccessMsg    =   "singleDeviceUnbindSuccessMsg";      //单个设备解绑成功
 static const string BindEndMsg                      =   "bindEndMsg";                        //绑定结束
 static const string Device_State_Changed            =   "device_state_changed";              //设备状态改变
+//订阅的zigbee站点消息
 static const string DeviceOnOffLineMsg              =   "device_on_off_line";                //设备上下线
 static const string TriggerSceneMsg                 =   "trigger_scene";                     //场景触发
 
-
 //发布消息ID
-static const string Scene_Msg_MessageID = "sceneMsg";
+static const string Scene_Msg_MessageID             =   "sceneMsg";
+static const string DeviceGroupList_Update_Message  =   "deviceGroupListUpdateMsg";
 
 #endif //EXHIBITION_PARAM_H
