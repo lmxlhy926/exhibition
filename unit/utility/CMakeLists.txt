@@ -1,2 +1,2 @@
 
-add_executable(adbParse  adbParse.cpp)
+add_executable(addressExtract  adbParse.cpp)
