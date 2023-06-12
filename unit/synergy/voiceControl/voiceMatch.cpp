@@ -217,8 +217,8 @@ void voiceMatch::controlByParsedItem(ParsedItem& parsedItem){
         requestData.setString("service_id", "control_device");
         requestData.putData("request", qlibc::QData().setValue("device_list", deviceList));
         LOG_GREEN << "voice controlRequest: " << requestData.toJsonString();
-        // httpUtil::sitePostRequest("127.0.0.1", 9007, requestData, responseData);
-        // LOG_BLUE << "voice controlResponse: " << responseData.toJsonString();
+        httpUtil::sitePostRequest("127.0.0.1", 9007, requestData, responseData);
+        LOG_BLUE << "voice controlResponse: " << responseData.toJsonString();
 
     }else if(parsedItem.ctrlType == ControlType::Group){
         Json::Value group_list(Json::arrayValue);
@@ -233,8 +233,8 @@ void voiceMatch::controlByParsedItem(ParsedItem& parsedItem){
         requestData.setString("service_id", "control_group");
         requestData.putData("request", qlibc::QData().setValue("group_list", group_list));
         LOG_GREEN << "voice controlRequest: " << requestData.toJsonString();
-        // httpUtil::sitePostRequest("127.0.0.1", 9007, requestData, responseData);
-        // LOG_BLUE << "voice controlResponse: " << responseData.toJsonString();
+        httpUtil::sitePostRequest("127.0.0.1", 9007, requestData, responseData);
+        LOG_BLUE << "voice controlResponse: " << responseData.toJsonString();
     }
 }
 
