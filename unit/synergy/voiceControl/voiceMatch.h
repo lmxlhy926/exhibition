@@ -7,7 +7,6 @@
 
 #include <string>
 #include <regex>
-#include <mutex>
 #include "qlibc/QData.h"
 using namespace std;
 
@@ -15,9 +14,7 @@ using namespace std;
 enum ActionCode{
     NoneAction = 0,
     powerOn,
-    powerOn1,
     powerOff,
-    powerOff1,
     luminance1,
     luminance2,
     color_temperature1,
@@ -38,13 +35,11 @@ enum ControlType{
 
 //解析项：房间名、动作码、<设备号、组id、类型>、动作参数
 struct ParsedItem{
-    string deviceType;
-    std::map<string, Json::Value> devIdGrpId;
-    std::vector<string> roomNameVec;
-    ControlType ctrlType = ControlType::NoneType;        //控制类型，单个设备or分组
     ActionCode actionCode = ActionCode::NoneAction;      //控制动作码
-    string param;
-    bool hasAll{false};
+    ControlType ctrlType = ControlType::NoneType;        //控制类型，单个设备or分组
+    std::map<string, Json::Value> devIdGrpId;            //匹配的设备ids,组ids；
+    string param;                                        //控制参数
+    std::vector<string> roomList;                        //所在房间
 };
 
 
@@ -54,7 +49,6 @@ struct CommandItem{
     Json::Value command_para;
 };
 
-class voiceMatchUtil;
 
 class voiceMatch{
 private:
@@ -65,52 +59,53 @@ private:
     const int deltaLuminance = 20;
     const int defaultTemperature = 60;
     const int deltaTemperature = 20;
-    std::mutex Mutex;   //保护静态变量
-
 public:
     explicit voiceMatch(const string& ctrlStr);
 
     void parseAndControl();
 
-    string code2Action(ActionCode code);
+    //获取动作码描述字符串
+    string getActionString(ActionCode code);
 
-    void action2Command(ParsedItem& parsedItem, CommandItem& commandItem);
-
+    //打印解析结果
     void printParsedItem(ParsedItem& parsedItem);
 
+    //解析并控制
     void controlByParsedItem(ParsedItem& parsedItem);
 };
 
+
 class voiceMatchUtil{
+public:
     //移除控制字符串中的无效字符
-    string eraseInvalidCharacter(const string& str);
+    static string eraseInvalidCharacter(const string& str);
 
     //提取控制字符串中的房间
-    std::vector<string> extractRoom(string& voiceString, const std::vector<string>& roomList);
+    static std::vector<string> extractRoom(string& voiceString, const std::vector<string>& roomList);
 
     //提取控制字符串中的控制设备类型
-    string extractDeviceType(string& voiceString, const std::map<string, string> deviceTypeMap);
+    static string extractDeviceType(string& voiceString, const std::map<string, string> deviceTypeMap);
 
     //提取控制字符串中的控制参数
-    string extractParam(string& voiceString);
+    static string extractParam(string& voiceString);
 
     //提取控制字符串中的控制动作码
-    ActionCode extractAction(string& voiceString, std::map<string, ActionCode> matchRex2ActionCode, std::map<ActionCode, std::vector<int>> actionCodeCaptureGroup);
+    static ActionCode extractAction(string& voiceString, std::map<string, ActionCode> matchRex2ActionCode, std::map<ActionCode, std::vector<int>> actionCodeCaptureGroup);
 
     //提取匹配的设备ID
-    bool getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, std::map<string, Json::Value>& matchedDeviceMap);
+    static bool getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, std::map<string, Json::Value>& matchedDeviceMap);
 
     //提取匹配的组ID
-    bool getSpecificGroupId(string& voiceString, qlibc::QData& groupList, std::map<string, Json::Value>& matchedGroupMap);
+    static bool getSpecificGroupId(string& voiceString, qlibc::QData& groupList, std::map<string, Json::Value>& matchedGroupMap);
 
     //从设备列表中获取类型匹配的设备
-    bool getDeviceIdsFromDeviceType(qlibc::QData& deviceList, string& deviceType, std::map<string, Json::Value>& matchedDeviceMap);
+    static bool getDeviceIdsFromDeviceType(qlibc::QData& deviceList, string& deviceType, std::map<string, Json::Value>& matchedDeviceMap);
 
     //从组列表中提取房间名匹配的组
-    bool getGroupIdsFromRoomName(qlibc::QData& groupList, string& roomName, std::map<string, Json::Value>& matchedGroupMap);
+    static bool getGroupIdsFromRoomName(qlibc::QData& groupList, string& roomName, std::map<string, Json::Value>& matchedGroupMap);
 
     // 提取匹配到的设备或组
-    bool findDeviceIdOrGroupId(string& voiceString, qlibc::QData& deviceList, qlibc::QData& groupList, 
+    static bool findDeviceIdOrGroupId(string& voiceString, qlibc::QData& deviceList, qlibc::QData& groupList, 
                                const std::map<string, string> deviceTypeMap, struct ParsedItem& parsedItem);
 };
 

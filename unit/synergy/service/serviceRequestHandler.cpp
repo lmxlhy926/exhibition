@@ -13,7 +13,7 @@
 #include "../sourceManage/deviceManager.h"
 #include "../sourceManage/groupManager.h"
 #include "../control/sceneCommand.h"
-#include "../voiceControl/voiceStringMatch.h"
+#include "../voiceControl/voiceMatch.h"
 #include <vector>
 #include <regex>
 
@@ -550,8 +550,8 @@ namespace synergy {
         LOG_INFO << "voiceControl_service_handler: " << qlibc::QData(request.body).toJsonString();
         qlibc::QData requestData(request.body);
         string voiceControlString = requestData.getData("request").getString("controlString");
-        // voiceStringMatchControl voiceCtrl(voiceControlString);
-        // voiceCtrl.parseAndControl();
+        voiceMatch voiceCtrl(voiceControlString);
+        voiceCtrl.parseAndControl();
         response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
