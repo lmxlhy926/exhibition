@@ -550,8 +550,8 @@ namespace synergy {
         LOG_INFO << "voiceControl_service_handler: " << qlibc::QData(request.body).toJsonString();
         qlibc::QData requestData(request.body);
         string voiceControlString = requestData.getData("request").getString("controlString");
-        voiceStringMatchControl voiceCtrl(voiceControlString);
-        voiceCtrl.parseAndControl();
+        // voiceStringMatchControl voiceCtrl(voiceControlString);
+        // voiceCtrl.parseAndControl();
         response.set_content(okResponse.dump(), "text/json");
         return 0;
     }

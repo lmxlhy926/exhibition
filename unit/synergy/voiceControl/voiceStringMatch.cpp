@@ -34,14 +34,16 @@ voiceStringMatchControl::voiceStringMatchControl(string& ctrlStr)   :
         "生活阳台",
         "过道",
     }),
+
     deviceTypeMap({
         {"灯", "LIGHT"}
     }),
+
     matchRex2ActionCode({
         {".*(打开).*",    ActionCode::powerOn},
-        {".*(开).*",      ActionCode::powerOn1},
+        {".*(开).*",      ActionCode::powerOn},
         {".*(关闭).*",    ActionCode::powerOff},
-        {".*(关).*",      ActionCode::powerOff1},
+        {".*(关).*",      ActionCode::powerOff},
         {".*(亮一点).*",  ActionCode::luminanceUp},
         {".*(暗一点).*",  ActionCode::luminanceDown},
         {".*(白一点).*",  ActionCode::temperatureUp},
@@ -51,11 +53,10 @@ voiceStringMatchControl::voiceStringMatchControl(string& ctrlStr)   :
         {".*((调|变|换|设)(到|成|为|置)).*(色温).*", ActionCode::color_temperature1},
         {".*(色温).*((调|变|换|设)(到|成|为|置)).*", ActionCode::color_temperature2}
     }),
+    
     actionCodeCaptureGroup({
         {ActionCode::powerOn, {1}},
-        {ActionCode::powerOn1, {1}},
         {ActionCode::powerOff, {1}},
-        {ActionCode::powerOff1, {1}},
         {ActionCode::luminanceUp, {1}},
         {ActionCode::luminanceDown, {1}},
         {ActionCode::temperatureUp, {1}},
@@ -87,12 +88,14 @@ void voiceStringMatchControl::parseAndControl() {
             break;
         }
     }
+
     auto allPos = voiceString.find("所有");
     if(allPos != std::string::npos){
         voiceString.erase(allPos, string("所有").length());
         parsedItem.hasAll = true;
     }
     LOG_INFO << "1> after extracting room and all: " << voiceString;
+
 
     //确定动作
     for(auto& mr2acItem : matchRex2ActionCode){
