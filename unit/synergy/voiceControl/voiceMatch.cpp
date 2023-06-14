@@ -162,7 +162,7 @@ Json::Value buildCommandList(ActionCode actionCode, const Json::Value& deviceIte
             commandItem.command_para = "close";
         }else{
             commandItem.command_id = "power";
-            commandItem.command_para = "on";
+            commandItem.command_para = "off";
         }
 
 
