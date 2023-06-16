@@ -9,7 +9,7 @@
 #include "../sourceManage/deviceManager.h"
 #include "../sourceManage/groupManager.h"
 
-static std::vector<string> roomList{
+static std::set<string> roomList{
     "主卧",
     "儿童房",
     "书房",
@@ -78,17 +78,21 @@ void voiceMatch::parseAndControl(){
 
     //去除包含的字符
     voiceString = voiceMatchUtil::eraseInvalidCharacter(voiceString);
-    LOG_INFO << "0> total string: " << voiceString;
+    LOG_INFO << "> total string: " << voiceString;
+
+    //抽取房间
+    parsedItem.roomList = voiceMatchUtil::extractRoom(voiceString, roomList);
+    LOG_INFO << "> after extract room : " << voiceString;
    
     //确定动作
     parsedItem.actionCode = voiceMatchUtil::extractAction(voiceString, matchRex2ActionCode, actionCodeCaptureGroup);
-    LOG_INFO << "1> after extracting action: " << voiceString;
+    LOG_INFO << "> after extracting action: " << voiceString;
 
     //查找确定的设备、分组
     qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
     qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
     if(voiceMatchUtil::findDeviceIdOrGroupId(voiceString, deviceList, groupList, deviceTypeMap, parsedItem)){
-        LOG_INFO << "2> after extracting device or group: " << voiceString;
+        LOG_INFO << "> after extracting device or group: " << voiceString;
     }else{
         LOG_RED << "vocieString matchResult: can not find device or group, match missed.....";
         return;
@@ -96,7 +100,7 @@ void voiceMatch::parseAndControl(){
 
     //确定参数
     parsedItem.param = voiceMatchUtil::extractParam(voiceString);
-    LOG_INFO << "3> after extracting param: " << voiceString;
+    LOG_INFO << "> after extracting param: " << voiceString;
 
     //打印控制表项
     printParsedItem(parsedItem);
@@ -108,11 +112,11 @@ void voiceMatch::parseAndControl(){
 void voiceMatch::printParsedItem(ParsedItem &parsedItem){
     qlibc::QData ids, rooms;
     std::map<string, Json::Value> idsMap = parsedItem.devIdGrpId;
-    std::vector<string> roomsMap = parsedItem.roomList;
+    std::set<string> roomsSet = parsedItem.roomList;
     for(auto& elem : idsMap){
         ids.append(elem.first);
     }
-    for(auto& elem : roomsMap){
+    for(auto& elem : roomsSet){
         rooms.append(elem);
     }
     
@@ -252,12 +256,12 @@ string voiceMatchUtil::eraseInvalidCharacter(const string& str){
 }
 
 
-std::vector<string> voiceMatchUtil::extractRoom(string& voiceString, const std::vector<string>& roomList){
-    std::vector<string> matchedRoomsVec;
+std::set<string> voiceMatchUtil::extractRoom(string& voiceString, const std::set<string>& roomList){
+    std::set<string> matchedRoomsVec;
     for(auto& room :roomList){
         smatch sm;
         if(regex_search(voiceString, sm, regex(room))){
-            matchedRoomsVec.push_back(room);
+            matchedRoomsVec.insert(room);
             voiceString.erase(sm.position(), sm.length());
         }
     }
@@ -312,13 +316,21 @@ ActionCode voiceMatchUtil::extractAction(string& voiceString, std::map<string, A
     return ActionCode::NoneAction;
 }
 
-bool voiceMatchUtil::getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, std::map<string, Json::Value>& matchedDeviceMap) {
+bool voiceMatchUtil::getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, const struct ParsedItem& parsedItem,
+                                         std::map<string, Json::Value>& matchedDeviceMap) {
     //找到str中包含的设备名称
     std::set<string> deviceNames;
     Json::ArrayIndex size = deviceList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = deviceList.getArrayElement(i);
         string device_name = item.getString("device_name");
+        string room_name = item.getData("location").getString("room_name");
+        if(!parsedItem.roomList.empty()){  //有指定房间
+            if(parsedItem.roomList.find(room_name) == parsedItem.roomList.end()){   //该设备条目不属于指定房间
+                continue;
+            }
+        }
+
         if(!voiceString.empty() && !device_name.empty()){
             smatch sm;
             if(regex_search(voiceString, sm, regex(device_name))){
@@ -342,12 +354,20 @@ bool voiceMatchUtil::getSpecificDeviceId(string& voiceString, qlibc::QData& devi
     }
 }
 
-bool voiceMatchUtil::getSpecificGroupId(string& voiceString, qlibc::QData& groupList, std::map<string, Json::Value>& matchedGroupMap) {
+bool voiceMatchUtil::getSpecificGroupId(string& voiceString, qlibc::QData& groupList, const struct ParsedItem& parsedItem,
+                                        std::map<string, Json::Value>& matchedGroupMap) {
     std::set<string> groupNames;
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = groupList.getArrayElement(i);
         string group_name = item.getString("group_name");
+        string room_name = item.getData("location").getString("room_name");
+        if(!parsedItem.roomList.empty()){  //有指定房间
+            if(parsedItem.roomList.find(room_name) == parsedItem.roomList.end()){   //该设备条目不属于指定房间
+                continue;
+            }
+        }
+
         if(!voiceString.empty() && !group_name.empty()){
             smatch sm;
             if(regex_search(voiceString, sm, regex(group_name))){
@@ -383,8 +403,21 @@ bool voiceMatchUtil::getDeviceIdsFromDeviceType(qlibc::QData& deviceList, string
     return !matchedDeviceMap.empty();
 }
 
+bool voiceMatchUtil::getDeviceIdsFromRoomNameAndDeviceType(qlibc::QData& deviceList, const string& roomName, const string& deviceType,
+                                                           std::map<string, Json::Value>& matchedDeviceMap){
+    Json::ArrayIndex size = deviceList.size();
+    for(Json::ArrayIndex i = 0; i < size; ++i){
+        qlibc::QData item = deviceList.getArrayElement(i);
+        string device_type = item.getString("device_type");
+        string room_name = item.getData("location").getString("room_name");
+        if(room_name == roomName && device_type == deviceType){
+            matchedDeviceMap.insert(std::make_pair(item.getString("device_uid"), item.asValue()));
+        }
+    }
+    return !matchedDeviceMap.empty();
+}
 
-bool voiceMatchUtil::getGroupIdsFromRoomName(qlibc::QData& groupList, string& roomName, std::map<string, Json::Value>& matchedGroupMap) {
+bool voiceMatchUtil::getGroupIdsFromRoomName(qlibc::QData& groupList, const string& roomName, std::map<string, Json::Value>& matchedGroupMap) {
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = groupList.getArrayElement(i);
@@ -403,30 +436,41 @@ bool voiceMatchUtil::findDeviceIdOrGroupId(string& voiceString, qlibc::QData& de
     string deviceType;
     bool isMatch = false;
 
-    if(getSpecificDeviceId(voiceString, deviceList, deviceIdOrGroupIdMap)){     //设备id列表
+    if(getSpecificDeviceId(voiceString, deviceList, parsedItem, deviceIdOrGroupIdMap)){     //设备id列表
         parsedItem.ctrlType = ControlType::Device;
         parsedItem.devIdGrpId = deviceIdOrGroupIdMap;
         isMatch = true;
 
-    }else if(getSpecificGroupId(voiceString, groupList, deviceIdOrGroupIdMap)){ //组列表
+    }else if(getSpecificGroupId(voiceString, groupList, parsedItem, deviceIdOrGroupIdMap)){ //组列表
         parsedItem.ctrlType = ControlType::Group;
         parsedItem.devIdGrpId = deviceIdOrGroupIdMap;
         isMatch = true;
 
     }else{
         //提取房间 + 类型
-        parsedItem.roomList = extractRoom(voiceString, roomList);
         string deviceType = extractDeviceType(voiceString, deviceTypeMap);
 
-        if(!parsedItem.roomList.empty() && !deviceType.empty()){ //房间 + 类型； 组控：控制属于房间的所有的组
-            for(string& room : parsedItem.roomList){
-                std::map<string, Json::Value> devIdGroupIDMap;
-                getGroupIdsFromRoomName(groupList, room, devIdGroupIDMap);
-                copy(devIdGroupIDMap.begin(), devIdGroupIDMap.end(), inserter(deviceIdOrGroupIdMap, deviceIdOrGroupIdMap.begin()));
+        if(!parsedItem.roomList.empty() && !deviceType.empty()){ //房间 + 类型； 
+            if(deviceType == "LIGHT"){  //组控：控制属于房间的所有的组
+                for(const string& room : parsedItem.roomList){
+                    std::map<string, Json::Value> devIdGroupIDMap;
+                    getGroupIdsFromRoomName(groupList, room, devIdGroupIDMap);
+                    copy(devIdGroupIDMap.begin(), devIdGroupIDMap.end(), inserter(deviceIdOrGroupIdMap, deviceIdOrGroupIdMap.begin()));
+                }
+                parsedItem.ctrlType = ControlType::Group;
+                parsedItem.devIdGrpId = deviceIdOrGroupIdMap;
+                isMatch = true;
+
+            }else{  //控制房间的所有的单个设备
+                for(const string& room : parsedItem.roomList){
+                    std::map<string, Json::Value> devIdGroupIDMap;
+                    getDeviceIdsFromRoomNameAndDeviceType(deviceList, room, deviceType, devIdGroupIDMap);
+                    copy(devIdGroupIDMap.begin(), devIdGroupIDMap.end(), inserter(deviceIdOrGroupIdMap, deviceIdOrGroupIdMap.begin()));
+                }
+                parsedItem.ctrlType = ControlType::Device;
+                parsedItem.devIdGrpId = deviceIdOrGroupIdMap;
+                isMatch = true;
             }
-            parsedItem.ctrlType = ControlType::Group;
-            parsedItem.devIdGrpId = deviceIdOrGroupIdMap;
-            isMatch = true;
 
         }else if(!deviceType.empty()){  //类型
             if(deviceType == "LIGHT"){  //组控

@@ -39,7 +39,7 @@ struct ParsedItem{
     ControlType ctrlType = ControlType::NoneType;        //控制类型，单个设备or分组
     std::map<string, Json::Value> devIdGrpId;            //匹配的设备ids,组ids；
     string param;                                        //控制参数
-    std::vector<string> roomList;                        //所在房间
+    std::set<string> roomList;                           //所在房间
 };
 
 
@@ -81,7 +81,7 @@ public:
     static string eraseInvalidCharacter(const string& str);
 
     //提取控制字符串中的房间
-    static std::vector<string> extractRoom(string& voiceString, const std::vector<string>& roomList);
+    static std::set<string> extractRoom(string& voiceString, const std::set<string>& roomList);
 
     //提取控制字符串中的控制设备类型
     static string extractDeviceType(string& voiceString, const std::map<string, string> deviceTypeMap);
@@ -93,16 +93,19 @@ public:
     static ActionCode extractAction(string& voiceString, std::map<string, ActionCode> matchRex2ActionCode, std::map<ActionCode, std::vector<int>> actionCodeCaptureGroup);
 
     //提取匹配的设备ID
-    static bool getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, std::map<string, Json::Value>& matchedDeviceMap);
+    static bool getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, const struct ParsedItem& parsedItem, std::map<string, Json::Value>& matchedDeviceMap);
 
     //提取匹配的组ID
-    static bool getSpecificGroupId(string& voiceString, qlibc::QData& groupList, std::map<string, Json::Value>& matchedGroupMap);
+    static bool getSpecificGroupId(string& voiceString, qlibc::QData& groupList, const struct ParsedItem& parsedItem, std::map<string, Json::Value>& matchedGroupMap);
 
     //从设备列表中获取类型匹配的设备
     static bool getDeviceIdsFromDeviceType(qlibc::QData& deviceList, string& deviceType, std::map<string, Json::Value>& matchedDeviceMap);
 
+    //从设备列表中提取房间名匹配的组
+    static bool getDeviceIdsFromRoomNameAndDeviceType(qlibc::QData& deviceList, const string& roomName, const string& deviceType, std::map<string, Json::Value>& matchedDeviceMap);
+
     //从组列表中提取房间名匹配的组
-    static bool getGroupIdsFromRoomName(qlibc::QData& groupList, string& roomName, std::map<string, Json::Value>& matchedGroupMap);
+    static bool getGroupIdsFromRoomName(qlibc::QData& groupList, const string& roomName, std::map<string, Json::Value>& matchedGroupMap);
 
     // 提取匹配到的设备或组
     static bool findDeviceIdOrGroupId(string& voiceString, qlibc::QData& deviceList, qlibc::QData& groupList, 
