@@ -9,20 +9,7 @@
 #include "../sourceManage/deviceManager.h"
 #include "../sourceManage/groupManager.h"
 
-static std::set<string> roomList{
-    "主卧",
-    "儿童房",
-    "书房",
-    "客厅",
-    "餐厅",
-    "厨房",
-    "主卫",
-    "次卫",
-    "玄关",
-    "景观阳台",
-    "生活阳台",
-    "过道",
-};
+static std::set<string> roomList{};
 
 std::map<string, string> deviceTypeMap{
     {"灯", "LIGHT"},
@@ -74,23 +61,23 @@ std::map<ActionCode, string> actionCode2StringMap{
 voiceMatch::voiceMatch(const string &ctrlStr) : voiceString(ctrlStr){}
 
 void voiceMatch::parseAndControl(){
-     ParsedItem parsedItem;
+    //获取设备列表、组列表、刷新房间列表
+    qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
+    qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
+    voiceMatchUtil::refreshRoomList(deviceList, groupList);
+
+    ParsedItem parsedItem;
 
     //去除包含的字符
     voiceString = voiceMatchUtil::eraseInvalidCharacter(voiceString);
     LOG_INFO << "> total string: " << voiceString;
 
-    //抽取房间
-    parsedItem.roomList = voiceMatchUtil::extractRoom(voiceString, roomList);
-    LOG_INFO << "> after extract room : " << voiceString;
-   
+
     //确定动作
     parsedItem.actionCode = voiceMatchUtil::extractAction(voiceString, matchRex2ActionCode, actionCodeCaptureGroup);
     LOG_INFO << "> after extracting action: " << voiceString;
 
-    //查找确定的设备、分组
-    qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
-    qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
+    
     if(voiceMatchUtil::findDeviceIdOrGroupId(voiceString, deviceList, groupList, deviceTypeMap, parsedItem)){
         LOG_INFO << "> after extracting device or group: " << voiceString;
     }else{
@@ -135,6 +122,7 @@ void voiceMatch::printParsedItem(ParsedItem &parsedItem){
     data.putData("ids", ids);
     data.putData("param", qlibc::QData(parsedItem.param));
     data.putData("roomName", rooms);
+    data.setString("hasAll", parsedItem.containsAll ? "true" : "false");
     LOG_PURPLE << "parseItem: " << data.toJsonString(true);
 }
 
@@ -243,6 +231,23 @@ void voiceMatch::controlByParsedItem(ParsedItem& parsedItem){
 }
 
 
+std::recursive_mutex voiceMatchUtil::rMutex;
+void voiceMatchUtil::refreshRoomList(qlibc::QData& deviceList, qlibc::QData& groupList){
+    std::lock_guard<std::recursive_mutex> lg(rMutex);
+    Json::ArrayIndex deviceListSize = deviceList.size();
+    for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+        qlibc::QData item = deviceList.getArrayElement(i);
+        string roomName = item.getData("location").getString("room_name");
+        roomList.insert(roomName);
+    }
+
+    Json::ArrayIndex groupListSize = groupList.size();
+    for(Json::ArrayIndex i = 0; i < groupListSize; ++i){
+        qlibc::QData item = groupList.getArrayElement(i);
+        string roomName = item.getData("location").getString("room_name");
+        roomList.insert(roomName);
+    }
+}
 
 string voiceMatchUtil::eraseInvalidCharacter(const string& str){
     regex sep("[ ]+");
@@ -256,15 +261,42 @@ string voiceMatchUtil::eraseInvalidCharacter(const string& str){
 }
 
 
+bool voiceMatchUtil::containsAll(string& voiceString, struct ParsedItem& parsedItem){
+    auto allPos = voiceString.find("所有");
+    if(allPos != std::string::npos){
+        voiceString.erase(allPos, string("所有").length());
+        parsedItem.containsAll = true;
+        return true;
+    }
+    return false;
+}
+
+
 std::set<string> voiceMatchUtil::extractRoom(string& voiceString, const std::set<string>& roomList){
+    //匹配第一个符号要求的房间名
     std::set<string> matchedRoomsVec;
     for(auto& room :roomList){
-        smatch sm;
+        smatch sm;              
         if(regex_search(voiceString, sm, regex(room))){
-            matchedRoomsVec.insert(room);
+            if(matchedRoomsVec.empty()){
+                 matchedRoomsVec.insert(room);
+            }else{
+                if(matchedRoomsVec.begin()->size() < room.size()){
+                    matchedRoomsVec.erase(matchedRoomsVec.begin());
+                    matchedRoomsVec.insert(room);
+                }
+            }
+        }
+    }
+
+    if(!matchedRoomsVec.empty()){
+        string roomName = *matchedRoomsVec.begin();
+        smatch sm;
+        if(regex_search(voiceString, sm, regex(roomName))){
             voiceString.erase(sm.position(), sm.length());
         }
     }
+
     return matchedRoomsVec;
 }
 
@@ -316,7 +348,7 @@ ActionCode voiceMatchUtil::extractAction(string& voiceString, std::map<string, A
     return ActionCode::NoneAction;
 }
 
-bool voiceMatchUtil::getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, const struct ParsedItem& parsedItem,
+bool voiceMatchUtil::getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, struct ParsedItem& parsedItem,
                                          std::map<string, Json::Value>& matchedDeviceMap) {
     //找到str中包含的设备名称
     std::set<string> deviceNames;
@@ -324,19 +356,44 @@ bool voiceMatchUtil::getSpecificDeviceId(string& voiceString, qlibc::QData& devi
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = deviceList.getArrayElement(i);
         string device_name = item.getString("device_name");
-        string room_name = item.getData("location").getString("room_name");
-        if(!parsedItem.roomList.empty()){  //有指定房间
-            if(parsedItem.roomList.find(room_name) == parsedItem.roomList.end()){   //该设备条目不属于指定房间
-                continue;
-            }
-        }
-
+        
         if(!voiceString.empty() && !device_name.empty()){
             smatch sm;
             if(regex_search(voiceString, sm, regex(device_name))){
-                deviceNames.insert(device_name);
-                matchedDeviceMap.insert(std::make_pair(item.getString("device_uid"), item.asValue()));
+                /**
+                 * 名字长度最大匹配策略
+                 *      * 匹配最长的名字
+                 *      * 相同长度的名字匹配为第一个匹配到的名字
+                */
+                if(deviceNames.empty()){
+                    deviceNames.insert(device_name);
+                    matchedDeviceMap.insert(std::make_pair(item.getString("device_uid"), item.asValue()));
+                }else{
+                    if(deviceNames.begin()->size() < device_name.size()){
+                        deviceNames.erase(deviceNames.begin());
+                        deviceNames.insert(device_name);
+                        matchedDeviceMap.insert(std::make_pair(item.getString("device_uid"), item.asValue()));
+
+                    }else if(*deviceNames.begin() == device_name){
+                         matchedDeviceMap.insert(std::make_pair(item.getString("device_uid"), item.asValue()));
+                    }
+                }
             }
+        }
+    }
+
+    //匹配失败
+    if(deviceNames.empty()){
+        return false;
+    }
+
+    //删除名称不符合的设备
+    string matchedDeviceName = *deviceNames.begin();
+    for(auto pos = matchedDeviceMap.begin(); pos != matchedDeviceMap.end(); ){
+        if(pos->second["device_name"].asString() != matchedDeviceName){
+            pos = matchedDeviceMap.erase(pos);
+        }else{
+            ++pos;
         }
     }
 
@@ -344,36 +401,75 @@ bool voiceMatchUtil::getSpecificDeviceId(string& voiceString, qlibc::QData& devi
     if(matchedDeviceMap.empty()){
         return false;
     }else{
-        for(auto& deviceName : deviceNames){
-            smatch sm;
-            if(regex_search(voiceString, sm, regex(deviceName))){
-                voiceString.erase(sm.position(), sm.length());
+        //去除设备名称字段
+        smatch sm;
+        if(regex_search(voiceString, sm, regex(matchedDeviceName))){
+            voiceString.erase(sm.position(), sm.length());
+        }
+
+        //匹配房间，如果匹配到房间，则过滤不属于房间的设备
+        parsedItem.roomList = voiceMatchUtil::extractRoom(voiceString, roomList);
+        if(!parsedItem.roomList.empty()){
+            string roomName = *parsedItem.roomList.begin();
+            for(auto pos = matchedDeviceMap.begin(); pos != matchedDeviceMap.end(); ){
+                if(pos->second["location"]["room_name"].asString() != roomName){
+                    pos = matchedDeviceMap.erase(pos);
+                }else{
+                    ++pos;
+                }
             }
         }
+
         return true;
     }
 }
 
-bool voiceMatchUtil::getSpecificGroupId(string& voiceString, qlibc::QData& groupList, const struct ParsedItem& parsedItem,
+bool voiceMatchUtil::getSpecificGroupId(string& voiceString, qlibc::QData& groupList, struct ParsedItem& parsedItem,
                                         std::map<string, Json::Value>& matchedGroupMap) {
     std::set<string> groupNames;
     Json::ArrayIndex size = groupList.size();
     for(Json::ArrayIndex i = 0; i < size; ++i){
         qlibc::QData item = groupList.getArrayElement(i);
         string group_name = item.getString("group_name");
-        string room_name = item.getData("location").getString("room_name");
-        if(!parsedItem.roomList.empty()){  //有指定房间
-            if(parsedItem.roomList.find(room_name) == parsedItem.roomList.end()){   //该设备条目不属于指定房间
-                continue;
-            }
-        }
-
+       
         if(!voiceString.empty() && !group_name.empty()){
             smatch sm;
             if(regex_search(voiceString, sm, regex(group_name))){
-                groupNames.insert(group_name);
-                matchedGroupMap.insert(std::make_pair( item.getString("group_uid"), item.asValue()));
+
+                /**
+                 * 名字长度最大匹配策略
+                 *      * 匹配最长的名字
+                 *      * 相同长度的名字匹配为第一个匹配到的名字
+                */
+                if(groupNames.empty()){
+                    groupNames.insert(group_name);
+                    matchedGroupMap.insert(std::make_pair(item.getString("group_uid"), item.asValue()));
+                }else{
+                    if(groupNames.begin()->size() < group_name.size()){
+                        groupNames.erase(groupNames.begin());
+                        groupNames.insert(group_name);
+                        matchedGroupMap.insert(std::make_pair(item.getString("group_uid"), item.asValue()));
+
+                    }else if(*groupNames.begin() == group_name){
+                         matchedGroupMap.insert(std::make_pair(item.getString("group_uid"), item.asValue()));
+                    }
+                }
             }
+        }
+    }
+
+    //匹配失败
+    if(groupNames.empty()){
+        return false;
+    }
+
+    //删除名称不符合的设备
+    string matchedGroupName = *groupNames.begin();
+    for(auto pos = matchedGroupMap.begin(); pos != matchedGroupMap.end(); ){
+        if(pos->second["group_name"].asString() != matchedGroupName){
+            pos = matchedGroupMap.erase(pos);
+        }else{
+            ++pos;
         }
     }
 
@@ -381,12 +477,25 @@ bool voiceMatchUtil::getSpecificGroupId(string& voiceString, qlibc::QData& group
     if(matchedGroupMap.empty()){
         return false;
     }else{
-        for(auto& groupName : groupNames){
-            smatch sm;
-            if(regex_search(voiceString, sm, regex(groupName))){
-                voiceString.erase(sm.position(), sm.length());
+        //去除组名称字段
+        smatch sm;
+        if(regex_search(voiceString, sm, regex(matchedGroupName))){
+            voiceString.erase(sm.position(), sm.length());
+        }
+
+        //匹配房间，如果匹配到房间，则过滤不属于房间的组
+        parsedItem.roomList = voiceMatchUtil::extractRoom(voiceString, roomList);
+        if(!parsedItem.roomList.empty()){
+            string roomName = *parsedItem.roomList.begin();
+            for(auto pos = matchedGroupMap.begin(); pos != matchedGroupMap.end(); ){
+                if(pos->second["location"]["room_name"].asString() != roomName){
+                    pos = matchedGroupMap.erase(pos);
+                }else{
+                    ++pos;
+                }
             }
         }
+
         return true;
     }
 }
@@ -448,6 +557,8 @@ bool voiceMatchUtil::findDeviceIdOrGroupId(string& voiceString, qlibc::QData& de
 
     }else{
         //提取房间 + 类型
+        parsedItem.roomList = extractRoom(voiceString, roomList);
+        bool hasAll = containsAll(voiceString, parsedItem);
         string deviceType = extractDeviceType(voiceString, deviceTypeMap);
 
         if(!parsedItem.roomList.empty() && !deviceType.empty()){ //房间 + 类型； 
@@ -472,7 +583,7 @@ bool voiceMatchUtil::findDeviceIdOrGroupId(string& voiceString, qlibc::QData& de
                 isMatch = true;
             }
 
-        }else if(!deviceType.empty()){  //类型
+        }else if(parsedItem.roomList.empty() && !deviceType.empty() && hasAll){  //类型 + '所有'
             if(deviceType == "LIGHT"){  //组控
                 parsedItem.ctrlType = ControlType::Group;
                 std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();

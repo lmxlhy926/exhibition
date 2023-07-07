@@ -44,10 +44,6 @@ int main(int argc, char* argv[]) {
     GroupManager::getInstance();
     siteManager::getInstance();
 
-    //站点请求管理
-    serviceSiteManager->registerMessageId(Scene_Msg_MessageID);   //场景指令消息
-
-
 //注册服务
     //设备控制 + 场景命令
     serviceSiteManager->registerServiceRequestHandler(Control_Service_ID,
@@ -184,6 +180,7 @@ int main(int argc, char* argv[]) {
 
 
     //声明消息
+    serviceSiteManager->registerMessageId(Scene_Msg_MessageID);            //场景指令消息
     serviceSiteManager->registerMessageId(ScanResultMsg);                  //扫描结果
     serviceSiteManager->registerMessageId(SingleDeviceBindSuccessMsg);     //单个设备绑定结果
     serviceSiteManager->registerMessageId(SingleDeviceUnbindSuccessMsg);   //单个设备解绑结果

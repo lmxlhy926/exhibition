@@ -7,6 +7,7 @@
 
 #include <string>
 #include <regex>
+#include <mutex>
 #include "qlibc/QData.h"
 using namespace std;
 
@@ -40,6 +41,7 @@ struct ParsedItem{
     std::map<string, Json::Value> devIdGrpId;            //匹配的设备ids,组ids；
     string param;                                        //控制参数
     std::set<string> roomList;                           //所在房间
+    bool containsAll{false};                             //包含'所有'字段
 };
 
 
@@ -76,9 +78,18 @@ public:
 
 
 class voiceMatchUtil{
+private:
+    static std::recursive_mutex rMutex;
+
 public:
+    //刷新房间列表
+    static void refreshRoomList(qlibc::QData& deviceList, qlibc::QData& groupList);
+
     //移除控制字符串中的无效字符
     static string eraseInvalidCharacter(const string& str);
+
+    //判断是否包含字段'所有'
+    static bool containsAll(string& voiceString, struct ParsedItem& parsedItem);
 
     //提取控制字符串中的房间
     static std::set<string> extractRoom(string& voiceString, const std::set<string>& roomList);
@@ -93,10 +104,10 @@ public:
     static ActionCode extractAction(string& voiceString, std::map<string, ActionCode> matchRex2ActionCode, std::map<ActionCode, std::vector<int>> actionCodeCaptureGroup);
 
     //提取匹配的设备ID
-    static bool getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, const struct ParsedItem& parsedItem, std::map<string, Json::Value>& matchedDeviceMap);
+    static bool getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, struct ParsedItem& parsedItem, std::map<string, Json::Value>& matchedDeviceMap);
 
     //提取匹配的组ID
-    static bool getSpecificGroupId(string& voiceString, qlibc::QData& groupList, const struct ParsedItem& parsedItem, std::map<string, Json::Value>& matchedGroupMap);
+    static bool getSpecificGroupId(string& voiceString, qlibc::QData& groupList, struct ParsedItem& parsedItem, std::map<string, Json::Value>& matchedGroupMap);
 
     //从设备列表中获取类型匹配的设备
     static bool getDeviceIdsFromDeviceType(qlibc::QData& deviceList, string& deviceType, std::map<string, Json::Value>& matchedDeviceMap);
