@@ -72,16 +72,47 @@ void voiceMatch::parseAndControl(){
     voiceString = voiceMatchUtil::eraseInvalidCharacter(voiceString);
     LOG_INFO << "> total string: " << voiceString;
 
+    //如果有房间，提取动作时，房间信息不参与提取
+    std::map<string, string> restultMap = voiceMatchUtil::preExtractRoom(voiceString, roomList);
+    if(!restultMap.empty()){
+        string prefix = restultMap.find("prefix")->second;
+        string room = restultMap.find("room")->second;
+        string suffix = restultMap.find("suffix")->second;
 
-    //确定动作
-    parsedItem.actionCode = voiceMatchUtil::extractAction(voiceString, matchRex2ActionCode, actionCodeCaptureGroup);
+        LOG_INFO << "prefix: " << prefix;
+        LOG_INFO << "room: " << room;
+        LOG_INFO << "suffix: " << suffix;
+
+        ActionCode actionCodePrefix = voiceMatchUtil::extractAction(prefix, matchRex2ActionCode, actionCodeCaptureGroup);
+        ActionCode actionCodeSuffix = voiceMatchUtil::extractAction(suffix, matchRex2ActionCode, actionCodeCaptureGroup);
+        if(actionCodePrefix == ActionCode::NoneAction && actionCodeSuffix == ActionCode::NoneAction){
+            LOG_RED << "vocieString matchResult: can not find action, match missed.....";
+            return;
+        }
+
+        if(actionCodePrefix != ActionCode::NoneAction){
+            parsedItem.actionCode = actionCodePrefix;
+            voiceString = prefix + room + restultMap.find("suffix")->second;
+
+        }else if(actionCodeSuffix != ActionCode::NoneAction){
+            parsedItem.actionCode = actionCodeSuffix;
+            voiceString = restultMap.find("prefix")->second + room + suffix;
+        }
+
+    }else{
+        //确定动作
+        parsedItem.actionCode = voiceMatchUtil::extractAction(voiceString, matchRex2ActionCode, actionCodeCaptureGroup);
+        if(parsedItem.actionCode == ActionCode::NoneAction){
+            LOG_RED << "vocieString matchResult: can not find action, match missed.....";
+            return;
+        }
+    }
     LOG_INFO << "> after extracting action: " << voiceString;
-
     
     if(voiceMatchUtil::findDeviceIdOrGroupId(voiceString, deviceList, groupList, deviceTypeMap, parsedItem)){
-        LOG_INFO << "> after extracting device or group: " << voiceString;
+        LOG_INFO << "> after extracting deviceName groupName roomName: " << voiceString;
     }else{
-        LOG_RED << "vocieString matchResult: can not find device or group, match missed.....";
+        LOG_RED << "vocieString matchResult: can not find device or group or matchedTypeResult, match missed.....";
         return;
     }
 
@@ -247,6 +278,37 @@ void voiceMatchUtil::refreshRoomList(qlibc::QData& deviceList, qlibc::QData& gro
         string roomName = item.getData("location").getString("room_name");
         roomList.insert(roomName);
     }
+}
+
+
+map<string, string> voiceMatchUtil::preExtractRoom(const string& voiceString, const std::set<string>& roomList){
+    //匹配第一个符号要求的房间名
+    std::map<string, std::map<string, string>> matchedMap;
+    for(auto& room :roomList){
+        smatch sm;
+        string regexString = "(.*)" + room +  "(.*)";              
+        if(regex_match(voiceString, sm, regex(regexString))){
+            std::map<string, string> resultMap;
+            resultMap.insert(std::make_pair("prefix", sm.str(1)));
+            resultMap.insert(std::make_pair("room", room));
+            resultMap.insert(std::make_pair("suffix", sm.str(2)));
+            matchedMap.insert(std::make_pair(room, resultMap));   
+        }   
+    }
+
+    if(matchedMap.empty()){
+        return {};
+    }
+
+    //最长名称匹配
+    string maxLengthName;
+    for(auto& matchedMapElem : matchedMap){
+        if(maxLengthName.size() < matchedMapElem.first.size()){
+            maxLengthName = matchedMapElem.first;
+        } 
+    }
+
+    return matchedMap[maxLengthName];
 }
 
 string voiceMatchUtil::eraseInvalidCharacter(const string& str){

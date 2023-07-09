@@ -6,6 +6,7 @@
 #define EXHIBITION_VOICEMATCH_H
 
 #include <string>
+#include <vector>
 #include <regex>
 #include <mutex>
 #include "qlibc/QData.h"
@@ -84,6 +85,9 @@ private:
 public:
     //刷新房间列表
     static void refreshRoomList(qlibc::QData& deviceList, qlibc::QData& groupList);
+
+    //提取房间
+    static map<string, string> preExtractRoom(const string& voiceString, const std::set<string>& roomList);
 
     //移除控制字符串中的无效字符
     static string eraseInvalidCharacter(const string& str);
