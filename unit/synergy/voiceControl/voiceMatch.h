@@ -40,6 +40,9 @@ struct ParsedItem{
     ActionCode actionCode = ActionCode::NoneAction;      //控制动作码
     ControlType ctrlType = ControlType::NoneType;        //控制类型，单个设备or分组
     std::map<string, Json::Value> devIdGrpId;            //匹配的设备ids,组ids；
+    string deviceName;                                   //匹配的设备名称
+    string groupName;                                    //匹配的组名称
+    string matchedPattern;                               //匹配模式
     string param;                                        //控制参数
     std::set<string> roomList;                           //所在房间
     bool containsAll{false};                             //包含'所有'字段
