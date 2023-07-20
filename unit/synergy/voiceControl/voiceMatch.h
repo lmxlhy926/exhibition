@@ -35,14 +35,23 @@ enum ControlType{
     Type
 };
 
+enum MatchType{
+    NoneMatch = 0,
+    deviceMatch,
+    groupMatch,
+    roomPlusTypeMatch,
+    allPlusTypeMatch
+};
+
 //解析项：房间名、动作码、<设备号、组id、类型>、动作参数
 struct ParsedItem{
     ActionCode actionCode = ActionCode::NoneAction;      //控制动作码
     ControlType ctrlType = ControlType::NoneType;        //控制类型，单个设备or分组
+    MatchType matchType = MatchType::NoneMatch;          //匹配模式编码
+    string matchedPattern;                               //匹配模式说明
     std::map<string, Json::Value> devIdGrpId;            //匹配的设备ids,组ids；
     string deviceName;                                   //匹配的设备名称
     string groupName;                                    //匹配的组名称
-    string matchedPattern;                               //匹配模式
     string param;                                        //控制参数
     std::set<string> roomList;                           //所在房间
     bool containsAll{false};                             //包含'所有'字段
@@ -59,6 +68,7 @@ struct CommandItem{
 class voiceMatch{
 private:
     string voiceString;
+    string currentRoom;
     static int tempLuminance;
     static int tempTemperature;
     const int defaultLuminance = 60;
@@ -66,7 +76,7 @@ private:
     const int defaultTemperature = 60;
     const int deltaTemperature = 20;
 public:
-    explicit voiceMatch(const string& ctrlStr);
+    explicit voiceMatch(qlibc::QData controlData);
 
     void parseAndControl();
 
@@ -89,14 +99,23 @@ public:
     //刷新房间列表
     static void refreshRoomList(qlibc::QData& deviceList, qlibc::QData& groupList);
 
-    //提取房间
+    //判断是否包含设备类型
+    static bool isContainsDeviceType(string& voiceString, const std::map<string, string> deviceTypeMap);
+
+    //判断是否包含房间
+    static bool isContainsRoom(string& voiceString, const std::set<string>& roomList);
+
+    //是否包含所有
+    static bool isContainsAll(string& voiceString);
+
+    //判断是否包含字段'所有'，会提取`所有`字段
+    static bool containsAll(string& voiceString, struct ParsedItem& parsedItem);
+
+    //预提取房间，用房间来分割字段，屏蔽房间名对关键字的影响
     static map<string, string> preExtractRoom(const string& voiceString, const std::set<string>& roomList);
 
     //移除控制字符串中的无效字符
     static string eraseInvalidCharacter(const string& str);
-
-    //判断是否包含字段'所有'
-    static bool containsAll(string& voiceString, struct ParsedItem& parsedItem);
 
     //提取控制字符串中的房间
     static std::set<string> extractRoom(string& voiceString, const std::set<string>& roomList);
@@ -109,6 +128,9 @@ public:
 
     //提取控制字符串中的控制动作码
     static ActionCode extractAction(string& voiceString, std::map<string, ActionCode> matchRex2ActionCode, std::map<ActionCode, std::vector<int>> actionCodeCaptureGroup);
+
+    //删除不属于当前房间的设备或组
+    static void deleteDeviceOrGroupNotInCurrentRoom(struct ParsedItem& parsedItem, string currentRoom);
 
     //提取匹配的设备ID
     static bool getSpecificDeviceId(string& voiceString, qlibc::QData& deviceList, struct ParsedItem& parsedItem, std::map<string, Json::Value>& matchedDeviceMap);
@@ -127,7 +149,7 @@ public:
 
     // 提取匹配到的设备或组
     static bool findDeviceIdOrGroupId(string& voiceString, qlibc::QData& deviceList, qlibc::QData& groupList, 
-                               const std::map<string, string> deviceTypeMap, struct ParsedItem& parsedItem);
+                               const std::map<string, string> deviceTypeMap, struct ParsedItem& parsedItem, string currentRoom);
 };
 
 #endif //EXHIBITION_VOICEMATCH_H
