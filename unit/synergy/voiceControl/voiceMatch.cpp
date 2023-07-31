@@ -720,11 +720,15 @@ bool voiceMatchUtil::findDeviceIdOrGroupId(string& voiceString, qlibc::QData& de
             isMatch = true;
 
         }else{
-            if(hasRoom && hasDeviceType){
-                //提取房间 + 类型
-                parsedItem.roomList = extractRoom(voiceString, roomList);
-                bool hasAll = containsAll(voiceString, parsedItem);
+            if(hasDeviceType){
                 string deviceType = extractDeviceType(voiceString, deviceTypeMap);
+                if(hasRoom){
+                    parsedItem.roomList = extractRoom(voiceString, roomList);
+                    bool hasAll = containsAll(voiceString, parsedItem);
+                }else{
+                    parsedItem.roomList.insert(currentRoom);
+                    bool hasAll = containsAll(voiceString, parsedItem);
+                }  
 
                 if(!parsedItem.roomList.empty() && !deviceType.empty()){ //房间 + 类型； 
                     if(deviceType == "LIGHT"){  //组控：控制属于房间的所有的组
@@ -752,35 +756,37 @@ bool voiceMatchUtil::findDeviceIdOrGroupId(string& voiceString, qlibc::QData& de
                         isMatch = true;
                     }
                 }
-
-            }else if(!hasRoom && hasAll && hasDeviceType){
-            // parsedItem.roomList = extractRoom(voiceString, roomList);
-            // bool hasAll = containsAll(voiceString, parsedItem);
-            // string deviceType = extractDeviceType(voiceString, deviceTypeMap);
-
-            // if(deviceType == "LIGHT"){  //组控
-            //         parsedItem.ctrlType = ControlType::Group;
-            //         std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
-            //         for(auto& siteName : siteNames){
-            //             deviceIdOrGroupIdMap.insert(std::make_pair(string().append("FFFF").append(">").append(siteName), Json::Value()));
-            //         }
-            //         parsedItem.devIdGrpId = deviceIdOrGroupIdMap;
-            //         parsedItem.matchType = MatchType::allPlusTypeMatch;
-            //         parsedItem.matchedPattern = "match <all + type>";
-            //         isMatch = true;
-
-            //     }else{  //控制指定的单个类型的设备
-            //         std::map<string, Json::Value> matchedDeviceMap;
-            //         getDeviceIdsFromDeviceType(deviceList, deviceType, matchedDeviceMap);
-            //         parsedItem.ctrlType = ControlType::Device;
-            //         parsedItem.devIdGrpId = matchedDeviceMap;
-            //         parsedItem.matchType = MatchType::allPlusTypeMatch;
-            //         parsedItem.matchedPattern = "match <all + type>";
-            //         isMatch = true;
-            //     }
-
             }
+                #if 0
+                    //    if(!hasRoom && hasAll && hasDeviceType){
+                    //         parsedItem.roomList = extractRoom(voiceString, roomList);
+                    //         bool hasAll = containsAll(voiceString, parsedItem);
+                    //         string deviceType = extractDeviceType(voiceString, deviceTypeMap);
+
+                    //         if(deviceType == "LIGHT"){  //组控
+                    //             parsedItem.ctrlType = ControlType::Group;
+                    //             std::set<string> siteNames = SiteRecord::getInstance()->getSiteName();
+                    //             for(auto& siteName : siteNames){
+                    //                 deviceIdOrGroupIdMap.insert(std::make_pair(string().append("FFFF").append(">").append(siteName), Json::Value()));
+                    //             }
+                    //             parsedItem.devIdGrpId = deviceIdOrGroupIdMap;
+                    //             parsedItem.matchType = MatchType::allPlusTypeMatch;
+                    //             parsedItem.matchedPattern = "match <all + type>";
+                    //             isMatch = true;
+
+                    //         }else{  //控制指定的单个类型的设备
+                    //             std::map<string, Json::Value> matchedDeviceMap;
+                    //             getDeviceIdsFromDeviceType(deviceList, deviceType, matchedDeviceMap);
+                    //             parsedItem.ctrlType = ControlType::Device;
+                    //             parsedItem.devIdGrpId = matchedDeviceMap;
+                    //             parsedItem.matchType = MatchType::allPlusTypeMatch;
+                    //             parsedItem.matchedPattern = "match <all + type>";
+                    //             isMatch = true;
+                    //         }
+                    //     }
+                #endif
         }
+
 
     }else if(hasAll){
         if(hasDeviceType){
@@ -819,7 +825,6 @@ bool voiceMatchUtil::findDeviceIdOrGroupId(string& voiceString, qlibc::QData& de
                     isMatch = true;
                 }
             }
-
         }
     }
 
