@@ -7,6 +7,7 @@
 #include <iostream>
 #include <utility>
 #include "log/Logging.h"
+#include "snAddressMap.h"
 
 bleConfig* bleConfig::instance = nullptr;
 
@@ -314,59 +315,137 @@ string bleConfig::getNetKey(){
     return netKey;
 }
 
-void bleConfig::storeGroupluminance(const string& groupId, int luminance){
+void bleConfig::loadStatusFromFile(){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    auto pos = groupValueMap.find(groupId);
-    if(pos != groupValueMap.end()){
+    qlibc::QData status;
+    status.loadFromFile(FileUtils::contactFileName(dataDirPath, "data/status.json"));
+
+    qlibc::QData deviceList = status.getData("device_list");
+    Json::ArrayIndex deviceListSize = deviceList.size();
+    for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+        qlibc::QData item = deviceList.getArrayElement(i);
+        string address = SnAddressMap::getInstance()->deviceSn2Address(item.getString("device_id"));
+        if(address.empty()) break;
+        Json::Value statusValue;
+        qlibc::QData stateList = item.getData("state_list");
+        for(Json::ArrayIndex j = 0; j < stateList.size(); ++j){
+            qlibc::QData stateItem = stateList.getArrayElement(j);
+            statusValue[stateItem.getString("state_id")] = stateItem.getData("state_value").asValue();
+        }
+        devGrpValueMap.insert(std::make_pair(address, statusValue));
+    }
+
+    qlibc::QData groupList = status.getData("group_list");
+    Json::ArrayIndex groupListSize = groupList.size();
+    for(Json::ArrayIndex i = 0; i < groupListSize; ++i){
+        qlibc::QData item = groupList.getArrayElement(i);
+        string address = item.getString("group_id");
+        if(address.empty()) break;
+        Json::Value statusValue;
+        qlibc::QData stateList = item.getData("state_list");
+        for(Json::ArrayIndex j = 0; j < stateList.size(); ++j){
+            qlibc::QData stateItem = stateList.getArrayElement(j);
+            statusValue[stateItem.getString("state_id")] = stateItem.getData("state_value").asValue();
+        }
+        devGrpValueMap.insert(std::make_pair(address, statusValue));
+    }
+}
+
+void bleConfig::storeDevGrpStatus2File(){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData device_list, group_list;
+    for(auto& elem: devGrpValueMap){
+        if(isDevAddress(elem.first)){
+            qlibc::QData deviceItem = createStatusItem(Type::device, elem.first, elem.second["power"].asString(), 
+                                                      elem.second["luminance"].asInt(), elem.second["color_temperature"].asInt());
+            device_list.append(deviceItem);
+        }else if(isGrpAddress(elem.first)){
+            qlibc::QData deviceItem = createStatusItem(Type::group, elem.first, elem.second["power"].asString(), 
+                                                      elem.second["luminance"].asInt(), elem.second["color_temperature"].asInt());
+            group_list.append(deviceItem);
+        }
+    }
+
+    qlibc::QData statusList;
+    statusList.putData("device_list", device_list);
+    statusList.putData("group_list", group_list);
+    statusList.saveToFile(FileUtils::contactFileName(dataDirPath, "data/status.json"), true);
+}
+
+void bleConfig::storeLuminance_powerOn(const string& groupId){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    auto pos = devGrpValueMap.find(groupId);
+    if(pos != devGrpValueMap.end()){
+        pos->second["luminance"] = pos->second["tempLuminance"];
+        pos->second["power"] = "on";
+    }else{
+        Json::Value value;
+        value["power"] = "on";
+        devGrpValueMap.insert(std::make_pair(groupId, value));
+    }
+    storeDevGrpStatus2File();
+}
+
+void bleConfig::storeLuminance_powerOff(const string& groupId){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    auto pos = devGrpValueMap.find(groupId);
+    if(pos != devGrpValueMap.end()){
+        pos->second["luminance"] = 0;
+        pos->second["power"] = "off";
+    }else{
+        Json::Value value;
+        value["power"] = "off";
+        devGrpValueMap.insert(std::make_pair(groupId, value));
+    }
+    storeDevGrpStatus2File();
+}
+
+void bleConfig::storeLuminance(const string& groupId, int luminance){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    auto pos = devGrpValueMap.find(groupId);
+    if(pos != devGrpValueMap.end()){
         pos->second["luminance"] = luminance;
         pos->second["tempLuminance"] = luminance;
+        if(luminance == 0){
+             pos->second["power"] = "off";
+        }else{
+            pos->second["power"] = "on";
+        }
     }else{
         Json::Value value;
         value["luminance"] = luminance;
         value["tempLuminance"] = luminance;
-        groupValueMap.insert(std::make_pair(groupId, value));
+        if(luminance > 0){
+            value["power"] = "on";
+        }else{
+            value["power"] = "off";
+        }
+        devGrpValueMap.insert(std::make_pair(groupId, value));
     }
+    storeDevGrpStatus2File();
 }
 
-void bleConfig::storeGroupColorTemperature(const string& groupId, int temperature){
+void bleConfig::storeColorTemperature(const string& groupId, int temperature){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    auto pos = groupValueMap.find(groupId);
-    if(pos != groupValueMap.end()){
-        pos->second["temperature"] = temperature;
-        pos->second["tempTemperature"] = temperature;
+    auto pos = devGrpValueMap.find(groupId);
+    if(pos != devGrpValueMap.end()){
+        pos->second["color_temperature"] = temperature;
     }else{
         Json::Value value;
-        value["temperature"] = temperature;
-        value["tempTemperature"] = temperature;
-        groupValueMap.insert(std::make_pair(groupId, value));
+        value["color_temperature"] = temperature;
+        devGrpValueMap.insert(std::make_pair(groupId, value));
     }
+    storeDevGrpStatus2File();
 }
 
-Json::Value bleConfig::getGroupLuminanceColorTemperature(const string& groupId){
+Json::Value bleConfig::getLuminanceColorTemperature(const string& groupId){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    auto pos = groupValueMap.find(groupId);
-    if(pos != groupValueMap.end()){
+    auto pos = devGrpValueMap.find(groupId);
+    if(pos != devGrpValueMap.end()){
         return pos->second;
     }
     return {};
 }
-
-void bleConfig::storeGroupluminance_powerOff(const string& groupId){
-    std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    auto pos = groupValueMap.find(groupId);
-    if(pos != groupValueMap.end()){
-        pos->second["luminance"] = 0;
-    }
-}
-
-void bleConfig::storeGroupluminance_powerOn(const string& groupId){
-    std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    auto pos = groupValueMap.find(groupId);
-    if(pos != groupValueMap.end()){
-        pos->second["luminance"] = pos->second["tempLuminance"];
-    }
-}
-
 
 qlibc::QData bleConfig::defaultStatus() {
     qlibc::QData state_list;
@@ -389,5 +468,46 @@ qlibc::QData bleConfig::defaultStatus() {
 
     return state_list;
 }
+
+bool bleConfig::isDevAddress(const string& address){
+    return address.substr(2, 2) == "02";
+}
+
+bool bleConfig::isGrpAddress(const string& address){
+    return address.substr(2, 2) == "C0";
+}
+
+qlibc::QData bleConfig::createStatusItem(Type type, const string& address, const string& onOff, int luminance, int color_temperature){              
+    qlibc::QData itemPower;
+    itemPower.setString("state_id", "power");
+    itemPower.setString("state_value", onOff);
+
+    qlibc::QData itemLuminance;
+    itemLuminance.setString("state_id", "luminance");
+    itemLuminance.setInt("state_value", luminance);
+    
+    qlibc::QData itemColorTemperature;
+    itemColorTemperature.setString("state_id", "color_temperature");
+    itemColorTemperature.setInt("state_value", color_temperature);
+
+    qlibc::QData state_list;
+    state_list.append(itemPower);
+    state_list.append(itemLuminance);
+    state_list.append(itemColorTemperature);
+
+    qlibc::QData item;
+    if(type == Type::group){
+        item.setString("group_id", address);
+        
+    }else if(type == Type::device){
+        item.setString("device_id", SnAddressMap::getInstance()->address2DeviceSn(address));
+    }
+    item.setString("online_state", "online");
+    item.putData("state_list", state_list);
+    return item;
+}
+
+
+
 
 

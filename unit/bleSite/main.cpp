@@ -5,9 +5,11 @@
 #include "common/httpUtil.h"
 #include "serial/telinkDongle.h"
 #include "sourceManage/bleConfig.h"
+#include "sourceManage/scanListmanage.h"
+#include "sourceManage/groupAddressMap.h"
+#include "sourceManage/snAddressMap.h"
 #include "upStatus/recvPackageParse.h"
 #include "upStatus/statusEvent.h"
-#include "sourceManage/scanListmanage.h"
 #include "downCmd/logicControl.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
@@ -40,6 +42,7 @@ int main(int argc, char* argv[]) {
     //设置配置文件加载路径, 加载配置文件
     bleConfig* configPathPtr = bleConfig::getInstance();
     configPathPtr->setConfigPath(string(argv[1]));
+    configPathPtr->loadStatusFromFile();
 
     if(argc >= 3 && string(argv[2]) == "disableUpload"){
         LOG_INFO << "disableUpload...........";
@@ -47,6 +50,8 @@ int main(int argc, char* argv[]) {
     }
 
     //单例对象
+    GroupAddressMap::getInstance();
+    SnAddressMap::getInstance();
     ScanListmanage::getInstance();
 
     //注册串口上报回调函数，初始化并打开串口

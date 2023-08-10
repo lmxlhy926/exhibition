@@ -21,7 +21,7 @@ private:
     QData deviceListData;                           //蓝牙设备列表
     QData statusListData;                           //状态列表
     QData scanListData;                             //扫描设备列表
-    std::map<string, Json::Value> groupValueMap;    //蓝牙组亮度、色温列表
+    std::map<string, Json::Value> devGrpValueMap;   //蓝牙组、设备的亮度、色温列表
     string netKey;                                  //网络key
     httplib::ThreadPool threadPool;                 //线程池
     static bleConfig* instance;                     //静态对象
@@ -112,24 +112,41 @@ public:
     //获取网络key
     string getNetKey();
 
-    //存储蓝牙组亮度值
-    void storeGroupluminance(const string& groupId, int luminance);
+    //从status文件中加载设备、分组状态
+    void loadStatusFromFile();
 
-    //存储蓝牙组色温值
-    void storeGroupColorTemperature(const string& groupId, int temperature);
-
-    //获取蓝牙组亮度色温值
-    Json::Value getGroupLuminanceColorTemperature(const string& groupId);
-
-    //组控关闭时更改组状态
-    void storeGroupluminance_powerOff(const string& groupId);
+    //保存设备、分组状态
+    void storeDevGrpStatus2File();
 
     //组控打开时更改组状态
-    void storeGroupluminance_powerOn(const string& groupId);
+    void storeLuminance_powerOn(const string& groupId);
+
+    //组控关闭时更改组状态
+    void storeLuminance_powerOff(const string& groupId);
+
+    //存储蓝牙组亮度值
+    void storeLuminance(const string& groupId, int luminance);
+
+    //存储蓝牙组色温值
+    void storeColorTemperature(const string& groupId, int temperature);
+
+    //获取蓝牙组亮度色温值
+    Json::Value getLuminanceColorTemperature(const string& groupId);
 
 private:
     //产生设备的默认状态
     qlibc::QData defaultStatus();
+
+    enum class Type{
+        device,
+        group
+    };
+
+    bool isDevAddress(const string& address);
+
+    bool isGrpAddress(const string& address);
+
+    qlibc::QData createStatusItem(Type type, const string& address, const string& onOff, int luminance, int color_temperature);
 };
 
 

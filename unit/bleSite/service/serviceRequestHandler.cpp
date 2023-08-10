@@ -29,6 +29,52 @@ static const nlohmann::json errResponse = {
         {"response",{}}
 };
 
+enum controlMode{
+    power_mode,
+    luminance_mode,
+    color_temperature_mode,
+    luminance_color_temperature_mode,
+    luminance_relative_mode,
+    color_temperature_relative_mdoe            
+};
+
+static void printControlStatus(controlMode mode, const string& address, const string& powerOnOff, int luminance, int color_temperature){
+    qlibc::QData groupList = bleConfig::getInstance()->getGroupListData();
+    Json::Value::Members groupAddressVec = groupList.getMemberNames();
+    for(auto& key: groupAddressVec){
+        if(key == address){
+            string groupName = groupList.getData(key).getString("group_name");
+            switch(mode){
+                case power_mode:
+                    LOG_YELLOW << POWER << "---" << groupName << ": " << "<" << powerOnOff << ">";
+                    break;
+
+                case luminance_mode:
+                    LOG_YELLOW << LUMINANCE << "---" << groupName << ": " << "<" << luminance << ">";
+                    break;
+
+                case color_temperature_mode:
+                    LOG_YELLOW << COLORTEMPERATURE << "---" << groupName << ": " << "<" << color_temperature << ">";
+                    break;
+
+                case luminance_color_temperature_mode:
+                    LOG_YELLOW << LUMINANCECOLORTEMPERATURE << "---" << groupName << ": <" << luminance << ", "<< color_temperature << ">";
+                    break;
+
+                case luminance_relative_mode:
+                    LOG_YELLOW << LUMINANCERELATIVE << "---" << groupName << ": <" << luminance << ">";
+                    break;
+
+                case color_temperature_relative_mdoe:
+                    LOG_YELLOW << COLORTEMPERATURERELATIVE << "---" << groupName << ": <" << color_temperature << ">";
+                    break;
+            }
+            break;
+        }
+    }
+}
+
+
 /*
  * 单个设备控制和组设备控制，控制指令是相同的，区分是地址是设备地址还是组地址
  * 如果是单个设备控制：则需将设备mac转换为设备地址
@@ -69,14 +115,13 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
             if(command_id == POWER){    //开关
                 string powerOnOff = commandItem.getString("command_para");
                 cmdData.setString("commandPara", powerOnOff);
-                if(isGroup){    //组控开、闭时记录状态
-                    if(powerOnOff == "on"){
-                        bleConfig::getInstance()->storeGroupluminance_powerOn(address);
-                    }else if(powerOnOff == "off"){
-                        bleConfig::getInstance()->storeGroupluminance_powerOff(address);
-                    }
+                if(powerOnOff == "on"){
+                    bleConfig::getInstance()->storeLuminance_powerOn(address);
+                }else if(powerOnOff == "off"){
+                    bleConfig::getInstance()->storeLuminance_powerOff(address);
                 }
-
+                printControlStatus(power_mode, address, powerOnOff, 0, 0);
+                
             }else if(command_id == LUMINANCE){  //亮度
                 int luminance = commandItem.getInt("command_para");
                 if(luminance > 255){
@@ -84,10 +129,9 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                 }else if(luminance < 0){
                     luminance = 0;
                 }
-                cmdData.setInt("commandPara", luminance);
-                if(isGroup){    //组控设置亮度时记录状态
-                    bleConfig::getInstance()->storeGroupluminance(address, luminance);
-                }
+                cmdData.setInt("commandPara", luminance);          
+                bleConfig::getInstance()->storeLuminance(address, luminance);
+                printControlStatus(luminance_mode, address, "", luminance, 0);
 
             }else if(command_id == COLORTEMPERATURE){   //色温
                 int colorTemperature = commandItem.getInt("command_para");
@@ -97,9 +141,8 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                     colorTemperature = 2700;
                 }
                 cmdData.setInt("commandPara", colorTemperature);
-                if(isGroup){    //组控设置色温时记录状态
-                    bleConfig::getInstance()->storeGroupColorTemperature(address, colorTemperature);
-                }
+                bleConfig::getInstance()->storeColorTemperature(address, colorTemperature);
+                printControlStatus(color_temperature_mode, address, "", 0, colorTemperature);
 
             }else if(command_id == LUMINANCERELATIVE){  //相对亮度
                 if(!isGroup){
@@ -107,10 +150,10 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                 }else{  //组控设置相对亮度时记录状态
                     int relative = commandItem.getInt("command_para");
                     int setLuminance{};
-                    if (bleConfig::getInstance()->getGroupLuminanceColorTemperature(address)["luminance"].empty()) {
+                    if (bleConfig::getInstance()->getLuminanceColorTemperature(address)["luminance"].empty()) {
                         setLuminance = 128;
                     } else {
-                        int currentLuminance = bleConfig::getInstance()->getGroupLuminanceColorTemperature(address)["luminance"].asInt();
+                        int currentLuminance = bleConfig::getInstance()->getLuminanceColorTemperature(address)["luminance"].asInt();
                         setLuminance = static_cast<int>(currentLuminance + 2.55 * relative);
                         if (setLuminance > 255) {
                             setLuminance = 255;
@@ -120,7 +163,8 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                     }
                     cmdData.setString("command", LUMINANCE);
                     cmdData.setInt("commandPara", setLuminance);
-                    bleConfig::getInstance()->storeGroupluminance(address, setLuminance);
+                    bleConfig::getInstance()->storeLuminance(address, setLuminance);
+                    printControlStatus(luminance_relative_mode, address, "", setLuminance, 0);
                 }
 
             }else if(command_id == COLORTEMPERATURERELATIVE){   //相对色温
@@ -129,10 +173,10 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                 }else{  //组控设置相对色温时记录状态
                     int relative = commandItem.getInt("command_para");
                     int setColorTemperature{};
-                    if (bleConfig::getInstance()->getGroupLuminanceColorTemperature(address)["temperature"].empty()) {
+                    if (bleConfig::getInstance()->getLuminanceColorTemperature(address)["color_temperature"].empty()) {
                         setColorTemperature = 4600;
                     } else {
-                        int currentColorTemperature = bleConfig::getInstance()->getGroupLuminanceColorTemperature(address)["temperature"].asInt();
+                        int currentColorTemperature = bleConfig::getInstance()->getLuminanceColorTemperature(address)["color_temperature"].asInt();
                         setColorTemperature = currentColorTemperature + 38 * relative;
                         if (setColorTemperature > 6500) {
                             setColorTemperature = 6500;
@@ -142,7 +186,8 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                     }
                     cmdData.setString("command", COLORTEMPERATURE);
                     cmdData.setInt("commandPara", setColorTemperature);
-                    bleConfig::getInstance()->storeGroupColorTemperature(address, setColorTemperature);
+                    bleConfig::getInstance()->storeColorTemperature(address, setColorTemperature);
+                    printControlStatus(color_temperature_relative_mdoe, address, "", 0, setColorTemperature);
                 }
 
             }else if(command_id == LUMINANCECOLORTEMPERATURE){  //亮度、色温联合控制
@@ -163,22 +208,9 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
                 cmdData.setInt("commandParaLuminance", luminance);
                 cmdData.setInt("commandParaColorTemperature", colorTemperature);
 
-                if(isGroup){    //组控联合控制亮度、色温时记录状态
-                    bleConfig::getInstance()->storeGroupluminance(address, luminance);
-                    bleConfig::getInstance()->storeGroupColorTemperature(address, colorTemperature);
-                }
-
-                //打印控制信息
-                qlibc::QData groupList = bleConfig::getInstance()->getGroupListData();
-                Json::Value::Members groupAddressVec = groupList.getMemberNames();
-                for(auto& key: groupAddressVec){
-                    if(key == address){
-                        string groupName = groupList.getData(key).getString("group_name");
-                        LOG_YELLOW << "===>" << groupName << ": " << commandItem.getInt("command_para_luminance") << ", "
-                        << commandItem.getInt("command_para_color_temperature");
-                        break;
-                    }
-                }
+                bleConfig::getInstance()->storeLuminance(address, luminance);
+                bleConfig::getInstance()->storeColorTemperature(address, colorTemperature);
+                printControlStatus(luminance_color_temperature_mode, address, "", luminance, colorTemperature);
 
             }else if(command_id == MODECONFIG){   //模式
                 cmdData.setInt("commandPara", commandItem.getInt("command_para"));
@@ -189,6 +221,7 @@ void controlDevice(qlibc::QData& deviceList, LogicControl& lc){
         }
     }
 }
+
 
 int reset_device_service_handler(const Request& request, Response& response, LogicControl& lc){
     LOG_INFO << "reset_device_service_handler: " << qlibc::QData(request.body).toJsonString();
@@ -334,7 +367,11 @@ int control_device_service_handler(const Request& request, Response& response, L
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
-            controlDevice(deviceList, lc);
+            try{
+                controlDevice(deviceList, lc);
+            }catch(const exception& e){
+                LOG_RED << "device controlDevice exception: " << e.what();
+            }
         });
 
         response.set_content(okResponse.dump(), "text/json");
@@ -694,7 +731,11 @@ int control_group_service_handler(const Request& request, Response& response, Lo
     if(requestBody.type() != Json::nullValue){
         bleConfig::getInstance()->enqueue([requestBody, &lc]{
             qlibc::QData groupList = requestBody.getData("request").getData("group_list");
-            controlDevice(groupList, lc);
+            try{
+                controlDevice(groupList, lc);
+            }catch(const exception& e){
+                LOG_RED << "group controlDevice exception: " << e.what();
+            }
         });
 
         response.set_content(okResponse.dump(), "text/json");
