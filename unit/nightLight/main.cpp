@@ -10,6 +10,7 @@
 #include "log/Logging.h"
 #include "common/httpUtil.h"
 #include "source/lightManage.h"
+#include "service.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 
@@ -61,11 +62,9 @@ int main(int argc, char* argv[]) {
     
 
 
-    // //注册消息处理函数
-    // servicesite::ServiceSiteManager::registerMessageHandler(ScanResultMsg,                 synergy::messagePublish);
-    // servicesite::ServiceSiteManager::registerMessageHandler(SingleDeviceBindSuccessMsg,    synergy::messagePublish);
-    // servicesite::ServiceSiteManager::registerMessageHandler(SingleDeviceUnbindSuccessMsg,  synergy::messagePublish);
-
+    //雷达点位消息
+    servicesite::ServiceSiteManager::registerMessageHandler(ScanResultMsg,  radarMessageHandle);
+   
 
     // 站点监听线程启动
     while(true){

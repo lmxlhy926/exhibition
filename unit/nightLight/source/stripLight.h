@@ -21,9 +21,10 @@ struct LightParamType{
 
 struct StripPositionType{
     bool enable;                    //此段是否开启跟随功能
-    uint offset;                    //控制距离偏移量
     CoordPointType start;           //灯带起始位置
-    CoordPointType end;             //等待结束位置
+    CoordPointType end;             //灯带结束位置
+    uint startChipNum;              //起始控制编号
+    uint endChipNum;                //终止控制编号
     LightParamType lightParam;      //亮度色温控制参数
 };
 
@@ -57,6 +58,7 @@ enum class FunctionCode{
 */
 
 using PointSequenceType = std::map<string, std::map<string, CoordPointType>>;  //<area, <targetNo, coordPoint>>
+
 class stripLight{
 private:
     string deviceId;                //灯带唯一序列号
@@ -69,12 +71,12 @@ public:
         init(stripDevices);
     }
 
+    //计算点位是否落在灯带范围内，对灯带相应的段进行控制
+    void calculateAndContol(const PointSequenceType& pointSequence);
+
 private:
     //初始灯带参数
     void init(Json::Value stripDevices);
-
-    //计算点位是否落在灯带范围内，对灯带相应的段进行控制
-    void calculateAndContol(PointSequenceType pointSequence);
 };
 
 

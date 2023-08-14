@@ -3,14 +3,13 @@
 
 #include "stripLight.h"
 #include <map>
+#include <vector>
 #include <mutex>
-
-using stripLightConType = std::map<string, stripLight>;    //
 
 class lightManage{
 private:
     std::recursive_mutex Mutex;
-    stripLightConType lightsContainer;
+    std::vector<stripLight> lightsContainer;
     static lightManage* Instance;
     
 public:
@@ -21,6 +20,10 @@ public:
 
     //收到雷达站点的点位消息后，调用此函数
     void calculateCoordPointAndControl(const string& pointsMessage);
+
+private:
+    //转换坐标
+    PointSequenceType trans2PointSequence(const string& pointMessage);
 };
 
 #endif
