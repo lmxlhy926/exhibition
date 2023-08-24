@@ -88,6 +88,11 @@ public:
 
     //解析并控制
     void controlByParsedItem(ParsedItem& parsedItem);
+
+private:
+    bool sceneControlMatch(const string& action_name, bool& option);
+
+    bool modifyRulesConfig();
 };
 
 

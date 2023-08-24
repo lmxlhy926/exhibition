@@ -64,6 +64,9 @@ voiceMatch::voiceMatch(qlibc::QData controlData){
 }
 
 void voiceMatch::parseAndControl(){
+    //如果是场景控制指令，则不进行设备控制
+    if(modifyRulesConfig()) return;
+
     //获取设备列表、组列表、刷新房间列表
     qlibc::QData deviceList = DeviceManager::getInstance()->getAllDeviceList();
     qlibc::QData groupList = GroupManager::getInstance()->getAllGroupList();
@@ -275,6 +278,80 @@ void voiceMatch::controlByParsedItem(ParsedItem& parsedItem){
         httpUtil::sitePostRequest("127.0.0.1", 9007, requestData, responseData);
         LOG_BLUE << "voice controlResponse: " << responseData.toJsonString();
     }
+}
+
+bool voiceMatch::sceneControlMatch(const string& action_name, bool& option){
+    if(!regex_search(voiceString, regex(action_name))){
+        return false;
+    }
+    if(regex_search(voiceString, regex("开"))){
+        option = true;
+        return true;
+    }else if(regex_search(voiceString, regex("关"))){
+        option = false;
+        return true;
+    }
+    return false;
+}
+
+bool voiceMatch::modifyRulesConfig(){
+    //获取本机场景文件
+    qlibc::QData ruleRequest, ruleResponse;
+    ruleRequest.setString("service_id", "getSceneConfigFile");
+    ruleRequest.putData("request",{});
+    if(!httpUtil::sitePostRequest("127.0.0.1", 9006, ruleRequest, ruleResponse)){
+        LOG_RED << "can not get rulesConfig.json...";
+        return false;
+    }
+
+    //遍历匹配
+    qlibc::QData ruleData = ruleResponse.getData("response");
+    string timeStamp = ruleData.getString("timeStamp");
+    qlibc::QData scenes_action_list = ruleData.getData("scenes_action_list");
+    Json::ArrayIndex scenes_action_list_size = scenes_action_list.size();
+    bool toggle{false}, isMatch{false};
+    Json::ArrayIndex i{0};
+    for(; i < scenes_action_list_size; ++i){
+        qlibc::QData ithData = scenes_action_list.getArrayElement(i);
+        string action_name = ithData.getString("action_name");
+        if(sceneControlMatch(action_name, toggle)){
+            isMatch = true;
+            break;
+        }
+    }
+    if(!isMatch){
+        LOG_INFO << "voicecmd is not a sceneControl cmd...";
+        return false;
+    }
+
+    if(ruleData.asValue()["scenes_action_list"][i]["scene_switch"].asBool() == toggle){
+        LOG_INFO << "state is not needed to change...";
+        return true;
+    }
+
+    //修改场景文件中的scene_switch、timeStamp
+    long int timeStampInt{0};
+    try{
+        timeStampInt = stol(timeStamp);
+    }catch(const exception& e){
+        LOG_RED << "timeStamp trans error: " << e.what();
+        return false;
+    }
+    timeStampInt++;
+    ruleData.asValue()["scenes_action_list"][i]["scene_switch"] = toggle;
+    ruleData.asValue()["timeStamp"] = std::to_string(timeStampInt);
+
+    //存储文件
+    qlibc::QData saveRuleRequest, saveRuleResponse;
+    saveRuleRequest.setString("service_id", "saveSceneConfigFile");
+    saveRuleRequest.putData("request", ruleData);
+    LOG_INFO << "save rules-config.txt to config_site....";
+    if(!httpUtil::sitePostRequest("127.0.0.1", 9006, saveRuleRequest, saveRuleResponse)){
+        LOG_RED << "save rules-config.txt failed...";
+        return true;
+    }
+    LOG_INFO << "save rules-config.txt successfully...";
+    return true;
 }
 
 

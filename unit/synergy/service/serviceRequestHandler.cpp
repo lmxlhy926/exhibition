@@ -551,7 +551,13 @@ namespace synergy {
         qlibc::QData requestData(request.body);
         qlibc::QData controlData = requestData.getData("request");
         voiceMatch voiceCtrl(controlData);
-        voiceCtrl.parseAndControl();
+        try{
+            voiceCtrl.parseAndControl();
+        }catch(const exception& e){
+            LOG_RED << "exception: " << e.what();
+            response.set_content(errResponse.dump(), "text/json");
+            return 0;
+        }
         response.set_content(okResponse.dump(), "text/json");
         return 0;
     }
