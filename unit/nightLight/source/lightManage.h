@@ -15,15 +15,15 @@ private:
 public:
     static lightManage* getInstance();
 
-    //刷新夜灯列表
-    void flushLightsContaienr(Json::Value& deviceLists);
+    //从文件加载夜灯列表
+    void loadLightsContaienr();
 
     //收到雷达站点的点位消息后，调用此函数
     void calculateCoordPointAndControl(const string& pointsMessage);
 
 private:
     //转换坐标
-    PointSequenceType trans2PointSequence(const string& pointMessage);
+    RadarPointsType trans2PointSequence(const string& pointMessage);
 };
 
 #endif

@@ -1,0 +1,22 @@
+
+
+灯带是设备，属于设备站点
+夜灯是逻辑灯，属于夜灯跟随站点
+
+//夜灯参数
+
+{
+	"nightStripList" : [
+		{
+			"device_name":"逻辑灯带名称"，
+			"positionPoints": "",
+			"property":{
+				"device_id":"物理灯带id",
+			}
+		},
+		{},
+		{},
+	]
+}
+
+
