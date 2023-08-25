@@ -93,6 +93,8 @@ private:
     bool sceneControlMatch(const string& action_name, bool& option);
 
     bool modifyRulesConfig();
+
+    void sceneExecute(Json::Value& ruleValue, std::map<int, bool> matchIndexMap);
 };
 
 

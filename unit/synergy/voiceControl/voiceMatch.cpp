@@ -309,22 +309,28 @@ bool voiceMatch::modifyRulesConfig(){
     string timeStamp = ruleData.getString("timeStamp");
     qlibc::QData scenes_action_list = ruleData.getData("scenes_action_list");
     Json::ArrayIndex scenes_action_list_size = scenes_action_list.size();
-    bool toggle{false}, isMatch{false};
+    bool toggle{false};
     Json::ArrayIndex i{0};
+    std::map<int, bool> matchIndexMap;
     for(; i < scenes_action_list_size; ++i){
         qlibc::QData ithData = scenes_action_list.getArrayElement(i);
         string action_name = ithData.getString("action_name");
         if(sceneControlMatch(action_name, toggle)){
-            isMatch = true;
-            break;
+            matchIndexMap.insert(std::make_pair(i, toggle));
         }
     }
-    if(!isMatch){
+    if(matchIndexMap.empty()){
         LOG_INFO << "voicecmd is not a sceneControl cmd...";
         return false;
     }
 
-    if(ruleData.asValue()["scenes_action_list"][i]["scene_switch"].asBool() == toggle){
+    bool isModify{false};
+    for(auto& elem : matchIndexMap){
+        ruleData.asValue()["scenes_action_list"][elem.first]["scene_switch"] = toggle;
+        isModify = true;
+    }
+
+    if(!isModify){
         LOG_INFO << "state is not needed to change...";
         return true;
     }
@@ -335,10 +341,9 @@ bool voiceMatch::modifyRulesConfig(){
         timeStampInt = stol(timeStamp);
     }catch(const exception& e){
         LOG_RED << "timeStamp trans error: " << e.what();
-        return false;
+        return true;
     }
     timeStampInt++;
-    ruleData.asValue()["scenes_action_list"][i]["scene_switch"] = toggle;
     ruleData.asValue()["timeStamp"] = std::to_string(timeStampInt);
 
     //存储文件
@@ -351,9 +356,46 @@ bool voiceMatch::modifyRulesConfig(){
         return true;
     }
     LOG_INFO << "save rules-config.txt successfully...";
+
+    //执行场景指令
+    sceneExecute(ruleData.asValue(), matchIndexMap);
     return true;
 }
 
+void voiceMatch::sceneExecute(Json::Value& ruleValue, std::map<int, bool> matchIndexMap){
+    std::vector<Json::Value> ctrlVec;
+    bool isOn;
+    for(auto& elem : matchIndexMap){
+        isOn = elem.second;
+        qlibc::QData action_result(ruleValue["scenes_action_list"][elem.first]["cmd"]["action_result"]);
+        Json::ArrayIndex action_result_size = action_result.size();
+        for(Json::ArrayIndex i = 0; i < action_result_size; ++i){
+            qlibc::QData cmd(action_result.getArrayElement(i).getData("cmd"));
+            ctrlVec.push_back(cmd.asValue());
+        }
+    }
+
+    Json::Value command, command_list(Json::arrayValue);
+    command["command_id"] = "power";
+    if(isOn){
+        command["command_para"] = "on";
+    }else{
+        command["command_para"] = "off";
+    }
+    command["transTime"] = 0;
+    command_list.append(command);
+    
+    for(auto& elem : ctrlVec){
+        Json::ArrayIndex group_list_size = elem["request"]["group_list"].size();
+        for(Json::ArrayIndex i = 0; i < group_list_size; ++i){
+            elem["request"]["group_list"][i]["command_list"] = command_list;
+        }
+        //发送控制命令
+        qlibc::QData controlRequest(elem);
+        qlibc::QData conTrolResponse;
+        httpUtil::sitePostRequest("127.0.0.1", 9007, controlRequest, conTrolResponse);
+    }
+}
 
 std::recursive_mutex voiceMatchUtil::rMutex;
 void voiceMatchUtil::refreshRoomList(qlibc::QData& deviceList, qlibc::QData& groupList){
