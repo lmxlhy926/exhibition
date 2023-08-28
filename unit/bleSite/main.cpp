@@ -24,6 +24,10 @@ int main(int argc, char* argv[]) {
     string path = "/data/changhong/edge_midware/lhy/bleMeshSiteLog.txt";
     muduo::logInitLogger(path);
 
+    for(int i = 0; i < argc; ++i){
+        LOG_INFO << string(argv[i]);
+    }
+
     LOG_RED << "-----------------------------------------";
     LOG_RED << "-----------------------------------------";
     LOG_RED << "---------------MESH_SITE START-----------";
@@ -205,6 +209,9 @@ int main(int argc, char* argv[]) {
 
     //获取分组列表
     serviceSiteManager->registerServiceRequestHandler(GetGroupList_Device_Service_ID, getGroupList_service_handler);
+
+    //测试接口
+    serviceSiteManager->registerServiceRequestHandler("test", test_service_handler);
 
 
     //注册白名单改变处理函数

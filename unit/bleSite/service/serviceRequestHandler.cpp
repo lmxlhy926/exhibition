@@ -759,3 +759,18 @@ int getGroupList_service_handler(const Request& request, Response& response){
     return 0;
 }
 
+
+int test_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "==>: " << requestBody.toJsonString();
+    string deviceSn = requestBody.getData("request").getString("deviceSn");
+    uint forward = requestBody.getData("request").asValue()["forward"].asUInt();
+    SnAddressMap::getInstance()->getNodeAssignAddr(deviceSn, forward);
+    qlibc::QData retData;
+    retData.setInt("code", 0);
+    retData.setString("error", "ok");
+    retData.putData("response", {});
+
+    response.set_content(retData.toJsonString(), "text/json");
+    return 0;
+}

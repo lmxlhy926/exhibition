@@ -20,6 +20,7 @@ using namespace std;
 class SnAddressMap {
 private:
     map<string, Json::Value> snAddrMap;
+    uint _index;
     std::recursive_mutex rMutex_;
 
     SnAddressMap(){
@@ -37,13 +38,10 @@ public:
     }
 
     //获取分配节点cmdData
-    qlibc::QData getNodeAssignAddr(string deviceSn);
+    qlibc::QData getNodeAssignAddr(string deviceSn, uint forward = 1);
 
     //删除对应的条目并更新存储文件
     void deleteDeviceSn(string& deviceSn);
-
-    //获取设备地址列表
-    qlibc::QData getAddrList();
 
     //deviceSn--->unicastAddress
     string deviceSn2Address(string deviceSn);
@@ -58,14 +56,20 @@ private:
     //将map转换为json格式并存储到文件
     void map2JsonDataAndSave2File();
 
-    //数值转换为节点地址
-    string intAddr2FullAddr(unsigned int i);
+    //插入条目，如果之前有此deviceSn则先删除后插入, 地址增长分配。
+    void insert(string &deviceSn, string address);
 
-    //插入条目，如果之前有此deviceSn则先删除后插入
-    void insert(string& deviceSn, unsigned int intAddr);
+    //从加载的sn信息中得到Index;
+    void initIndex();
 
-    //找到最小可用数值，将可用数值转换为地址
-    string getAddress(string& deviceSn);
+    //index转换为地址
+    string index2Address();
+
+    //index步进
+    void indexForward(uint forward);
+
+    //获取地址，步进地址空间
+    string getAddress(string& deviceSn, uint forward = 1);
 };
 
 #endif //EXHIBITION_SNADDRESSMAP_H
