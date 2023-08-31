@@ -20,6 +20,7 @@
 #include "common/httpUtil.h"
 #include "deviceTypeExtract.h"
 #include "../sourceManage/util.h"
+#include "serial/telinkDongle.h"
 
 using namespace servicesite;
 using namespace std;
@@ -103,6 +104,7 @@ public:
     Event unbindSuccessEvent;                   //单个设备成功解绑事件
     Event gateWayIndexEvent;                    //拟配置节点响应报告
     Event gateWayNetInfoEvent;                  //网络配置信息报告
+    Event typeEvent;                            //设备类型事件
 private:
     static EventTable* eventTable;
 
@@ -192,6 +194,38 @@ public:
     }
 };
 
+
+class TypeEvent : public ReportEvent{
+private:
+    string sourceData;
+    string typeCode;
+public:
+    explicit TypeEvent(string data) : sourceData(std::move(data)){
+        init();
+    }
+
+    void postEvent() override{
+        if(typeCode == "02FF"){
+            qlibc::QData data;
+            data.setString("type", "triple_switch");
+            EventTable::getInstance()->typeEvent.putData(data);
+            EventTable::getInstance()->typeEvent.notify_all();
+
+        }else if(typeCode == "01FF"){
+            qlibc::QData data;
+            data.setString("type", "night_light");
+            EventTable::getInstance()->typeEvent.putData(data);
+            EventTable::getInstance()->typeEvent.notify_all();
+        }
+    }
+
+private:
+    void init(){
+        ReadBinaryString rs(sourceData);
+        rs.readBytes(8);
+        rs.read2Byte(typeCode);
+    }
+};
 
 //网关网络信息响应
 class GateWayNetInfoAck : public ReportEvent{
@@ -381,6 +415,12 @@ public:
             //更新状态列表，发布状态变更消息
             bleConfig::getInstance()->updateStatusListData(status);
             publishState(device_id, "power", state_value);
+
+            //清空三火开关列表
+            string address = SnAddressMap::getInstance()->deviceSn2Address(device_id);
+            string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
+            TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
+            telinkDonglePtr->deleteTripleSwitchControlData(address);
     }
 
 private:

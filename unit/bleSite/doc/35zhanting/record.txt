@@ -1,0 +1,41 @@
+
+{
+        "device_list" :
+        [
+                {
+                        "device_id" : "0EC682971B30",       //大灯
+                        "device_model" : "单火三控开关",
+                        "device_modelCode" : "A3",
+                        "device_type" : "TRIPLE_SWITCH",
+                        "location" :
+                        {
+                                "room_name" : "玄关",
+                                "room_no" : "6"
+                        }
+                },
+                {
+                        "device_id" : "07C682971B30",   //右边
+                        "device_model" : "单火三控开关",
+                        "device_modelCode" : "CA",
+                        "device_type" : "TRIPLE_SWITCH",
+                        "location" :
+                        {
+                                "room_name" : "玄关",
+                                "room_no" : "6"
+                        }
+                },
+                {
+                        "device_id" : "C3CF82971B30",   //左边
+                        "device_model" : "单火三控开关",
+                        "device_modelCode" : "F9",
+                        "device_type" : "TRIPLE_SWITCH",
+                        "location" :
+                        {
+                                "room_name" : "玄关",
+                                "room_no" : "6"
+                        }
+                }
+        ]
+}
+
+

@@ -49,6 +49,9 @@ public:
     //unicastAddress--->deviceSn
     string address2DeviceSn(string address);
 
+     //index步进
+    void indexForward(uint forward);
+
 private:
     //加载存储的<sn-address>数据到snAddMap中
     void loadCache2Map();
@@ -64,9 +67,6 @@ private:
 
     //index转换为地址
     string index2Address();
-
-    //index步进
-    void indexForward(uint forward);
 
     //获取地址，步进地址空间
     string getAddress(string& deviceSn, uint forward = 1);

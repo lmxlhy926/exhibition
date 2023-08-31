@@ -40,11 +40,25 @@ string SnAddressMap::deviceSn2Address(string deviceSn){
 string SnAddressMap::address2DeviceSn(string address){
     std::lock_guard<recursive_mutex> lg(rMutex_);
     for(auto& elem : snAddrMap){
+        if(elem.first == "index") continue;
         if(elem.second["unicast_address"] == address){
             return elem.first;
         }
     }
     return "";
+}
+
+//index步进
+void SnAddressMap::indexForward(uint forward){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    _index += forward;
+    auto pos = snAddrMap.find("index");
+    if(pos != snAddrMap.end()){
+        pos->second = _index;
+    }else{
+        snAddrMap.insert(std::make_pair("index", _index));
+    }
+    map2JsonDataAndSave2File();     //存储到文件
 }
 
 void SnAddressMap::loadCache2Map() {
@@ -80,6 +94,11 @@ void SnAddressMap::insert(string &deviceSn, string address) {
 //从加载的sn信息中得到Index;
 void SnAddressMap::initIndex(){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    auto pos = snAddrMap.find("index");
+    if( pos != snAddrMap.end()){
+        _index = pos->second.asUInt();
+        return;
+    }
     std::vector<int> highByteVec, lowByteVec;
     for(auto& elem : snAddrMap){
         try{
@@ -101,7 +120,12 @@ void SnAddressMap::initIndex(){
     if(!lowByteVec.empty()){
         lowByte = *std::max_element(lowByteVec.begin(), lowByteVec.end());
     }
+
+    if(highByte == 0 && lowByte == 0){   //从0002开始计算地址
+        highByte = 2;   
+    }
     _index = highByte * 256 + lowByte + 1;  //可用的最小index
+    snAddrMap.insert(std::make_pair("index", _index));
 }
 
 //index转换为地址
@@ -115,12 +139,6 @@ string SnAddressMap::index2Address(){
     return ss.str();
 }
 
-//index步进
-void SnAddressMap::indexForward(uint forward){
-    std::lock_guard<std::recursive_mutex> lg(rMutex_);
-    _index += forward;
-}
-
 //获取地址，步进地址空间
 string SnAddressMap::getAddress(string& deviceSn, uint forward){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);
@@ -131,5 +149,6 @@ string SnAddressMap::getAddress(string& deviceSn, uint forward){
     map2JsonDataAndSave2File();     //存储到文件
     return deviceSnAddress; //返回地址
 }
+
 
 

@@ -765,7 +765,8 @@ int test_service_handler(const Request& request, Response& response){
     LOG_INFO << "==>: " << requestBody.toJsonString();
     string deviceSn = requestBody.getData("request").getString("deviceSn");
     uint forward = requestBody.getData("request").asValue()["forward"].asUInt();
-    SnAddressMap::getInstance()->getNodeAssignAddr(deviceSn, forward);
+    SnAddressMap::getInstance()->getNodeAssignAddr(deviceSn);
+    SnAddressMap::getInstance()->indexForward(forward);
     qlibc::QData retData;
     retData.setInt("code", 0);
     retData.setString("error", "ok");

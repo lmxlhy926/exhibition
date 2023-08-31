@@ -7,6 +7,7 @@
 #include "sourceManage/bleConfig.h"
 #include "serial/telinkDongle.h"
 #include "../parameter.h"
+#include "upStatus/statusEvent.h"
 
 string BuildBinaryString::commandPrefix = "E8 FF 00 00 00 00 02 03";
 
@@ -15,8 +16,39 @@ bool DownUtility::parse2Send(qlibc::QData &cmdData){
     string binaryString = cmdData2BinaryCommandString(cmdData);
     string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
     TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
-    telinkDonglePtr->write2Seria(binaryString);
-    return true;
+
+    /**
+     * 如果是开关指令，
+     * 提取其地址，转换为device_id，并判断其是否为三火开关的控制指令
+    */
+    ReadBinaryString rs(binaryString);
+    string address, opcode;
+    rs.readBytes(8).readBytes(address, 2);
+    rs.readBytes(opcode, 2);
+    if(opcode == "8203" && !address.empty()){
+        string deviceSn = SnAddressMap::getInstance()->address2DeviceSn(address);
+        //判断设备类型
+        qlibc::QData deviceList= bleConfig::getInstance()->getDeviceListData().getData("device_list");
+        Json::ArrayIndex size = deviceList.size();
+        bool isTripleSwitchCtrl{false};
+        for(Json::ArrayIndex i = 0; i < size; ++i){
+            qlibc::QData ithData = deviceList.getArrayElement(i);
+            string device_type = ithData.getString("device_type");
+            string device_id = ithData.getString("device_id");
+            if(device_type == "TRIPLE_SWITCH" && device_id == deviceSn){
+                isTripleSwitchCtrl = true;
+                break;
+            }
+        }
+        if(isTripleSwitchCtrl){
+            return telinkDonglePtr->write2Serial_tripleSwitch(binaryString);       
+        }else{
+            return telinkDonglePtr->write2Seria(binaryString);
+        }
+    }
+
+    //其它指令
+    return telinkDonglePtr->write2Seria(binaryString);
 }
 
 

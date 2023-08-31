@@ -6,4 +6,5 @@ target_link_libraries(downCmd PUBLIC serial)
 target_link_libraries(downCmd PUBLIC log)
 target_link_libraries(downCmd PUBLIC sourceManage)
 target_link_libraries(downCmd PUBLIC siteService)
+target_link_libraries(downCmd PUBLIC upStatus)
 

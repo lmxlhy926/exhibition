@@ -39,6 +39,33 @@ bool TelinkDongle::write2Seria(std::string& commandString) {
     return true;
 }
 
+//向串口写入三火开关控制数据
+bool TelinkDongle::write2Serial_tripleSwitch(std::string& commandString){
+    {
+        std::lock_guard<std::mutex> lg(sendMutex);
+        sendList_tripleSwitch.push_back(commandString);
+    }
+    sendConVar.notify_one();
+    return true;
+}
+
+//删除队列里的三火开关控制数据
+void TelinkDongle::deleteTripleSwitchControlData(string address){
+    if(address.empty()) return;
+    std::lock_guard<std::mutex> lg(sendMutex);
+    if(addressTryCountMap.find(address) != addressTryCountMap.end()){
+        addressTryCountMap.erase(address);
+    }
+    for(auto pos = sendList_tripleSwitch.begin(); pos != sendList_tripleSwitch.end(); ++pos){
+        string elemAddress = getCommandAddress(*pos);
+        if(elemAddress == address){
+            sendList_tripleSwitch.erase(pos);
+            return;
+        }
+    }
+}
+
+
 void TelinkDongle::registerPkgMsgFunc(PackageMsgHandleFuncType fun) {
     packageMsgHandledFunc = std::move(fun);
 }
@@ -97,9 +124,9 @@ void TelinkDongle::sendThreadFunc(){
         string commandString;
         {
             std::unique_lock<std::mutex> ul(sendMutex);
-            if(sendList.empty()){  //如果发送列表没有数据则等待
+            if(sendList.empty() && sendList_tripleSwitch.empty()){  //如果发送列表没有数据则等待
                 sendConVar.wait(ul, [this](){
-                    return !sendList.empty() || !commonSerial.isOpened();
+                    return !sendList.empty() || !sendList_tripleSwitch.empty() || !commonSerial.isOpened();
                 });
             }
 
@@ -108,8 +135,8 @@ void TelinkDongle::sendThreadFunc(){
                 return;
             }
 
-            commandString = sendList.front();
-            sendList.pop_front();
+            //从队列取得命令字符串
+            commandString = getCommandString();
         }
 
         if(commonSerial.isOpened()){
@@ -120,7 +147,6 @@ void TelinkDongle::sendThreadFunc(){
                 LOG_HLIGHT << "==>sendCmd<false>: " << binary2SendString(commandVec);
             }
             this_thread::sleep_for(std::chrono::milliseconds(500));
-
         }
     }
 }
@@ -245,3 +271,61 @@ void TelinkDongle::packageHandel(){
     }
 }
 
+
+//提取命令中的地址
+string TelinkDongle::getCommandAddress(string commandString){
+    string address = commandString.substr(8 * 2, 4);
+    return address;
+}
+
+//记录三火开关数据
+string TelinkDongle::recordTripleSwitch(string commandString){
+    commandString = commandString.substr(0, commandString.size() - 4);
+    string address = getCommandAddress(commandString);
+    auto pos = addressTryCountMap.find(address);
+    if( pos != addressTryCountMap.end()){
+        pos->second++;
+        stringstream ss;
+        ss << std::setw(2) << std::setfill('0') << pos->second;
+        commandString.append(ss.str());
+        if(pos->second >= 6){
+            addressTryCountMap.erase(pos);
+            sendList_tripleSwitch.pop_front();
+        }
+    }else{
+        addressTryCountMap.insert(std::make_pair(address, 1));
+        stringstream ss;
+        ss << std::setw(2) << std::setfill('0') << 1;
+        commandString.append(ss.str());
+    }
+    common = false;
+    triple = true;
+    return commandString;
+}
+
+string TelinkDongle::getCommandString(){
+    string commandString;
+    if(!sendList_tripleSwitch.empty() && sendList.empty()){ 
+        commandString = sendList_tripleSwitch.front();
+        commandString = recordTripleSwitch(commandString);
+
+    }else if(!sendList.empty() && sendList_tripleSwitch.empty()){
+        commandString = sendList.front();
+        sendList.pop_front();
+        common = true;
+        triple = false;
+
+    }else{
+        if(!common){
+            commandString = sendList.front();
+            sendList.pop_front();
+            common = true;
+            triple = false;
+
+        }else if(!triple){
+            commandString = sendList_tripleSwitch.front();
+            commandString = recordTripleSwitch(commandString);
+        }
+    } 
+    return commandString;  
+}

@@ -144,6 +144,20 @@ bool BindDevice::addDevice(string& deviceSn, qlibc::QData& property) {
     qlibc::QData bind(BindString);
     DownUtility::parse2Send(bind);
 
+    if(EventTable::getInstance()->typeEvent.wait(3) != std::cv_status::timeout){
+        qlibc::QData data = EventTable::getInstance()->typeEvent.getData();
+        string type = data.getString("type");
+        if(type == "triple_switch"){
+            property.setString("device_type", "TRIPLE_SWITCH");
+            property.setString("device_model", "单火三控开关");
+            SnAddressMap::getInstance()->indexForward(2);   //占用三个地址
+
+        }else if(type == "night_light"){
+            property.setString("device_type", "LIGHT");
+            property.setString("device_model", "夜灯灯带");
+        }
+    }
+    
     if(EventTable::getInstance()->bindSuccessEvent.wait(30) == std::cv_status::timeout){
         LOG_RED << "<<: xxxxxxxxxBIND FAILEDxxxxxxxx";
         LOG_RED << "<<: xxxxxxxxxxxxxxxxxxxxxxxxxxxx";

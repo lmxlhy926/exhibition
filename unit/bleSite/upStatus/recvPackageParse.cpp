@@ -74,6 +74,9 @@ void RecvPackageParse::parse2Event(string& completePackageString) {
     }else if(hciType == "91" && subType == "8B"){   //网络key信息
         GateWayNetInfoAck(rs.remainingString()).postEvent();
 
+    }else if(hciType == "91" && subType == "8E"){
+        TypeEvent(rs.remainingString()).postEvent();
+
     }else if(hciType == "91" && subType == "82"){   //绑定成功
         BindResult(rs.remainingString()).postEvent();
 

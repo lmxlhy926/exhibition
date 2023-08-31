@@ -13,6 +13,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <list>
+#include <map>
 
 #define MaxReadOneShot (1024)
 
@@ -28,7 +29,11 @@ private:
     std::mutex recvMutex;
     std::condition_variable recvConVar;
 
+    bool common{false};
+    bool triple{false};
     std::list<string> sendList;     //发送队列
+    std::list<string> sendList_tripleSwitch;    //三火开关发送队列
+    std::map<string, int> addressTryCountMap;   //三火开关控制计数
     std::mutex sendMutex;
     std::condition_variable sendConVar;
 
@@ -68,6 +73,12 @@ public:
     //向串口写数据
     bool write2Seria(std::string& commandString);
 
+    //向串口写入三火开关控制数据
+    bool write2Serial_tripleSwitch(std::string& commandString);
+
+    //删除队列里的三火开关控制数据
+    void deleteTripleSwitchControlData(string address);
+
     //注册包消息处理函数
     void registerPkgMsgFunc(PackageMsgHandleFuncType fun);
 
@@ -90,6 +101,14 @@ private:
     string packageEscape(std::vector<uint8_t>& originFrame) const;  //转义包数据后，转换为字符串
 
     void packageHandel();   //从队列中读取子包，调用回调函数处理
+
+    //提取命令中的地址
+    string getCommandAddress(string commandString);
+
+    //记录三火开关数据
+    string recordTripleSwitch(string commandString);
+
+    string getCommandString();
 };
 
 
