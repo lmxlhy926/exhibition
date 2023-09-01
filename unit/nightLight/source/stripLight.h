@@ -46,7 +46,7 @@ enum class FunctionCode{
 //实体灯带参数
 struct StripParamType{
     string deviceId;            //灯带唯一序列号
-    uint totalLength;           //灯带总长度     （cm）
+    uint stripLength;           //灯带总长度     （cm）
     uint singleChipLength;      //单芯片受控长度  (cm)
     uint totalChips;            //灯控芯片数量
     FunctionCode funCode;       //功能码
@@ -65,7 +65,7 @@ struct StripParamType{
  *              普通灯带模式时，如果开启按段跟随。只要按段跟随的段对应的控制范围内有人，则灯带亮。所有段都没人，则灯带暗。
 */
 
-using RadarPointsType = std::map<string, std::map<string, CoordPointType>>;  //<房间号, <targetNo, coordPoint>>
+using RadarPointsType = std::map<string, std::vector<CoordPointType>>;  //<房间号, coordPoint>
 
 /**
  * 逻辑灯带类：包含实体灯带属性、逻辑段灯带属性。
@@ -74,36 +74,46 @@ class stripLight{
 private:
     StripParamType physicalStrip;   //所属的实体灯带
     std::multimap<string, LogicalStripType> logicalStripMap;    //<房间编号，逻辑灯带段属性>
+    std::vector<uint> chipOpendIndex;   //打开的芯片编号
 public:
-    stripLight(Json::Value nightStripProperty){
-        init(nightStripProperty);
+    stripLight(StripParamType stripParam, LogicalStripType logicalStrip){
+        init(stripParam, logicalStrip);
     }
 
     //增加新的逻辑段
-    void addNewLogicStrip(Json::Value nightStripProperty);
+    bool addLogiclStrip(LogicalStripType strip);
+
+    //删除逻辑段
+    bool deleteLogiclStrip(LogicalStripType strip);
+
+    //获取逻辑灯带列表
+    qlibc::QData getLogiclStripList();
 
     //计算点位是否落在灯带范围内，对灯带相应的段进行控制
     void handleRadarPoints(const RadarPointsType& allRoomAreaPoints);
 
 private:
     //初始灯带参数
-    void init(Json::Value nightStripProperty);
+    void init(StripParamType stripParam, LogicalStripType logicalStrip);
 
-    //保存逻辑灯带
-    void storeLogicStrip();
+    bool pointsEqual(CoordPointType first, CoordPointType second);
 
-    //获取交叉点
-    CoordPointType getCrossPoint(CoordPointType start, CoordPointType end, CoordPointType point);
+    //获取交叉点坐标
+    CoordPointType getCrossPoint(LogicalStripType& logicalStrip, CoordPointType point);
 
-    //比较点位和交叉点，判断是否在灯带控制范围内
-    bool isInValidRange(CoordPointType point, CoordPointType crossPoint, double matchDistance);
-    
-    //获取芯片控制编号
-    uint getCtrlChipIndex(CoordPointType start, CoordPointType crossPoint, double offsetDistance,
-                          uint singleChipLength, uint startChipNum, uint endChipNum);
+    /**
+     * 如果是受控点，则返回灯带控制编号
+     * 如果不是受控点，返回-1
+    */
+    int getCtrlChipIndex(LogicalStripType& logicalStrip, CoordPointType point);
 
-    //匹配点位和逻辑灯带
-    void matchControl(std::map<string, CoordPointType> roomAreaPoints, LogicalStripType logicalStrip);
+
+    //设置本次需要点亮的芯片标号
+    void setChipIndexs2Open(LogicalStripType& logicalStrip, std::vector<CoordPointType> points, std::vector<uint>& chipIndex2Open);
+
+
+    //依据编号控制灯带
+    void controlStrip(std::vector<uint> index2Open, std::vector<uint> index2Close);
 };
 
 

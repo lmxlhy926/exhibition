@@ -9,21 +9,40 @@
 class lightManage{
 private:
     std::recursive_mutex Mutex;
-    std::vector<stripLight> lightsContainer;
+    std::vector<stripLight> stripLightContainer;
     static lightManage* Instance;
-    
+    lightManage(){
+        loadStripLightsContainer();
+    }
 public:
-    static lightManage* getInstance();
+    static lightManage* getInstance(){
+        if(nullptr == Instance){
+            Instance = new lightManage();
+        }
+        return Instance;
+    }
 
-    //从文件加载夜灯列表
-    void loadLightsContaienr();
+    //保存夜灯灯带
+    void addLogicalStrip(qlibc::QData& data);
 
-    //收到雷达站点的点位消息后，调用此函数
-    void calculateCoordPointAndControl(const string& pointsMessage);
+    //删除夜灯灯带
+    void delLogicalStrip(qlibc::QData& data);
+
+    //获取夜灯灯带列表
+    qlibc::QData getLogicalStripList();
+
+    //处理雷达点位
+    void handleRadarPoints(qlibc::QData& pointData);
 
 private:
     //转换坐标
-    RadarPointsType trans2PointSequence(const string& pointMessage);
+    RadarPointsType trans2PointSequence(qlibc::QData& pointData);
+
+    //从文件加载夜灯列表
+    void loadStripLightsContainer();
+
+    //存储灯带列表
+    void storeStripLightsContainer();
 };
 
 #endif

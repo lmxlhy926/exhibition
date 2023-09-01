@@ -1,31 +1,49 @@
 #include "lightManage.h"
 
+lightManage* lightManage::Instance = nullptr;
+ 
+//保存夜灯灯带
+void lightManage::addLogicalStrip(qlibc::QData& data){
+    qlibc::QData request = data.getData("request");
 
- void lightManage::flushLightsContaienr(Json::Value& deviceLists){
+}
+
+//删除夜灯灯带
+void lightManage::delLogicalStrip(qlibc::QData& data){
+    qlibc::QData request = data.getData("request");
+
+}
+
+
+//获取夜灯灯带列表
+qlibc::QData lightManage::getLogicalStripList(){
+    return {};
+}
+
+void lightManage::handleRadarPoints(qlibc::QData&  pointData){
     std::lock_guard<std::recursive_mutex> lg(Mutex);
-
-    return;
- }
-
-
-
-void lightManage::calculateCoordPointAndControl(const string& pointsMessage){
-    std::lock_guard<std::recursive_mutex> lg(Mutex);
-    PointSequenceType pointSequence = trans2PointSequence(pointsMessage);
-    for(auto& elem : lightsContainer){
-        elem.calculateAndContol(pointSequence);
+    RadarPointsType pointSequence = trans2PointSequence(pointData);
+    for(auto& stripLight : stripLightContainer){
+        stripLight.handleRadarPoints(pointSequence);
     }
     return;
 }
 
 
-PointSequenceType lightManage::trans2PointSequence(const string& pointMessage){
-    PointSequenceType pointSequence;
+RadarPointsType lightManage::trans2PointSequence(qlibc::QData& pointData){
+    RadarPointsType pointSequence;
     return pointSequence;
 }
 
+void lightManage::loadStripLightsContainer(){
 
 
+}
+
+void lightManage::storeStripLightsContainer(){
+
+
+}
 
 
 

@@ -10,7 +10,7 @@
 #include "log/Logging.h"
 #include "common/httpUtil.h"
 #include "source/lightManage.h"
-#include "service.h"
+#include "service/service.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 
@@ -39,31 +39,48 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setSiteIdSummary(SynergySiteID, SynergySiteName);
 
     //单例对象
-  
+    lightManage::getInstance();
 
-//注册服务
-    //
-    // serviceSiteManager->registerServiceRequestHandler(Control_Service_ID,
-    //                                                   [](const Request& request, Response& response) -> int{
-    //     return synergy::cloudCommand_service_handler(request, response);
-    // });
+    //保存灯带
+    serviceSiteManager->registerServiceRequestHandler(SaveStrip_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return saveStrip_service_request_handler(request, response);
+    });
 
-    // //语音控制服务
-    // serviceSiteManager->registerServiceRequestHandler(VoiceControl_Service_ID,
-    //                                                   [](const Request& request, Response& response) -> int{
-    //     return synergy::voiceControl_service_handler(request, response);
-    // });
+    //删除灯带
+    serviceSiteManager->registerServiceRequestHandler(DelStrip_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return delStrip_service_request_handler(request, response);
+    });
+
+    //获取灯带列表
+    serviceSiteManager->registerServiceRequestHandler(GetStripList_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return getStripList_service_request_handler(request, response);
+    });
 
 
     // //声明消息
     // serviceSiteManager->registerMessageId(Scene_Msg_MessageID);            //场景指令消息
-    // serviceSiteManager->registerMessageId(ScanResultMsg);                  //扫描结果
-    // serviceSiteManager->registerMessageId(SingleDeviceBindSuccessMsg);     //单个设备绑定结果
     
 
-
+ 
     //雷达点位消息
-    servicesite::ServiceSiteManager::registerMessageHandler(ScanResultMsg,  radarMessageHandle);
+    servicesite::ServiceSiteManager::registerMessageHandler(Radar_Msg_MessageID,  radarMessageHandle);
+    threadPool_.enqueue([&](){
+        while(true){
+            int code;
+            std::vector<string> messageIdList;
+            messageIdList.push_back(Radar_Msg_MessageID);
+            code = serviceSiteManager->subscribeMessage("127.0.0.1", 9011, messageIdList);
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                printf("subscribeMessage radarPoints ok.\n");
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            LOG_RED << "subscribeMessage radarPoints failed....., start to subscribe in 10 seconds";
+        }
+    });
    
 
     // 站点监听线程启动
