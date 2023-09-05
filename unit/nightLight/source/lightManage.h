@@ -9,7 +9,9 @@
 class lightManage{
 private:
     std::recursive_mutex Mutex;
-    std::vector<stripLight> stripLightContainer;
+    string start_time;
+    string end_time;
+    std::map<string, stripLight> stripLightContainer;
     static lightManage* Instance;
     lightManage(){
         loadStripLightsContainer();
@@ -22,19 +24,25 @@ public:
         return Instance;
     }
 
-    //保存夜灯灯带
-    void addLogicalStrip(qlibc::QData& data);
+    //保存夜灯执行对象
+    void addExecuteObj(qlibc::QData& data);
 
-    //删除夜灯灯带
-    void delLogicalStrip(qlibc::QData& data);
+    //删除夜灯执行对象
+    void delExecuteObj(qlibc::QData& data);
 
     //获取夜灯灯带列表
-    qlibc::QData getLogicalStripList();
+    qlibc::QData getLogiclStripList();
 
     //处理雷达点位
     void handleRadarPoints(qlibc::QData& pointData);
 
 private:
+    //获取设备列表
+    qlibc::QData getDeviceList();
+
+    //获取灯带物理参数
+    StripParamType getStripParam(const string& device_id, qlibc::QData& deviceList);
+
     //转换坐标
     RadarPointsType trans2PointSequence(qlibc::QData& pointData);
 
@@ -43,6 +51,9 @@ private:
 
     //存储灯带列表
     void storeStripLightsContainer();
+
+    //格式转换
+    LogicalStripType logicalStripValue2Struct(Json::Value const& value);
 };
 
 #endif

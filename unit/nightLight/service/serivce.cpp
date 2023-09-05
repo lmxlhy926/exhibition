@@ -29,7 +29,7 @@ static const nlohmann::json errResponse = {
 int saveStrip_service_request_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "saveStrip_service_request_handler: " << requestBody.toJsonString();
-    lightManage::getInstance()->addLogicalStrip(requestBody);
+    lightManage::getInstance()->addExecuteObj(requestBody);
     response.set_content(okResponse.dump(), "text/json");
     return 0;
 }
@@ -39,7 +39,7 @@ int saveStrip_service_request_handler(const Request& request, Response& response
 int delStrip_service_request_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "delStrip_service_request_handler: " << requestBody.toJsonString();
-    lightManage::getInstance()->delLogicalStrip(requestBody);
+    lightManage::getInstance()->delExecuteObj(requestBody);
     response.set_content(okResponse.dump(), "text/json");
     return 0;
 }
@@ -49,7 +49,7 @@ int delStrip_service_request_handler(const Request& request, Response& response)
 int getStripList_service_request_handler(const Request& request, Response& response){
      qlibc::QData requestBody(request.body);
     LOG_INFO << "getStripList_service_request_handler: " << requestBody.toJsonString();
-    qlibc::QData data = lightManage::getInstance()->getLogicalStripList();
+    qlibc::QData data = lightManage::getInstance()->getLogiclStripList();
     response.set_content(data.toJsonString(), "text/json");
     return 0;
 }

@@ -3,20 +3,91 @@
 灯带是设备，属于设备站点
 夜灯是逻辑灯，属于夜灯跟随站点
 
-//夜灯参数
 
+//设置整条灯带属性
 {
-	"nightStripList" : [
+	"switch_time" : 		1,		//转换时间
+	"strip_length": 		2.4,	//灯带长度
+	"lighting_range": 		0.5,	//亮灯长度
+	"sensing_distance": 	0.5,	//感应距离
+	"led_spacing": 			0.5,	//led芯片长度
+	"brightness": 			255,	//亮度
+	"color_temperature": 	2700,	//色温
+	"focus_offset": 		0.5		//焦点偏移
+}
+
+
+
+//存储执行对象
+{
+	"start_time" : "",
+	"end_time" : "",
+	"execuObjName":"执行对象名称",
+	"stripDeviceId": "灯带id",
+	"logicalStrips":[
 		{
-			"device_name":"逻辑灯带名称"，
-			"positionPoints": "",
-			"property":{
-				"device_id":"物理灯带id",
-			}
+			"logicalStripName": "逻辑灯带名称",
+			"roomNo": "房间编号",
+			"start_x" : 0.1,
+			"start_y" : 0.2,
+			"end_x": 0.1,
+			"end_y" : 0.2,
+			"start_chipNum" : 10,
+			"end_chipNum": 20
 		},
-		{},
-		{},
+		{
+			"logicalStripName": "逻辑灯带名称",
+			"roomNo": "房间编号",
+			"start_x" : 0.1,
+			"start_y" : 0.2,
+			"end_x": 0.1,
+			"end_y" : 0.2,
+			"start_chipNum" : 10,
+			"end_chipNum": 20
+		}
 	]
 }
 
+
+//删除执行对象
+{
+	"execuObjName":"执行对象名称",
+	"stripDeviceId": "灯带id"
+}
+
+
+
+//获取灯带列表
+{
+	"start_time": "",
+	"end_time": "",
+	"list": [
+		{
+			"execuObjName":"执行对象名称",
+			"stripDeviceId": "灯带id",
+			"logicalStrips":[
+				{
+					"logicalStripName": "逻辑灯带名称",
+					"roomNo": "房间编号",
+					"start_x" : 0.1,
+					"start_y" : 0.2,
+					"end_x": 0.1,
+					"end_y" : 0.2,
+					"start_chipNum" : 10,
+					"end_chipNum": 20
+				},
+				{
+					"logicalStripName": "逻辑灯带名称",
+					"roomNo": "房间编号",
+					"start_x" : 0.1,
+					"start_y" : 0.2,
+					"end_x": 0.1,
+					"end_y" : 0.2,
+					"start_chipNum" : 10,
+					"end_chipNum": 20
+				}
+			]
+		}
+	]
+}
 

@@ -1,62 +1,59 @@
 
 #include "stripLight.h"
-#include "math.h"
+#include <math.h>
+#include "sendBuffer.h"
 #include <algorithm>
 
-bool stripLight::addLogiclStrip(LogicalStripType strip){
-    string roomNo = strip.roomNo;
-    auto pos = logicalStripMap.find(roomNo);
+
+bool stripLight::addExecuteObj(string const& objName, std::vector<LogicalStripType> const& logicalStripVec){
+    std::lock_guard<std::recursive_mutex> lg(Mutex);
+    auto pos = logicalStripMap.find(objName);
     if(pos != logicalStripMap.end()){
-        logicalStripMap.insert(std::make_pair(roomNo, strip));
-        return true;
+        logicalStripMap.erase(pos);
+        logicalStripMap.insert(std::make_pair(objName, logicalStripVec));
     }else{
-        auto start = logicalStripMap.lower_bound(roomNo);
-        auto end = logicalStripMap.upper_bound(roomNo);
-        bool noMatch{true};
-        for(auto pos = start; pos != end; ++pos){
-            if(pointsEqual(strip.start, pos->second.start) && pointsEqual(strip.end, pos->second.end)){
-                noMatch = false;
-                break;
-            }
-        }
-        if(noMatch){
-            logicalStripMap.insert(std::make_pair(roomNo, strip));
-            return true;
-        }
-        return false;
+        logicalStripMap.insert(std::make_pair(objName, logicalStripVec));
     }
+    return true;
 }
 
-
 //删除逻辑段
-bool stripLight::deleteLogiclStrip(LogicalStripType strip){
-    for(auto pos = logicalStripMap.begin(); pos != logicalStripMap.end(); ){
-        if(pointsEqual(pos->second.start, strip.start) && pointsEqual(pos->second.end, strip.end)){
-            pos = logicalStripMap.erase(pos);
-        }else{
-            ++pos;
-        }
+bool stripLight::delExecuteObj(string const& objName){
+    std::lock_guard<std::recursive_mutex> lg(Mutex);
+    auto pos = logicalStripMap.find(objName);
+    if(pos != logicalStripMap.end()){
+        logicalStripMap.erase(pos);
     }
     return true;
 }
 
 //获取逻辑灯带列表
-qlibc::QData stripLight::getLogiclStripList(){
-
-    return {};
+Json::Value stripLight::getLogiclStripList(){
+    std::lock_guard<std::recursive_mutex> lg(Mutex);
+    Json::Value list;
+    for(auto& elem : logicalStripMap){
+        Json::Value obj, logicalStrips;
+        for(auto& logicalStrip : elem.second){
+            logicalStrips.append(LogicalStripType2Value(logicalStrip));
+        }
+        obj["execuObjName"] = elem.first;
+        obj["stripDeviceId"] = physicalStrip.device_id;
+        obj["logicalStrips"] = logicalStrips;
+        list.append(obj);
+    }
+    return list;
 }
 
-void stripLight::handleRadarPoints(const RadarPointsType& allRoomAreaPoints){
+
+void stripLight::handleRadarPoints(const RadarPointsType& allPoints){
+    std::lock_guard<std::recursive_mutex> lg(Mutex);
     std::vector<uint> chipIndex2Open;
-    for(auto& roomAreaPoints : allRoomAreaPoints){
-        if(logicalStripMap.find(roomAreaPoints.first) == logicalStripMap.end()){
-            continue;
-        }
-        //此点所属的房间有逻辑灯带，找到逻辑灯带，进行处理
-        auto start = logicalStripMap.lower_bound(roomAreaPoints.first);
-        auto end = logicalStripMap.upper_bound(roomAreaPoints.first);
-        for(auto pos = start; pos != end; ++pos){
-            setChipIndexs2Open(pos->second, roomAreaPoints.second, chipIndex2Open);
+    for(auto elem : logicalStripMap){
+        for(auto& logicalStrip : elem.second){
+            auto pos = allPoints.find(logicalStrip.roomNo);
+            if(pos != allPoints.end()){
+                setChipIndexs2Open(logicalStrip, pos->second, chipIndex2Open);
+            }
         }
     }
 
@@ -76,18 +73,7 @@ void stripLight::handleRadarPoints(const RadarPointsType& allRoomAreaPoints){
 }
 
 
-void stripLight::init(StripParamType stripParam, LogicalStripType logicalStrip){
-    physicalStrip = stripParam;
-    logicalStripMap.insert(std::make_pair(logicalStrip.roomNo, logicalStrip));
-    return;
-}
-
-bool stripLight::pointsEqual(CoordPointType first, CoordPointType second){
-    return first.x == second.x && first.y == second.y;
-}
-
-
-CoordPointType stripLight::getCrossPoint(LogicalStripType& logicalStrip, CoordPointType point){
+CoordPointType stripLight::getCrossPoint(LogicalStripType const& logicalStrip, CoordPointType const& point){
     CoordPointType start = logicalStrip.start;
     CoordPointType end = logicalStrip.end;
     double k = (end.y - start.y) / (end.x - start.x);
@@ -100,7 +86,8 @@ CoordPointType stripLight::getCrossPoint(LogicalStripType& logicalStrip, CoordPo
     return crossPoint;
 }
 
-int stripLight::getCtrlChipIndex(LogicalStripType& logicalStrip, CoordPointType point){
+
+int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPointType const& point){
     CoordPointType crossPoint = getCrossPoint(logicalStrip, point);
     //计算交叉点距离起始点的距离
     double crossPoint2Start = sqrt(pow((crossPoint.y - logicalStrip.start.y), 2) + pow((crossPoint.x - logicalStrip.start.x), 2));
@@ -112,14 +99,14 @@ int stripLight::getCtrlChipIndex(LogicalStripType& logicalStrip, CoordPointType 
     double min_x = *min_element(absxVec.begin(), absxVec.end());
     double max_x = *max_element(absxVec.begin(), absxVec.end());
     bool dropPointMatch = min_x < fabs(crossPoint.x) && fabs(crossPoint.x) < max_x;
-    bool distanceMatch = crossPoint2Point < logicalStrip.matchDistance;
+    bool distanceMatch = crossPoint2Point < physicalStrip.sensing_distance;
 
     //如果不是受控点，则控制编号返回-1
     if(!(dropPointMatch && distanceMatch))  return -1;
 
     //计算控制编号
-    double crossPoint2StartAmend = crossPoint2Start + logicalStrip.offsetDistance;
-    uint spacingChipNum = static_cast<uint>(crossPoint2StartAmend / physicalStrip.singleChipLength);
+    double crossPoint2StartAmend = crossPoint2Start + physicalStrip.focus_offset;
+    uint spacingChipNum = static_cast<uint>(crossPoint2StartAmend / physicalStrip.led_spacing);
     uint ctrolChipIndex = logicalStrip.startChipNum + spacingChipNum;
     if(ctrolChipIndex > logicalStrip.endChipNum){
         ctrolChipIndex = logicalStrip.endChipNum;
@@ -128,7 +115,19 @@ int stripLight::getCtrlChipIndex(LogicalStripType& logicalStrip, CoordPointType 
 }
 
 
- void stripLight::setChipIndexs2Open(LogicalStripType& logicalStrip, std::vector<CoordPointType> points, std::vector<uint>& chipIndex2Open){
+void stripLight::controlStrip(std::vector<uint> index2Open, std::vector<uint> index2Close){
+    //todo 转换为命令
+    string command;
+
+
+
+
+    sendBuffer::getInstance()->enque(command);
+    return;
+}
+
+
+void stripLight::setChipIndexs2Open(LogicalStripType const& logicalStrip, std::vector<CoordPointType> const& points, std::vector<uint>& chipIndex2Open){
     //找出有受控点的编号
     for(auto& point : points){
         if(chipIndex2Open.size() > 3) break;
@@ -136,14 +135,25 @@ int stripLight::getCtrlChipIndex(LogicalStripType& logicalStrip, CoordPointType 
         if(chipIndex == -1) continue;
         chipIndex2Open.push_back(chipIndex);
     }
- }
-
-
-void stripLight::controlStrip(std::vector<uint> index2Open, std::vector<uint> index2Close){
-
     return;
 }
 
 
+bool stripLight::pointsEqual(CoordPointType first, CoordPointType second){
+    return first.x == second.x && first.y == second.y;
+}
 
+
+Json::Value stripLight::LogicalStripType2Value(LogicalStripType const& logicalStrip){
+    Json::Value value;
+    value["logicalStripName"] = logicalStrip.logicalName;
+    value["roomNo"] = logicalStrip.roomNo;
+    value["start_x"] = logicalStrip.start.x;
+    value["start_y"] = logicalStrip.start.y;
+    value["end_x"] = logicalStrip.end.x;
+    value["end_y"] = logicalStrip.end.y;
+    value["start_chipNum"] = logicalStrip.startChipNum;
+    value["end_chipNum"] = logicalStrip.endChipNum;
+    return value;
+}
 
