@@ -49,7 +49,7 @@ int delStrip_service_request_handler(const Request& request, Response& response)
 int getStripList_service_request_handler(const Request& request, Response& response){
      qlibc::QData requestBody(request.body);
     LOG_INFO << "getStripList_service_request_handler: " << requestBody.toJsonString();
-    qlibc::QData data = lightManage::getInstance()->getLogiclStripList();
+    qlibc::QData data = lightManage::getInstance()->getLogicalStripList();
     response.set_content(data.toJsonString(), "text/json");
     return 0;
 }

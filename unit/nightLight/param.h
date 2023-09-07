@@ -20,6 +20,11 @@ static const string SynergySiteID = "collaborate";
 static const string SynergySiteName = "协同服务";
 static const int SynergySitePort = 9007;
 
+static const string LightFlowSiteID = "light_flow";
+static const string LightFlowSiteName = "夜灯跟随";
+static const int LightFlowSitePort = 9020;
+
+
 
 //服务ID
 static const string SaveStrip_Service_ID          = "saveStrip";           //保存灯带

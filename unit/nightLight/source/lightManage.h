@@ -9,9 +9,9 @@
 class lightManage{
 private:
     std::recursive_mutex Mutex;
-    string start_time;
-    string end_time;
-    std::map<string, stripLight> stripLightContainer;
+    string start_time;  //响应起始时间
+    string end_time;    //响应结束时间
+    std::map<string, stripLight> stripLightContainer;   //灯带管理
     static lightManage* Instance;
     lightManage(){
         loadStripLightsContainer();
@@ -31,17 +31,35 @@ public:
     void delExecuteObj(qlibc::QData& data);
 
     //获取夜灯灯带列表
-    qlibc::QData getLogiclStripList();
+    qlibc::QData getLogicalStripList();
 
     //处理雷达点位
     void handleRadarPoints(qlibc::QData& pointData);
 
 private:
+    //判断时刻是否在响应范围内
+    bool isInValidTime();
+
     //获取设备列表
     qlibc::QData getDeviceList();
 
+    //灯带结构参数转换
+    StripParamType stripData2Struct(const Json::Value& data);
+
     //获取灯带物理参数
     StripParamType getStripParam(const string& device_id, qlibc::QData& deviceList);
+
+    //获取白名单
+    qlibc::QData getWhiteList();
+
+    //获取区域房间对应map
+    std::map<string, string> getAreaRoomMap(qlibc::QData& data);
+
+    //区域房间号转换
+    string areaNum2RoomNo(const string& areaNo, std::map<string, string> const& areaRoomMap);
+
+    //坐标点位转换
+    std::vector<CoordPointType> getCoordPointVec(qlibc::QData& targetList);
 
     //转换坐标
     RadarPointsType trans2PointSequence(qlibc::QData& pointData);

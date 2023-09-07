@@ -51,6 +51,7 @@ struct StripParamType{
     double focus_offset;                     //提前偏移量 (cm)
     NightLightCtlParamType lightParam;       //亮度色温控制参数
     FunctionCode funCode;       //功能码
+    bool valid{false};                       //转换
 };
 
 
@@ -97,7 +98,7 @@ public:
     bool delExecuteObj(string const& objName);
 
     //获取逻辑灯带列表
-    Json::Value getLogiclStripList();
+    Json::Value getLogicalStripList();
 
     //计算点位是否落在灯带范围内，对灯带相应的段进行控制
     void handleRadarPoints(const RadarPointsType& allPoints);

@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
 
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
-    serviceSiteManager->setServerPort(SynergySitePort);
-    serviceSiteManager->setSiteIdSummary(SynergySiteID, SynergySiteName);
+    serviceSiteManager->setServerPort(LightFlowSitePort);
+    serviceSiteManager->setSiteIdSummary(LightFlowSiteID, LightFlowSiteName);
 
     //单例对象
     lightManage::getInstance();

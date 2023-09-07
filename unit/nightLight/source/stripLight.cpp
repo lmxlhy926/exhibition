@@ -3,6 +3,9 @@
 #include <math.h>
 #include "sendBuffer.h"
 #include <algorithm>
+#include <bitset>
+#include <sstream>
+#include <iomanip>
 
 
 bool stripLight::addExecuteObj(string const& objName, std::vector<LogicalStripType> const& logicalStripVec){
@@ -28,7 +31,7 @@ bool stripLight::delExecuteObj(string const& objName){
 }
 
 //获取逻辑灯带列表
-Json::Value stripLight::getLogiclStripList(){
+Json::Value stripLight::getLogicalStripList(){
     std::lock_guard<std::recursive_mutex> lg(Mutex);
     Json::Value list;
     for(auto& elem : logicalStripMap){
@@ -116,11 +119,48 @@ int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPoin
 
 
 void stripLight::controlStrip(std::vector<uint> index2Open, std::vector<uint> index2Close){
-    //todo 转换为命令
+    //聚合所有控制索引
+    std::vector<uint> index2Ctrl;
+    copy(index2Open.begin(), index2Open.end(), back_inserter(index2Ctrl));
+    copy(index2Close.begin(), index2Close.end(), back_inserter(index2Ctrl));
+
+    //拆分控制索引的高2位和低8位
+    std::vector<string> high2ByteVec;
+    std::vector<uint> lightsCtrlVec;
+    for(auto& elem : index2Ctrl){
+        std::bitset<10> uintBitset(elem);
+        high2ByteVec.push_back(uintBitset.to_string().substr(0, 2));
+        lightsCtrlVec.push_back((uintBitset & std::bitset<10>("0011111111")).to_ulong());
+    }
+
+    //高2为的16进制字符串表示
+    string high2ByteBinaryStr;
+    for(auto pos = high2ByteVec.crbegin(); pos != high2ByteVec.crend(); ++pos){
+        high2ByteBinaryStr.append(*pos);
+    }
+    stringstream ss;
+    ss << std::uppercase << std::hex << std::setw(4) << std::setfill('0') << std::bitset<16>(high2ByteBinaryStr).to_ulong();
+    string high2ByteStr = ss.str();
+
+    //所有待控制的索引的低8位字符串表示
+    string  light2CtrlStr;
+    for(auto& elem : lightsCtrlVec){
+        stringstream ss;
+        ss << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << elem;
+        light2CtrlStr.append(ss.str());
+    }
+    //不需要控制的点位填补0
+    uint size2Zero = 6 - index2Open.size() - index2Close.size();
+    for(int i = 0; i < size2Zero; ++i){
+        light2CtrlStr.append("00");
+    }
+
+    //构造控制命令字符串
     string command;
-
-
-
+    command.append("E2");
+    command.append("00000211");
+    command.append(high2ByteStr);
+    command.append(light2CtrlStr);
 
     sendBuffer::getInstance()->enque(command);
     return;
