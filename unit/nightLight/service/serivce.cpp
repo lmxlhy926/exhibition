@@ -18,19 +18,34 @@ static const nlohmann::json errResponse = {
         {"response",{}}
 };
 
- void radarMessageHandle(const Request& request){
+void radarMessageHandle(const Request& request){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "radarMessageHandle: " << requestBody.toJsonString();
-    lightManage::getInstance()->handleRadarPoints(requestBody);
- }
+    qlibc::QData content = requestBody.getData("content");
+    lightManage::getInstance()->handleRadarPoints(content);
+}
+
+
+int radarPoint_service_request_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "radarPoint_service_request_handler: " << requestBody.toJsonString();
+    qlibc::QData requestData = requestBody.getData("request");
+    lightManage::getInstance()->handleRadarPoints(requestData);
+    return 0;
+}
 
 
 //保存夜灯灯带
 int saveStrip_service_request_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "saveStrip_service_request_handler: " << requestBody.toJsonString();
-    lightManage::getInstance()->addExecuteObj(requestBody);
-    response.set_content(okResponse.dump(), "text/json");
+    qlibc::QData requestData = requestBody.getData("request");
+    bool ret = lightManage::getInstance()->addExecuteObj(requestData);
+    if(ret){
+        response.set_content(okResponse.dump(), "text/json");
+    }else{
+        response.set_content(errResponse.dump(), "text/json");
+    }
     return 0;
 }
 
@@ -39,7 +54,8 @@ int saveStrip_service_request_handler(const Request& request, Response& response
 int delStrip_service_request_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "delStrip_service_request_handler: " << requestBody.toJsonString();
-    lightManage::getInstance()->delExecuteObj(requestBody);
+    qlibc::QData requestData = requestBody.getData("request");
+    lightManage::getInstance()->delExecuteObj(requestData);
     response.set_content(okResponse.dump(), "text/json");
     return 0;
 }
@@ -49,7 +65,10 @@ int delStrip_service_request_handler(const Request& request, Response& response)
 int getStripList_service_request_handler(const Request& request, Response& response){
      qlibc::QData requestBody(request.body);
     LOG_INFO << "getStripList_service_request_handler: " << requestBody.toJsonString();
-    qlibc::QData data = lightManage::getInstance()->getLogicalStripList();
-    response.set_content(data.toJsonString(), "text/json");
+    qlibc::QData ret;
+    ret.setInt("code", 0);
+    ret.setString("error", "ok");
+    ret.putData("response", lightManage::getInstance()->getLogicalStripList());
+    response.set_content(ret.toJsonString(), "text/json");
     return 0;
 }

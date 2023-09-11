@@ -6,6 +6,7 @@
 #include <bitset>
 #include <sstream>
 #include <iomanip>
+#include "log/Logging.h"
 
 
 bool stripLight::addExecuteObj(string const& objName, std::vector<LogicalStripType> const& logicalStripVec){
@@ -91,7 +92,12 @@ CoordPointType stripLight::getCrossPoint(LogicalStripType const& logicalStrip, C
 
 
 int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPointType const& point){
+    printPoint("handlePoint", point);
+
+    //得到交叉点
     CoordPointType crossPoint = getCrossPoint(logicalStrip, point);
+    printPoint("crossPoint", crossPoint);
+
     //计算交叉点距离起始点的距离
     double crossPoint2Start = sqrt(pow((crossPoint.y - logicalStrip.start.y), 2) + pow((crossPoint.x - logicalStrip.start.x), 2));
     //计算交叉点距离点位的距离
@@ -119,6 +125,18 @@ int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPoin
 
 
 void stripLight::controlStrip(std::vector<uint> index2Open, std::vector<uint> index2Close){
+    Json::Value printValue, openList, closeList;
+    for(auto& elem : index2Open){   
+        openList.append(elem);
+    }
+    for(auto& elem : index2Close){
+        closeList.append(elem);
+    }
+    printValue["openIndexList"] = openList;
+    printValue["closeIndexList"] = closeList;
+    LOG_PURPLE << "index2Ctrl: " << qlibc::QData(printValue).toJsonString(true);
+    
+
     //聚合所有控制索引
     std::vector<uint> index2Ctrl;
     copy(index2Open.begin(), index2Open.end(), back_inserter(index2Ctrl));
@@ -184,9 +202,16 @@ bool stripLight::pointsEqual(CoordPointType first, CoordPointType second){
 }
 
 
+void stripLight::printPoint(const string& msg, const CoordPointType& point){
+    Json::Value pointValue;
+    pointValue["x"] = point.x;
+    pointValue["y"] = point.y;
+    LOG_PURPLE << msg << ": " << qlibc::QData(pointValue).toJsonString(true);
+}
+
 Json::Value stripLight::LogicalStripType2Value(LogicalStripType const& logicalStrip){
     Json::Value value;
-    value["logicalStripName"] = logicalStrip.logicalName;
+    value["logicalStripName"] = logicalStrip.logicalStripName;
     value["roomNo"] = logicalStrip.roomNo;
     value["start_x"] = logicalStrip.start.x;
     value["start_y"] = logicalStrip.start.y;
@@ -194,6 +219,21 @@ Json::Value stripLight::LogicalStripType2Value(LogicalStripType const& logicalSt
     value["end_y"] = logicalStrip.end.y;
     value["start_chipNum"] = logicalStrip.startChipNum;
     value["end_chipNum"] = logicalStrip.endChipNum;
+    return value;
+}
+
+
+Json::Value stripLight::physicalStripType2Value(StripParamType const& physicalStrip){
+    Json::Value value;
+    value["brightness"] = physicalStrip.lightParam.night2Light_brightness;
+    value["color_temperature"] = physicalStrip.lightParam.night2Light_color_temperature;
+    value["switch_time"] = physicalStrip.lightParam.night2Light_swithTime;
+    value["strip_length"] = physicalStrip.strip_length;
+    value["lighting_range"] = physicalStrip.lighting_range;
+    value["sensing_distance"] = physicalStrip.sensing_distance;
+    value["led_spacing"] = physicalStrip.led_spacing;
+    value["valid"] = physicalStrip.valid;
+    value["device_id"] = physicalStrip.device_id;
     return value;
 }
 

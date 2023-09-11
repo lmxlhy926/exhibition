@@ -4,9 +4,11 @@
 #include "siteService/service_site_manager.h"
 
 
-//蓝牙设备状态消息发布
+//雷达点位处理
 void radarMessageHandle(const Request& request);
 
+//接收雷达点位
+int radarPoint_service_request_handler(const Request& request, Response& response);
 
 //保存夜灯灯带
 int saveStrip_service_request_handler(const Request& request, Response& response);

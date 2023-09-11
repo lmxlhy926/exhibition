@@ -1,5 +1,6 @@
 #include "sendBuffer.h"
 #include "qlibc/QData.h"
+#include "log/Logging.h"
 
 sendBuffer* sendBuffer::Instance = nullptr;
 
@@ -32,6 +33,8 @@ void sendBuffer::sendCommand(){
     qlibc::QData request, response;
     request.setString("service_id", "");
     request.setValue("request", value);
+
+    LOG_GREEN << "request: " << request.toJsonString();
     
     //todo 发送请求
 

@@ -2,8 +2,8 @@
 #ifndef NIGHTLIGHT_SENDBUFFER_H
 #define NIGHTLIGHT_SENDBUFFER_H
 
-#include <queue>
 #include <string>
+#include <queue>
 #include <mutex>
 #include <thread>
 #include <condition_variable>

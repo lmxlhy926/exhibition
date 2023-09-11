@@ -22,12 +22,12 @@ using json = nlohmann::json;
 
 int main(int argc, char* argv[]) {
     //增加log打印
-    string path = "/data/changhong/edge_midware/lhy/nightLightSiteLog.txt";
+    string path = "/data/changhong/edge_midware/lhy/lightFlowLog.txt";
     muduo::logInitLogger(path);
 
     LOG_RED << "-----------------------------------------";
     LOG_RED << "-----------------------------------------";
-    LOG_RED << "---------------LIGHTNIGHT START-------------";
+    LOG_RED << "---------------LIGHTFLOW START-------------";
     LOG_RED << "-----------------------------------------";
     LOG_RED << "-----------------------------------------";
 
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setSiteIdSummary(LightFlowSiteID, LightFlowSiteName);
 
     //单例对象
-    lightManage::getInstance();
+    lightManage::getInstance();     //加载灯带对象
 
     //保存灯带
     serviceSiteManager->registerServiceRequestHandler(SaveStrip_Service_ID,
@@ -59,6 +59,12 @@ int main(int argc, char* argv[]) {
         return getStripList_service_request_handler(request, response);
     });
 
+    //雷达点位模拟
+    serviceSiteManager->registerServiceRequestHandler(RadarPoint_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return radarPoint_service_request_handler(request, response);
+    });
+
 
     // //声明消息
     // serviceSiteManager->registerMessageId(Scene_Msg_MessageID);            //场景指令消息
@@ -66,21 +72,21 @@ int main(int argc, char* argv[]) {
 
  
     //雷达点位消息
-    servicesite::ServiceSiteManager::registerMessageHandler(Radar_Msg_MessageID,  radarMessageHandle);
-    threadPool_.enqueue([&](){
-        while(true){
-            int code;
-            std::vector<string> messageIdList;
-            messageIdList.push_back(Radar_Msg_MessageID);
-            code = serviceSiteManager->subscribeMessage("127.0.0.1", 9011, messageIdList);
-            if (code == ServiceSiteManager::RET_CODE_OK) {
-                printf("subscribeMessage radarPoints ok.\n");
-                break;
-            }
-            std::this_thread::sleep_for(std::chrono::seconds(10));
-            LOG_RED << "subscribeMessage radarPoints failed....., start to subscribe in 10 seconds";
-        }
-    });
+    // servicesite::ServiceSiteManager::registerMessageHandler(Radar_Msg_MessageID,  radarMessageHandle);
+    // threadPool_.enqueue([&](){
+    //     while(true){
+    //         int code;
+    //         std::vector<string> messageIdList;
+    //         messageIdList.push_back(Radar_Msg_MessageID);
+    //         code = serviceSiteManager->subscribeMessage("127.0.0.1", 9011, messageIdList);
+    //         if (code == ServiceSiteManager::RET_CODE_OK) {
+    //             printf("subscribeMessage radarPoints ok.\n");
+    //             break;
+    //         }
+    //         std::this_thread::sleep_for(std::chrono::seconds(10));
+    //         LOG_RED << "subscribeMessage radarPoints failed....., start to subscribe in 10 seconds";
+    //     }
+    // });
    
 
     // 站点监听线程启动

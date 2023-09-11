@@ -26,7 +26,7 @@ struct NightLightCtlParamType{
 
 //逻辑灯带参数
 struct LogicalStripType{
-    string logicalName;                         //逻辑灯带名称
+    string logicalStripName;                    //逻辑灯带名称
     string roomNo;                              //灯带房间号
     CoordPointType start;                       //灯带起始位置
     CoordPointType end;                         //灯带结束位置
@@ -50,8 +50,8 @@ struct StripParamType{
     double sensing_distance;                 //感应距离
     double focus_offset;                     //提前偏移量 (cm)
     NightLightCtlParamType lightParam;       //亮度色温控制参数
-    FunctionCode funCode;       //功能码
-    bool valid{false};                       //转换
+    FunctionCode funCode;                    //功能码
+    bool valid{false};                       //有效数据？
 };
 
 
@@ -91,7 +91,7 @@ public:
         this->chipOpendIndex = sl.chipOpendIndex;
     }
 
-    //增加新的逻辑段
+    //增加新的逻辑段或替换之前存在的逻辑段
     bool addExecuteObj(string const& objName, std::vector<LogicalStripType> const& logicalStripVec);
 
     //删除逻辑段
@@ -122,8 +122,14 @@ private:
     //点位比较
     bool pointsEqual(CoordPointType first, CoordPointType second);
 
+    //打印点位
+    void printPoint(const string& msg, const CoordPointType& point);
+
     //灯带逻辑属性的Json格式
     Json::Value LogicalStripType2Value(LogicalStripType const& logicalStrip);
+
+    //物理灯带属性信息
+    Json::Value physicalStripType2Value(StripParamType const& physicalStrip);
 };
 
 
