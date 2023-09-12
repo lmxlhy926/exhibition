@@ -1,6 +1,7 @@
 #include "sendBuffer.h"
 #include "qlibc/QData.h"
 #include "log/Logging.h"
+#include "common/httpUtil.h"
 
 sendBuffer* sendBuffer::Instance = nullptr;
 
@@ -21,16 +22,21 @@ void sendBuffer::sendCommand(){
             command = queue.front();
             queue.pop();
         }
+        qlibc::QData request, response;
         Json::Value value;
         value["commandString"] = command;
-        qlibc::QData request, response;
-        request.setString("service_id", "");
+        request.setString("service_id", "send2CmdBuffer");
         request.setValue("request", value);
-
         LOG_GREEN << "request: " << request.toJsonString();
-        
-        //todo 发送请求
+        httpUtil::sitePostRequest("127.0.0.1", 9006, request, response);
+        LOG_YELLOW << "response: " << response.toJsonString();
 
+        //todo 
+        /**
+         * 命令最终要发送给设备管理站点
+         * 但是设备是在蓝牙站点上的
+         * 所以需要指明要控制的物理灯带，设备管理站点根据做转发
+        */
     }
 }
 

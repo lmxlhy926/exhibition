@@ -41,6 +41,8 @@ static const string AddDevice2GroupByRoom_Device_Service_ID     = "add_device_to
 static const string RemoveDeviceFromGroup_Device_Service_ID     = "remove_device_from_group";       //从分组删除设备
 static const string ControlGroup_Device_Service_ID              = "control_group";                  //控制分组
 static const string GetGroupList_Device_Service_ID              = "get_group_list";                 //获取分组列表
+static const string Send2CmdBuffer_Service_ID                   = "send2CmdBuffer";                 //发送到命令缓冲区
+
 
 //二进制指令调试
 static const string Ble_Device_Test_Command_Service_ID = "BleDeviceCommand";

@@ -5,11 +5,13 @@
 #include <map>
 #include <vector>
 #include <mutex>
+#include "sendBuffer.h"
 
 class lightManage{
 private:
     string start_time;  //响应起始时间
     string end_time;    //响应结束时间
+    qlibc::QData logicalStripata;   //逻辑灯带数据
     std::recursive_mutex Mutex;
     std::map<string, stripLight> stripLightContainer;   //灯带管理<deviceid, stripLight>
     static lightManage* Instance;
@@ -60,6 +62,9 @@ private:
 
     //存储灯带列表
     void storeStripLightsContainer();
+
+    //物理灯带配置
+    void configPhysicalStrip(const StripParamType& sp);
 
     //判断时刻是否在响应范围内
     bool isInValidTime();

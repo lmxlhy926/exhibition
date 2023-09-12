@@ -509,6 +509,7 @@ int device_config_service_handler(const Request& request, Response& response){
                 if(!configItem.getString("device_name").empty())
                     deviceItem.setString("device_name", configItem.getString("device_name"));
                 deviceItem.putData("location", configItem.getData("location"));
+                deviceItem.putData("stripProperty", configItem.getData("stripProperty"));
                 newDeviceList.append(deviceItem);
                 break;
             }
@@ -756,6 +757,18 @@ int getGroupList_service_handler(const Request& request, Response& response){
     retData.putData("response", GroupAddressMap::getInstance()->getGroupList());
 
     response.set_content(retData.toJsonString(), "text/json");
+    return 0;
+}
+
+
+int send2Buffer_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "send2Buffer_service_handler: " << requestBody.toJsonString();
+    string command = requestBody.getData("request").getString("commandString");
+    string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
+    TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
+    telinkDonglePtr->write2Seria(command);
+    response.set_content(okResponse.dump(), "text/json");
     return 0;
 }
 

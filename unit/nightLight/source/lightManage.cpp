@@ -37,11 +37,13 @@ bool lightManage::addExecuteObj(qlibc::QData& data, qlibc::QData deviceList){
         string stripDeviceId = ithData.getString("stripDeviceId");
 
         //有相应物理灯带存在，则加入逻辑灯带。没有物理灯带存在，则先创建物理灯带，然后加入逻辑灯带
+        StripParamType sp = getStripParam(stripDeviceId, deviceList);
+        //刷新物理灯带信息，向网关发送灯带配置信息
+        configPhysicalStrip(sp);
         auto pos = stripLightContainer.find(stripDeviceId);
         if(pos != stripLightContainer.end()){
             pos->second.addExecuteObj(execuObjName, logicalStripVec);
         }else{
-            StripParamType sp = getStripParam(stripDeviceId, deviceList);
             if(!sp.valid)   continue;
             stripLight sl(sp);
             sl.addExecuteObj(execuObjName, logicalStripVec);
@@ -200,23 +202,32 @@ LogicalStripType lightManage::logicalStripValue2Struct(Json::Value const& value)
 
 
 void lightManage::loadStripLightsContainer(){
-    qlibc::QData data, deviceList;
-    data.loadFromFile(STRIPLIST_PATH);
+    {
+        std::lock_guard<std::recursive_mutex> lg(Mutex);
+        if(logicalStripata.empty()){
+            logicalStripata.loadFromFile(STRIPLIST_PATH);
+        } 
+    }
+    qlibc::QData deviceList;
     while(!getDeviceList(deviceList)){
         std::this_thread::sleep_for(std::chrono::seconds(2));
         LOG_RED << "CAN NOT GET DEVICELIST, TRY TO GET AGAIN IN 2 SECONDS...";
     }
-    LOG_INFO << "data: " << data.toJsonString(true);
-    LOG_INFO << "deviceList: " << deviceList.toJsonString(true);
-    addExecuteObj(data, deviceList);
+    addExecuteObj(logicalStripata, deviceList);
     return;
 }
 
 
 void lightManage::storeStripLightsContainer(){
     std::lock_guard<std::recursive_mutex> lg(Mutex);
-    qlibc::QData data = getLogicalStripList();
-    data.saveToFile(STRIPLIST_PATH);
+    logicalStripata = getLogicalStripList();
+    logicalStripata.saveToFile(STRIPLIST_PATH);
+}
+
+
+void lightManage::configPhysicalStrip(const StripParamType& sp){
+    string command;
+    // sendBuffer::getInstance()->enque(command);
 }
 
 
