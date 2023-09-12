@@ -31,6 +31,7 @@ int radarPoint_service_request_handler(const Request& request, Response& respons
     LOG_INFO << "radarPoint_service_request_handler: " << requestBody.toJsonString();
     qlibc::QData requestData = requestBody.getData("request");
     lightManage::getInstance()->handleRadarPoints(requestData);
+    response.set_content(okResponse.dump(), "text/json");
     return 0;
 }
 

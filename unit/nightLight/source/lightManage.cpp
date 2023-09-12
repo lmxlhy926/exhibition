@@ -240,12 +240,6 @@ std::map<string, string> lightManage::getAreaRoomMap(qlibc::QData& data){
             }
         }
     }
-
-    Json::Value value;
-    for(auto& elem : areaRoomMap){
-        value[elem.first] = elem.second;
-    }
-    LOG_PURPLE << "areaRoomMap: " << qlibc::QData(value).toJsonString(true);
     return areaRoomMap;
 }
 
@@ -315,7 +309,7 @@ void lightManage::printPointSequence(const RadarPointsType& radarPoints){
        }
        value[elem.first] = pointList;
     }
-    LOG_PURPLE << "radarPoints: " << qlibc::QData(value).toJsonString(true);
+    LOG_YELLOW << "radarPoints: " << qlibc::QData(value).toJsonString();
 }
 
 

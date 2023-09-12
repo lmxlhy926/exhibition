@@ -10,6 +10,7 @@
 #include "log/Logging.h"
 #include "common/httpUtil.h"
 #include "source/lightManage.h"
+#include "source/sendBuffer.h"
 #include "service/service.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
@@ -40,6 +41,7 @@ int main(int argc, char* argv[]) {
 
     //单例对象
     lightManage::getInstance();     //加载灯带对象
+    sendBuffer::getInstance();      //指令缓存
 
     //保存灯带
     serviceSiteManager->registerServiceRequestHandler(SaveStrip_Service_ID,

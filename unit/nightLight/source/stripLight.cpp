@@ -6,6 +6,8 @@
 #include <bitset>
 #include <sstream>
 #include <iomanip>
+#include <iterator>
+#include <iostream>
 #include "log/Logging.h"
 
 
@@ -61,18 +63,28 @@ void stripLight::handleRadarPoints(const RadarPointsType& allPoints){
         }
     }
 
-    std::vector<uint> chipIndex2Close;
+    //记录需要保持的索引
+    std::vector<uint> chipIndex2Saved;
     for(auto& elem : chipOpendIndex){
         auto pos = find(chipIndex2Open.begin(), chipIndex2Open.end(), elem);
-        if(pos == chipIndex2Open.end()){
-            chipIndex2Close.push_back(elem);    //要关闭的编号
-        }else{
-            chipIndex2Open.erase(pos);  //剔除不需要打开的编号
+        if(pos != chipIndex2Open.end()){
+            chipIndex2Saved.push_back(elem);
         }
     }
 
+    for(auto& elem : chipIndex2Saved){
+        chipOpendIndex.erase(remove(chipOpendIndex.begin(), chipOpendIndex.end(), elem), chipOpendIndex.end()); //剔除需要保持的，剩下的是需要关闭的
+        chipIndex2Open.erase(remove(chipIndex2Open.begin(), chipIndex2Open.end(), elem), chipIndex2Open.end()); //剔除已经打开的，剩下的是真正需要打开的
+    }
+
+    std::vector<uint> chipIndex2Close = chipOpendIndex;
+    //记录所有打开的的索引
+    chipOpendIndex = chipIndex2Saved;
+    copy(chipIndex2Open.begin(), chipIndex2Open.end(), back_inserter(chipOpendIndex));
+
+   
+    //控制需要操作的索引
     controlStrip(chipIndex2Open, chipIndex2Close);
-    chipOpendIndex = chipIndex2Open;
     return;
 }
 
@@ -82,37 +94,39 @@ CoordPointType stripLight::getCrossPoint(LogicalStripType const& logicalStrip, C
     CoordPointType end = logicalStrip.end;
     double k = (end.y - start.y) / (end.x - start.x);
     double b = start.y - k * start.x;
+    LOG_HLIGHT << "logicalStripLine: " << k << " * x + " << b;
     double k0 = -1 / k;
     double b0 = point.y - k0 * point.x;
+    LOG_HLIGHT << "crossLine:        " << k0 << " * x + " << b0;
     CoordPointType crossPoint;
     crossPoint.x = (b0 - b) / (k - k0);
     crossPoint.y = k * crossPoint.x + b;
+    printPoint("crossPoint", crossPoint);
     return crossPoint;
 }
 
 
 int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPointType const& point){
     printPoint("handlePoint", point);
-
     //得到交叉点
     CoordPointType crossPoint = getCrossPoint(logicalStrip, point);
-    printPoint("crossPoint", crossPoint);
-
     //计算交叉点距离起始点的距离
     double crossPoint2Start = sqrt(pow((crossPoint.y - logicalStrip.start.y), 2) + pow((crossPoint.x - logicalStrip.start.x), 2));
+    LOG_HLIGHT << "crossPoint2Start: " << crossPoint2Start;
     //计算交叉点距离点位的距离
     double crossPoint2Point = sqrt(pow((crossPoint.y - point.y), 2) + pow((crossPoint.x - point.x), 2));
+    LOG_HLIGHT << "crossPoint2Point: " << crossPoint2Point;
 
     //判断落点和受控距离
     std::vector<double> absxVec{abs(logicalStrip.start.x), fabs(logicalStrip.end.x)};
     double min_x = *min_element(absxVec.begin(), absxVec.end());
     double max_x = *max_element(absxVec.begin(), absxVec.end());
-    bool dropPointMatch = min_x < fabs(crossPoint.x) && fabs(crossPoint.x) < max_x;
-    bool distanceMatch = crossPoint2Point < physicalStrip.sensing_distance;
+    bool dropPointMatch = min_x <= fabs(crossPoint.x) && fabs(crossPoint.x) <= max_x;
+    bool distanceMatch = crossPoint2Point <= physicalStrip.sensing_distance;
 
     //如果不是受控点，则控制编号返回-1
     if(!(dropPointMatch && distanceMatch))  return -1;
-
+   
     //计算控制编号
     double crossPoint2StartAmend = crossPoint2Start + physicalStrip.focus_offset;
     uint spacingChipNum = static_cast<uint>(crossPoint2StartAmend / physicalStrip.led_spacing);
@@ -120,27 +134,33 @@ int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPoin
     if(ctrolChipIndex > logicalStrip.endChipNum){
         ctrolChipIndex = logicalStrip.endChipNum;
     }
+    LOG_PURPLE << "MATCH INDEX: " << ctrolChipIndex;
+    LOG_INFO << "************************************************************";
     return ctrolChipIndex;
 }
 
 
+void stripLight::setChipIndexs2Open(LogicalStripType const& logicalStrip, std::vector<CoordPointType> const& points, std::vector<uint>& chipIndex2Open){
+    //找出有受控点的编号
+    for(auto& point : points){
+        if(chipIndex2Open.size() >= 3) break;
+        int chipIndex = getCtrlChipIndex(logicalStrip, point);
+        if(chipIndex == -1) continue;
+        chipIndex2Open.push_back(chipIndex);
+    }
+    return;
+}
+
+
 void stripLight::controlStrip(std::vector<uint> index2Open, std::vector<uint> index2Close){
-    Json::Value printValue, openList, closeList;
-    for(auto& elem : index2Open){   
-        openList.append(elem);
-    }
-    for(auto& elem : index2Close){
-        closeList.append(elem);
-    }
-    printValue["openIndexList"] = openList;
-    printValue["closeIndexList"] = closeList;
-    LOG_PURPLE << "index2Ctrl: " << qlibc::QData(printValue).toJsonString(true);
-    
+    //打印将要控制的索引
+    printIndex(index2Open, index2Close);
 
     //聚合所有控制索引
     std::vector<uint> index2Ctrl;
     copy(index2Open.begin(), index2Open.end(), back_inserter(index2Ctrl));
     copy(index2Close.begin(), index2Close.end(), back_inserter(index2Ctrl));
+    if(index2Ctrl.empty())  return;
 
     //拆分控制索引的高2位和低8位
     std::vector<string> high2ByteVec;
@@ -151,7 +171,7 @@ void stripLight::controlStrip(std::vector<uint> index2Open, std::vector<uint> in
         lightsCtrlVec.push_back((uintBitset & std::bitset<10>("0011111111")).to_ulong());
     }
 
-    //高2为的16进制字符串表示
+    //高2位的16进制字符串表示
     string high2ByteBinaryStr;
     for(auto pos = high2ByteVec.crbegin(); pos != high2ByteVec.crend(); ++pos){
         high2ByteBinaryStr.append(*pos);
@@ -168,7 +188,7 @@ void stripLight::controlStrip(std::vector<uint> index2Open, std::vector<uint> in
         light2CtrlStr.append(ss.str());
     }
     //不需要控制的点位填补0
-    uint size2Zero = 6 - index2Open.size() - index2Close.size();
+    uint size2Zero = 6 - index2Ctrl.size();
     for(int i = 0; i < size2Zero; ++i){
         light2CtrlStr.append("00");
     }
@@ -180,19 +200,10 @@ void stripLight::controlStrip(std::vector<uint> index2Open, std::vector<uint> in
     command.append(high2ByteStr);
     command.append(light2CtrlStr);
 
+    
+
     sendBuffer::getInstance()->enque(command);
-    return;
-}
 
-
-void stripLight::setChipIndexs2Open(LogicalStripType const& logicalStrip, std::vector<CoordPointType> const& points, std::vector<uint>& chipIndex2Open){
-    //找出有受控点的编号
-    for(auto& point : points){
-        if(chipIndex2Open.size() > 3) break;
-        int chipIndex = getCtrlChipIndex(logicalStrip, point);
-        if(chipIndex == -1) continue;
-        chipIndex2Open.push_back(chipIndex);
-    }
     return;
 }
 
@@ -206,8 +217,32 @@ void stripLight::printPoint(const string& msg, const CoordPointType& point){
     Json::Value pointValue;
     pointValue["x"] = point.x;
     pointValue["y"] = point.y;
-    LOG_PURPLE << msg << ": " << qlibc::QData(pointValue).toJsonString(true);
+    LOG_HLIGHT << msg << ": " << qlibc::QData(pointValue).toJsonString();
 }
+
+
+void stripLight::printIndex(std::vector<uint> index2Open, std::vector<uint> index2Close){
+    Json::Value printValue, openList, closeList;
+    for(auto& elem : index2Open){   
+        openList.append(elem);
+    }
+    for(auto& elem : index2Close){
+        closeList.append(elem);
+    }
+    printValue["openIndexList"] = openList;
+    printValue["closeIndexList"] = closeList;
+    LOG_PURPLE << "index2Control: " << qlibc::QData(printValue).toJsonString(true);
+}
+
+
+void stripLight::printIndex(const string& msg, std::vector<uint> indexVec){
+    Json::Value value;
+    for(auto& elem : indexVec){
+        value.append(elem);
+    }
+    LOG_PURPLE << msg << ": " << qlibc::QData(value).toJsonString(true);
+}
+
 
 Json::Value stripLight::LogicalStripType2Value(LogicalStripType const& logicalStrip){
     Json::Value value;

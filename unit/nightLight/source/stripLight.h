@@ -42,8 +42,8 @@ enum class FunctionCode{
 //实体灯带参数
 struct StripParamType{
     string device_id;                        //灯带唯一序列号
-    uint strip_length;                       //灯带总长度     （cm）
-    uint led_spacing;                        //单芯片受控长度  (cm)
+    double strip_length;                     //灯带总长度     （cm）
+    double led_spacing;                      //单芯片受控长度  (cm)
     uint totalChips;                         //灯控芯片数量
     double lighting_range;                   //亮灯长度
     uint singleCtlChipNum;                   //受控芯片数量
@@ -113,17 +113,23 @@ private:
     */
     int getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPointType const& point);
 
-    //依据编号控制灯带
-    void controlStrip(std::vector<uint> index2Open, std::vector<uint> index2Close);
-
     //设置本次需要点亮的芯片标号
     void setChipIndexs2Open(LogicalStripType const& logicalStrip, std::vector<CoordPointType> const& points, std::vector<uint>& chipIndex2Open);
+
+    //依据编号控制灯带
+    void controlStrip(std::vector<uint> index2Open, std::vector<uint> index2Close);
 
     //点位比较
     bool pointsEqual(CoordPointType first, CoordPointType second);
 
     //打印点位
     void printPoint(const string& msg, const CoordPointType& point);
+
+    //打印开启关闭索引
+    void printIndex(std::vector<uint> index2Open, std::vector<uint> index2Close);
+
+    //打印索引
+    void printIndex(const string& msg, std::vector<uint> indexVec);
 
     //灯带逻辑属性的Json格式
     Json::Value LogicalStripType2Value(LogicalStripType const& logicalStrip);

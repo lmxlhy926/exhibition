@@ -15,7 +15,7 @@ private:
     std::mutex Mutex;
     std::condition_variable cv;
     std::queue<string> queue;
-    std::thread* threadPtr;
+    std::thread* threadPtr = nullptr;
 
     sendBuffer(){
         threadPtr = new thread([this](){
@@ -24,7 +24,12 @@ private:
     }
 public:
     //获取全局对象；
-    static sendBuffer* getInstance();
+    static sendBuffer* getInstance(){
+        if(Instance == nullptr){
+            Instance = new sendBuffer();
+        }
+        return Instance;
+    }
 
     //压入命令
     void enque(const string& command);
