@@ -365,12 +365,27 @@ namespace synergy {
         return 0;
     }
 
+//配置设备属性
     int configProperty_device_service_handler(const Request& request, Response& response){
         LOG_INFO << "synergy->configProperty_device_service_handler: " << qlibc::QData(request.body).toJsonString();
         sendRequest(request, response);
         return 0;
     }
 
+//配置灯带属性
+    int configNightStrip_service_handler(const Request& request, Response& response){
+        LOG_INFO << "synergy->configNightStrip_service_handler: " << qlibc::QData(request.body).toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
+
+//控制灯带灯珠
+    int stripPointControl_service_handler(const Request& request, Response& response){
+        qlibc::QData requestData(request.body);
+        LOG_INFO << "synergy->stripPointControl_service_handler: " << requestData.toJsonString();
+        sendRequest(request, response);
+        return 0;
+    }
 
 //设备控制
     int deviceControl_service_handler(const Request& request, Response& response){

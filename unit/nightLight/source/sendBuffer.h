@@ -7,6 +7,7 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+#include "qlibc/QData.h"
 using namespace std;
 
 class sendBuffer{
@@ -14,7 +15,7 @@ private:
     static sendBuffer* Instance;
     std::mutex Mutex;
     std::condition_variable cv;
-    std::queue<string> queue;
+    std::queue<Json::Value> queue;
     std::thread* threadPtr = nullptr;
 
     sendBuffer(){
@@ -32,7 +33,7 @@ public:
     }
 
     //压入命令
-    void enque(const string& command);
+    void enque(const Json::Value& command);
 
 private:
     //取得命令，发送

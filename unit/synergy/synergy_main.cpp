@@ -122,6 +122,19 @@ int main(int argc, char* argv[]) {
         return synergy::configProperty_device_service_handler(request, response);
     });
 
+    //配置灯带属性
+    serviceSiteManager->registerServiceRequestHandler(StirpConfig_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::configNightStrip_service_handler(request, response);
+    });
+
+
+    //灯带灯珠控制
+    serviceSiteManager->registerServiceRequestHandler(StripPointControl_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::stripPointControl_service_handler(request, response);
+    });
+
 
     //注册设备控制回调
     serviceSiteManager->registerServiceRequestHandler(Control_Device_Service_ID,

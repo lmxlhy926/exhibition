@@ -3,7 +3,6 @@
 
 #include "siteService/service_site_manager.h"
 
-
 //雷达点位处理
 void radarMessageHandle(const Request& request);
 
@@ -13,12 +12,13 @@ int radarPoint_service_request_handler(const Request& request, Response& respons
 //保存夜灯灯带
 int saveStrip_service_request_handler(const Request& request, Response& response);
 
-
 //删除夜灯灯带
 int delStrip_service_request_handler(const Request& request, Response& response);
 
-
 //获取灯带列表
 int getStripList_service_request_handler(const Request& request, Response& response);
+
+//控制灯带灯珠
+
 
 #endif

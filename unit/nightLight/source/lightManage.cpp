@@ -1,6 +1,7 @@
 #include "lightManage.h"
 #include "common/httpUtil.h"
 #include "log/Logging.h"
+#include "../param.h"
 #include <algorithm>
 
 static const string STRIPLIST_PATH = "/data/changhong/edge_midware/stripDeviceList.json";
@@ -118,7 +119,7 @@ bool lightManage::getDeviceList(qlibc::QData& deviceList){
     deviceRequest.setValue("request", Json::nullValue);
     int count{};
     while(count < 3){
-        if(httpUtil::sitePostRequest("127.0.0.1", 9007, deviceRequest, deviceResponse)){
+        if(httpUtil::sitePostRequest("127.0.0.1", SynergySitePort, deviceRequest, deviceResponse)){
             deviceList = deviceResponse.getData("response").getData("device_list");
             return true;
         }else{
@@ -158,6 +159,7 @@ StripParamType lightManage::stripData2Struct(const Json::Value& data){
         
         sp.lightParam = param;
         sp.device_id =          data["device_id"].asString();
+        sp.sourceSite =         data["sourceSite"].asString();
         sp.strip_length =       data["stripProperty"]["strip_length"].asDouble();
         sp.lighting_range =     data["stripProperty"]["lighting_range"].asDouble();
         sp.sensing_distance =   data["stripProperty"]["sensing_distance"].asDouble();

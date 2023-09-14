@@ -76,7 +76,10 @@ int control_group_service_handler(const Request& request, Response& response, Lo
 int getGroupList_service_handler(const Request& request, Response& response);
 
 //接收转换后的指令
-int send2Buffer_service_handler(const Request& request, Response& response);
+int stripPointControl_service_handler(const Request& request, Response& response);
+
+//配置夜灯参数
+int configNightStrip_service_handler(const Request& request, Response& response);
 
 //测试接口
 int test_service_handler(const Request& request, Response& response);

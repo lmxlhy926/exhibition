@@ -211,7 +211,10 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->registerServiceRequestHandler(GetGroupList_Device_Service_ID, getGroupList_service_handler);
 
     //发送指令到命令缓冲区
-    serviceSiteManager->registerServiceRequestHandler(Send2CmdBuffer_Service_ID, send2Buffer_service_handler);
+    serviceSiteManager->registerServiceRequestHandler(StripPointControl_Service_ID, stripPointControl_service_handler);
+
+    //灯带配置
+    serviceSiteManager->registerServiceRequestHandler(StirpConfig_Service_ID, configNightStrip_service_handler);
 
     //测试接口
     serviceSiteManager->registerServiceRequestHandler("test", test_service_handler);

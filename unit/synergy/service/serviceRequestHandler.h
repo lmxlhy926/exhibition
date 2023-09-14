@@ -56,6 +56,12 @@ namespace synergy{
 //修改设备属性
     int configProperty_device_service_handler(const Request& request, Response& response);
 
+//配置灯带属性
+    int configNightStrip_service_handler(const Request& request, Response& response);
+
+//接收灯带灯珠控制指令
+    int stripPointControl_service_handler(const Request& request, Response& response);
+
 //设备控制
     int deviceControl_service_handler(const Request& request, Response& response);
 

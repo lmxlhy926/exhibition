@@ -22,7 +22,7 @@ void radarMessageHandle(const Request& request){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "radarMessageHandle: " << requestBody.toJsonString();
     qlibc::QData content = requestBody.getData("content");
-    lightManage::getInstance()->handleRadarPoints(content);
+    // lightManage::getInstance()->handleRadarPoints(content);
 }
 
 

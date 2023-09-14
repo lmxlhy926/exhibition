@@ -64,6 +64,8 @@ static const string AddDevice2Group_Device_Service_ID           = "add_device_to
 static const string RemoveDeviceFromGroup_Device_Service_ID     = "remove_device_from_group";       //从分组删除设备
 static const string ControlGroup_Device_Service_ID              = "control_group";                  //控制分组
 static const string GetGroupList_Device_Service_ID              = "get_group_list";                 //获取分组列表
+static const string StirpConfig_Service_ID                      = "stripConfig";                    //灯带配置
+static const string StripPointControl_Service_ID                = "stripPointControl";              //亮灯点控制
 
 
 //订阅消息ID

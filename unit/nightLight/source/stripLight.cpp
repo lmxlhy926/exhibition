@@ -125,8 +125,12 @@ int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPoin
     bool distanceMatch = crossPoint2Point <= physicalStrip.sensing_distance;
 
     //如果不是受控点，则控制编号返回-1
-    if(!(dropPointMatch && distanceMatch))  return -1;
-   
+    if(!(dropPointMatch && distanceMatch)){
+        LOG_RED << "MATCH FAILED ...";
+        LOG_INFO << "************************************************************";
+        return -1;
+    }  
+    
     //计算控制编号
     double crossPoint2StartAmend = crossPoint2Start + physicalStrip.focus_offset;
     uint spacingChipNum = static_cast<uint>(crossPoint2StartAmend / physicalStrip.led_spacing);
@@ -200,9 +204,11 @@ void stripLight::controlStrip(std::vector<uint> index2Open, std::vector<uint> in
     command.append(high2ByteStr);
     command.append(light2CtrlStr);
 
-    
-
-    sendBuffer::getInstance()->enque(command);
+    Json::Value commandValue;
+    commandValue["device_id"] = physicalStrip.device_id;
+    commandValue["sourceSite"] = physicalStrip.sourceSite;
+    commandValue["payload"] = command;
+    sendBuffer::getInstance()->enque(commandValue);
 
     return;
 }

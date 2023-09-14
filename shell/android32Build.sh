@@ -13,4 +13,5 @@ else
 	/home/lhy/install/android-ndk-r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip /home/lhy/smarthome/exhibition/out/android32/config_site
 	/home/lhy/install/android-ndk-r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip /home/lhy/smarthome/exhibition/out/android32/ble_site
 	/home/lhy/install/android-ndk-r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip /home/lhy/smarthome/exhibition/out/android32/synergy_site
+	/home/lhy/install/android-ndk-r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip /home/lhy/smarthome/exhibition/out/android32/light_flow_site
 fi	

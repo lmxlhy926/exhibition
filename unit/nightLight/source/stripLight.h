@@ -42,6 +42,7 @@ enum class FunctionCode{
 //实体灯带参数
 struct StripParamType{
     string device_id;                        //灯带唯一序列号
+    string sourceSite;                       //灯带来源站点标识
     double strip_length;                     //灯带总长度     （cm）
     double led_spacing;                      //单芯片受控长度  (cm)
     uint totalChips;                         //灯控芯片数量

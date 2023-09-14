@@ -761,13 +761,76 @@ int getGroupList_service_handler(const Request& request, Response& response){
 }
 
 
-int send2Buffer_service_handler(const Request& request, Response& response){
+int stripPointControl_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "send2Buffer_service_handler: " << requestBody.toJsonString();
-    string command = requestBody.getData("request").getString("commandString");
+    string payload = requestBody.getData("request").getString("payload");
+    string device_id = requestBody.getData("request").getString("device_id");
+    string command;
+    command.append("E8FF000000000203");
+    command.append(SnAddressMap::getInstance()->deviceSn2Address(device_id));
+    command.append(payload);
     string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
     TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
     telinkDonglePtr->write2Seria(command);
+    response.set_content(okResponse.dump(), "text/json");
+    return 0;
+}
+
+
+int configNightStrip_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "configNightStrip_service_handler: " << requestBody.toJsonString();
+    requestBody.setString("service_id", Config_Device_Property_Service_ID);
+    qlibc::QData responseBody;
+    httpUtil::sitePostRequest("127.0.0.1", 9001, requestBody, responseBody);
+    
+    qlibc::QData deviceList = requestBody.getData("request").getData("device_list");
+    Json::ArrayIndex deviceListSize = deviceList.size();
+    for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+        qlibc::QData ithData = deviceList.getArrayElement(i);
+        string snAddress = SnAddressMap::getInstance()->deviceSn2Address(ithData.getString("device_id"));
+        if(snAddress.empty())   continue;
+        qlibc::QData stripProperty = ithData.getData("stripProperty");
+        if(stripProperty.empty())   continue;
+        try{
+            double strip_length = stripProperty.asValue()["strip_length"].asDouble();
+            double lighting_range = stripProperty.asValue()["lighting_range"].asDouble();
+            double led_spacing = stripProperty.asValue()["led_spacing"].asDouble();
+            uint switch_time = stripProperty.asValue()["switch_time"].asUInt();
+            uint totalChips = static_cast<uint>(strip_length / led_spacing);
+            uint singleCtrlChips = static_cast<uint>(lighting_range / led_spacing);
+
+            string totalChipsHex, singleCtrlChipsHex, switchTimeHex;
+            stringstream ss;
+            ss << std::hex << std::uppercase << std::setfill('0') << std::setw(4)  << totalChips;
+            totalChipsHex = ss.str();
+            ss.str("");
+
+            ss << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << singleCtrlChips;
+            singleCtrlChipsHex = ss.str();
+            ss.str("");
+
+            ss << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << switch_time;
+            switchTimeHex = ss.str();
+
+            string command;
+            command.append("E8FF000000000203");
+            command.append(snAddress);
+            command.append("E000000211");
+            command.append(totalChipsHex);
+            command.append(singleCtrlChipsHex);
+            command.append(switchTimeHex);
+            command.append(switchTimeHex);
+            command.append("01");
+            string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
+            TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
+            telinkDonglePtr->write2Seria(command);
+
+        }catch(const exception& e){
+            LOG_RED << "stripProperty format error: " << e.what();
+        }
+    }
     response.set_content(okResponse.dump(), "text/json");
     return 0;
 }

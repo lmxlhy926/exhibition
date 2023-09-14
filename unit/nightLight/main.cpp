@@ -40,8 +40,8 @@ int main(int argc, char* argv[]) {
     serviceSiteManager->setSiteIdSummary(LightFlowSiteID, LightFlowSiteName);
 
     //单例对象
-    sendBuffer::getInstance();      //指令缓存
-    lightManage::getInstance();     //加载灯带对象
+    // sendBuffer::getInstance();      //指令缓存
+    // lightManage::getInstance();     //加载灯带对象
     
 
     //保存灯带
