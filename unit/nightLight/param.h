@@ -29,6 +29,7 @@ static const int LightFlowSitePort = 9020;
 static const string SaveStrip_Service_ID          = "saveStrip";           //保存灯带
 static const string DelStrip_Service_ID           = "delStrip";            //删除灯带
 static const string GetStripList_Service_ID       = "getStripList";        //获取灯带列表
+static const string StripPointControl_Service_ID  = "stripPointControl";   //亮灯点控制
 static const string RadarPoint_Service_ID         = "radarPoint";          //雷达点位
 
 

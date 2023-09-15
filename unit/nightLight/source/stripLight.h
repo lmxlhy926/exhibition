@@ -117,9 +117,6 @@ private:
     //设置本次需要点亮的芯片标号
     void setChipIndexs2Open(LogicalStripType const& logicalStrip, std::vector<CoordPointType> const& points, std::vector<uint>& chipIndex2Open);
 
-    //依据编号控制灯带
-    void controlStrip(std::vector<uint> index2Open, std::vector<uint> index2Close);
-
     //点位比较
     bool pointsEqual(CoordPointType first, CoordPointType second);
 
@@ -127,7 +124,7 @@ private:
     void printPoint(const string& msg, const CoordPointType& point);
 
     //打印开启关闭索引
-    void printIndex(std::vector<uint> index2Open, std::vector<uint> index2Close);
+    void printIndex(std::vector<uint> index2Open);
 
     //打印索引
     void printIndex(const string& msg, std::vector<uint> indexVec);

@@ -64,7 +64,7 @@ int delStrip_service_request_handler(const Request& request, Response& response)
 
 //获取灯带列表
 int getStripList_service_request_handler(const Request& request, Response& response){
-     qlibc::QData requestBody(request.body);
+    qlibc::QData requestBody(request.body);
     LOG_INFO << "getStripList_service_request_handler: " << requestBody.toJsonString();
     qlibc::QData ret;
     ret.setInt("code", 0);
@@ -73,3 +73,4 @@ int getStripList_service_request_handler(const Request& request, Response& respo
     response.set_content(ret.toJsonString(), "text/json");
     return 0;
 }
+

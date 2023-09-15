@@ -18,7 +18,5 @@ int delStrip_service_request_handler(const Request& request, Response& response)
 //获取灯带列表
 int getStripList_service_request_handler(const Request& request, Response& response);
 
-//控制灯带灯珠
-
 
 #endif

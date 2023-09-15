@@ -13,6 +13,7 @@
 #include "qlibc/QData.h"
 #include "log/Logging.h"
 #include "sourceManage/snAddressMap.h"
+#include "sourceManage/bleConfig.h"
 #include "sourceManage/groupAddressMap.h"
 #include "siteService/service_site_manager.h"
 #include "../parameter.h"
@@ -367,6 +368,53 @@ private:
         rs.read2Byte(groupAddress);
     }
 };
+
+
+//灯带参数配置成功
+class StripConfigStatus : ReportEvent{
+private:
+    string sourceData;
+    string unicast_address;
+    string group_address;
+    string opcode;
+    string status;
+public:
+    explicit StripConfigStatus(string data) : sourceData(std::move(data)){
+        init();
+    }
+
+    void postEvent() override{
+            string device_id = SnAddressMap::getInstance()->address2DeviceSn(unicast_address);
+            if(device_id.empty()){
+                return;
+            }
+            string device_name = bleConfig::getInstance()->getDeviceName(device_id);
+
+            bool isConfigSuccess = ((status == "00") ? true : false);
+            qlibc::QData status;
+            status.setString("device_id", device_id);
+            status.setString("device_name", device_name);
+            if(isConfigSuccess){
+                status.setString("config", "success");
+                LOG_GREEN << "==>StripConfigStatus: " << status.toJsonString();
+            }else{
+                status.setString("config", "failed");
+                LOG_RED << "==>StripConfigStatus: " << status.toJsonString();
+            }
+    }
+
+private:
+    void init(){
+        LOG_GREEN << "==>stripConfigStatus: " << spaceIntervalFormat(sourceData);
+        ReadBinaryString rs(sourceData);
+        rs.read2Byte(unicast_address);
+        rs.read2Byte(group_address);
+        rs.read2Byte(opcode);
+        rs.read2Byte();
+        rs.readByte(status);
+    }
+};
+
 
 //开关状态
 class LightOnOffStatus : ReportEvent{

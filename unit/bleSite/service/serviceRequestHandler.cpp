@@ -761,15 +761,79 @@ int getGroupList_service_handler(const Request& request, Response& response){
 }
 
 
-int stripPointControl_service_handler(const Request& request, Response& response){
-    qlibc::QData requestBody(request.body);
-    LOG_INFO << "send2Buffer_service_handler: " << requestBody.toJsonString();
-    string payload = requestBody.getData("request").getString("payload");
-    string device_id = requestBody.getData("request").getString("device_id");
+//灯带控制
+string controlStrip(std::vector<uint> const& index2Open, string device_id){
     string command;
     command.append("E8FF000000000203");
     command.append(SnAddressMap::getInstance()->deviceSn2Address(device_id));
-    command.append(payload);
+    command.append("E2");
+    command.append("00000211");
+
+    //聚合所有控制索引
+    std::vector<uint> index2Ctrl;
+    copy(index2Open.begin(), index2Open.end(), back_inserter(index2Ctrl));
+    if(index2Ctrl.empty()){
+        command.append("0000");
+        command.append("000000000000");
+        return command;
+    }
+
+    //拆分控制索引的高2位和低8位
+    std::vector<string> high2ByteVec;
+    std::vector<uint> lightsCtrlVec;
+    for(auto& elem : index2Ctrl){
+        std::bitset<10> uintBitset(elem);
+        high2ByteVec.push_back(uintBitset.to_string().substr(0, 2));
+        lightsCtrlVec.push_back((uintBitset & std::bitset<10>("0011111111")).to_ulong());
+    }
+
+    //高2位的16进制字符串表示
+    string high2ByteBinaryStr;
+    for(auto pos = high2ByteVec.crbegin(); pos != high2ByteVec.crend(); ++pos){
+        high2ByteBinaryStr.append(*pos);
+    }
+    stringstream ss;
+    ss << std::uppercase << std::hex << std::setw(4) << std::setfill('0') << std::bitset<16>(high2ByteBinaryStr).to_ulong();
+    string high2ByteStr = ss.str();
+
+    //所有待控制的索引的低8位字符串表示
+    string  light2CtrlStr;
+    for(auto& elem : lightsCtrlVec){
+        stringstream ss;
+        ss << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << elem;
+        light2CtrlStr.append(ss.str());
+    }
+    //不需要控制的点位填补0
+    uint size2Zero = 6 - index2Ctrl.size();
+    for(int i = 0; i < size2Zero; ++i){
+        light2CtrlStr.append("00");
+    }
+
+    //构造控制命令字符串
+    command.append(high2ByteStr);
+    command.append(light2CtrlStr);
+    return command;
+}
+
+
+int stripPointControl_service_handler(const Request& request, Response& response){
+    qlibc::QData requestBody(request.body);
+    LOG_INFO << "stripPointControl_service_handler: " << requestBody.toJsonString();
+    string device_id = requestBody.getData("request").getString("device_id");
+    qlibc::QData controlPoints = requestBody.getData("request").getData("controlPoints");
+    Json::ArrayIndex size = controlPoints.size();
+    std::vector<uint> controlPointVec;
+    for(Json::ArrayIndex i = 0; i < size; ++i){
+        try{
+            uint index = controlPoints.getArrayElement(i).asValue().asUInt();
+            if(controlPointVec.size() < 6){     //最多控制6个点
+                 controlPointVec.push_back(index);
+            }
+        }catch(const exception& e){
+            LOG_RED << "throw exception in controlStripPoint: " << e.what();
+        }
+    }
+    string command = controlStrip(controlPointVec, device_id);
     string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
     TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
     telinkDonglePtr->write2Seria(command);
@@ -804,7 +868,8 @@ int configNightStrip_service_handler(const Request& request, Response& response)
             string totalChipsHex, singleCtrlChipsHex, switchTimeHex;
             stringstream ss;
             ss << std::hex << std::uppercase << std::setfill('0') << std::setw(4)  << totalChips;
-            totalChipsHex = ss.str();
+            totalChipsHex.append(ss.str().substr(2, 2));
+            totalChipsHex.append(ss.str().substr(0, 2));
             ss.str("");
 
             ss << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << singleCtrlChips;
@@ -812,7 +877,8 @@ int configNightStrip_service_handler(const Request& request, Response& response)
             ss.str("");
 
             ss << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << switch_time;
-            switchTimeHex = ss.str();
+            switchTimeHex.append(ss.str().substr(2, 2));
+            switchTimeHex.append(ss.str().substr(0, 2));
 
             string command;
             command.append("E8FF000000000203");

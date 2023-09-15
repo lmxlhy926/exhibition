@@ -48,6 +48,7 @@ string SnAddressMap::address2DeviceSn(string address){
     return "";
 }
 
+
 //index步进
 void SnAddressMap::indexForward(uint forward){
     std::lock_guard<std::recursive_mutex> lg(rMutex_);

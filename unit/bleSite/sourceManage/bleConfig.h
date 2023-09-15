@@ -52,6 +52,9 @@ public:
     //获取设备列表
     QData getDeviceListData();
 
+    //获取设备名称
+    string getDeviceName(string device_id);
+
     //设备列表中插入新绑定的设备条目
     void insertDeviceItem(string& deviceID, qlibc::QData& property);
 

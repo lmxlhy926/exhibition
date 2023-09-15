@@ -102,6 +102,10 @@ void RecvPackageParse::parse2Event(string& completePackageString) {
         }else if(opcode == "804A"){     //解绑消息
             rs.rollBack(6);
             UnBindResult(rs.remainingString()).postEvent();
+
+        }else if(opcode == "C411"){
+            rs.rollBack(6);
+            StripConfigStatus(rs.remainingString()).postEvent();
         }
     }
 }

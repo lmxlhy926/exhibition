@@ -63,28 +63,23 @@ void stripLight::handleRadarPoints(const RadarPointsType& allPoints){
         }
     }
 
-    //记录需要保持的索引
-    std::vector<uint> chipIndex2Saved;
-    for(auto& elem : chipOpendIndex){
-        auto pos = find(chipIndex2Open.begin(), chipIndex2Open.end(), elem);
-        if(pos != chipIndex2Open.end()){
-            chipIndex2Saved.push_back(elem);
-        }
+    if(chipIndex2Open == chipOpendIndex){
+        LOG_PURPLE << "contorl points is identical, no need to control...";
+        return;
     }
+    chipOpendIndex = chipIndex2Open;
+    //将要控制的点位
+    printIndex(chipIndex2Open);
 
-    for(auto& elem : chipIndex2Saved){
-        chipOpendIndex.erase(remove(chipOpendIndex.begin(), chipOpendIndex.end(), elem), chipOpendIndex.end()); //剔除需要保持的，剩下的是需要关闭的
-        chipIndex2Open.erase(remove(chipIndex2Open.begin(), chipIndex2Open.end(), elem), chipIndex2Open.end()); //剔除已经打开的，剩下的是真正需要打开的
+    Json::Value controlPointsValue;
+    for(auto elem : chipIndex2Open){
+        controlPointsValue.append(elem);
     }
-
-    std::vector<uint> chipIndex2Close = chipOpendIndex;
-    //记录所有打开的的索引
-    chipOpendIndex = chipIndex2Saved;
-    copy(chipIndex2Open.begin(), chipIndex2Open.end(), back_inserter(chipOpendIndex));
-
-   
-    //控制需要操作的索引
-    controlStrip(chipIndex2Open, chipIndex2Close);
+    Json::Value commandValue;
+    commandValue["device_id"] = physicalStrip.device_id;
+    commandValue["sourceSite"] = physicalStrip.sourceSite;
+    commandValue["controlPoints"] = controlPointsValue;
+    sendBuffer::getInstance()->enque(commandValue);
     return;
 }
 
@@ -147,69 +142,11 @@ int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPoin
 void stripLight::setChipIndexs2Open(LogicalStripType const& logicalStrip, std::vector<CoordPointType> const& points, std::vector<uint>& chipIndex2Open){
     //找出有受控点的编号
     for(auto& point : points){
-        if(chipIndex2Open.size() >= 3) break;
+        if(chipIndex2Open.size() >= 6) break;
         int chipIndex = getCtrlChipIndex(logicalStrip, point);
         if(chipIndex == -1) continue;
         chipIndex2Open.push_back(chipIndex);
     }
-    return;
-}
-
-
-void stripLight::controlStrip(std::vector<uint> index2Open, std::vector<uint> index2Close){
-    //打印将要控制的索引
-    printIndex(index2Open, index2Close);
-
-    //聚合所有控制索引
-    std::vector<uint> index2Ctrl;
-    copy(index2Open.begin(), index2Open.end(), back_inserter(index2Ctrl));
-    copy(index2Close.begin(), index2Close.end(), back_inserter(index2Ctrl));
-    if(index2Ctrl.empty())  return;
-
-    //拆分控制索引的高2位和低8位
-    std::vector<string> high2ByteVec;
-    std::vector<uint> lightsCtrlVec;
-    for(auto& elem : index2Ctrl){
-        std::bitset<10> uintBitset(elem);
-        high2ByteVec.push_back(uintBitset.to_string().substr(0, 2));
-        lightsCtrlVec.push_back((uintBitset & std::bitset<10>("0011111111")).to_ulong());
-    }
-
-    //高2位的16进制字符串表示
-    string high2ByteBinaryStr;
-    for(auto pos = high2ByteVec.crbegin(); pos != high2ByteVec.crend(); ++pos){
-        high2ByteBinaryStr.append(*pos);
-    }
-    stringstream ss;
-    ss << std::uppercase << std::hex << std::setw(4) << std::setfill('0') << std::bitset<16>(high2ByteBinaryStr).to_ulong();
-    string high2ByteStr = ss.str();
-
-    //所有待控制的索引的低8位字符串表示
-    string  light2CtrlStr;
-    for(auto& elem : lightsCtrlVec){
-        stringstream ss;
-        ss << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << elem;
-        light2CtrlStr.append(ss.str());
-    }
-    //不需要控制的点位填补0
-    uint size2Zero = 6 - index2Ctrl.size();
-    for(int i = 0; i < size2Zero; ++i){
-        light2CtrlStr.append("00");
-    }
-
-    //构造控制命令字符串
-    string command;
-    command.append("E2");
-    command.append("00000211");
-    command.append(high2ByteStr);
-    command.append(light2CtrlStr);
-
-    Json::Value commandValue;
-    commandValue["device_id"] = physicalStrip.device_id;
-    commandValue["sourceSite"] = physicalStrip.sourceSite;
-    commandValue["payload"] = command;
-    sendBuffer::getInstance()->enque(commandValue);
-
     return;
 }
 
@@ -227,16 +164,12 @@ void stripLight::printPoint(const string& msg, const CoordPointType& point){
 }
 
 
-void stripLight::printIndex(std::vector<uint> index2Open, std::vector<uint> index2Close){
+void stripLight::printIndex(std::vector<uint> index2Open){
     Json::Value printValue, openList, closeList;
     for(auto& elem : index2Open){   
         openList.append(elem);
     }
-    for(auto& elem : index2Close){
-        closeList.append(elem);
-    }
     printValue["openIndexList"] = openList;
-    printValue["closeIndexList"] = closeList;
     LOG_PURPLE << "index2Control: " << qlibc::QData(printValue).toJsonString(true);
 }
 

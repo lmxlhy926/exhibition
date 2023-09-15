@@ -66,6 +66,20 @@ QData bleConfig::getDeviceListData(){
     return deviceListData;
 }
 
+string bleConfig::getDeviceName(string device_id){
+    std::lock_guard<std::recursive_mutex> lg(rMutex_);
+    qlibc::QData deviceList = bleConfig::getInstance()->getDeviceListData().getData("device_list");
+    Json::ArrayIndex deviceListSize = deviceList.size();
+    for(Json::ArrayIndex i = 0; i < deviceListSize; ++i){
+        qlibc::QData ithData = deviceList.getArrayElement(i);
+        if(device_id == ithData.getString("device_id")){
+            return ithData.getString("device_name");
+        }
+    }
+    return "";
+}
+
+
 /*
  * 如果设备列表有该条目，则先删除该条目
  * 将新设备添加入设备列表中

@@ -62,6 +62,7 @@ int main(int argc, char* argv[]) {
         return getStripList_service_request_handler(request, response);
     });
 
+    
     //雷达点位模拟
     serviceSiteManager->registerServiceRequestHandler(RadarPoint_Service_ID,
                                                       [](const Request& request, Response& response) -> int{
