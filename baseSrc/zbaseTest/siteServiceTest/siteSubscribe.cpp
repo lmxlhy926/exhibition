@@ -3,22 +3,23 @@
 #include "common/httpUtil.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
-#include "log/Logging.h"
 
 using namespace std;
 using namespace servicesite;
 using namespace httplib;
 using json = nlohmann::json;
 
+
 void messageHandler(const Request& request){
-    LOG_INFO << request.body;
+    qlibc::QData data(request.body);
+    printf("%s\n", data.toJsonString());
+    ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
+    serviceSiteManager->publishMessage("reportAllTargets", data.toJsonString());
 }
 
 
 int main(int argc, char* argv[]) {
-//    string path = "/data/changhong/edge_midware/lhy/siteScribe.txt";
-//    muduo::logInitLogger(path);
-
+  
     httplib::ThreadPool threadPool_(10);
     // 创建 serviceSiteManager 对象, 单例
     ServiceSiteManager* serviceSiteManager = ServiceSiteManager::getInstance();
@@ -26,28 +27,20 @@ int main(int argc, char* argv[]) {
     ServiceSiteManager::setSiteIdSummary("scribeSite", "订阅测试站点");
 
     //注册白名单改变处理函数
-    serviceSiteManager->registerMessageHandler( "scanResultMsg", messageHandler);
-    serviceSiteManager->registerMessageHandler( "singleDeviceBindSuccessMsg", messageHandler);
-    serviceSiteManager->registerMessageHandler( "bindEndMsg", messageHandler);
-    serviceSiteManager->registerMessageHandler( "singleDeviceUnbindSuccessMsg", messageHandler);
-    serviceSiteManager->registerMessageHandler( "device_state_changed", messageHandler);
-
+    serviceSiteManager->registerMessageHandler( "reportAllTargets", messageHandler);
+   
     threadPool_.enqueue([&](){
         while(true){
             std::vector<string> messageIdList{
-                    "scanResultMsg",
-                    "singleDeviceBindSuccessMsg",
-                    "bindEndMsg",
-                    "singleDeviceUnbindSuccessMsg",
-                    "device_state_changed"
+                    "reportAllTargets",
             };
-            int code = serviceSiteManager->subscribeMessage("192.168.7.232", 9007, messageIdList);
+            int code = serviceSiteManager->subscribeMessage("192.168.0.122", 9003, messageIdList);
             if (code == ServiceSiteManager::RET_CODE_OK) {
-                LOG_INFO << "subscribeMessage ok.";
+                printf("subscribeMessage ok...\n")
                 break;
             }
             std::this_thread::sleep_for(std::chrono::seconds(3));
-            LOG_INFO << "subscribed  failed....., start to subscribe in 3 seconds";
+            printf("subscribed  failed....., start to subscribe in 3 seconds...\n");
         }
     });
 
@@ -58,12 +51,9 @@ int main(int argc, char* argv[]) {
             //自启动方式
             int code = serviceSiteManager->start();
             if(code != 0){
-                LOG_INFO << "===>scribeSite startByRegister error, code = ";
-                LOG_INFO << "===>scribeSite startByRegister in 3 seconds....";
+                printf("===>scribeSite startByRegister error....\n");
+                printf("===>scribeSite startByRegister in 3 seconds....\n");
                 std::this_thread::sleep_for(std::chrono::seconds(3));
-            }else{
-                LOG_INFO << "===>scribeSite startByRegister successfully.....";
-                break;
             }
         }
     });
