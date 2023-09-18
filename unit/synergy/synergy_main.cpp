@@ -13,6 +13,8 @@
 #include "common/httpUtil.h"
 #include "sourceManage/deviceManager.h"
 #include "sourceManage/groupManager.h"
+#include "sourceManage/lightManage.h"
+#include "sourceManage/sendBuffer.h"
 #include "log/Logging.h"
 
 using namespace std;
@@ -43,6 +45,8 @@ int main(int argc, char* argv[]) {
     DeviceManager::getInstance();
     GroupManager::getInstance();
     siteManager::getInstance();
+    sendBuffer::getInstance();      //指令缓存
+    lightManage::getInstance();     //加载灯带对象
 
 //注册服务
     //设备控制 + 场景命令
@@ -190,6 +194,30 @@ int main(int argc, char* argv[]) {
     //获取分组列表
     serviceSiteManager->registerServiceRequestHandler(GetGroupList_Device_Service_ID, synergy::getGroupList_service_handler);
 
+    //保存灯带
+    serviceSiteManager->registerServiceRequestHandler(SaveStrip_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::saveStrip_service_request_handler(request, response);
+    });
+
+    //删除灯带
+    serviceSiteManager->registerServiceRequestHandler(DelStrip_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::delStrip_service_request_handler(request, response);
+    });
+
+    //获取灯带列表
+    serviceSiteManager->registerServiceRequestHandler(GetStripList_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::getStripList_service_request_handler(request, response);
+    });
+
+    
+    //雷达点位模拟
+    serviceSiteManager->registerServiceRequestHandler(RadarPoint_Service_ID,
+                                                      [](const Request& request, Response& response) -> int{
+        return synergy::radarPoint_service_request_handler(request, response);
+    });
 
 
     //声明消息
@@ -212,6 +240,24 @@ int main(int argc, char* argv[]) {
     servicesite::ServiceSiteManager::registerMessageHandler(Device_State_Changed,          synergy::messagePublish);
     servicesite::ServiceSiteManager::registerMessageHandler(DeviceOnOffLineMsg,            synergy::messagePublish);
     servicesite::ServiceSiteManager::registerMessageHandler(TriggerSceneMsg,               synergy::messagePublish);
+    servicesite::ServiceSiteManager::registerMessageHandler(Radar_Msg_MessageID,           synergy::radarMessageHandle);
+
+
+    //雷达点位消息
+    threadPool_.enqueue([&](){
+        while(true){
+            int code;
+            std::vector<string> messageIdList;
+            messageIdList.push_back(Radar_Msg_MessageID);
+            code = serviceSiteManager->subscribeMessage("192.168.0.122", 9003, messageIdList);
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                LOG_PURPLE << "subscribeMessage radarPoints ok....";
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            LOG_RED << "subscribeMessage radarPoints failed....., start to subscribe in 10 seconds";
+        }
+    });
 
 
     // 站点监听线程启动

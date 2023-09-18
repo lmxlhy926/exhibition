@@ -64,12 +64,21 @@ static const string AddDevice2Group_Device_Service_ID           = "add_device_to
 static const string RemoveDeviceFromGroup_Device_Service_ID     = "remove_device_from_group";       //从分组删除设备
 static const string ControlGroup_Device_Service_ID              = "control_group";                  //控制分组
 static const string GetGroupList_Device_Service_ID              = "get_group_list";                 //获取分组列表
-static const string StirpConfig_Service_ID                      = "stripConfig";                    //灯带配置
-static const string StripPointControl_Service_ID                = "stripPointControl";              //亮灯点控制
+
+
+//夜灯服务ID
+static const string StirpConfig_Service_ID        = "stripConfig";         //灯带配置
+static const string StripPointControl_Service_ID  = "stripPointControl";   //亮灯点控制
+static const string SaveStrip_Service_ID          = "saveStrip";           //保存灯带
+static const string DelStrip_Service_ID           = "delStrip";            //删除灯带
+static const string GetStripList_Service_ID       = "getStripList";        //获取灯带列表
+static const string RadarPoint_Service_ID         = "radarPoint";          //雷达点位
 
 
 //订阅消息ID
 static const string Site_OnOffLine_MessageID        =   "site_onoffline";
+//订阅雷达
+static const string Radar_Msg_MessageID             =   "reportAllTargets";
 //订阅蓝牙站点的消息
 static const string ScanResultMsg                   =   "scanResultMsg";                     //扫描结果消息
 static const string SingleDeviceBindSuccessMsg      =   "singleDeviceBindSuccessMsg";        //单个设备绑定成功
@@ -83,5 +92,6 @@ static const string TriggerSceneMsg                 =   "trigger_scene";        
 //发布消息ID
 static const string Scene_Msg_MessageID             =   "sceneMsg";
 static const string DeviceGroupList_Update_Message  =   "deviceGroupListUpdateMsg";
+
 
 #endif //EXHIBITION_PARAM_H
