@@ -78,7 +78,7 @@ static const string RadarPoint_Service_ID         = "radarPoint";          //雷
 //订阅消息ID
 static const string Site_OnOffLine_MessageID        =   "site_onoffline";
 //订阅雷达
-static const string Radar_Msg_MessageID             =   "reportAllTargets";
+static const string Radar_Msg_MessageID             =   "reportTracingTargets";
 //订阅蓝牙站点的消息
 static const string ScanResultMsg                   =   "scanResultMsg";                     //扫描结果消息
 static const string SingleDeviceBindSuccessMsg      =   "singleDeviceBindSuccessMsg";        //单个设备绑定成功

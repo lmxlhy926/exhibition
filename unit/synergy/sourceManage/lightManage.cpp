@@ -252,7 +252,7 @@ string lightManage::areaNum2RoomNo(const string& areaNo, std::map<string, string
     if(pos != areaRoomMap.end()){
         return pos->second;
     }
-    return "";
+    return areaNo;
 }
 
 
@@ -285,9 +285,11 @@ RadarPointsType lightManage::trans2PointSequence(qlibc::QData& pointData){
     for(Json::ArrayIndex i = 0; i < areaListSize; ++i){
         qlibc::QData ithData = areaList.getArrayElement(i);
         string roomNo = areaNum2RoomNo(ithData.getString("areaNo"), areaRoomMap);
+        if(roomNo.empty())  continue;
         qlibc::QData targetList = ithData.getData("targetList");
         std::vector<CoordPointType> coordPointVec = getCoordPointVec(targetList);
-        auto pos = rp.find("roomNo");
+        if(coordPointVec.empty())   continue;
+        auto pos = rp.find(roomNo);
         if(pos == rp.end()){
             rp.insert(std::make_pair(roomNo, coordPointVec));
         }else{

@@ -244,20 +244,20 @@ int main(int argc, char* argv[]) {
 
 
     //雷达点位消息
-    threadPool_.enqueue([&](){
-        while(true){
-            int code;
-            std::vector<string> messageIdList;
-            messageIdList.push_back(Radar_Msg_MessageID);
-            code = serviceSiteManager->subscribeMessage("192.168.0.122", 9003, messageIdList);
-            if (code == ServiceSiteManager::RET_CODE_OK) {
-                LOG_PURPLE << "subscribeMessage radarPoints ok....";
-                break;
-            }
-            std::this_thread::sleep_for(std::chrono::seconds(10));
-            LOG_RED << "subscribeMessage radarPoints failed....., start to subscribe in 10 seconds";
-        }
-    });
+    // threadPool_.enqueue([&](){
+    //     while(true){
+    //         int code;
+    //         std::vector<string> messageIdList;
+    //         messageIdList.push_back(Radar_Msg_MessageID);
+    //         code = serviceSiteManager->subscribeMessage("192.168.0.115", 8999, messageIdList);
+    //         if (code == ServiceSiteManager::RET_CODE_OK) {
+    //             LOG_PURPLE << "subscribeMessage radarPoints ok....";
+    //             break;
+    //         }
+    //         std::this_thread::sleep_for(std::chrono::seconds(10));
+    //         LOG_RED << "subscribeMessage radarPoints failed....., start to subscribe in 10 seconds";
+    //     }
+    // });
 
 
     // 站点监听线程启动
