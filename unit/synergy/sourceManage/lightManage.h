@@ -5,19 +5,40 @@
 #include <map>
 #include <vector>
 #include <mutex>
+#include <sys/time.h>
 #include "sendBuffer.h"
+#include "common/httpUtil.h"
 
 class lightManage{
 private:
     string start_time;  //响应起始时间
     string end_time;    //响应结束时间
     qlibc::QData logicalStripata;   //逻辑灯带数据
-    std::recursive_mutex Mutex;
+    qlibc::QData whiteListData;
+    std::thread* updateWhiteListThread;
     std::map<string, stripLight> stripLightContainer;   //灯带管理<deviceid, stripLight>
+    std::recursive_mutex Mutex;
+    long timeMomentRecord{0};
     static lightManage* Instance;
+
     lightManage(){
         loadStripLightsContainer();
+        //创建线程定时更新白名单
+        updateWhiteListThread = new thread([this](){
+            qlibc::QData deviceRequest, deviceResponse;
+            deviceRequest.setString("service_id", "whiteListRequest");
+            deviceRequest.setValue("request", Json::nullValue);
+            while(true){
+                if(httpUtil::sitePostRequest("127.0.0.1", 9006, deviceRequest, deviceResponse)){
+                    std::lock_guard<std::recursive_mutex> lg(Mutex);
+                    this->whiteListData = deviceResponse.getData("response");
+                    break;
+                }
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+        });
     }
+
 public:
     static lightManage* getInstance(){
         if(nullptr == Instance){
@@ -83,6 +104,9 @@ private:
 
     //打印转换坐标集
     void printPointSequence(const RadarPointsType& radarPoints);
+
+    //获取时间精确到微秒
+    long getNowTime();
 };
 
 #endif

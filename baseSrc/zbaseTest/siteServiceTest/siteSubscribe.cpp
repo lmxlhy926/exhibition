@@ -3,19 +3,12 @@
 #include "common/httpUtil.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
+#include "log/Logging.h"
 
 using namespace std;
 using namespace servicesite;
 using namespace httplib;
 using json = nlohmann::json;
-
-
-void messageHandler(const Request& request){
-    qlibc::QData data(request.body);
-    printf("%s\n", data.toJsonString().c_str());
-    qlibc::QData response;
-    httpUtil::sitePostRequest("172.29.90.147", 9007, data, response);
-}
 
 int main(int argc, char* argv[]) {
     qlibc::QData configData;
@@ -41,7 +34,16 @@ int main(int argc, char* argv[]) {
 
     //注册白名单改变处理函数
     for(auto& elem : messageIdList){
-        serviceSiteManager->registerMessageHandler(elem, messageHandler);
+        serviceSiteManager->registerMessageId(elem);
+        serviceSiteManager->registerMessageHandler(elem, [&serviceSiteManager](const Request& request){
+            bool is2Handle{true};
+            if(is2Handle){
+                LOG_PURPLE << "---------RADAR MESSAGE---------";
+                qlibc::QData data(request.body);
+                string messageId = data.getString("message_id");
+                serviceSiteManager->publishMessage(messageId, data.toJsonString());
+            }
+        });
     }
 
    
@@ -58,22 +60,13 @@ int main(int argc, char* argv[]) {
     });
 
 
-    // 站点监听线程启动
-    threadPool_.enqueue([&](){
-        while(true){
-            //自启动方式
-            int code = serviceSiteManager->start();
-            if(code != 0){
-                printf("===>scribeSite startByRegister error....\n");
-                printf("===>scribeSite startByRegister in 3 seconds....\n");
-                std::this_thread::sleep_for(std::chrono::seconds(3));
-            }
-        }
-    });
-
-
     while(true){
-        std::this_thread::sleep_for(std::chrono::seconds(60 *10));
+        int code = serviceSiteManager->start();
+        if(code != 0){
+            printf("===>scribeSite startByRegister error....\n");
+            printf("===>scribeSite startByRegister in 3 seconds....\n");
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+        }
     }
 
     return 0;

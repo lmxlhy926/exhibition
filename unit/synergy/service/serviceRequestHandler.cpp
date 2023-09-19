@@ -21,6 +21,9 @@
 
 using namespace servicesite;
 
+static uint radarMessageIndex{0};
+static mutex indexMutex;
+
 namespace synergy {
 
     std::vector<string> sceneVec = {
@@ -586,6 +589,7 @@ namespace synergy {
         ServiceSiteManager::getInstance()->publishMessage(message_id, requestData.toJsonString());
         return;
     }
+
 
     void radarMessageHandle(const Request& request){
         qlibc::QData requestBody(request.body);

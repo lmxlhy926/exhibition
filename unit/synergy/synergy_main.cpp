@@ -249,7 +249,7 @@ int main(int argc, char* argv[]) {
     //         int code;
     //         std::vector<string> messageIdList;
     //         messageIdList.push_back(Radar_Msg_MessageID);
-    //         code = serviceSiteManager->subscribeMessage("192.168.0.115", 8999, messageIdList);
+    //         code = serviceSiteManager->subscribeMessage("127.0.0.1", 9003, messageIdList);
     //         if (code == ServiceSiteManager::RET_CODE_OK) {
     //             LOG_PURPLE << "subscribeMessage radarPoints ok....";
     //             break;

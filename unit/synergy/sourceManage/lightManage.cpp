@@ -101,6 +101,17 @@ qlibc::QData lightManage::getLogicalStripList(){
 
 
 void lightManage::handleRadarPoints(qlibc::QData&  pointData){
+    bool is2Handle{false};
+    {
+        long now = getNowTime();
+        std::lock_guard<std::recursive_mutex> lg(Mutex);
+        if(now - timeMomentRecord >= 300 * 1000){
+            timeMomentRecord = now;
+            is2Handle = true;
+        }
+    }
+    if(!is2Handle)  return;
+
     if(!isInValidTime()){
         LOG_RED << "NOT IN VALID TIME....";
         return;
@@ -121,19 +132,9 @@ bool lightManage::getDeviceList(qlibc::QData& deviceList){
 
 
 bool lightManage::getWhiteList(qlibc::QData& whiteList){
-    qlibc::QData deviceRequest, deviceResponse;
-    deviceRequest.setString("service_id", "whiteListRequest");
-    deviceRequest.setValue("request", Json::nullValue);
-    int count{};
-    while(count < 3){
-        if(httpUtil::sitePostRequest("127.0.0.1", 9006, deviceRequest, deviceResponse)){
-            whiteList = deviceResponse.getData("response");
-            return true;
-        }else{
-            ++count;
-        }
-    }
-    return false;
+    std::lock_guard<std::recursive_mutex> lg(Mutex);
+    whiteList = whiteListData;
+    return true;
 }
 
 
@@ -285,6 +286,7 @@ RadarPointsType lightManage::trans2PointSequence(qlibc::QData& pointData){
     for(Json::ArrayIndex i = 0; i < areaListSize; ++i){
         qlibc::QData ithData = areaList.getArrayElement(i);
         string roomNo = areaNum2RoomNo(ithData.getString("areaNo"), areaRoomMap);
+        roomNo = "1";
         if(roomNo.empty())  continue;
         qlibc::QData targetList = ithData.getData("targetList");
         std::vector<CoordPointType> coordPointVec = getCoordPointVec(targetList);
@@ -317,5 +319,11 @@ void lightManage::printPointSequence(const RadarPointsType& radarPoints){
     LOG_YELLOW << "radarPoints: " << qlibc::QData(value).toJsonString();
 }
 
+
+long lightManage::getNowTime(){
+    struct timeval tv{};
+    gettimeofday(&tv, nullptr);
+    return tv.tv_sec * 1000 * 1000 + tv.tv_usec;
+}
 
 
