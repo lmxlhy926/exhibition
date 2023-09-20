@@ -842,6 +842,52 @@ int stripPointControl_service_handler(const Request& request, Response& response
 }
 
 
+string getHex(uint num){
+    stringstream ss;
+    ss << std::hex << std::uppercase << std::setfill('0') << std::setw(2)  << num;
+    return ss.str();
+}
+
+
+std::vector<string> getbrightColorCommand(uint brightness, uint color_temperature, uint controlNum, string prefix){
+    if(color_temperature < 2700){
+        color_temperature = 2700;
+    }else if(color_temperature > 6500){
+        color_temperature = 6500;
+    }
+    uint delta = color_temperature - 2700;
+    double proportion = delta / (6500 - 2700);
+
+    uint coldLight = static_cast<uint>(brightness * delta);
+    uint warmLight = static_cast<uint>(brightness * (1 - delta));
+
+    string common;
+    common.append(prefix);
+    common.append("E1");
+    common.append("00000211");
+
+    uint value = controlNum / 2;
+    uint module = controlNum % 2;
+
+    std::vector<string> commandVec;
+    for(int i = 1; i <= value; ++i){
+        string extra;
+        extra.append(getHex(i));
+        extra.append(getHex(coldLight)).append(getHex(warmLight)).append("00");
+        extra.append(getHex(coldLight)).append(getHex(warmLight)).append("00");
+        commandVec.push_back(string(common).append(extra));
+    }
+    if(module != 0){
+        string extra;
+        extra.append(getHex(value + 1));
+        extra.append(getHex(coldLight)).append(getHex(warmLight)).append("00");
+        extra.append("000000");
+        commandVec.push_back(string(common).append(extra));
+    }
+    return commandVec;
+}
+
+
 int configNightStrip_service_handler(const Request& request, Response& response){
     qlibc::QData requestBody(request.body);
     LOG_INFO << "configNightStrip_service_handler: " << requestBody.toJsonString();
@@ -862,6 +908,8 @@ int configNightStrip_service_handler(const Request& request, Response& response)
             double lighting_range = stripProperty.asValue()["lighting_range"].asDouble();
             double led_spacing = stripProperty.asValue()["led_spacing"].asDouble();
             uint switch_time = stripProperty.asValue()["switch_time"].asUInt();
+            uint brightness = stripProperty.asValue()["brightness"].asUInt();
+            uint color_temperature = stripProperty.asValue()["color_temperature"].asUInt();
             uint totalChips = static_cast<uint>(strip_length / led_spacing);
             uint singleCtrlChips = static_cast<uint>(lighting_range / led_spacing);
 
@@ -892,6 +940,14 @@ int configNightStrip_service_handler(const Request& request, Response& response)
             string serialName = bleConfig::getInstance()->getSerialData().getString("serial");
             TelinkDongle* telinkDonglePtr = TelinkDongle::getInstance(serialName);
             telinkDonglePtr->write2Seria(command);
+
+            //发送亮度色温参数
+            string prefix;
+            prefix.append("E8FF000000000203").append(snAddress);
+            std::vector<string> commandVec = getbrightColorCommand(brightness, color_temperature, singleCtrlChips, prefix);
+            for(auto& elem : commandVec){
+                telinkDonglePtr->write2Seria(elem);
+            }
 
         }catch(const exception& e){
             LOG_RED << "stripProperty format error: " << e.what();

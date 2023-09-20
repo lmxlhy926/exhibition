@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <thread>
+#include <regex>
 #include "qlibc/QData.h"
 #include "log/Logging.h"
 #include "common/httpUtil.h"

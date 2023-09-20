@@ -28,7 +28,7 @@ void sendBuffer::sendCommand(){
         request.setValue("request", command);
         LOG_GREEN << "request: " << request.toJsonString();
         httpUtil::sitePostRequest("127.0.0.1", SynergySitePort, request, response);
-        LOG_YELLOW << "response: " << response.toJsonString();
+        LOG_BLUE << "response: " << response.toJsonString();
     }
 }
 

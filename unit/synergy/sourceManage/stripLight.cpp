@@ -62,11 +62,9 @@ void stripLight::handleRadarPoints(const RadarPointsType& allPoints){
             }
         }
     }
+    //控制点相同，无需控制
+    if(chipIndex2Open == chipOpendIndex)    return;
 
-    if(chipIndex2Open == chipOpendIndex){
-        LOG_PURPLE << "contorl points is identical, no need to control...";
-        return;
-    }
     chipOpendIndex = chipIndex2Open;
     //将要控制的点位
     printIndex(chipIndex2Open);
@@ -115,6 +113,7 @@ int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPoin
     printPoint("handlePoint", point);
     //得到交叉点
     CoordPointType crossPoint = getCrossPoint(logicalStrip, point);
+    printPoint("crossPoint", crossPoint);
     //计算交叉点距离起始点的距离
     double crossPoint2Start = sqrt(pow((crossPoint.y - logicalStrip.start.y), 2) + pow((crossPoint.x - logicalStrip.start.x), 2));
     //计算交叉点距离点位的距离
@@ -129,8 +128,7 @@ int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPoin
 
     //如果不是受控点，则控制编号返回-1
     if(!(dropPointMatch && distanceMatch)){
-        // LOG_RED << "MATCH FAILED ...";
-        // LOG_INFO << "************************************************************";
+        LOG_INFO << "MATCH FAILED...";
         return -1;
     }  
     
@@ -142,7 +140,6 @@ int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPoin
         ctrolChipIndex = logicalStrip.endChipNum;
     }
 
-    printPoint("crossPoint", crossPoint);
     LOG_HLIGHT << "crossPoint2Start: " << crossPoint2Start;
     LOG_HLIGHT << "crossPoint2Point: " << crossPoint2Point;
     LOG_PURPLE << "MATCH INDEX: " << ctrolChipIndex;

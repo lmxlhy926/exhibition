@@ -4,6 +4,7 @@
 #include "../param.h"
 #include "deviceManager.h"
 #include <algorithm>
+#include <regex>
 
 static const string STRIPLIST_PATH = "/data/changhong/edge_midware/stripDeviceList.json";
 
@@ -40,8 +41,6 @@ bool lightManage::addExecuteObj(qlibc::QData& data, qlibc::QData deviceList){
 
         //有相应物理灯带存在，则加入逻辑灯带。没有物理灯带存在，则先创建物理灯带，然后加入逻辑灯带
         StripParamType sp = getStripParam(stripDeviceId, deviceList);
-        //刷新物理灯带信息，向网关发送灯带配置信息
-        configPhysicalStrip(sp);
         auto pos = stripLightContainer.find(stripDeviceId);
         if(pos != stripLightContainer.end()){
             pos->second.addExecuteObj(execuObjName, logicalStripVec);
@@ -94,12 +93,6 @@ qlibc::QData lightManage::getLogicalStripList(){
 }
 
 
- void lightManage::updatePhysicalStrip(qlibc::QData& deviceList){
-
-
- }
-
-
 void lightManage::handleRadarPoints(qlibc::QData&  pointData){
     bool is2Handle{false};
     {
@@ -116,6 +109,7 @@ void lightManage::handleRadarPoints(qlibc::QData&  pointData){
         LOG_RED << "NOT IN VALID TIME....";
         return;
     }
+
     RadarPointsType pointSequence = trans2PointSequence(pointData);
     std::lock_guard<std::recursive_mutex> lg(Mutex);
     for(auto& elem : stripLightContainer){
@@ -218,14 +212,15 @@ void lightManage::storeStripLightsContainer(){
 }
 
 
-void lightManage::configPhysicalStrip(const StripParamType& sp){
-    string command;
-    // sendBuffer::getInstance()->enque(command);
-}
-
-
 bool lightManage::isInValidTime(){
-    return true;
+    int start = getHourMinute(start_time);
+    int end = getHourMinute(end_time);
+    if(start == -1 || end == -1)    return false;
+    int now = getHourMinute();
+    if(start <= now && now <= end){
+        return true;
+    }
+    return false;
 }
 
 
@@ -326,4 +321,27 @@ long lightManage::getNowTime(){
     return tv.tv_sec * 1000 * 1000 + tv.tv_usec;
 }
 
+int lightManage::getHourMinute(string timeStr){
+    smatch sm;
+    bool isMatch = regex_match(timeStr, sm, regex("([[:digit:]]{2}):([[:digit:]]{2})"));
+    if(isMatch){
+        try{
+            int hour = stol(sm.str(1), nullptr, 10);
+            int minute = stol(sm.str(2), nullptr, 10);
+            return hour * 60 + minute;
+        }catch(const exception& e){
+            LOG_INFO << "getHourMinute exception: " << e.what();
+        }
+    }
+    return -1;
+}
+
+int lightManage::getHourMinute(){
+    struct timeval tv{};
+    gettimeofday(&tv, nullptr);
+    struct tm *tm_time = localtime(&tv.tv_sec);
+    int hour = tm_time->tm_hour;
+    int minute = tm_time->tm_min;
+    return hour * 60 + minute;
+}
 

@@ -56,9 +56,6 @@ public:
     //获取夜灯灯带列表
     qlibc::QData getLogicalStripList();
 
-    //更新物理灯带信息
-    void updatePhysicalStrip(qlibc::QData& deviceList);
-
      //处理雷达点位
     void handleRadarPoints(qlibc::QData& pointData);
 
@@ -84,9 +81,6 @@ private:
     //存储灯带列表
     void storeStripLightsContainer();
 
-    //物理灯带配置
-    void configPhysicalStrip(const StripParamType& sp);
-
     //判断时刻是否在响应范围内
     bool isInValidTime();
 
@@ -107,6 +101,12 @@ private:
 
     //获取时间精确到微秒
     long getNowTime();
+
+    //字符串转为分钟数
+    int getHourMinute(string timeStr);
+
+    //获取当前的分钟数
+    int getHourMinute();
 };
 
 #endif
