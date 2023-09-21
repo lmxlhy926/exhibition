@@ -7,3 +7,5 @@
 /build_cygwin
 /.vscode
 /shell/addressExtract
+unit/zunitTest/nightStripTest/config.json
+baseSrc/zbaseTest/siteServiceTest/config.json

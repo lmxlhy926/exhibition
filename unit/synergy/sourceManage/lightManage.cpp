@@ -98,7 +98,7 @@ void lightManage::handleRadarPoints(qlibc::QData&  pointData){
     {
         long now = getNowTime();
         std::lock_guard<std::recursive_mutex> lg(Mutex);
-        if(now - timeMomentRecord >= 300 * 1000){
+        if(now - timeMomentRecord >= 150 * 1000){
             timeMomentRecord = now;
             is2Handle = true;
         }

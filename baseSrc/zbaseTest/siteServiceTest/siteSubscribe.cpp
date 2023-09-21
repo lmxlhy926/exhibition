@@ -1,14 +1,38 @@
 
 #include <thread>
+#include <sys/time.h>
+#include <unistd.h>
+#include <time.h>
 #include "common/httpUtil.h"
 #include "siteService/nlohmann/json.hpp"
 #include "siteService/service_site_manager.h"
 #include "log/Logging.h"
+#include <map>
 
 using namespace std;
 using namespace servicesite;
 using namespace httplib;
 using json = nlohmann::json;
+
+
+string time2HourMinute(time_t time){
+    struct tm *tm_time = localtime(&time);
+    int hour = tm_time->tm_hour;
+    int minute = tm_time->tm_min;
+    int seconds = tm_time->tm_sec;
+    return string().append(std::to_string(hour)).append(":").append(std::to_string(minute)).append(":").append(std::to_string(seconds));
+}
+
+void storeData(std::map<time_t, Json::Value>& dataMap){
+    qlibc::QData data;
+    for(auto& elem : dataMap){
+        Json::Value value;
+        value[time2HourMinute(elem.first)] = elem.second;
+        data.append(value);
+    }
+    data.saveToFile("./pointData.json", true);
+}
+
 
 int main(int argc, char* argv[]) {
     qlibc::QData configData;
@@ -33,16 +57,33 @@ int main(int argc, char* argv[]) {
     ServiceSiteManager::setSiteIdSummary("scribeSite", "订阅测试站点");
 
     //注册白名单改变处理函数
+    std::map<time_t, Json::Value> dataMap;
+    time_t latestMinute = time(nullptr);
+    bool start = true;
     for(auto& elem : messageIdList){
         serviceSiteManager->registerMessageId(elem);
-        serviceSiteManager->registerMessageHandler(elem, [&serviceSiteManager](const Request& request){
-            bool is2Handle{true};
-            if(is2Handle){
-                LOG_PURPLE << "---------RADAR MESSAGE---------";
-                qlibc::QData data(request.body);
-                string messageId = data.getString("message_id");
-                serviceSiteManager->publishMessage(messageId, data.toJsonString());
+        serviceSiteManager->registerMessageHandler(elem, [&serviceSiteManager, &dataMap, &latestMinute, &start](const Request& request){
+            qlibc::QData data(request.body);
+            time_t now = time(nullptr);
+            if(now - latestMinute > 10 || start){
+                latestMinute = now;
+                Json::Value value;
+                value.append(data.asValue());
+                dataMap.insert(std::make_pair(now, value));
+                start = false;
+            }else{
+                auto pos = dataMap.find(latestMinute);
+                if(pos != dataMap.end()){
+                    pos->second.append(data.asValue());
+                }
             }
+            
+            storeData(dataMap);
+            LOG_INFO << data.toJsonString();
+            LOG_PURPLE << "-------------";
+            string messageId = data.getString("message_id");
+            serviceSiteManager->publishMessage(messageId, data.toJsonString());
+            
         });
     }
 

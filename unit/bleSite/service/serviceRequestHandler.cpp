@@ -858,8 +858,8 @@ std::vector<string> getbrightColorCommand(uint brightness, uint color_temperatur
     uint delta = color_temperature - 2700;
     double proportion = delta / (6500 - 2700);
 
-    uint coldLight = static_cast<uint>(brightness * delta);
-    uint warmLight = static_cast<uint>(brightness * (1 - delta));
+    uint coldLight = static_cast<uint>(brightness * proportion);
+    uint warmLight = static_cast<uint>(brightness * (1 - proportion));
 
     string common;
     common.append(prefix);

@@ -39,30 +39,73 @@ void sendPoints(std::vector<CoordPoint> pointsVec){
     loop(targetList);
 }
 
+void sendPoint(double x, double y){
+    std::vector<CoordPoint> pointsVec;
+    CoordPoint point;
+    point.x = x;
+    point.y = y;
+    pointsVec.push_back(point);
+    sendPoints(pointsVec);
+}
 
-int main(int argc, char* argv[]){
+
+void stripTest(qlibc::QData& data){
+    double start_x = data.asValue()["strip"]["start_x"].asDouble();
+    double start_y = data.asValue()["strip"]["start_y"].asDouble();
+    double end_x = data.asValue()["strip"]["end_x"].asDouble();
+    double end_y = data.asValue()["strip"]["end_y"].asDouble();
+    uint num = data.asValue()["strip"]["num"].asInt();
+    uint interval = data.asValue()["strip"]["interval"].asInt();
+
+    double k = (end_y - start_y) /(end_x - start_x);
+    double forwardDelta = (end_x - start_x) / num;
+    double backwardDelta = (start_x - end_x) / num;
     while(true){
-        for(double x = 6.35, y = 5.19; x > 4.12; x += -0.1){
-            std::vector<CoordPoint> pointsVec;
-            CoordPoint point;
-            point.x = x;
-            point.y = y;
-            pointsVec.push_back(point);
-            sendPoints(pointsVec);
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        double x = start_x;
+        double y = start_y;
+        for(int i = 0; i < num; ++i){
+            x += forwardDelta;
+            y += k * forwardDelta;
+            sendPoint(x, y);
+            std::this_thread::sleep_for(std::chrono::milliseconds(interval));
         }
 
-        for(double x = 4.12, y = 5.19; x < 6.35; x += 0.1){
-            std::vector<CoordPoint> pointsVec;
-            CoordPoint point;
-            point.x = x;
-            point.y = y;
-            pointsVec.push_back(point);
-            sendPoints(pointsVec);
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        x = end_x;
+        y = end_y;
+        for(int i = 0; i < num; ++i){
+            x += backwardDelta;
+            y += k * backwardDelta;
+            sendPoint(x, y);
+            std::this_thread::sleep_for(std::chrono::milliseconds(interval));
         }
     }
-   
+}
+
+
+void pointTest(qlibc::QData& data){
+    qlibc::QData simulationPoint = data.getData("simulationPoint");
+    Json::ArrayIndex size = simulationPoint.size();
+    for(Json::ArrayIndex i = 0; i < size; ++size){
+        qlibc::QData request= simulationPoint.getArrayElement(i);
+        qlibc::QData response;
+        httpUtil::sitePostRequest("127.0.0.1", 9007, request, response);
+        LOG_INFO << request.toJsonString();
+        std::this_thread::sleep_for(std::chrono::microseconds(200));
+    }
+}
+
+
+
+int main(int argc, char* argv[]){
+    qlibc::QData data;
+    data.loadFromFile("/home/lhy/smarthome/exhibition/unit/zunitTest/nightStripTest/config.json");
+    bool simulate_strip = data.getBool("simulate_strip");
+    bool simulate_point = data.getBool("simulate_point");
+    if(simulate_strip){
+        stripTest(data);
+    }else{
+        pointTest(data);
+    }
     return 0;
 }
 

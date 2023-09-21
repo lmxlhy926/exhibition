@@ -213,13 +213,6 @@ int main(int argc, char* argv[]) {
     });
 
     
-    //雷达点位模拟
-    serviceSiteManager->registerServiceRequestHandler(RadarPoint_Service_ID,
-                                                      [](const Request& request, Response& response) -> int{
-        return synergy::radarPoint_service_request_handler(request, response);
-    });
-
-
     //声明消息
     serviceSiteManager->registerMessageId(Scene_Msg_MessageID);            //场景指令消息
     serviceSiteManager->registerMessageId(ScanResultMsg);                  //扫描结果
@@ -244,20 +237,20 @@ int main(int argc, char* argv[]) {
 
 
     //雷达点位消息
-    // threadPool_.enqueue([&](){
-    //     while(true){
-    //         int code;
-    //         std::vector<string> messageIdList;
-    //         messageIdList.push_back(Radar_Msg_MessageID);
-    //         code = serviceSiteManager->subscribeMessage("127.0.0.1", 9003, messageIdList);
-    //         if (code == ServiceSiteManager::RET_CODE_OK) {
-    //             LOG_PURPLE << "subscribeMessage radarPoints ok....";
-    //             break;
-    //         }
-    //         std::this_thread::sleep_for(std::chrono::seconds(10));
-    //         LOG_RED << "subscribeMessage radarPoints failed....., start to subscribe in 10 seconds";
-    //     }
-    // });
+    threadPool_.enqueue([&](){
+        while(true){
+            int code;
+            std::vector<string> messageIdList;
+            messageIdList.push_back(Radar_Msg_MessageID);
+            code = serviceSiteManager->subscribeMessage("127.0.0.1", 9003, messageIdList);
+            if (code == ServiceSiteManager::RET_CODE_OK) {
+                LOG_PURPLE << "subscribeMessage radarPoints ok....";
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            LOG_RED << "subscribeMessage radarPoints failed....., start to subscribe in 10 seconds";
+        }
+    });
 
 
     // 站点监听线程启动
