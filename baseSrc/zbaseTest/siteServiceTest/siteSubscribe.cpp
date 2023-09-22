@@ -77,10 +77,7 @@ int main(int argc, char* argv[]) {
                     pos->second.append(data.asValue());
                 }
             }
-            
-            storeData(dataMap);
-            LOG_INFO << data.toJsonString();
-            LOG_PURPLE << "-------------";
+            LOG_PURPLE << "------radarMessage-------";
             string messageId = data.getString("message_id");
             serviceSiteManager->publishMessage(messageId, data.toJsonString());
             

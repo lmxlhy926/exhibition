@@ -178,5 +178,6 @@ then
 	#拷贝到指定目录
 	echo "copy sites to /mnt/d/bywg/outbin/arm64 .........";
 	cp /home/lhy/smarthome/exhibition/out/arm64/*site /mnt/d/bywg/outbin/arm64/
+	cp /home/lhy/smarthome/exhibition/out/arm64/nightStripTest /mnt/d/bywg/outbin/arm64/
 fi
 

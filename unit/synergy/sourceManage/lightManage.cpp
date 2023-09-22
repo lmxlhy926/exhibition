@@ -259,9 +259,11 @@ std::vector<CoordPointType> lightManage::getCoordPointVec(qlibc::QData& targetLi
         qlibc::QData ithData = targetList.getArrayElement(i);
         double x = ithData.asValue()["x"].asDouble();
         double y = ithData.asValue()["y"].asDouble();
+        uint identity = ithData.asValue()["identity"].asUInt();
         CoordPointType cp;
         cp.x = x;
         cp.y = y;
+        cp.identity = identity;
         coordPointVec.push_back(cp);
     }
     return coordPointVec;
@@ -281,7 +283,7 @@ RadarPointsType lightManage::trans2PointSequence(qlibc::QData& pointData){
     for(Json::ArrayIndex i = 0; i < areaListSize; ++i){
         qlibc::QData ithData = areaList.getArrayElement(i);
         string roomNo = areaNum2RoomNo(ithData.getString("areaNo"), areaRoomMap);
-        roomNo = "1";
+        if(roomNo != "8")   continue;
         if(roomNo.empty())  continue;
         qlibc::QData targetList = ithData.getData("targetList");
         std::vector<CoordPointType> coordPointVec = getCoordPointVec(targetList);
@@ -311,7 +313,8 @@ void lightManage::printPointSequence(const RadarPointsType& radarPoints){
        }
        value[elem.first] = pointList;
     }
-    LOG_YELLOW << "radarPoints: " << qlibc::QData(value).toJsonString();
+    if(value.empty())   return;
+    LOG_YELLOW << "transedRadarPoints: " << qlibc::QData(value).toJsonString();
 }
 
 

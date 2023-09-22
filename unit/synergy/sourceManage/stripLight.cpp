@@ -116,8 +116,10 @@ int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPoin
     printPoint("crossPoint", crossPoint);
     //计算交叉点距离起始点的距离
     double crossPoint2Start = sqrt(pow((crossPoint.y - logicalStrip.start.y), 2) + pow((crossPoint.x - logicalStrip.start.x), 2));
+     LOG_HLIGHT << "crossPoint2Start: " << crossPoint2Start;
     //计算交叉点距离点位的距离
     double crossPoint2Point = sqrt(pow((crossPoint.y - point.y), 2) + pow((crossPoint.x - point.x), 2));
+    LOG_HLIGHT << "crossPoint2Point: " << crossPoint2Point;
     
     //判断落点和受控距离
     std::vector<double> absxVec{abs(logicalStrip.start.x), fabs(logicalStrip.end.x)};
@@ -140,8 +142,6 @@ int stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPoin
         ctrolChipIndex = logicalStrip.endChipNum;
     }
 
-    LOG_HLIGHT << "crossPoint2Start: " << crossPoint2Start;
-    LOG_HLIGHT << "crossPoint2Point: " << crossPoint2Point;
     LOG_PURPLE << "MATCH INDEX: " << ctrolChipIndex;
     LOG_INFO << "************************************************************";
     return ctrolChipIndex;
@@ -169,6 +169,7 @@ void stripLight::printPoint(const string& msg, const CoordPointType& point){
     Json::Value pointValue;
     pointValue["x"] = point.x;
     pointValue["y"] = point.y;
+    pointValue["identity"] = point.identity;
     LOG_HLIGHT << msg << ": " << qlibc::QData(pointValue).toJsonString();
 }
 

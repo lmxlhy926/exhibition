@@ -10,8 +10,9 @@ using namespace std;
 
 //坐标点位
 struct CoordPointType{
-    double x;   //x坐标
-    double y;   //y坐标
+    double x;       //x坐标
+    double y;       //y坐标
+    uint identity;  //人员编号
 };
 
 //灯带灯光控制参数
