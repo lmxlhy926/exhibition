@@ -93,6 +93,25 @@ qlibc::QData lightManage::getLogicalStripList(){
 }
 
 
+void lightManage::udpatePhysicalStrip(qlibc::QData& request){
+    std::lock_guard<std::recursive_mutex> lg(Mutex);
+    qlibc::QData device_list = request.getData("request").getData("device_list");
+    string sourceSite = request.getData("request").getString("sourceSite");
+    Json::ArrayIndex size = device_list.size();
+    for(Json::ArrayIndex i = 0; i < size; ++i){
+        qlibc::QData ithData = device_list.getArrayElement(i);
+        string device_id = ithData.getString("device_id");
+        ithData.setString("sourceSite", sourceSite);
+        StripParamType sp = stripData2Struct(ithData.asValue());
+        if(!sp.valid)   continue;
+        auto pos = stripLightContainer.find(device_id);
+        if(pos != stripLightContainer.end()){
+            pos->second.updatePhysicalStrip(sp);
+        }
+    }
+}
+
+
 void lightManage::handleRadarPoints(qlibc::QData&  pointData){
     bool is2Handle{false};
     {
@@ -135,14 +154,6 @@ bool lightManage::getWhiteList(qlibc::QData& whiteList){
 StripParamType lightManage::stripData2Struct(const Json::Value& data){
     StripParamType sp{};
     try{
-        struct NightLightCtlParamType param;
-        memset(&param, 0, sizeof(param));
-        param.night2Light_brightness =          data["stripProperty"]["brightness"].asInt();
-        param.night2Light_color_temperature =   data["stripProperty"]["color_temperature"].asInt();
-        param.night2Light_swithTime =           data["stripProperty"]["switch_time"].asInt();
-        param.light2Night_swithTime =           data["stripProperty"]["switch_time"].asInt();
-        
-        sp.lightParam = param;
         sp.device_id =          data["device_id"].asString();
         sp.sourceSite =         data["sourceSite"].asString();
         sp.strip_length =       data["stripProperty"]["strip_length"].asDouble();
@@ -259,11 +270,13 @@ std::vector<CoordPointType> lightManage::getCoordPointVec(qlibc::QData& targetLi
         qlibc::QData ithData = targetList.getArrayElement(i);
         double x = ithData.asValue()["x"].asDouble();
         double y = ithData.asValue()["y"].asDouble();
+        string device_id = ithData.asValue()["device_id"].asString();
         uint identity = ithData.asValue()["identity"].asUInt();
         CoordPointType cp;
         cp.x = x;
         cp.y = y;
         cp.identity = identity;
+        cp.device_id = device_id;
         coordPointVec.push_back(cp);
     }
     return coordPointVec;
@@ -283,7 +296,7 @@ RadarPointsType lightManage::trans2PointSequence(qlibc::QData& pointData){
     for(Json::ArrayIndex i = 0; i < areaListSize; ++i){
         qlibc::QData ithData = areaList.getArrayElement(i);
         string roomNo = areaNum2RoomNo(ithData.getString("areaNo"), areaRoomMap);
-        if(roomNo != "8")   continue;
+        if(roomNo != "8")   continue;   //todo 这里是为了b10测试
         if(roomNo.empty())  continue;
         qlibc::QData targetList = ithData.getData("targetList");
         std::vector<CoordPointType> coordPointVec = getCoordPointVec(targetList);
@@ -307,6 +320,8 @@ void lightManage::printPointSequence(const RadarPointsType& radarPoints){
        Json::Value pointList;
        for(auto& coordPoint: coordPointVec){
             Json::Value point;
+            point["device_id"] = coordPoint.device_id;
+            point["identity"] = coordPoint.identity;
             point["x"] = coordPoint.x;
             point["y"] = coordPoint.y;
             pointList.append(point);

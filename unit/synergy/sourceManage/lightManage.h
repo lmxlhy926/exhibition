@@ -56,6 +56,9 @@ public:
     //获取夜灯灯带列表
     qlibc::QData getLogicalStripList();
 
+    //更新物理灯带参数
+    void udpatePhysicalStrip(qlibc::QData& request);
+
      //处理雷达点位
     void handleRadarPoints(qlibc::QData& pointData);
 

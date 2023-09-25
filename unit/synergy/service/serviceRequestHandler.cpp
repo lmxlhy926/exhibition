@@ -380,6 +380,8 @@ namespace synergy {
 //配置灯带属性
     int configNightStrip_service_handler(const Request& request, Response& response){
         LOG_INFO << "synergy->configNightStrip_service_handler: " << qlibc::QData(request.body).toJsonString();
+        qlibc::QData requestData(request.body);
+        lightManage::getInstance()->udpatePhysicalStrip(requestData);
         sendRequest(request, response);
         return 0;
     }

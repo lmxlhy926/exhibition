@@ -62,6 +62,7 @@ void sendPoint(double x, double y, string areaNo){
         Json::Value targetListItem;
         targetListItem["x"] = elem.x;
         targetListItem["y"] = elem.y;
+        targetListItem["identity"] = 1;
         targetList.append(targetListItem);
     }
     sendMessage2SynergySite(targetList, areaNo);
