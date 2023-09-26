@@ -26,17 +26,16 @@ muduo::TimeStamp muduo::TimeStamp::fromUnixTime(time_t t) {
     //时间戳转换为：年月日时分秒时间结构
     struct timeval tv{};
     struct timezone tz{};
-    struct tm *tm_time = nullptr;
-
+    struct tm tm_time;
     gettimeofday(&tv, &tz);
-    tm_time = localtime(&tv.tv_sec);
+    localtime_r(&tv.tv_sec, &tm_time);
 
     if(printOption){
         snprintf(buf, sizeof buf, "%4d-%02d-%02d %02d:%02d:%02d:%06ld",
-                 tm_time->tm_year + 1900, tm_time->tm_mon + 1, tm_time->tm_mday,
-                 tm_time->tm_hour, tm_time->tm_min, tm_time->tm_sec, tv.tv_usec);
+                 tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_mday,
+                 tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec, tv.tv_usec);
     }else{
-        strftime(buf, sizeof buf, "%Y-%m-%d %H:%M:%S", tm_time);
+        strftime(buf, sizeof buf, "%Y-%m-%d %H:%M:%S", &tm_time);
     }
 
     return string(buf, strlen(buf));

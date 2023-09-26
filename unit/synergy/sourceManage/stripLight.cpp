@@ -106,7 +106,7 @@ void stripLight::handleRadarPoints(const RadarPointsType& allPoints){
         commandValue["controlPoints"] = indexValue;
         sendBuffer::getInstance()->enque(commandValue);
     }
-    LOG_PURPLE << "index2Control: " << qlibc::QData(commandValue).toJsonString(true);
+    LOG_PURPLE << "index2Control: " << qlibc::QData(commandValue).toJsonString();
     return;
 }
 

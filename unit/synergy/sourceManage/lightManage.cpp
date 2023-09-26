@@ -5,6 +5,7 @@
 #include "deviceManager.h"
 #include <algorithm>
 #include <regex>
+#include <chrono>
 
 static const string STRIPLIST_PATH = "/data/changhong/edge_midware/stripDeviceList.json";
 
@@ -296,7 +297,7 @@ RadarPointsType lightManage::trans2PointSequence(qlibc::QData& pointData){
     for(Json::ArrayIndex i = 0; i < areaListSize; ++i){
         qlibc::QData ithData = areaList.getArrayElement(i);
         string roomNo = areaNum2RoomNo(ithData.getString("areaNo"), areaRoomMap);
-        if(roomNo != "8")   continue;   //todo 这里是为了b10测试
+        // if(roomNo != "8")   continue;   //todo 这里是为了b10测试
         if(roomNo.empty())  continue;
         qlibc::QData targetList = ithData.getData("targetList");
         std::vector<CoordPointType> coordPointVec = getCoordPointVec(targetList);
@@ -357,9 +358,10 @@ int lightManage::getHourMinute(string timeStr){
 int lightManage::getHourMinute(){
     struct timeval tv{};
     gettimeofday(&tv, nullptr);
-    struct tm *tm_time = localtime(&tv.tv_sec);
-    int hour = tm_time->tm_hour;
-    int minute = tm_time->tm_min;
+    struct tm tm_time;
+    localtime_r(&tv.tv_sec, &tm_time);
+    int hour = tm_time.tm_hour;
+    int minute = tm_time.tm_min;
     return hour * 60 + minute;
 }
 
