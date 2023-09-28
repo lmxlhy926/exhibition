@@ -127,10 +127,10 @@ CoordPointType stripLight::getCrossPoint(LogicalStripType const& logicalStrip, C
         CoordPointType end = logicalStrip.end;
         double k = (end.y - start.y) / (end.x - start.x);
         double b = start.y - k * start.x;
-        LOG_HLIGHT << "logicalStripLine: " << k << " * x + " << b;
+        LOG_INFO << "logicalStripLine: " << k << " * x + " << b;
         double k0 = -1 / k;
         double b0 = point.y - k0 * point.x;
-        LOG_HLIGHT << "crossLine:        " << k0 << " * x + " << b0;
+        LOG_INFO << "crossLine:        " << k0 << " * x + " << b0;
         crossPoint.x = (b0 - b) / (k - k0);
         crossPoint.y = k * crossPoint.x + b;
     }
@@ -139,17 +139,13 @@ CoordPointType stripLight::getCrossPoint(LogicalStripType const& logicalStrip, C
 
 
 struct ControlPointType stripLight::getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPointType const& point){
-    printPoint("handlePoint", point);
+    printPoint("tag handlePoint", point);
     //得到交叉点
     CoordPointType crossPoint = getCrossPoint(logicalStrip, point);
-    printPoint("crossPoint", crossPoint);
     //计算交叉点距离起始点的距离
     double crossPoint2Start = sqrt(pow((crossPoint.y - logicalStrip.start.y), 2) + pow((crossPoint.x - logicalStrip.start.x), 2));
-    LOG_HLIGHT << "crossPoint2Start: " << crossPoint2Start;
     //计算交叉点距离点位的距离
     double crossPoint2Point = sqrt(pow((crossPoint.y - point.y), 2) + pow((crossPoint.x - point.x), 2));
-    LOG_HLIGHT << "crossPoint2Point: " << crossPoint2Point;
-    
     //判断落点和受控距离
     std::vector<double> absxVec{abs(logicalStrip.start.x), fabs(logicalStrip.end.x)};
     double min_x = *min_element(absxVec.begin(), absxVec.end());
@@ -157,9 +153,26 @@ struct ControlPointType stripLight::getCtrlChipIndex(LogicalStripType const& log
     bool dropPointMatch = min_x <= fabs(crossPoint.x) && fabs(crossPoint.x) <= max_x;
     bool distanceMatch = crossPoint2Point <= physicalStrip.sensing_distance;
 
+    printPoint("tag crossPoint", crossPoint);
+    stringstream ss;
+    ss << std::setw(2) << crossPoint2Start/physicalStrip.strip_length * 100;
+    if(dropPointMatch){
+        LOG_HLIGHT << "tag cross x:  "  << crossPoint.x << "       Match " << ss.str() << "%";
+    }else if(min_x > fabs(crossPoint.x)){
+        LOG_RED << "tag cross x:  "     << crossPoint.x << "       DisMatch, X lower  < " << min_x;
+    }else if(fabs(crossPoint.x) > max_x){
+        LOG_RED << "tag cross x:  "     << crossPoint.x << "       DisMatch, X higher > " << max_x;
+    }
+
+    if(distanceMatch){
+        LOG_HLIGHT << "tag distance: "  << crossPoint2Point << "  Match...";
+    }else{
+        LOG_RED    << "tag distance: "  << crossPoint2Point << "  Dismatch...";
+    }
+
     //如果不是受控点，则控制编号返回-1
     if(!(dropPointMatch && distanceMatch)){
-        LOG_INFO << "MATCH FAILED...";
+        LOG_INFO << "tag MATCH FAILED...";
         struct ControlPointType invalidCtrlPoint;
         invalidCtrlPoint.ctrlIndex = -1;
         return invalidCtrlPoint;
@@ -172,7 +185,7 @@ struct ControlPointType stripLight::getCtrlChipIndex(LogicalStripType const& log
         ctrolChipIndex = logicalStrip.endChipNum;
     }
 
-    LOG_PURPLE << "MATCH INDEX: " << ctrolChipIndex;
+    LOG_PURPLE << "tag MATCH INDEX: " << ctrolChipIndex;
     LOG_INFO << "************************************************************";
     
     struct ControlPointType ctrlPoint{};
@@ -212,7 +225,7 @@ void stripLight::printPoint(const string& msg, const CoordPointType& point){
     pointValue["y"] = point.y;
     pointValue["identity"] = point.identity;
     pointValue["device_id"] = point.device_id;
-    LOG_HLIGHT << msg << ": " << qlibc::QData(pointValue).toJsonString();
+    LOG_INFO << msg << ": " << qlibc::QData(pointValue).toJsonString();
 }
 
 

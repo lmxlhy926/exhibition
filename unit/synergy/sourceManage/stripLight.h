@@ -112,6 +112,7 @@ private:
     */
     struct ControlPointType getCtrlChipIndex(LogicalStripType const& logicalStrip, CoordPointType const& point);
 
+    
     //设置本次需要点亮的芯片标号
     void setChipIndexs2Open(LogicalStripType const& logicalStrip, std::vector<CoordPointType> const& points,
                             std::map<int, ControlPointType>& chipIndex2Open);
